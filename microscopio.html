@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estúdio de Microscopia Virtual — Palas Atlas</title>
+  <meta name="description" content="Visualizador de microscopia digital do Palas Atlas — análise morfológica interativa com marcadores anatômicos.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans:  ['Inter',         'system-ui', 'sans-serif'],
+            serif: ['Merriweather',  'serif'],
+            mono:  ['JetBrains Mono','monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- Web Component da Marca (Single Source of Truth) -->
+  <script src="js/brand-logo.js?v=2"></script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+
+    /* Prose do texto descritivo lateral */
+    .prose-atlas h3       { color:#e5e5e5; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
+    .prose-atlas p        { color:#d4d4d4; line-height:1.8; margin-bottom:1rem; }
+    .prose-atlas strong   { color:#fff; font-weight:600; }
+    .prose-atlas .pin-link {
+      color: #38bdf8;
+      text-decoration: underline;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0 2px;
+      transition: color .15s;
+    }
+    .prose-atlas .pin-link:hover { color: #7dd3fc; }
+
+    /* Scrollbar minimalista */
+    ::-webkit-scrollbar       { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #404040; }
+  </style>
+</head>
+
+<body class="bg-neutral-950 w-screen h-screen overflow-hidden flex flex-col font-sans text-slate-200 selection:bg-neutral-800 selection:text-white">
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       BARRA SUPERIOR DO LEITOR (item 1)
+       bg-neutral-950 | borda inferior | Studio Dark
+       ════════════════════════════════════════════════════════════════════ -->
+  <header class="shrink-0 w-full bg-neutral-950 border-b border-neutral-800 px-4 py-2.5 flex items-center justify-between z-50">
+
+    <!-- Esquerda: Voltar + Breadcrumb -->
+    <div class="flex items-center gap-3 min-w-0">
+      <button
+        type="button"
+        onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
+        class="flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-white transition-colors cursor-pointer shrink-0"
+        aria-label="Voltar para Tecido"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Voltar para Tecido
+      </button>
+      <span class="text-neutral-700 select-none hidden sm:block">|</span>
+      <span id="viewerBreadcrumb" class="text-xs text-neutral-500 font-sans tracking-wide truncate max-w-[160px] md:max-w-xs hidden"></span>
+    </div>
+
+    <!-- Direita: Marca monocromática (dark-bg) + ações rápidas -->
+    <div class="flex items-center gap-4 shrink-0">
+      <button
+        type="button"
+        onclick="window.osdViewerAction('reset')"
+        class="text-[11px] font-mono text-neutral-500 hover:text-white transition-colors cursor-pointer"
+        title="Resetar visualização"
+      >1:1</button>
+      <button
+        type="button"
+        onclick="window.osdViewerAction('fullpage')"
+        class="text-neutral-500 hover:text-white transition-colors cursor-pointer"
+        title="Tela cheia"
+        aria-label="Tela cheia"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+        </svg>
+      </button>
+      <brand-logo theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
+    </div>
+
+  </header>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       WORKSPACE: Canvas (esq.) + Painel lateral (dir.)
+       ════════════════════════════════════════════════════════════════════ -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- 70% Esquerda — Estúdio Óptico -->
+    <main class="relative flex-1 h-full bg-neutral-900 border-r border-neutral-800 overflow-hidden flex items-center justify-center">
+
+      <!-- Skeleton / Splash de carregamento -->
+      <div id="osdSkeleton" class="absolute inset-0 bg-neutral-950/95 backdrop-blur-md flex flex-col items-center justify-center z-[99] transition-opacity duration-700">
+        <img src="assets/logo-transparente.png?v=4" class="h-16 w-auto animate-pulse opacity-70" alt="Carregando"/>
+        <p class="text-xs text-neutral-400 tracking-wider mt-4 font-mono">Mapeando estruturas morfológicas...</p>
+      </div>
+
+      <!-- Container Deep Zoom (OpenSeadragon) -->
+      <div id="osd-viewer"
+        class="w-full h-full bg-neutral-950 relative overflow-hidden transition-opacity duration-500 opacity-0"
+      ></div>
+
+      <!-- REVÓLVER DE OBJETIVAS + ZOOM DINÂMICO (Canto inferior esquerdo) -->
+      <div class="absolute bottom-4 left-4 z-20 flex items-center gap-2 p-1.5 rounded-xl bg-zinc-900/95 border border-zinc-700/80 backdrop-blur-md shadow-2xl text-xs font-mono select-none">
+        <!-- Valores nominais das objetivas -->
+        <button type="button" onclick="window.trocarLente(4, this)"    class="lens-btn bg-blue-600 text-white shadow-md font-semibold px-3 py-1 rounded-lg transition-all active-lens" data-mag="4">4x</button>
+        <button type="button" onclick="window.trocarLente(10, this)"   class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="10">10x</button>
+        <button type="button" onclick="window.trocarLente(40, this)"   class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="40">40x</button>
+        <button type="button" onclick="window.trocarLente(60, this)"   class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="60">60x</button>
+        <button type="button" onclick="window.trocarLente(100, this)"  class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="100">100x</button>
+        
+        <!-- Divisor -->
+        <div class="w-[1px] h-4 bg-zinc-700/80 my-auto"></div>
+
+        <!-- Display do Zoom Dinâmico em Tempo Real -->
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-zinc-950/60 border border-zinc-800">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-blue-400 font-bold" id="zoomIndicatorDisplay">4.0x</span>
+        </div>
+      </div>
+
+      <!-- Dica operacional -->
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none text-[10px] text-neutral-600 whitespace-nowrap z-10">
+        Scroll → Zoom &bull; Arrastar → Pan
+      </div>
+
+    </main>
+
+    <!-- 30% Direita — Painel de Informações -->
+    <aside class="w-[380px] h-full bg-neutral-950 text-slate-300 border-l border-neutral-800/80 text-sm leading-relaxed overflow-hidden flex flex-col z-40 shrink-0">
+
+      <!-- Cabeçalho do Painel: Título e Coloração (item 2) -->
+      <div class="p-6 border-b border-neutral-800 bg-neutral-900/40 shrink-0">
+        <h2 id="slideTitle" class="text-xl font-serif font-bold text-white leading-tight tracking-tight">
+          Carregando lâmina...
+        </h2>
+        <p id="slideColoracao" class="mt-2 text-xs font-mono text-neutral-400">
+          Hematoxilina e Eosina (H&amp;E)
+        </p>
+        <span id="slideDisciplina" class="hidden">—</span>
+      </div>
+
+      <!-- Descrição completa com hiperlinks de pinos (item 2) -->
+      <div
+        id="slideDescriptionContainer"
+        class="p-6 flex-1 overflow-y-auto bg-neutral-950"
+        style="-webkit-overflow-scrolling:touch;"
+      >
+        <div class="text-sm text-neutral-500 font-sans italic">
+          As informações desta lâmina serão renderizadas aqui.
+        </div>
+      </div>
+
+    </aside>
+
+  </div><!-- /workspace -->
+
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/microscope-engine.js?v=2026.0813"></script>
+</body>
+</html>

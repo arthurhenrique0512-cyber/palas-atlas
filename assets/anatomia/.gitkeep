@@ -1,0 +1,1 @@
+# Diretório reservado para armazenar as imagens de Anatomia Macroscópica. No banco (Firestore) salvar apenas os caminhos relativos (ex: /assets/anatomia/exemplo.jpg).
