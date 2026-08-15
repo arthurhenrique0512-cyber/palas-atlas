@@ -306,20 +306,36 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
           // CRÍTICO: sem onclick interceptor — o href navega diretamente para microscopio.html
           const imagemUrl = lamina.imagemUrl || lamina.imageUrl || lamina.caminhoImagemBase || lamina.dziUrl || "assets/histologia/muscular-esqueletico-he.jpg";
-          
-          let thumbSrc = imagemUrl;
-          let thumbSrcFallback = imagemUrl;
-          if (imagemUrl.toLowerCase().endsWith(".dzi")) {
-            const basePath = imagemUrl.substring(0, imagemUrl.lastIndexOf('.dzi'));
-            thumbSrc = `${basePath}_files/8/0_0.jpg`;
-            thumbSrcFallback = `${basePath}_files/8/0_0.jpeg`;
+
+          // thumbnailUrl tem prioridade máxima (campo dedicado à pré-visualização)
+          // Se não existir, tenta derivar do DZI ou usar a imagemUrl diretamente
+          let thumbSrc = lamina.thumbnailUrl || "";
+          let thumbSrcFallback = "";
+
+          if (!thumbSrc) {
+            if (imagemUrl.toLowerCase().endsWith(".dzi")) {
+              const basePath = imagemUrl.substring(0, imagemUrl.lastIndexOf('.dzi'));
+              thumbSrc = `${basePath}_files/8/0_0.jpg`;
+              thumbSrcFallback = `${basePath}_files/8/0_0.jpeg`;
+            } else {
+              thumbSrc = imagemUrl;
+              thumbSrcFallback = "assets/histologia/muscular-esqueletico-he.jpg";
+            }
           }
-          
+
+          // Placeholder SVG inline exibido quando nenhuma imagem carrega
+          const placeholderSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='192' viewBox='0 0 400 192'%3E%3Crect width='400' height='192' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='44%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='13' fill='%2394a3b8'%3ESem pré-visualização%3C/text%3E%3Ctext x='50%25' y='62%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23cbd5e1'%3EAbra a lâmina para visualizar%3C/text%3E%3C/svg%3E`;
+
           cardsLaminasHtml += `
             <a href="microscopio.html?id=${lamina.id}" class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm hover:border-sky-500/40 hover:shadow-md transition-all duration-200 overflow-hidden group cursor-pointer flex flex-col justify-between">
               <!-- Thumbnail da Imagem -->
               <div class="w-full h-48 bg-slate-100 relative overflow-hidden rounded-xl">
-                <img src="${thumbSrc}" alt="${nomeLamina}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="if(this.src!=='${thumbSrcFallback}') { this.src='${thumbSrcFallback}'; } else { this.style.display='none'; }">
+                <img
+                  src="${thumbSrc}"
+                  alt="${nomeLamina}"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onerror="this.onerror=null; if('${thumbSrcFallback}' && this.src!=='${thumbSrcFallback}') { this.src='${thumbSrcFallback}'; } else { this.src='${placeholderSvg}'; this.classList.remove('object-cover'); this.classList.add('object-contain','p-4','opacity-80'); }"
+                >
                 <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm font-sans">
                   ${coloracaoNome} - 40x
                 </div>
