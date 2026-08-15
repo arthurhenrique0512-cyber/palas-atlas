@@ -313,13 +313,16 @@
   <main id="mainRouterContainer" class="flex-1 w-full flex flex-col justify-center transition-all duration-300">
     
     <!-- HUB DE ENTRADA (#pgHome) - COMPÊNDIO ACADÊMICO -->
-    <section id="pgHome" style="background-image: url('./assets/hero-bg.jpeg');" class="w-full h-full flex-1 bg-cover bg-center bg-no-repeat bg-fixed text-neutral-100 p-4 md:p-8 pt-8 pb-24 relative overflow-x-hidden">
+    <section id="pgHome" class="w-full h-full flex-1 text-neutral-100 p-4 md:p-8 pt-8 pb-24 relative overflow-x-hidden">
+
+      <!-- Imagem de Fundo (Tag real para evitar bugs de background-fixed no WebKit/Blink) -->
+      <img src="assets/hero-bg.jpeg" alt="Fundo Palas Atlas" class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;">
 
       <!-- Overlay Dark Gradient (Mais suave) -->
-      <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/40 via-neutral-950/60 to-neutral-950/90 pointer-events-none z-0"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/40 via-neutral-950/60 to-neutral-950/90 pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;"></div>
 
       <!-- Textura Sutil de Fundo -->
-      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')] opacity-20 z-0 pointer-events-none"></div>
+      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')] opacity-20 pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;"></div>
 
       <!-- SEÇÃO 1: HERO SECTION -->
       <div class="max-w-6xl mx-auto px-6 flex flex-col items-center justify-center text-center pt-20 md:pt-28 pb-10 md:pb-12 mb-2 relative z-10 animate-fade-in-up">
