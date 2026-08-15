@@ -196,6 +196,11 @@ function inicializarOpenSeadragon() {
   const maxZoomPixelRatioMap = { 40: 1.2, 60: 1.8, 100: 2.5 };
   const maxZoomPixelRatio = maxZoomPixelRatioMap[maxMag] || 1.2;
 
+  // FIX BUG 1: Garantir min-height no container para evitar colapso no Safari iOS
+  if (container) {
+    container.style.minHeight = container.style.minHeight || "300px";
+  }
+
   viewer = window.OpenSeadragon({
     id:                       containerId,
     prefixUrl:                "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
@@ -217,15 +222,30 @@ function inicializarOpenSeadragon() {
     blendTime:                0.1,
     maxZoomPixelRatio:        maxZoomPixelRatio,
 
-    // ── TRAVA DE PAN (item 3 do pedido) ──────────────────────────────
-    panHorizontal:            true,   // ainda permite pan (desabilitar trava pan total)
+    // ── TRAVA DE PAN ──────────────────────────────────────────────────
+    panHorizontal:            true,
     panVertical:              true,
     constrainDuringPan:       true,
-    visibilityRatio:          0.8,    // 80%: nao some da tela ao arrastar
+    visibilityRatio:          0.8,
     minZoomImageRatio:        0.9,
     // ─────────────────────────────────────────────────────────────────
 
-    gestureSettingsMouse:     { scrollToZoom: true, clickToZoom: false, dblClickToZoom: false }
+    // Gestos de Mouse (Desktop)
+    gestureSettingsMouse: {
+      scrollToZoom:   true,
+      clickToZoom:    false,
+      dblClickToZoom: false,
+      dragToPan:      true
+    },
+
+    // FIX BUG 1: Gestos de Toque (Mobile) — ausentes anteriormente
+    gestureSettingsTouch: {
+      pinchToZoom:    true,
+      flickEnabled:   false,
+      dragToPan:      true,
+      dblClickToZoom: false,
+      pinchRotate:    false
+    }
   });
 
     // Configuração base da régua
@@ -407,14 +427,15 @@ function focarPinoNoViewer(pinIdRaw) {
   }
 
   // Cria elemento do pino neon pulsante
+  // FIX BUG 5: Removido <style> injetado via innerHTML a cada chamada.
+  // A keyframe @keyframes ping já está disponível via Tailwind (animate-ping).
   const pinId   = String(pino.id);
   const pinElem = document.createElement("div");
   pinElem.id    = `viewer-pin-${pinId}`;
   pinElem.style.cssText = "pointer-events:none; position:relative; display:flex; align-items:center; justify-content:center; width:32px; height:32px;";
   pinElem.innerHTML = `
-    <div style="position:absolute;width:100%;height:100%;background:rgba(56,189,248,0.4);border-radius:50%;animation:ping 1s cubic-bezier(0,0,0.2,1) infinite;"></div>
+    <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(56,189,248,0.4);border-radius:50%;"></div>
     <div style="position:relative;width:12px;height:12px;background:#0ea5e9;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 3px rgba(14,165,233,0.4),0 4px 12px rgba(0,0,0,0.5);"></div>
-    <style>@keyframes ping{75%,100%{transform:scale(2);opacity:0}}</style>
   `;
 
   // Adiciona overlay ancorado no ponto exato da imagem (item 6 — fix de posicionamento)

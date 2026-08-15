@@ -23,6 +23,11 @@ const simulatorState = {
   startY: 0
 };
 
+// FIX BUG 2: AbortController para gerenciar o ciclo de vida dos listeners do window
+let _windowAbortController = null;
+// FIX BUG 2: Guarda o unsubscribe do state para evitar acumulo de callbacks
+let _stateUnsubscribe = null;
+
 /**
  * Inicializa os ouvintes do motor e subscreve à navegação do roteador.
  */
@@ -30,16 +35,31 @@ function initSimulator() {
   const palco = document.getElementById("simuladoPalcoContainer");
   if (palco) {
     palco.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
     palco.addEventListener("mouseleave", handleMouseLeave);
     palco.addEventListener("wheel", handleWheel, { passive: false });
   }
 
-  // Ao ingressar na frente do Simulado, carregar os tópicos das peças disponíveis no banco de dados
-  subscribe((state) => {
+  // FIX BUG 2: Usar o unsubscribe retornado pelo subscribe para não acumular
+  // callbacks ao entrar e sair do simulado múltiplas vezes.
+  if (_stateUnsubscribe) _stateUnsubscribe(); // Limpa qualquer subscription anterior
+
+  _stateUnsubscribe = subscribe((state) => {
     if (state.frenteAtiva === "simulado") {
+      // FIX BUG 2: Registrar listeners do window com AbortController
+      // para garantir que sejam removidos ao sair do módulo
+      if (_windowAbortController) _windowAbortController.abort();
+      _windowAbortController = new AbortController();
+      const { signal } = _windowAbortController;
+      window.addEventListener("mousemove", handleMouseMove, { signal });
+      window.addEventListener("mouseup", handleMouseUp, { signal });
+
       carregarSetupSimulado();
+    } else {
+      // Ao sair do simulado, remove os listeners do window
+      if (_windowAbortController) {
+        _windowAbortController.abort();
+        _windowAbortController = null;
+      }
     }
   });
 }

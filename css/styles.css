@@ -117,38 +117,38 @@ button:active {
    3. DASHBOARD E FORMULÁRIOS (UI Administrativa "Clean Lab")
    ========================================================================== */
 
-/* Padronização de Inputs de Texto, Selects e Textareas - Estética Clean Lab */
-input[type="text"],
-input[type="number"],
-input[type="email"],
-select,
-textarea {
-  background-color: #f8fafc !important;
-  border: 1px solid #cbd5e1 !important;
+/* Padronização de Inputs — escopo LIMITADO ao painel do Dashboard para não
+   sobrescrever o tema escuro do Simulado e outras seções com !important */
+#pgDashboard input[type="text"],
+#pgDashboard input[type="number"],
+#pgDashboard input[type="email"],
+#pgDashboard select,
+#pgDashboard textarea {
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
   border-radius: 0.5rem;
-  color: #0f172a !important;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+  color: #0f172a;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   font-weight: 500;
 }
 
-input[type="text"]::placeholder,
-input[type="number"]::placeholder,
-select::placeholder,
-textarea::placeholder {
-  color: #94a3b8 !important;
+#pgDashboard input[type="text"]::placeholder,
+#pgDashboard input[type="number"]::placeholder,
+#pgDashboard textarea::placeholder {
+  color: #94a3b8;
   font-weight: 400;
 }
 
 /* Anel de foco clínico de alta precisão ao focar (Focus Ring) */
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="email"]:focus,
-select:focus,
-textarea:focus {
-  background-color: #ffffff !important;
-  border-color: #2563eb !important;
-  outline: none !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
+#pgDashboard input[type="text"]:focus,
+#pgDashboard input[type="number"]:focus,
+#pgDashboard input[type="email"]:focus,
+#pgDashboard select:focus,
+#pgDashboard textarea:focus {
+  background-color: #ffffff;
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
 /* Datagrid (Tabela de Acervo): Linhas Divisórias e Hover na Linha Inteira */
@@ -268,8 +268,10 @@ textarea:focus {
    ========================================================================== */
 
 /* Barra de Lentes e Cabeçalhos Ópticos - Vidro Desfocado (Glassmorphism) */
+/* FIX MELHORIA DS-2: Removido #pgHistologia da lista de seletores pois causava
+   fundo escuro forçado dentro do Acervo em Light Mode (bg-zinc-950 sobre bg-white). 
+   O glass-panel agora é apenas uma classe explícita, sem seletores por contexto de página. */
 .glass-panel,
-#pgHistologia .backdrop-blur-lg,
 #pgAnatomia .backdrop-blur-md,
 #pgSimulado .backdrop-blur-md {
   background: rgba(15, 23, 42, 0.78) !important;

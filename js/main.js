@@ -144,10 +144,19 @@ function renderView(state) {
   const isHomePage = !state.frenteAtiva;
   const isDashboard = state.frenteAtiva === 'dashboard';
 
-  const globalFooter = document.querySelector("footer");
-  if (globalFooter) {
-    if (isDashboard) globalFooter.classList.add("hidden");
-    else globalFooter.classList.remove("hidden");
+  const footerDark = document.getElementById("footer-dark");
+  const footerLight = document.getElementById("footer-light");
+  const isLightMode = ["histologia", "patologia", "anatomia", "parasitologia", "microbiologia"].includes(state.frenteAtiva);
+
+  if (isDashboard) {
+    if (footerDark) footerDark.classList.add("hidden");
+    if (footerLight) footerLight.classList.add("hidden");
+  } else if (isLightMode) {
+    if (footerDark) footerDark.classList.add("hidden");
+    if (footerLight) footerLight.classList.remove("hidden");
+  } else {
+    if (footerDark) footerDark.classList.remove("hidden");
+    if (footerLight) footerLight.classList.add("hidden");
   }
 
   if (isHomePage) {
@@ -374,16 +383,8 @@ window.toggleDashboard = toggleDashboard;
 
 window.navegarPara = navegarPara;
 
-// Ponto de entrada após carregamento do DOM
-// Garante que o init() rode mesmo se o script type="module" for carregado após o evento DOMContentLoaded
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
-
 /**
- * Inicializa e gerencia a transição morfológica do cabeçalho original Palas Atlas com base no scroll na Home Page.
+ * Inicializa e gerencia a transição morfológica do cabeçalho Palas Atlas com base no scroll na Home Page.
  */
 function inicializarHeaderDinamico() {
   const palasHeaderWrapper = document.getElementById("palasHeaderWrapper");
@@ -394,7 +395,6 @@ function inicializarHeaderDinamico() {
 
   function handleScroll() {
     const scrollY = window.scrollY || (homeContainer ? homeContainer.scrollTop : 0);
-
     if (scrollY > 30) {
       palasHeaderWrapper.classList.remove("p-0");
       palasHeaderWrapper.classList.add("pt-4", "px-4");
@@ -413,8 +413,15 @@ function inicializarHeaderDinamico() {
   handleScroll();
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", inicializarHeaderDinamico);
-} else {
+// FIX MELHORIA 5: Unificado em um único ponto de entrada (bootstrap)
+// para evitar condição de corrida entre init() e inicializarHeaderDinamico().
+function bootstrap() {
+  init();
   inicializarHeaderDinamico();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootstrap);
+} else {
+  bootstrap();
 }

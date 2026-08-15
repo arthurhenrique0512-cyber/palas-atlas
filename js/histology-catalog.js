@@ -135,7 +135,7 @@ function renderizarCatalogoHistologia(disciplina) {
   }
 
   c1.innerHTML = `
-    <div class="max-w-6xl mx-auto px-6 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10">
+    <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10">
       ${gerarIndiceLateral(modulo, null)}
       
       <div class="w-full">
@@ -211,7 +211,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
   // Renderização 2 Colunas Limpas (Índice + Texto)
   c2.innerHTML = `
-    <div class="max-w-6xl mx-auto px-6 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10">
+    <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10">
       ${gerarIndiceLateral(modulo, topico.id)}
 
       <div class="w-full">

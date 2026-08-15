@@ -58,7 +58,7 @@ class BrandLogo extends HTMLElement {
     // ─── Tamanhos (escala proporcional) ────────────────────────────────────
     const sizes = {
       sm: {
-        imgClass:      'h-6 md:h-7',
+        imgClass:      'h-7 md:h-8',
         textClass:     'text-sm md:text-sm',
         trackingPalas: 'tracking-[0.2em]',
         trackingAtlas: 'tracking-[0.2em]',
@@ -67,7 +67,7 @@ class BrandLogo extends HTMLElement {
         subtitleMt:    'mt-0.5',
       },
       md: {
-        imgClass:      'h-8 md:h-10',
+        imgClass:      'h-10 md:h-12',
         textClass:     'text-base md:text-lg',
         trackingPalas: 'tracking-[0.2em]',
         trackingAtlas: 'tracking-[0.2em]',
@@ -76,7 +76,7 @@ class BrandLogo extends HTMLElement {
         subtitleMt:    'mt-0.5',
       },
       lg: {
-        imgClass:      'h-11 md:h-14',
+        imgClass:      'h-14 md:h-16',
         textClass:     'text-lg md:text-xl',
         trackingPalas: 'tracking-[0.22em]',
         trackingAtlas: 'tracking-[0.22em]',
@@ -99,7 +99,8 @@ class BrandLogo extends HTMLElement {
       palasStyle    = 'background: linear-gradient(to right, #f5d98b, #e8b84b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;';
       // ATLAS: dourado levemente mais claro
       atlasStyle    = 'color: #d4a843;';
-      subtitleStyle = 'color: rgba(212, 168, 67, 0.65);';
+      // DIRETRIZ 1: Subtítulo branco total na Home Page
+      subtitleStyle = 'color: #ffffff;';
       // Emblema: filtro para tom dourado
       imgStyle      = 'filter: sepia(1) saturate(3) hue-rotate(5deg) brightness(1.05);';
     } else if (theme === 'light-bg') {
@@ -118,6 +119,15 @@ class BrandLogo extends HTMLElement {
       imgStyle      = 'filter: grayscale(1) brightness(1.8) contrast(0.9);';
     }
 
+    // DIRETRIZ 2: Tema "pure-white" para a Aba Lateral (Sidebar)
+    if (theme === 'pure-white') {
+      palasStyle    = 'color: #ffffff;';
+      atlasStyle    = 'color: #ffffff;';
+      subtitleStyle = 'color: #ffffff;';
+      // Converte imagem transparente/colorida para branco total
+      imgStyle      = 'filter: brightness(0) invert(1);';
+    }
+
     // ─── Template ───────────────────────────────────────────────────────────
     this.innerHTML = `
       <div class="flex flex-col items-center text-center select-none cursor-pointer group" style="text-decoration:none;">
@@ -131,8 +141,8 @@ class BrandLogo extends HTMLElement {
           <img
             src="assets/logo-transparente.png?v=4"
             alt="Emblema Palas Atlas"
-            class="${s.imgClass} w-auto object-contain transition-all duration-300 group-hover:scale-105"
-            style="${imgStyle}"
+            class="${s.imgClass} w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            style="${imgStyle} transform: translateZ(0); -webkit-backface-visibility: hidden; backface-visibility: hidden; will-change: transform; image-rendering: -webkit-optimize-contrast;"
           />
 
           <span

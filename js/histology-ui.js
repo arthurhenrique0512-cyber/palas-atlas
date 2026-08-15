@@ -260,7 +260,7 @@ function renderizarPinosNaLamina() {
 
     div.addEventListener("click", (e) => {
       e.stopPropagation();
-      selecionarPinoEExibirAnálise(index, div);
+      selecionarPinoEExibirAnalise(index, div); // FIX BUG 4: nome corrigido
     });
 
     containerPinos.appendChild(div);
@@ -272,7 +272,9 @@ function renderizarPinosNaLamina() {
  * @param {number} index - Índice da questão na array.
  * @param {HTMLElement} pinElement - Nó DOM do pino acionado.
  */
-function selecionarPinoEExibirAnálise(index, pinElement) {
+// FIX BUG 4: Renomeado de selecionarPinoEExibirAnálise (com acento) para nome ASCII puro.
+// Caracteres acentuados em identificadores JS causam erros em bundlers/minificadores.
+function selecionarPinoEExibirAnalise(index, pinElement) {
   opticalState.activePinIndex = index;
   const pinData = opticalState.currentLamina.questoes[index];
 
@@ -536,7 +538,7 @@ function handleWheel(e) {
 window.App = {
   ...window.App,
   aplicarPresetLente,
-  selecionarPinoEExibirAnálise,
+  selecionarPinoEExibirAnalise, // FIX BUG 4: nome corrigido (sem acento)
   limparSelecaoPino,
   carregarLaminasHistologia,
   selecionarLaminaPorId,

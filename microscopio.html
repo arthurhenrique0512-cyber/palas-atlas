@@ -65,10 +65,10 @@
        BARRA SUPERIOR DO LEITOR (item 1)
        bg-neutral-950 | borda inferior | Studio Dark
        ════════════════════════════════════════════════════════════════════ -->
-  <header class="shrink-0 w-full bg-neutral-950 border-b border-neutral-800 px-4 py-2.5 flex items-center justify-between z-50">
+  <header class="shrink-0 w-full bg-neutral-950 border-b border-neutral-800 px-4 py-2.5 flex items-center justify-between z-50 relative">
 
     <!-- Esquerda: Voltar + Breadcrumb -->
-    <div class="flex items-center gap-3 min-w-0">
+    <div class="flex items-center gap-3 min-w-0 z-10">
       <button
         type="button"
         onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
@@ -84,8 +84,13 @@
       <span id="viewerBreadcrumb" class="text-xs text-neutral-500 font-sans tracking-wide truncate max-w-[160px] md:max-w-xs hidden"></span>
     </div>
 
-    <!-- Direita: Marca monocromática (dark-bg) + ações rápidas -->
-    <div class="flex items-center gap-4 shrink-0">
+    <!-- Centro: Logo PALAS ATLAS (centralizado absolutamente para não ser deslocado pelas laterais) -->
+    <div class="absolute left-1/2 -translate-x-1/2 flex items-center z-10 pointer-events-none">
+      <brand-logo theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
+    </div>
+
+    <!-- Direita: Ações rápidas do viewer -->
+    <div class="flex items-center gap-4 shrink-0 z-10">
       <button
         type="button"
         onclick="window.osdViewerAction('reset')"
@@ -104,7 +109,6 @@
             d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
         </svg>
       </button>
-      <brand-logo theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
     </div>
 
   </header>
