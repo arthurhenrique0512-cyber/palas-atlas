@@ -315,11 +315,11 @@
     <!-- HUB DE ENTRADA (#pgHome) - COMPÊNDIO ACADÊMICO -->
     <section id="pgHome" class="w-full h-full flex-1 text-neutral-100 p-4 md:p-8 pt-8 pb-24 relative overflow-x-hidden">
 
-      <!-- Imagem de Fundo (Tag real para evitar bugs de background-fixed no WebKit/Blink) -->
+      <!-- Imagem de Fundo -->
       <img src="assets/hero-bg.jpeg" alt="Fundo Palas Atlas" class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;">
 
-      <!-- Overlay Dark Gradient (Mais suave) -->
-      <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/40 via-neutral-950/60 to-neutral-950/90 pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;"></div>
+      <!-- Overlay Dark Gradient (Mais escuro, conforme solicitado) -->
+      <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/75 via-neutral-950/85 to-neutral-950/95 pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;"></div>
 
       <!-- Textura Sutil de Fundo -->
       <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')] opacity-20 pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;"></div>
@@ -1535,7 +1535,7 @@
   </main>
 
   <!-- FOOTER INSTITUCIONAL (GLOBAL - DARK MODE) -->
-  <footer id="footer-dark" class="w-full bg-zinc-950 text-zinc-400 border-t border-zinc-900 mt-auto font-sans transition-opacity duration-300">
+  <footer id="footer-dark" class="w-full bg-zinc-950 text-zinc-400 border-t border-zinc-900 mt-auto font-sans transition-opacity duration-300 relative z-20">
     <div class="max-w-7xl mx-auto px-6 py-16 sm:py-20">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12">
         
@@ -1604,7 +1604,7 @@
   </footer>
 
   <!-- FOOTER INSTITUCIONAL (GLOBAL - LIGHT MODE) -->
-  <footer id="footer-light" class="w-full bg-zinc-100 text-zinc-700 border-t border-zinc-200 mt-auto font-sans transition-opacity duration-300 hidden">
+  <footer id="footer-light" class="w-full bg-zinc-100 text-zinc-700 border-t border-zinc-200 mt-auto font-sans transition-opacity duration-300 hidden relative z-20">
     <div class="max-w-7xl mx-auto px-6 py-16 sm:py-20">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12">
         
