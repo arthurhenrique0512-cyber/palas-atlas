@@ -314,7 +314,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
           if (!thumbSrc) {
             if (imagemUrl.toLowerCase().endsWith(".dzi")) {
-              const basePath = imagemUrl.substring(0, imagemUrl.lastIndexOf('.dzi'));
+              const basePath = imagemUrl.substring(0, imagemUrl.lastIndexOf(".dzi"));
               thumbSrc = `${basePath}_files/8/0_0.jpg`;
               thumbSrcFallback = `${basePath}_files/8/0_0.jpeg`;
             } else {
@@ -323,18 +323,23 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
             }
           }
 
-          // Placeholder SVG inline exibido quando nenhuma imagem carrega
-          const placeholderSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='192' viewBox='0 0 400 192'%3E%3Crect width='400' height='192' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='44%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='13' fill='%2394a3b8'%3ESem pré-visualização%3C/text%3E%3Ctext x='50%25' y='62%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23cbd5e1'%3EAbra a lâmina para visualizar%3C/text%3E%3C/svg%3E`;
-
           cardsLaminasHtml += `
             <a href="microscopio.html?id=${lamina.id}" class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm hover:border-sky-500/40 hover:shadow-md transition-all duration-200 overflow-hidden group cursor-pointer flex flex-col justify-between">
               <!-- Thumbnail da Imagem -->
-              <div class="w-full h-48 bg-slate-100 relative overflow-hidden rounded-xl">
+              <div class="w-full h-48 bg-slate-100 relative overflow-hidden rounded-xl flex items-center justify-center">
+                <!-- Placeholder exibido quando a imagem falha (visível via CSS quando a img é ocultada) -->
+                <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden">
+                  <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M12 3v1.5M6.75 4.5l.75 1.3M17.25 4.5l-.75 1.3"/>
+                  </svg>
+                  <span class="text-[11px] text-slate-400 font-serif">Sem pré-visualização</span>
+                  <span class="text-[10px] text-slate-300 font-sans">Abra a lâmina para ver</span>
+                </div>
                 <img
                   src="${thumbSrc}"
                   alt="${nomeLamina}"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onerror="this.onerror=null; if('${thumbSrcFallback}' && this.src!=='${thumbSrcFallback}') { this.src='${thumbSrcFallback}'; } else { this.src='${placeholderSvg}'; this.classList.remove('object-cover'); this.classList.add('object-contain','p-4','opacity-80'); }"
+                  onerror="var fb='${thumbSrcFallback}'; if(fb && this.src!==fb){this.src=fb;}else{this.style.display='none';var ph=this.parentElement.querySelector('.thumb-placeholder');if(ph){ph.classList.remove('hidden');ph.classList.add('flex');}}"
                 >
                 <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm font-sans">
                   ${coloracaoNome} - 40x
