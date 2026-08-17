@@ -125,6 +125,7 @@ function renderView(state) {
     elements.pgAnatomia,
     elements.pgHistologia,
     elements.pgDashboard
+  ];
 
   // Oculta sistematicamente todos os contentores
   allPages.forEach((page) => {
