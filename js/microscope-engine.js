@@ -251,17 +251,15 @@ function inicializarOpenSeadragon() {
     }
   });
 
-  // Configuração da Barra de Escala OSD (Scalebar) usando o plugin unistgov
-  if (typeof viewer.scalebar === "function") {
+  // Configuração base da régua
+  if (window.OpenSeadragon.ScalebarType) {
     viewer.scalebar({
-      type:            OpenSeadragon.ScalebarType.MICROSCOPY,
+      type:            window.OpenSeadragon.ScalebarType.MICROSCOPE,
+      location:        window.OpenSeadragon.ScalebarLocation.TOP_RIGHT,
       pixelsPerMeter:  pixelsPerMeter,
-      minWidth:        150,
-      location:        OpenSeadragon.ScalebarLocation.TOP_RIGHT,
-      color:           "#ffffff",
-      fontColor:       "#ffffff",
-      backgroundColor: "rgba(0,0,0,0.5)",
-      fontSize:        "12px",
+      color:           "#e4e4e7",
+      backgroundColor: "rgba(24, 24, 27, 0.8)",
+      fontFamily:      "'JetBrains Mono', monospace",
       barThickness:    2,
       xOffset:         16,
       yOffset:         16
