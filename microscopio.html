@@ -122,9 +122,9 @@
     <main class="relative flex-1 h-full bg-neutral-900 border-r border-neutral-800 overflow-hidden flex items-center justify-center">
 
       <!-- Skeleton / Splash de carregamento -->
-      <div id="osdSkeleton" class="absolute inset-0 bg-neutral-950/95 backdrop-blur-md flex flex-col items-center justify-center z-[99] transition-opacity duration-700">
-        <img src="assets/logo-transparente.png?v=4" class="h-16 w-auto animate-pulse opacity-70" alt="Carregando"/>
-        <p class="text-xs text-neutral-400 tracking-wider mt-4 font-mono">Mapeando estruturas morfológicas...</p>
+      <div id="osdSkeleton" class="absolute inset-0 bg-white flex flex-col items-center justify-center z-[99] transition-opacity duration-1000">
+        <video src="assets/logo-animada.mp4" autoplay loop muted playsinline class="w-48 md:w-64 h-auto pointer-events-none object-contain mb-4"></video>
+        <p class="text-xs text-neutral-800 tracking-wider font-mono uppercase font-semibold">Mapeando estruturas morfológicas...</p>
       </div>
 
       <!-- Container Deep Zoom (OpenSeadragon) -->

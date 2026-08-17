@@ -365,3 +365,10 @@ button:active {
 .animate-fadeIn {
   animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Splash Screen (Global Loader) - Transição White to Dark */
+.fade-out-loader {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
