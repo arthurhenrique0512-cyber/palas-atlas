@@ -13,7 +13,7 @@ const elements = {
   pgAnatomia: null,
   pgHistologia: null,
   pgDashboard: null,
-  pgSimulado: null,
+
   btnBackHome: null,
   headerGlobal: null,
   footerGlobal: null,
@@ -32,7 +32,7 @@ function init() {
   elements.pgAnatomia = document.getElementById("pgAnatomia");
   elements.pgHistologia = document.getElementById("pgHistologia");
   elements.pgDashboard = document.getElementById("pgDashboard");
-  elements.pgSimulado = document.getElementById("pgSimulado");
+
   elements.btnBackHome = document.getElementById("btnBackHome");
   elements.headerGlobal = document.getElementById("headerGlobal");
   elements.footerGlobal = document.getElementById("footerGlobal");
@@ -104,7 +104,7 @@ function init() {
   // Verifica parâmetros de rota (Deep Linking)
   const urlParams = new URLSearchParams(window.location.search);
   const frenteParam = urlParams.get("frente");
-  if (frenteParam && ["anatomia", "histologia", "patologia", "parasitologia", "microbiologia", "dashboard", "simulado"].includes(frenteParam)) {
+  if (frenteParam && ["anatomia", "histologia", "patologia", "parasitologia", "microbiologia", "dashboard"].includes(frenteParam)) {
     setFrenteAtiva(frenteParam);
   } else {
     // Executa a renderização inicial baseada no estado nulo (Home)
@@ -124,9 +124,7 @@ function renderView(state) {
     elements.pgHome,
     elements.pgAnatomia,
     elements.pgHistologia,
-    elements.pgDashboard,
-    elements.pgSimulado
-  ];
+    elements.pgDashboard
 
   // Oculta sistematicamente todos os contentores
   allPages.forEach((page) => {
@@ -139,6 +137,7 @@ function renderView(state) {
   const headerMin = document.getElementById("palasMinimalHeader");
   const brandLogo = document.querySelector("#palasMinimalHeader brand-logo");
   const btnOpenDrawer = document.getElementById("btnOpenDrawer");
+  const btnOpenSettings = document.getElementById("btnOpenSettings");
   const btnVoltarGlobal = document.getElementById("btnVoltarGlobal");
   
   const isHomePage = !state.frenteAtiva;
@@ -167,6 +166,7 @@ function renderView(state) {
       brandLogo.setAttribute("theme", "dark-bg");
     }
     if (btnOpenDrawer) btnOpenDrawer.className = "p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
+    if (btnOpenSettings) btnOpenSettings.className = "p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.add("hidden");
       btnVoltarGlobal.classList.remove("flex");
@@ -179,6 +179,7 @@ function renderView(state) {
       brandLogo.setAttribute("theme", "dark-bg");
     }
     if (btnOpenDrawer) btnOpenDrawer.className = "p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
+    if (btnOpenSettings) btnOpenSettings.className = "p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.add("hidden");
       btnVoltarGlobal.classList.remove("flex");
@@ -191,6 +192,7 @@ function renderView(state) {
       brandLogo.setAttribute("theme", "light-bg");
     }
     if (btnOpenDrawer) btnOpenDrawer.className = "p-2 text-slate-800 hover:text-sky-600 text-xl transition-colors focus:outline-none cursor-pointer flex items-center hidden";
+    if (btnOpenSettings) btnOpenSettings.className = "p-2 text-slate-800 hover:text-sky-600 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.remove("hidden");
       btnVoltarGlobal.classList.add("flex");
@@ -221,8 +223,6 @@ function renderView(state) {
     if (window.App && typeof window.App.inicializarPainelCms === "function") {
       window.App.inicializarPainelCms();
     }
-  } else if (state.frenteAtiva === "simulado") {
-    if (elements.pgSimulado) elements.pgSimulado.classList.remove("hidden");
   }
 }
 

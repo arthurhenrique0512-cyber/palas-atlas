@@ -31,8 +31,9 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <!-- Web Component da Marca (Single Source of Truth) -->
+  <!-- Web Component da Marca e Configurações -->
   <script src="js/brand-logo.js?v=2"></script>
+  <script src="js/settings-panel.js"></script>
 
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
@@ -108,6 +109,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
         </svg>
+      </button>
+      <!-- Botão Configurações -->
+      <button id="btnOpenSettings" onclick="if(window.App && window.App.openSettings) window.App.openSettings(); else window.dispatchEvent(new Event('open-settings-panel'));" class="text-neutral-500 hover:text-white transition-colors cursor-pointer" aria-label="Configurações do Site" title="Configurações">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
       </button>
     </div>
 
@@ -192,5 +197,8 @@
 
   <script type="module" src="js/firebase-config.js"></script>
   <script type="module" src="js/microscope-engine.js?v=2026.0813"></script>
+
+  <!-- Web Component - Painel de Configurações -->
+  <settings-panel></settings-panel>
 </body>
 </html>

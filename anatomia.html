@@ -30,6 +30,7 @@
   <!-- Firebase V8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="js/settings-panel.js"></script>
   
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
@@ -45,10 +46,15 @@
   <!-- MENU LATERAL ESQUERDO: Regiões Topográficas -->
   <aside class="w-64 h-full bg-neutral-900 border-r border-neutral-800 flex flex-col z-40 shrink-0">
     <div class="p-6 border-b border-neutral-800">
-      <a href="index.html" class="flex items-center gap-3 text-neutral-400 hover:text-white transition-colors no-underline">
-        <img src="assets/logo-transparente.png?v=5" alt="Palas Atlas" class="h-6 w-auto object-contain brightness-110 drop-shadow-[0_0_8px_rgba(30,58,138,0.2)]" style="filter: hue-rotate(180deg) saturate(100%);" />
-        <span class="font-serif tracking-widest text-sm uppercase">Palas Atlas</span>
-      </a>
+      <div class="flex justify-between items-start">
+        <a href="index.html" class="flex items-center gap-3 text-neutral-400 hover:text-white transition-colors no-underline">
+          <img src="assets/logo-transparente.png?v=5" alt="Palas Atlas" class="h-6 w-auto object-contain brightness-110 drop-shadow-[0_0_8px_rgba(30,58,138,0.2)]" style="filter: hue-rotate(180deg) saturate(100%);" />
+          <span class="font-serif tracking-widest text-sm uppercase">Palas Atlas</span>
+        </a>
+        <button onclick="if(window.App && window.App.openSettings) window.App.openSettings(); else window.dispatchEvent(new Event('open-settings-panel'));" class="text-neutral-500 hover:text-white transition-colors cursor-pointer" aria-label="Configurações do Site" title="Configurações">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </button>
+      </div>
       <h2 class="text-xl font-bold text-white mt-6 tracking-tight">Anatomia</h2>
       <p class="text-xs text-neutral-500 mt-1 uppercase tracking-wider font-mono">Atlas de Dissecação</p>
     </div>
@@ -118,5 +124,8 @@
 
   <script type="module" src="js/firebase-config.js?v=2026.99996"></script>
   <script type="module" src="js/anatomy-viewer.js?v=2026.99996"></script>
+
+  <!-- Web Component - Painel de Configurações -->
+  <settings-panel></settings-panel>
 </body>
 </html>
