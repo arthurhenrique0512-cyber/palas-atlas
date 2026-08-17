@@ -139,7 +139,7 @@ class BrandLogo extends HTMLElement {
           >PALAS</span>
 
           <img
-            src="assets/logo-transparente.png?v=4"
+            src="assets/logo-transparente.png?v=5"
             alt="Emblema Palas Atlas"
             class="${s.imgClass} w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             style="${imgStyle}"
