@@ -185,7 +185,7 @@ function renderView(state) {
     }
   } else {
     // PÁGINAS INTERNAS: monocromático escuro + header claro fixo
-    if (headerMin) headerMin.className = "sticky top-0 left-0 w-full h-[88px] bg-slate-50/90 backdrop-blur-md border-b border-slate-200/80 z-50 px-6 flex items-center justify-between transition-all duration-300";
+    if (headerMin) headerMin.className = "sticky top-0 left-0 w-full h-[88px] bg-white/90 backdrop-blur-md border-b border-slate-200 z-50 px-6 flex items-center justify-between transition-all duration-300";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
       brandLogo.setAttribute("theme", "light-bg");

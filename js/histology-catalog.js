@@ -21,9 +21,9 @@ function gerarIndiceLateral(modulo, topicoAtivoId) {
     modulo.topicos.forEach(topico => {
       const isAtivo = topico.id === topicoAtivoId;
       if (isAtivo) {
-        htmlItens += `<button class="text-sky-700 font-semibold border-l-2 border-sky-600 pl-3 -ml-[25px] py-1 block w-full text-left">${topico.titulo}</button>`;
+        htmlItens += `<button class="bg-slate-100 text-slate-900 font-semibold px-3 py-1.5 rounded-lg w-full text-left truncate" title="${topico.titulo}">${topico.titulo}</button>`;
       } else {
-        htmlItens += `<button onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')" class="text-slate-600 hover:text-slate-900 py-1 block transition-colors w-full text-left">${topico.titulo}</button>`;
+        htmlItens += `<button onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')" class="text-slate-500 hover:text-slate-800 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors w-full text-left truncate" title="${topico.titulo}">${topico.titulo}</button>`;
       }
     });
   }
@@ -31,8 +31,8 @@ function gerarIndiceLateral(modulo, topicoAtivoId) {
   const navItem = (id, label, icon) => {
     const isAtivo = disciplinaAtual === id;
     const btnClass = isAtivo 
-      ? "text-sky-700 font-semibold py-1 block w-full text-left flex items-center gap-2"
-      : "text-slate-600 hover:text-slate-900 py-1 block transition-colors w-full text-left flex items-center gap-2";
+      ? "bg-slate-100 text-slate-900 font-semibold px-3 py-2 rounded-lg w-full text-left flex items-center gap-2"
+      : "text-slate-500 hover:text-slate-800 hover:bg-slate-50 px-3 py-2 rounded-lg transition-colors w-full text-left flex items-center gap-2";
     return `
       <button onclick="window.App.selecionarFrente('${id}')" class="${btnClass}">
         ${icon}
@@ -101,8 +101,8 @@ function renderizarCatalogoHistologia(disciplina) {
       htmlCards += `
         <div 
           onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
-          class="bg-white rounded-xl p-6 border border-slate-200/80 shadow-sm hover:border-blue-500/40 hover:shadow-md transition-all cursor-pointer">
-          <h3 class="font-serif text-lg text-slate-900 font-semibold">${topico.titulo}</h3>
+          class="bg-white rounded-2xl p-6 border border-slate-200/60 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center">
+          <h3 class="font-serif text-lg text-slate-800 font-semibold leading-tight">${topico.titulo}</h3>
         </div>
       `;
       
@@ -135,7 +135,7 @@ function renderizarCatalogoHistologia(disciplina) {
   }
 
   c1.innerHTML = `
-    <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10">
+    <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-10">
       ${gerarIndiceLateral(modulo, null)}
       
       <div class="w-full">
@@ -211,7 +211,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
   // Renderização 2 Colunas Limpas (Índice + Texto)
   c2.innerHTML = `
-    <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10">
+    <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-10">
       ${gerarIndiceLateral(modulo, topico.id)}
 
       <div class="w-full">
@@ -324,7 +324,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           }
 
           cardsLaminasHtml += `
-            <a href="microscopio.html?id=${lamina.id}" class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm hover:border-sky-500/40 hover:shadow-md transition-all duration-200 overflow-hidden group cursor-pointer flex flex-col justify-between">
+            <a href="microscopio.html?id=${lamina.id}" class="bg-white rounded-2xl p-5 border border-slate-200/60 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer flex flex-col justify-between">
               <!-- Thumbnail da Imagem -->
               <div class="w-full h-48 bg-slate-100 relative overflow-hidden rounded-xl flex items-center justify-center">
                 <!-- Placeholder exibido quando a imagem falha (visível via CSS quando a img é ocultada) -->
@@ -347,7 +347,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
               </div>
               <!-- Rodapé do Card -->
               <div class="mt-4">
-                <h3 class="text-base font-serif font-semibold text-slate-900 group-hover:text-blue-700 transition-colors leading-tight">${nomeLamina}</h3>
+                <h3 class="text-base font-serif font-semibold text-slate-800 group-hover:text-sky-700 transition-colors leading-tight">${nomeLamina}</h3>
               </div>
             </a>
           `;
