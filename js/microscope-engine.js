@@ -269,7 +269,7 @@ function inicializarOpenSeadragon() {
   // ── Evento: imagem aberta com sucesso ────────────────────────────────
   viewer.addHandler("open", () => {
     const elapsed = Date.now() - window.__microscopeStartTime;
-    const remainingTime = Math.max(0, 2000 - elapsed); // Garante no min 2 segundos
+    const remainingTime = Math.max(0, 3000 - elapsed); // Garante no min 3 segundos
 
     setTimeout(() => {
       // Remove skeleton de carregamento com fade out suave

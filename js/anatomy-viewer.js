@@ -68,7 +68,7 @@ async function carregarRegiao(regiaoId, regiaoNome) {
     msgVazio.classList.remove("hidden");
   } finally {
     const elapsed = Date.now() - startTime;
-    const remainingTime = Math.max(0, 2000 - elapsed); // Garante no min 2 segundos
+    const remainingTime = Math.max(0, 3000 - elapsed); // Garante no min 3 segundos
     setTimeout(() => {
       loader.style.opacity = '0';
       loader.style.pointerEvents = 'none';
