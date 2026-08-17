@@ -201,6 +201,9 @@ function inicializarOpenSeadragon() {
     container.style.minHeight = container.style.minHeight || "300px";
   }
 
+  // Registra o tempo de início do carregamento da imagem
+  window.__microscopeStartTime = Date.now();
+
   viewer = window.OpenSeadragon({
     id:                       containerId,
     prefixUrl:                "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
@@ -248,15 +251,17 @@ function inicializarOpenSeadragon() {
     }
   });
 
-    // Configuração base da régua
-  if (window.OpenSeadragon.ScalebarType) {
+  // Configuração da Barra de Escala OSD (Scalebar) usando o plugin unistgov
+  if (typeof viewer.scalebar === "function") {
     viewer.scalebar({
-      type:            window.OpenSeadragon.ScalebarType.MICROSCOPE,
-      location:        window.OpenSeadragon.ScalebarLocation.TOP_RIGHT,
+      type:            OpenSeadragon.ScalebarType.MICROSCOPY,
       pixelsPerMeter:  pixelsPerMeter,
-      color:           "#e4e4e7",
-      backgroundColor: "rgba(24, 24, 27, 0.8)",
-      fontFamily:      "'JetBrains Mono', monospace",
+      minWidth:        150,
+      location:        OpenSeadragon.ScalebarLocation.TOP_RIGHT,
+      color:           "#ffffff",
+      fontColor:       "#ffffff",
+      backgroundColor: "rgba(0,0,0,0.5)",
+      fontSize:        "12px",
       barThickness:    2,
       xOffset:         16,
       yOffset:         16
@@ -265,11 +270,24 @@ function inicializarOpenSeadragon() {
 
   // ── Evento: imagem aberta com sucesso ────────────────────────────────
   viewer.addHandler("open", () => {
-    // Remove skeleton de carregamento
-    const skeleton  = document.getElementById("osdSkeleton");
-    const osdCanvas = document.getElementById("osd-viewer");
-    if (skeleton)  skeleton.classList.add("hidden");
-    if (osdCanvas) osdCanvas.classList.remove("opacity-0");
+    const elapsed = Date.now() - window.__microscopeStartTime;
+    const remainingTime = Math.max(0, 2000 - elapsed); // Garante no min 2 segundos
+
+    setTimeout(() => {
+      // Remove skeleton de carregamento com fade out suave
+      const skeleton  = document.getElementById("osdSkeleton");
+      const osdCanvas = document.getElementById("osd-viewer");
+      if (skeleton) {
+        skeleton.style.opacity = '0';
+        skeleton.style.pointerEvents = 'none';
+        setTimeout(() => {
+          skeleton.classList.add("hidden");
+          skeleton.style.opacity = '';
+          skeleton.style.pointerEvents = '';
+        }, 1000); // 1s da animacao css
+      }
+      if (osdCanvas) osdCanvas.classList.remove("opacity-0");
+    }, remainingTime);
 
     // Salva zoom home como baseline 4x (item 4)
     homeZoomRef = viewer.viewport.getHomeZoom();

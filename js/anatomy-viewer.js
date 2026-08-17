@@ -43,6 +43,7 @@ async function carregarRegiao(regiaoId, regiaoNome) {
   carouselContainer.classList.add("hidden");
   msgVazio.classList.add("hidden");
   
+  const startTime = Date.now();
   try {
     const snapshot = await db.collection("anatomia_pecas")
       .where("regiao", "==", regiaoId)
@@ -66,7 +67,17 @@ async function carregarRegiao(regiaoId, regiaoNome) {
     msgVazio.textContent = "Erro de conexão ao carregar o atlas.";
     msgVazio.classList.remove("hidden");
   } finally {
-    loader.classList.add("hidden");
+    const elapsed = Date.now() - startTime;
+    const remainingTime = Math.max(0, 2000 - elapsed); // Garante no min 2 segundos
+    setTimeout(() => {
+      loader.style.opacity = '0';
+      loader.style.pointerEvents = 'none';
+      setTimeout(() => {
+        loader.classList.add("hidden");
+        loader.style.opacity = '';
+        loader.style.pointerEvents = '';
+      }, 1000);
+    }, remainingTime);
   }
 }
 

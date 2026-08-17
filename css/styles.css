@@ -372,3 +372,13 @@ button:active {
   pointer-events: none;
   transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Barra de Progresso Animada (Sweep) */
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(250%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-sweep { 
+  animation: sweep 1.5s infinite ease-in-out; 
+}
