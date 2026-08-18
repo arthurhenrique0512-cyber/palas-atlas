@@ -122,13 +122,13 @@ function renderizarDescricaoETextos() {
             <button
               type="button"
               onclick="window.focarPinoNoViewer('${pin.id}')"
-              class="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 hover:border-sky-500/50 text-left transition-all group cursor-pointer"
+              class="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 hover:border-amber-500/50 text-left transition-all group cursor-pointer"
             >
               <div class="flex items-center gap-2.5 truncate pr-2">
-                <span class="w-2 h-2 rounded-full bg-sky-400 shrink-0 animate-pulse"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0 animate-pulse"></span>
                 <span class="text-sm font-medium text-slate-200 truncate">${pin.rotulo || "Estrutura"}</span>
               </div>
-              <span class="text-xs text-neutral-500 group-hover:text-sky-400 shrink-0 transition-colors">Focar &rarr;</span>
+              <span class="text-xs text-neutral-500 group-hover:text-amber-400 shrink-0 transition-colors">Focar &rarr;</span>
             </button>
           `).join('')}
         </div>
@@ -155,7 +155,7 @@ function renderizarDescricaoETextos() {
 
   // Estiliza pin-links inline injetados pelo CMS no descricaoHTML
   container.querySelectorAll('.pin-link, [data-pin-id]').forEach(el => {
-    el.className = "pin-link text-sky-400 hover:text-sky-300 underline font-medium cursor-pointer transition-colors px-0.5";
+    el.className = "pin-link text-amber-500 hover:text-amber-400 underline font-medium cursor-pointer transition-colors px-0.5";
   });
 }
 
@@ -379,7 +379,7 @@ function atualizarLenteBotaoAtivo() {
 
     const isAtivo = btn.textContent.trim() === objetivo;
     btn.className = isAtivo
-      ? "lens-btn bg-blue-600 text-white shadow-md font-semibold px-3 py-1 rounded-lg transition-all active-lens"
+      ? "lens-btn bg-amber-600 text-white shadow-md font-semibold px-3 py-1 rounded-lg transition-all active-lens"
       : "lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all";
   });
 }
@@ -503,9 +503,9 @@ export function trocarLente(objetivaDesejada, btnElement) {
 
   if (btnElement) {
     document.querySelectorAll(".lens-btn").forEach(l => {
-      l.className = "lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all";
+      l.className = "lens-btn text-slate-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all duration-200 cursor-pointer";
     });
-    btnElement.className = "lens-btn bg-sky-500/20 text-sky-400 border border-sky-500/40 font-bold px-3 py-1.5 rounded-lg text-xs transition-all active-lens";
+    btnElement.className = "lens-btn bg-amber-500/20 text-amber-500 border border-amber-500/40 font-bold px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer active-lens";
   }
 }
 
