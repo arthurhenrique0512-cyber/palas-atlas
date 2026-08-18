@@ -105,6 +105,17 @@ class SettingsPanel extends HTMLElement {
         body.theme-override-enabled .text-neutral-300 { color: #334155 !important; }
         body.theme-override-enabled .border-neutral-800 { border-color: #e2e8f0 !important; }
         body.theme-override-enabled .border-neutral-700 { border-color: #cbd5e1 !important; }
+        body.theme-override-enabled .glass-card {
+          background: rgba(255, 255, 255, 0.85) !important;
+          border-color: rgba(0, 0, 0, 0.1) !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        }
+        body.theme-override-enabled .glass-card:hover {
+          background: rgba(255, 255, 255, 0.95) !important;
+          border-color: rgba(212, 175, 55, 0.5) !important;
+        }
+        body.theme-override-enabled h2.text-white, 
+        body.theme-override-enabled h3.text-white { color: #0f172a !important; }
       `;
       document.body.classList.add('theme-override-enabled');
     } else {

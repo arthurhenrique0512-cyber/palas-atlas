@@ -104,7 +104,7 @@
     });
   </script>
 
-  <header id="palasMinimalHeader" class="fixed left-0 w-full top-0 h-24 bg-transparent border border-transparent z-50 px-6 flex items-center justify-between transition-all duration-300">
+  <header id="palasMinimalHeader" class="fixed left-0 w-full top-0 h-20 md:h-24 bg-transparent border border-transparent z-50 px-4 md:px-6 flex items-center justify-between transition-all duration-300">
     
     <!-- Lado Esquerdo (Botão Voltar) -->
     <div class="w-24 md:w-32 flex items-center">
@@ -123,12 +123,12 @@
     <!-- Lado Direito: Botão Menu Lateral e Configurações -->
     <div class="w-24 md:w-32 flex justify-end items-center gap-2">
       <!-- Botão Configurações -->
-      <button id="btnOpenSettings" onclick="window.App.openSettings()" class="p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center" aria-label="Configurações do Site" title="Configurações">
+      <button id="btnOpenSettings" onclick="window.App.openSettings()" class="p-3 md:p-2 w-11 h-11 md:w-auto md:h-auto text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center justify-center rounded-full" aria-label="Configurações do Site" title="Configurações">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
       </button>
 
       <!-- Botão Menu Drawer -->
-      <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center" aria-label="Abrir Menu Lateral" title="Menu">
+      <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="p-3 md:p-2 w-11 h-11 md:w-auto md:h-auto text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center justify-center rounded-full" aria-label="Abrir Menu Lateral" title="Menu">
         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
     </div>
@@ -145,7 +145,7 @@
       <aside
         id="sideDrawer"
         style="z-index: 99999; position: fixed; top: 0; right: 0;"
-        class="hidden !fixed !top-0 !right-0 h-full w-80 bg-neutral-950 text-white border-l border-neutral-800 !z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between shadow-2xl overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-800">
+        class="hidden !fixed !top-0 !right-0 h-full w-[85vw] max-w-[320px] sm:w-80 bg-neutral-950 text-white border-l border-neutral-800 !z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out p-5 md:p-6 flex flex-col justify-between shadow-2xl overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-800">
 
         <div class="space-y-6">
           <!-- Topo: Cabeçalho do Menu com Título e Botão Fechar -->
@@ -157,7 +157,7 @@
             <button
               type="button"
               onclick="window.App.fecharMenuLateral()"
-              class="p-2 text-neutral-400 hover:text-white hover:bg-neutral-800/60 rounded-lg transition-all"
+              class="p-3 w-12 h-12 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-800/60 rounded-lg transition-all"
               aria-label="Fechar menu">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -181,7 +181,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('anatomia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-neutral-600 shrink-0 group-hover:bg-sky-500"></span>
                 <span>Anatomia Macroscópica</span>
               </button>
@@ -189,7 +189,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('histologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-neutral-600 shrink-0 group-hover:bg-sky-500"></span>
                 <span>Histologia Microscópica</span>
               </button>
@@ -197,7 +197,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('patologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-neutral-600 shrink-0 group-hover:bg-sky-500"></span>
                 <span>Patologia Geral e Sistêmica</span>
               </button>
@@ -205,7 +205,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('parasitologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-neutral-600 shrink-0 group-hover:bg-sky-500"></span>
                 <span>Parasitologia Médica</span>
               </button>
@@ -213,7 +213,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('microbiologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-neutral-600 shrink-0 group-hover:bg-sky-500"></span>
                 <span>Microbiologia e Micologia</span>
               </button>
@@ -227,7 +227,7 @@
             <div class="space-y-1">
               <a
                 href="topicos.html"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left no-underline">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left no-underline">
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition-all duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
@@ -237,7 +237,7 @@
               <button
                 type="button"
                 onclick="window.App.fecharMenuLateral(); window.App.abrirModalAjuda();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition-all duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -257,7 +257,7 @@
               <a
                 href="sobre.html"
                 onclick="window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left no-underline">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left no-underline">
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition-all duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -269,7 +269,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 onclick="window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left no-underline">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left no-underline">
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition-all duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
@@ -279,7 +279,7 @@
               <button
                 type="button"
                 onclick="window.App.toggleDashboard(); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-slate-300 hover:text-white hover:bg-neutral-900/80 border-l-2 border-transparent pl-4 py-3 md:py-2.5 rounded-xl transition-all text-sm font-medium cursor-pointer w-full text-left">
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition-all duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                 </svg>
@@ -359,16 +359,16 @@
       <!-- SEÇÃO 2: BENTO GRID DE MÓDULOS -->
       <div class="max-w-6xl mx-auto px-4 md:px-8 py-6 relative z-10 animate-fade-in-up delay-200">
         <!-- Grid Base -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           
           <!-- FILEIRA SUPERIOR -->
           
           <!-- Histologia (2 colunas) -->
-          <div onclick="window.App.selecionarFrente('histologia')" class="glass-card md:col-span-2 rounded-2xl p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[220px]">
+          <div onclick="window.App.selecionarFrente('histologia')" class="glass-card md:col-span-2 rounded-2xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[220px]">
             <div class="relative z-10">
               <span class="absolute -bottom-6 -right-2 text-[180px] font-serif font-black text-white/[0.02] group-hover:text-white/[0.04] transition-colors duration-500 pointer-events-none select-none leading-none">1</span>
               <h2 class="text-white font-serif text-2xl md:text-3xl mb-2">Histologia</h2>
-              <p class="text-neutral-400 text-sm leading-relaxed max-w-md">Estudo da organização tecidual e celular em lâminas virtuais de alta definição com diferentes colorações histológicas.</p>
+              <p class="text-neutral-400 text-[15px] leading-[1.6] md:text-sm md:leading-relaxed max-w-md">Estudo da organização tecidual e celular em lâminas virtuais de alta definição com diferentes colorações histológicas.</p>
             </div>
             <div class="relative z-10 mt-6 flex justify-end">
               <div class="w-9 h-9 rounded-full bg-neutral-800/50 border border-neutral-700/50 flex items-center justify-center text-neutral-300 group-hover:text-white group-hover:bg-neutral-700 transition-all">
@@ -378,11 +378,11 @@
           </div>
 
           <!-- Anatomia (1 coluna) -->
-          <div onclick="window.App.selecionarFrente('anatomia')" class="glass-card md:col-span-1 rounded-2xl p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[220px]">
+          <div onclick="window.App.selecionarFrente('anatomia')" class="glass-card md:col-span-1 rounded-2xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[220px]">
             <div class="relative z-10">
               <span class="absolute -bottom-6 -right-2 text-[180px] font-serif font-black text-white/[0.02] group-hover:text-white/[0.04] transition-colors duration-500 pointer-events-none select-none leading-none">2</span>
               <h2 class="text-white font-serif text-xl md:text-2xl mb-2">Anatomia</h2>
-              <p class="text-neutral-400 text-sm leading-relaxed">Estudo topográfico da arquitetura corporal e acidentes anatômicos em peças e cortes cadavéricos reais (em breve).</p>
+              <p class="text-neutral-400 text-[15px] leading-[1.6] md:text-sm md:leading-relaxed">Estudo topográfico da arquitetura corporal e acidentes anatômicos em peças e cortes cadavéricos reais (em breve).</p>
             </div>
             <div class="relative z-10 mt-6 flex justify-end">
               <div class="w-9 h-9 rounded-full bg-neutral-800/50 border border-neutral-700/50 flex items-center justify-center text-neutral-300 group-hover:text-white group-hover:bg-neutral-700 transition-all">
@@ -394,11 +394,11 @@
           <!-- FILEIRA INFERIOR -->
 
           <!-- Patologia Geral (1 coluna) -->
-          <div onclick="window.App.selecionarFrente('patologia')" class="glass-card md:col-span-1 rounded-2xl p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
+          <div onclick="window.App.selecionarFrente('patologia')" class="glass-card md:col-span-1 rounded-2xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
             <div class="relative z-10">
               <span class="absolute -bottom-6 -right-2 text-[180px] font-serif font-black text-white/[0.02] group-hover:text-white/[0.04] transition-colors duration-500 pointer-events-none select-none leading-none">3</span>
               <h2 class="text-white font-serif text-xl mb-1">Patologia</h2>
-              <p class="text-neutral-400 text-sm leading-relaxed">Análise das alterações morfológicas teciduais, processos inflamatórios, mecanismos de lesão e neoplasias (em breve).</p>
+              <p class="text-neutral-400 text-[15px] leading-[1.6] md:text-sm md:leading-relaxed">Análise das alterações morfológicas teciduais, processos inflamatórios, mecanismos de lesão e neoplasias (em breve).</p>
             </div>
             <div class="relative z-10 mt-6 flex justify-end">
               <div class="w-9 h-9 rounded-full bg-neutral-800/50 border border-neutral-700/50 flex items-center justify-center text-neutral-300 group-hover:text-white group-hover:bg-neutral-700 transition-all">
@@ -408,11 +408,11 @@
           </div>
 
           <!-- Parasitologia (1 coluna) -->
-          <div onclick="window.App.selecionarFrente('parasitologia')" class="glass-card md:col-span-1 rounded-2xl p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
+          <div onclick="window.App.selecionarFrente('parasitologia')" class="glass-card md:col-span-1 rounded-2xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
             <div class="relative z-10">
               <span class="absolute -bottom-6 -right-2 text-[180px] font-serif font-black text-white/[0.02] group-hover:text-white/[0.04] transition-colors duration-500 pointer-events-none select-none leading-none">4</span>
               <h2 class="text-white font-serif text-xl mb-1">Parasitologia</h2>
-              <p class="text-neutral-400 text-sm leading-relaxed">Identificação morfológica e características estruturais de protozoários e helmintos de interesse médico (em breve).</p>
+              <p class="text-neutral-400 text-[15px] leading-[1.6] md:text-sm md:leading-relaxed">Identificação morfológica e características estruturais de protozoários e helmintos de interesse médico (em breve).</p>
             </div>
             <div class="relative z-10 mt-6 flex justify-end">
               <div class="w-9 h-9 rounded-full bg-neutral-800/50 border border-neutral-700/50 flex items-center justify-center text-neutral-300 group-hover:text-white group-hover:bg-neutral-700 transition-all">
@@ -422,11 +422,11 @@
           </div>
 
           <!-- Microbiologia (1 coluna) -->
-          <div onclick="window.App.selecionarFrente('microbiologia')" class="glass-card md:col-span-1 rounded-2xl p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
+          <div onclick="window.App.selecionarFrente('microbiologia')" class="glass-card md:col-span-1 rounded-2xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
             <div class="relative z-10">
               <span class="absolute -bottom-6 -right-2 text-[180px] font-serif font-black text-white/[0.02] group-hover:text-white/[0.04] transition-colors duration-500 pointer-events-none select-none leading-none">5</span>
               <h2 class="text-white font-serif text-xl mb-1">Microbiologia</h2>
-              <p class="text-neutral-400 text-sm leading-relaxed">Análise morfotintorial e identificação de arranjos bacterianos e estruturas fúngicas em lâminas (em breve).</p>
+              <p class="text-neutral-400 text-[15px] leading-[1.6] md:text-sm md:leading-relaxed">Análise morfotintorial e identificação de arranjos bacterianos e estruturas fúngicas em lâminas (em breve).</p>
             </div>
             <div class="relative z-10 mt-6 flex justify-end">
               <div class="w-9 h-9 rounded-full bg-neutral-800/50 border border-neutral-700/50 flex items-center justify-center text-neutral-300 group-hover:text-white group-hover:bg-neutral-700 transition-all">
