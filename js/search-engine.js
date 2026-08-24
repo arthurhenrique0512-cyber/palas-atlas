@@ -18,14 +18,12 @@ export function initGlobalSearch() {
   const loadCache = async () => {
     if (isCacheLoaded || !db) return;
     try {
-      console.log("[SearchEngine] Baixando acervo para busca...");
       const snapshot = await db.collection("laminas").get();
       // Filtra client-side para evitar problemas de índice no Firestore
       slidesCache = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
         .filter(lamina => lamina.status === "ativa");
       isCacheLoaded = true;
-      console.log(`[SearchEngine] ${slidesCache.length} lâminas ativas carregadas no cache.`);
     } catch (e) {
       console.error("[SearchEngine] Erro ao carregar acervo para busca:", e);
     }

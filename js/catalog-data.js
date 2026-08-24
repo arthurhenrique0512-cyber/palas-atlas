@@ -95,7 +95,6 @@ export const catalogData = {
             dziUrl: "",
             imageUrl: "/assets/histologia/muscular-esqueletico-he.jpg",
             caminhoImagemBase: "/assets/histologia/muscular-esqueletico-he.jpg",
-            questoes: []
           }
         ]
       },

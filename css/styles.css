@@ -138,12 +138,6 @@ body {
               0 10px 15px -5px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Card 3: Simulado Prático (Unified Blue/Zinc Mode) */
-#pgHome .bg-gradient-to-b:hover {
-  transform: translateY(-4px);
-  border-color: #2563eb !important;
-  box-shadow: 0 25px 35px -12px rgba(30, 58, 138, 0.5), 
-              0 0 30px rgba(37, 99, 235, 0.3) !important;
 }
 
 /* Efeito de compressão tátil em botões ao clicar (Active State) */
@@ -297,8 +291,7 @@ button:active {
   }
 }
 
-.pin-pulse,
-#simuladoPinStageOverlay div {
+.pin-pulse {
   animation: pinRipple 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
 }
 
@@ -310,9 +303,7 @@ button:active {
 /* FIX MELHORIA DS-2: Removido #pgHistologia da lista de seletores pois causava
    fundo escuro forçado dentro do Acervo em Light Mode (bg-zinc-950 sobre bg-white). 
    O glass-panel agora é apenas uma classe explícita, sem seletores por contexto de página. */
-.glass-panel,
-#pgAnatomia .backdrop-blur-md,
-#pgSimulado .backdrop-blur-md {
+.glass-panel {
   background: rgba(15, 23, 42, 0.78) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
@@ -324,9 +315,7 @@ button:active {
 
 /* Aceleração de GPU para Renderização 60 FPS Sem Engasgos (Will-Change e Preserve 3D) */
 .microscope-view img,
-#slideImageMatrix,
-#anatomyImageMatrix,
-#simuladoImageMatrix {
+#slideImageMatrix {
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -335,9 +324,7 @@ button:active {
   image-rendering: -webkit-optimize-contrast;
 }
 
-#opticalTransformLayer,
-#anatomyTransformLayer,
-#simuladoTransformLayer {
+#opticalTransformLayer {
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -345,9 +332,7 @@ button:active {
 }
 
 /* Superfícies de Arrasto e Cursor Tátil */
-#estudioOpticoContainer,
-#bancadaDissecacaoContainer,
-#simuladoPalcoContainer {
+#estudioOpticoContainer {
   touch-action: none;
   overflow: hidden;
   position: relative;

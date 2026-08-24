@@ -220,7 +220,6 @@
             </div>
           </div>
 
-          <!-- BLOCO 2: FERRAMENTAS E SIMULADO -->
           <div class="pt-5 border-t border-neutral-800">
             <span class="text-[10px] tracking-[0.25em] font-sans font-semibold text-neutral-500 uppercase mb-3 px-2 block">Ferramentas</span>
 
@@ -636,23 +635,6 @@
             <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
             Lâminas &amp; Acervo
           </button>
-          <button
-            type="button"
-            id="btnTopicoAnatomia"
-            onclick="window.App.alternarTopicoCms('anatomia')"
-            class="text-neutral-400 hover:text-white px-4 py-2.5 text-xs flex items-center gap-2 transition-colors cursor-pointer border-b-2 border-transparent">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            Anatomia Macroscópica
-          </button>
-          <button
-            type="button"
-            id="btnTopicoQuestoes"
-            onclick="window.App.alternarTopicoCms('questoes')"
-            class="text-neutral-400 hover:text-white px-4 py-2.5 text-xs flex items-center gap-2 transition-colors cursor-pointer border-b-2 border-transparent">
-            <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
-            Gerenciador de Questões
-          </button>
-        </div>
         <div class="flex items-center gap-3 font-mono">
           <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -1012,114 +994,6 @@
               <label for="anaImgUrl" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">URL da Imagem Cadavérica</label>
               <input type="text" id="anaImgUrl" placeholder="Ex: assets/anatomia/torax_camada1.jpg" class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors">
             </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label for="anaRegiao" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Região</label>
-                <select id="anaRegiao" class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer appearance-none">
-                  <option value="cabeca">Cabeça</option>
-                  <option value="pescoco">Pescoço</option>
-                  <option value="torax">Tórax</option>
-                  <option value="membro-superior">Membro Superior</option>
-                  <option value="membro-inferior">Membro Inferior</option>
-                  <option value="abdome">Abdome</option>
-                  <option value="pelve">Pelve</option>
-                </select>
-              </div>
-              <div>
-                <label for="anaOrdem" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Ordem de Dissecação</label>
-                <input type="number" id="anaOrdem" placeholder="Ex: 1" class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors">
-              </div>
-            </div>
-
-            <div>
-              <label for="anaLegenda" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Legenda Estrutural</label>
-              <textarea id="anaLegenda" rows="5" placeholder="1 - Pele&#10;2 - Tela Subcutânea&#10;3 - Fáscia Muscular..." class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors resize-none"></textarea>
-            </div>
-
-            <button type="button" id="btnSalvarAnatomia" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-medium py-3 rounded-lg transition-colors text-xs uppercase tracking-wider mt-2 cursor-pointer">
-              Salvar Camada Cadavérica
-            </button>
-            <input type="hidden" id="anaIdEmEdicao" value="">
-          </div>
-        </div>
-
-        <!-- COLUNA DA DIREITA - TABELA DE ORDENAÇÃO -->
-        <div class="flex-1 flex flex-col bg-neutral-900/60 backdrop-blur-md border border-neutral-800/80 rounded-xl overflow-hidden mb-12 shadow-2xl min-h-[500px]">
-          
-          <div class="p-6 border-b border-neutral-800 bg-neutral-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h3 class="text-lg font-medium text-white flex items-center gap-2">
-                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                Ordenamento de Camadas
-              </h3>
-              <p class="text-xs text-slate-400 mt-1">Gerencie a profundidade da dissecação por região.</p>
-            </div>
-            
-            <div class="flex items-center gap-2">
-              <span class="text-[11px] font-bold uppercase text-neutral-500 font-mono">Filtrar:</span>
-              <select id="filtroRegiaoAnatomia" class="bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer">
-                <option value="todas">Todas as Regiões</option>
-                <option value="cabeca">Cabeça</option>
-                <option value="pescoco">Pescoço</option>
-                <option value="torax">Tórax</option>
-                <option value="membro-superior">Membro Superior</option>
-                <option value="membro-inferior">Membro Inferior</option>
-                <option value="abdome">Abdome</option>
-                <option value="pelve">Pelve</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="flex-1 overflow-auto">
-            <table class="w-full text-left border-collapse">
-              <thead class="bg-neutral-950 sticky top-0 z-10 shadow-sm">
-                <tr class="border-b border-neutral-800 text-[10px] font-mono font-bold uppercase text-neutral-400 tracking-wider">
-                  <th class="py-3 px-4 w-16 text-center">Ordem</th>
-                  <th class="py-3 px-4">Região</th>
-                  <th class="py-3 px-4">URL Imagem</th>
-                  <th class="py-3 px-4 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody id="tabelaAnatomiaCms" class="divide-y divide-neutral-800/60 text-sm text-neutral-300 font-medium">
-                <tr>
-                  <td colspan="4" class="py-8 text-center text-xs font-mono text-neutral-500">Conectando ao banco de dados...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-
-
-
-
-  </main>
-
-  <!-- FOOTER INSTITUCIONAL (GLOBAL - DARK MODE) -->
-  <footer id="footer-dark" class="w-full bg-zinc-950 text-zinc-400 border-t border-zinc-900 mt-auto font-sans transition-opacity duration-300 relative z-20">
-    <div class="max-w-7xl mx-auto px-6 py-16 sm:py-20">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12">
-        
-        <!-- Coluna 1: Marca -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2">
-            <span class="text-lg font-serif font-bold text-amber-500/90">PALAS</span>
-            <span class="text-lg font-serif font-bold text-amber-500/90">ATLAS</span>
-          </div>
-          <p class="text-xs leading-relaxed max-w-xs text-zinc-400">
-            Atlas Morfológico Digital. Integração científica e prática laboratorial para o ciclo básico da saúde.
-          </p>
-          <div class="flex items-center gap-3 pt-2">
-            <a href="#" class="hover:text-blue-400 transition-colors text-xs text-zinc-400" aria-label="Twitter">
-              <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="#" class="hover:text-blue-400 transition-colors text-xs text-zinc-400" aria-label="Instagram">
-              <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-            </a>
             <a href="mailto:contato@palasatlas.com" class="hover:text-blue-400 transition-colors text-xs text-zinc-400" aria-label="Email">
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </a>
@@ -1143,7 +1017,6 @@
           <h4 class="text-white font-bold tracking-wider text-xs uppercase">Plataforma</h4>
           <ul class="space-y-2.5">
             <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="index.html">Início (Home)</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="index.html">Simulado Integrado</a></li>
             <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
           </ul>
         </div>
@@ -1212,7 +1085,6 @@
           <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Plataforma</h4>
           <ul class="space-y-2.5">
             <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="index.html">Início (Home)</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="index.html">Simulado Integrado</a></li>
             <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
           </ul>
         </div>
@@ -1307,18 +1179,6 @@
           </div>
         </div>
 
-        <!-- Passo 4 -->
-        <div class="flex gap-4 items-start p-4 rounded-2xl bg-neutral-950/60 border border-neutral-800/80 hover:border-neutral-700 transition-all">
-          <div class="w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-mono font-bold text-xs shrink-0 mt-0.5">
-            04
-          </div>
-          <div class="space-y-1">
-            <h4 class="text-sm md:text-base font-medium text-white tracking-wide">Simulado Multidisciplinar</h4>
-            <p class="font-sans text-xs md:text-sm text-neutral-400 leading-relaxed font-light">
-              Acesse pelo Menu Lateral para testar seus conhecimentos em questões práticas com cronômetro e feedback imediato.
-            </p>
-          </div>
-        </div>
 
       </div>
 
@@ -1346,11 +1206,7 @@
   <!-- main.js importa dashboard-engine e microscope-engine via ES module import -->
   <!-- NÃO carregar esses arquivos duplicados aqui para evitar duas instâncias isoladas -->
   <script type="module" src="js/main.js?v=1787013751"></script>
-  <script type="module" src="js/histology-ui.js?v=2026.0813"></script>
   <script type="module" src="js/histology-catalog.js?v=2026.0813"></script>
-  <script type="module" src="js/anatomy-ui.js?v=2026.0813"></script>
-  <script type="module" src="js/anatomy-admin.js?v=2026.0813"></script>
-  <script type="module" src="js/simulator.js?v=2026.0814"></script>
   <!-- COOKIE CONSENT BANNER -->
   <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[9999] bg-neutral-900/95 backdrop-blur-md border border-neutral-800 p-5 rounded-2xl shadow-2xl text-neutral-300 text-xs leading-relaxed hidden">
     <p>Utilizamos cookies essenciais para otimizar sua experiência de estudo no visualizador morfológico. Ao continuar navegando, você concorda com nossa Política de Privacidade.</p>

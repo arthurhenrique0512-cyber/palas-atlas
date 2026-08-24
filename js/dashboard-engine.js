@@ -78,8 +78,6 @@ export function toggleDashboard() {
 export function alternarTopicoCms(topico) {
   const contEditor = document.getElementById("topicoCmsEditor");
   const contAcervo = document.getElementById("topicoCmsAcervo");
-  const contAnatomia = document.getElementById("topicoCmsAnatomia");
-  const contQuestoes = document.getElementById("topicoCmsQuestoes");
 
   if (topico === "acervo" && viewerInstance && typeof viewerInstance.destroy === "function") {
     try { viewerInstance.destroy(); } catch(e) {}
@@ -88,36 +86,20 @@ export function alternarTopicoCms(topico) {
   
   const btnEditor = document.getElementById("btnTopicoEditor");
   const btnAcervo = document.getElementById("btnTopicoAcervo");
-  const btnAnatomia = document.getElementById("btnTopicoAnatomia");
-  const btnQuestoes = document.getElementById("btnTopicoQuestoes");
   
   const clsAtivo = "border-b-2 border-sky-500 text-sky-400 font-medium px-4 py-2.5 text-xs flex items-center gap-2 transition-colors cursor-pointer";
   const clsInativo = "text-neutral-400 hover:text-white px-4 py-2.5 text-xs flex items-center gap-2 transition-colors cursor-pointer border-b-2 border-transparent";
   
   if (contEditor) contEditor.classList.add("hidden");
   if (contAcervo) contAcervo.classList.add("hidden");
-  if (contAnatomia) contAnatomia.classList.add("hidden");
-  if (contQuestoes) contQuestoes.classList.add("hidden");
   
   if (btnEditor) btnEditor.className = clsInativo;
   if (btnAcervo) btnAcervo.className = clsInativo;
-  if (btnAnatomia) btnAnatomia.className = clsInativo;
-  if (btnQuestoes) btnQuestoes.className = clsInativo;
 
   if (topico === "acervo" || topico === "laminas") {
     if (contAcervo) contAcervo.classList.remove("hidden");
     if (btnAcervo) btnAcervo.className = clsAtivo.replace('border-sky-500 text-sky-400', 'border-blue-500 text-blue-400');
     renderizarTabelaAcervo();
-  } else if (topico === "anatomia") {
-    if (contAnatomia) contAnatomia.classList.remove("hidden");
-    if (btnAnatomia) btnAnatomia.className = clsAtivo.replace('border-sky-500 text-sky-400', 'border-emerald-500 text-emerald-400');
-  } else if (topico === "questoes") {
-    if (contQuestoes) contQuestoes.classList.remove("hidden");
-    if (btnQuestoes) btnQuestoes.className = clsAtivo.replace('border-sky-500 text-sky-400', 'border-violet-500 text-violet-400');
-    if (typeof window.App.carregarOpcoesLaminasParaQuestoes === "function") {
-      window.App.carregarOpcoesLaminasParaQuestoes();
-      window.App.carregarQuestoesCms();
-    }
   } else {
     if (contEditor) contEditor.classList.remove("hidden");
     if (btnEditor) btnEditor.className = clsAtivo;
@@ -197,7 +179,7 @@ export function renderizarTabelaAcervo() {
   }
   let rowsHtml = "";
   listaFiltrada.forEach((lamina) => {
-    const totalPinos = Array.isArray(lamina.pinos) ? lamina.pinos.length : (Array.isArray(lamina.questoes) ? lamina.questoes.length : 0);
+    const totalPinos = (lamina.pinos || []).length;
     const nomeSeguro = (lamina.nome || "Peca sem titulo").replace(/'/g, "\\'");
     const isAtiva = lamina.status === "ativa";
     const badgeStatus = isAtiva
@@ -283,7 +265,7 @@ export async function editarLaminaCms(id) {
   setTimeout(() => {
     editorPins = [];
     if (viewerInstance && typeof viewerInstance.clearOverlays === "function") viewerInstance.clearOverlays();
-    const pinosOrigem = Array.isArray(lamina.pinos) ? lamina.pinos : (Array.isArray(lamina.questoes) ? lamina.questoes : []);
+    const pinosOrigem = (lamina.pinos || []);
     if (pinosOrigem.length > 0) {
       pinosOrigem.forEach((pin, i) => {
         const pinoData = { id: pin.id || `pin_${Date.now()}_${i}`, rotulo: pin.rotulo || pin.nome || `${i + 1}`, x: pin.x || 0, y: pin.y || 0 };
@@ -691,183 +673,13 @@ export async function publicarLaminaCms() {
 }
 
 /* =========================================================
-   GERENCIADOR DE QUESTÕES (SIMULADO)
    ========================================================= */
 
-async function carregarOpcoesLaminasParaQuestoes() {
-  const select = document.getElementById("questaoLaminaIdCms");
-  if (!select) return;
-  
-  select.innerHTML = '<option value="">Carregando...</option>';
-  try {
-    const laminasSnap = await db.collection("laminas").get();
-    const pecasSnap = await db.collection("pecas").get();
-    
-    let html = '<option value="">-- Selecione uma Lâmina ou Peça --</option>';
-    
-    // Agrupar Peças
-    if (!pecasSnap.empty) {
-      html += '<optgroup label="Peças (Anatomia)">';
-      pecasSnap.forEach(doc => {
-        const d = doc.data();
-        html += `<option value="${doc.id}">[ANATOMIA] ${d.nome || doc.id}</option>`;
-      });
-      html += '</optgroup>';
-    }
+window.osdEditorAction = osdEditorAction;
+window.publicarLaminaCms = publicarLaminaCms;
 
-    // Agrupar Lâminas
-    if (!laminasSnap.empty) {
-      html += '<optgroup label="Lâminas (Histologia / Patologia)">';
-      laminasSnap.forEach(doc => {
-        const d = doc.data();
-        const disc = (d.disciplina || "histologia").toUpperCase();
-        html += `<option value="${doc.id}">[${disc}] ${d.nome || doc.id}</option>`;
-      });
-      html += '</optgroup>';
-    }
-    
-    select.innerHTML = html;
-  } catch(e) {
-    console.error("Erro ao carregar opções para questões:", e);
-    select.innerHTML = '<option value="">Erro ao carregar</option>';
-  }
-}
-
-async function carregarQuestoesCms() {
-  const tbody = document.getElementById("tabelaQuestoesCms");
-  const filtroDisc = document.getElementById("filtroDisciplinaQuestoes")?.value || "todas";
-  if (!tbody) return;
-  
-  tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-neutral-500 text-xs">Carregando questões...</td></tr>';
-  
-  try {
-    const snap = await db.collection("questoes").get();
-    if (snap.empty) {
-      tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-neutral-500 text-xs">Nenhuma questão cadastrada.</td></tr>';
-      return;
-    }
-    
-    let html = "";
-    snap.forEach(doc => {
-      const q = doc.data();
-      if (filtroDisc !== "todas" && q.disciplina !== filtroDisc) return;
-      
-      const badgeStatus = q.ativo !== false 
-        ? '<span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded text-[10px] uppercase font-bold">Ativa</span>'
-        : '<span class="px-2 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded text-[10px] uppercase font-bold">Inativa</span>';
-        
-      html += `
-        <tr class="hover:bg-neutral-800/30 transition-colors">
-          <td class="py-3 px-4">${badgeStatus}</td>
-          <td class="py-3 px-4 text-[11px] font-mono text-neutral-400 uppercase">${q.disciplina || "-"}</td>
-          <td class="py-3 px-4 font-semibold text-white text-xs">${q.topico || "-"}</td>
-          <td class="py-3 px-4 text-xs text-neutral-400 truncate max-w-xs" title="${q.pergunta || ""}">${q.pergunta || "-"}</td>
-          <td class="py-3 px-4 text-right space-x-2">
-            <button onclick="window.App.editarQuestao('${doc.id}')" class="text-sky-400 hover:text-sky-300 text-xs font-medium cursor-pointer">Editar</button>
-            <button onclick="window.App.excluirQuestao('${doc.id}')" class="text-rose-400 hover:text-rose-300 text-xs font-medium cursor-pointer">Excluir</button>
-          </td>
-        </tr>
-      `;
-    });
-    
-    tbody.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-neutral-500 text-xs">Nenhuma questão encontrada para este filtro.</td></tr>';
-  } catch(e) {
-    console.error("Erro ao carregar questões:", e);
-    tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-rose-500 text-xs">Erro ao carregar questões.</td></tr>';
-  }
-}
-
-function resetarFormularioQuestao() {
-  document.getElementById("questaoIdCms").value = "";
-  document.getElementById("questaoLaminaIdCms").value = "";
-  document.getElementById("questaoDisciplinaCms").value = "anatomia";
-  document.getElementById("questaoTopicoCms").value = "";
-  document.getElementById("questaoPerguntaCms").value = "";
-  document.getElementById("questaoGabaritoCms").value = "";
-  document.getElementById("questaoPinoIdCms").value = "";
-  document.getElementById("questaoAtivoCms").checked = true;
-  document.getElementById("btnSalvarQuestao").textContent = "Salvar Questão";
-}
-
-async function editarQuestao(id) {
-  try {
-    const doc = await db.collection("questoes").doc(id).get();
-    if (!doc.exists) return;
-    const q = doc.data();
-    
-    document.getElementById("questaoIdCms").value = id;
-    document.getElementById("questaoLaminaIdCms").value = q.laminaId || "";
-    document.getElementById("questaoDisciplinaCms").value = q.disciplina || "anatomia";
-    document.getElementById("questaoTopicoCms").value = q.topico || "";
-    document.getElementById("questaoPerguntaCms").value = q.pergunta || "";
-    document.getElementById("questaoGabaritoCms").value = q.gabarito || "";
-    document.getElementById("questaoPinoIdCms").value = q.pinoId || "";
-    document.getElementById("questaoAtivoCms").checked = q.ativo !== false;
-    
-    document.getElementById("btnSalvarQuestao").textContent = "Atualizar Questão";
-  } catch(e) {
-    console.error(e);
-  }
-}
-
-async function excluirQuestao(id) {
-  if (!confirm("Excluir esta questão permanentemente?")) return;
-  try {
-    await db.collection("questoes").doc(id).delete();
-    carregarQuestoesCms();
-  } catch(e) {
-    console.error(e);
-    alert("Erro ao excluir");
-  }
-}
-
-// Interceptar submit do Form de Questões
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("formQuestaoCms");
-  if (form) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById("btnSalvarQuestao");
-      btn.textContent = "Salvando...";
-      btn.disabled = true;
-      
-      try {
-        const id = document.getElementById("questaoIdCms").value;
-        const payload = {
-          laminaId: document.getElementById("questaoLaminaIdCms").value,
-          disciplina: document.getElementById("questaoDisciplinaCms").value,
-          topico: document.getElementById("questaoTopicoCms").value,
-          pergunta: document.getElementById("questaoPerguntaCms").value,
-          gabarito: document.getElementById("questaoGabaritoCms").value,
-          pinoId: document.getElementById("questaoPinoIdCms").value || null,
-          ativo: document.getElementById("questaoAtivoCms").checked,
-          dataAtualizacao: new Date().toISOString()
-        };
-        
-        if (id) {
-          await db.collection("questoes").doc(id).update(payload);
-        } else {
-          payload.dataCriacao = new Date().toISOString();
-          await db.collection("questoes").add(payload);
-        }
-        
-        resetarFormularioQuestao();
-        carregarQuestoesCms();
-      } catch(error) {
-        console.error(error);
-        alert("Erro ao salvar questão");
-      } finally {
-        btn.textContent = "Salvar Questão";
-        btn.disabled = false;
-      }
-    });
-  }
-  
-  const filtro = document.getElementById("filtroDisciplinaQuestoes");
-  if (filtro) {
-    filtro.addEventListener("change", carregarQuestoesCms);
-  }
-});
+// inicializarPainelCms() e chamada pelo main.js via window.App.inicializarPainelCms()
+// quando frenteAtiva === "dashboard" no renderView. Nao executar aqui automaticamente.
 
 window.App = window.App || {};
 Object.assign(window.App, {
@@ -876,9 +688,7 @@ Object.assign(window.App, {
   editarLaminaCms, excluirLaminaCms, resetarFormularioDashboard,
   atualizarTopicosCms, carregarImagemNoEditor, adicionarPinoEditor,
   editarRotuloPinoCms, excluirPinoCms, vincularTextoAoPino,
-  inicializarEventosPreviewInterativo, osdEditorAction, publicarLaminaCms,
-  carregarOpcoesLaminasParaQuestoes, carregarQuestoesCms, resetarFormularioQuestao,
-  editarQuestao, excluirQuestao
+  inicializarEventosPreviewInterativo, osdEditorAction, publicarLaminaCms
 });
 window.inicializarPainelCms = inicializarPainelCms;
 window.toggleDashboard = toggleDashboard;
@@ -898,6 +708,3 @@ window.excluirPinoCms = excluirPinoCms;
 window.vincularTextoAoPino = vincularTextoAoPino;
 window.osdEditorAction = osdEditorAction;
 window.publicarLaminaCms = publicarLaminaCms;
-
-// inicializarPainelCms() e chamada pelo main.js via window.App.inicializarPainelCms()
-// quando frenteAtiva === "dashboard" no renderView. Nao executar aqui automaticamente.
