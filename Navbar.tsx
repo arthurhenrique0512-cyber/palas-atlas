@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface NavbarProps {
   onOpenSettings?: () => void;
@@ -16,6 +17,8 @@ export default function Navbar({
 }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === '/';
 
   const handleToggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -38,7 +41,7 @@ export default function Navbar({
           className="pointer-events-auto group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-4 sm:px-5 py-2.5 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none"
           aria-label="Palas Atlas - Início"
         >
-          {/* Estrutura Centralizada da Marca: PALAS [ÍCONE] ATLAS */}
+          {/* Estrutura Centralizada da Marca: PALAS [ÍCONE DA CORUJA CONDICIONAL] ATLAS */}
           <div className="flex flex-col items-start justify-center">
             <div className="flex items-center gap-2.5">
               {/* PALAS - Ouro-champanhe fosco (~20% maior) */}
@@ -46,25 +49,27 @@ export default function Navbar({
                 PALAS
               </span>
 
-              {/* Ícone Central Morfológico / Atena (~20% maior) */}
-              <span className="text-[#d4af37] group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M6 18h8" />
-                  <path d="M3 22h18" />
-                  <path d="M14 22a7 7 0 1 0-7-7" />
-                  <path d="M9 14h2" />
-                  <path d="M9 12a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2" />
-                  <circle cx="11" cy="8" r="1" fill="currentColor" />
-                </svg>
-              </span>
+              {/* Ícone da Coruja: renderizado APENAS quando a rota for a Home (pathname === '/') */}
+              {isHome && (
+                <span className="text-[#d4af37] group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M6 18h8" />
+                    <path d="M3 22h18" />
+                    <path d="M14 22a7 7 0 1 0-7-7" />
+                    <path d="M9 14h2" />
+                    <path d="M9 12a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2" />
+                    <circle cx="11" cy="8" r="1" fill="currentColor" />
+                  </svg>
+                </span>
+              )}
 
               {/* ATLAS - Off-white / Azul-gelo suave (~20% maior) */}
               <span className="font-serif font-normal text-base sm:text-lg tracking-[0.2em] text-slate-100 group-hover:text-white leading-none transition-colors">
