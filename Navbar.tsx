@@ -35,21 +35,21 @@ export default function Navbar({
         {/* ── LADO ESQUERDO: Cápsula Flutuante do Logotipo (Top-Left) ── */}
         <Link
           href="/"
-          className="pointer-events-auto group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-4 sm:px-5 py-2 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none"
+          className="pointer-events-auto group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-4 sm:px-5 py-2.5 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none"
           aria-label="Palas Atlas - Início"
         >
           {/* Estrutura Centralizada da Marca: PALAS [ÍCONE] ATLAS */}
           <div className="flex flex-col items-start justify-center">
-            <div className="flex items-center gap-2">
-              {/* PALAS - Ouro-champanhe fosco */}
-              <span className="font-serif font-bold text-sm sm:text-base tracking-[0.2em] text-[#d4af37] leading-none transition-colors group-hover:text-amber-200">
+            <div className="flex items-center gap-2.5">
+              {/* PALAS - Ouro-champanhe fosco (~20% maior) */}
+              <span className="font-serif font-bold text-base sm:text-lg tracking-[0.2em] text-[#d4af37] leading-none transition-colors group-hover:text-amber-200">
                 PALAS
               </span>
 
-              {/* Ícone Central Morfológico / Atena */}
+              {/* Ícone Central Morfológico / Atena (~20% maior) */}
               <span className="text-[#d4af37] group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
+                  className="w-5 h-5 sm:w-6 sm:h-6"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -66,14 +66,14 @@ export default function Navbar({
                 </svg>
               </span>
 
-              {/* ATLAS - Off-white / Azul-gelo suave */}
-              <span className="font-serif font-normal text-sm sm:text-base tracking-[0.2em] text-slate-100 group-hover:text-white leading-none transition-colors">
+              {/* ATLAS - Off-white / Azul-gelo suave (~20% maior) */}
+              <span className="font-serif font-normal text-base sm:text-lg tracking-[0.2em] text-slate-100 group-hover:text-white leading-none transition-colors">
                 ATLAS
               </span>
             </div>
 
             {/* Subtítulo: Proteção Mobile com hidden md:block */}
-            <span className="hidden md:block text-[9px] tracking-[0.2em] uppercase text-neutral-400 font-sans font-medium mt-1 leading-tight transition-colors group-hover:text-neutral-300">
+            <span className="hidden md:block text-[10px] tracking-[0.22em] uppercase text-neutral-400 font-sans font-medium mt-1 leading-tight transition-colors group-hover:text-neutral-300">
               Atlas Morfológico Digital
             </span>
           </div>

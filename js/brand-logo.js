@@ -67,12 +67,12 @@ class BrandLogo extends HTMLElement {
         subtitleMt:    'mt-0.5',
       },
       md: {
-        imgClass:      'h-4 sm:h-5',
-        textClass:     'text-sm sm:text-base',
+        imgClass:      'h-5 sm:h-6 md:h-6',
+        textClass:     'text-base sm:text-lg',
         trackingPalas: 'tracking-[0.2em]',
         trackingAtlas: 'tracking-[0.2em]',
-        subtitleClass: 'text-[9px] tracking-[0.2em]',
-        gap:           'gap-2',
+        subtitleClass: 'text-[9.5px] tracking-[0.22em]',
+        gap:           'gap-2.5',
         subtitleMt:    'mt-1',
       },
       lg: {
