@@ -114,6 +114,9 @@ function init() {
  * @param {Object} state - Estado imutável atual da aplicação.
  */
 function renderView(state) {
+  // Controle de scroll global: força rolagem para o topo absoluto (0, 0) a cada transição de rota/frente
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
   const allPages = [
     elements.pgHome,
     elements.pgAnatomia,
