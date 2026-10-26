@@ -13,7 +13,7 @@
 
 export const catalogData = {
   histologia: {
-    tituloDisciplina: "Histologia Microscópica",
+    tituloDisciplina: "Histologia",
     bibliografia: "Junqueira & Carneiro - Histologia Básica",
     caminhoBase: "/assets/histologia/",
     corDestaque: "border-blue-600 bg-blue-50 text-blue-800",
