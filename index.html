@@ -375,117 +375,116 @@
 
           </div>
 
-          <!-- COLUNA DIREITA: A "Vitrine de Lâminas" Interativa (lg:col-span-5) -->
+          <!-- COLUNA DIREITA: Vitrine de Lâminas (Zero-Box / Borderless Editorial) -->
           <div class="lg:col-span-5 w-full">
-            <div id="heroSlideShowcase" class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-xl relative overflow-hidden group transition-all duration-300 hover:border-white/[0.1]">
+            <div id="heroSlideShowcase" class="relative group/showcase w-full flex flex-col space-y-4">
               
-              <!-- Cabeçalho e Controles de Navegação (Discretos e Editoriais) -->
-              <div class="flex items-center justify-between pb-3 border-b border-white/[0.04]">
-                <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400/80 animate-pulse" title="Lâmina em visualização"></span>
-                </div>
-                <div class="flex items-center gap-1.5 text-neutral-400 text-xs font-mono select-none">
-                  <button type="button" id="vitrinePrevBtn" class="text-neutral-500 hover:text-neutral-200 transition-colors p-1 cursor-pointer focus:outline-none" aria-label="Lâmina anterior">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-                  </button>
-                  <span id="vitrineCounter" class="text-[10px] tracking-widest text-neutral-400 font-mono px-1">1 / 3</span>
-                  <button type="button" id="vitrineNextBtn" class="text-neutral-500 hover:text-neutral-200 transition-colors p-1 cursor-pointer focus:outline-none" aria-label="Próxima lâmina">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                  </button>
+              <!-- Imagem Principal Flutuante (Borderless com Glow Ambiente) -->
+              <div class="relative group/preview w-full">
+                <!-- Glow ambiente sutil no fundo -->
+                <div class="absolute -inset-1 bg-gradient-to-tr from-[#d4af37]/15 via-emerald-500/10 to-amber-500/10 rounded-2xl blur-2xl opacity-40 group-hover/preview:opacity-75 transition-opacity duration-700 pointer-events-none"></div>
+
+                <div class="aspect-[16/10] w-full rounded-2xl overflow-hidden relative shadow-2xl shadow-black/90 bg-neutral-950">
+                  <img
+                    id="vitrineImage"
+                    src="assets/histologia/muscular-esqueletico-he.jpg"
+                    alt="Lâmina Morfológica"
+                    class="w-full h-full object-cover transition-opacity duration-300 ease-in-out group-hover/preview:scale-[1.03] transition-transform duration-700"
+                  />
+                  <!-- Sombra/gradiente sutil nas bordas internas para profundidade -->
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none"></div>
+
+                  <!-- Badges Técnicos Minimalistas Flutuantes -->
+                  <div class="absolute top-3 left-3 flex items-center gap-1.5 z-10">
+                    <span id="vitrineStainBadge" class="bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider text-neutral-300">
+                      HE &bull; 40x
+                    </span>
+                  </div>
+                  <div class="absolute top-3 right-3 z-10">
+                    <span class="bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider text-[#d4af37] flex items-center gap-1.5 font-medium">
+                      <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                      Deep Zoom DZI
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <!-- Preview da Lâmina com Badges Sutis -->
-              <div class="aspect-[16/10] w-full rounded-xl overflow-hidden relative border border-white/[0.05] bg-black/40 my-3.5 group/preview">
-                <img
-                  id="vitrineImage"
-                  src="assets/histologia/muscular-esqueletico-he.jpg"
-                  alt="Lâmina Morfológica"
-                  class="w-full h-full object-cover transition-opacity duration-300 ease-in-out group-hover/preview:scale-[1.02] transition-transform duration-700"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-neutral-950/60 via-transparent to-transparent pointer-events-none"></div>
-                
-                <!-- Badges Superiores Flutuantes Discretos -->
-                <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
-                  <span id="vitrineStainBadge" class="bg-neutral-950/60 backdrop-blur-sm border border-white/[0.08] px-2 py-0.5 rounded text-[9px] font-mono tracking-wider text-neutral-300">
-                    HE &bull; 40x
-                  </span>
-                </div>
-                <div class="absolute top-2.5 right-2.5 z-10">
-                  <span class="bg-neutral-950/60 backdrop-blur-sm border border-white/[0.08] px-2 py-0.5 rounded text-[9px] font-mono tracking-wider text-amber-200/80 flex items-center gap-1 font-medium">
-                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    Deep Zoom DZI
-                  </span>
-                </div>
-              </div>
-
-              <!-- Hierarquia de Textos e Metadados -->
-              <div class="space-y-1 mb-4 text-left">
-                <div class="flex items-center justify-between text-xs">
-                  <span id="vitrineCategory" class="text-[10px] tracking-widest uppercase text-neutral-400 font-mono">
+              <!-- Tipografia Editorial Solta (Sem Caixas ou Molduras) -->
+              <div class="space-y-1.5 text-left pt-1">
+                <div class="flex items-center justify-between">
+                  <span id="vitrineCategory" class="text-[10px] sm:text-[11px] tracking-widest uppercase text-[#d4af37]/80 font-mono font-medium">
                     Histologia &bull; Tecido Muscular
                   </span>
-                  <span id="vitrineSpecimen" class="text-[10px] tracking-wider text-neutral-500 font-mono">
+                  <span id="vitrineSpecimen" class="text-[10px] sm:text-[11px] tracking-wider text-neutral-500 font-mono">
                     Corte Longitudinal
                   </span>
                 </div>
-                <h3 id="vitrineTitle" class="font-serif font-bold text-lg sm:text-xl text-slate-100 leading-snug tracking-tight">
+                <h3 id="vitrineTitle" class="font-serif font-bold text-xl sm:text-2xl text-slate-100 leading-snug tracking-tight">
                   Músculo Estriado Esquelético
                 </h3>
-                <p id="vitrineDesc" class="text-xs text-neutral-400 line-clamp-2 leading-relaxed font-sans">
+                <p id="vitrineDesc" class="text-xs sm:text-sm text-neutral-400 line-clamp-2 leading-relaxed font-sans">
                   Fibras multinucleadas cilíndricas com estriações transversais evidentes e núcleos periféricos.
                 </p>
               </div>
 
-              <!-- Botão de Acesso Rápido (CTA Limpo e Refinado) -->
-              <a
-                id="vitrineActionBtn"
-                href="microscopio.html?id=muscular-esqueletico-he"
-                class="w-full bg-white/[0.03] hover:bg-[#d4af37]/10 border border-white/[0.07] hover:border-[#d4af37]/40 text-neutral-300 hover:text-[#d4af37] rounded-xl py-2.5 px-4 text-xs font-medium tracking-wide flex items-center justify-center gap-2 transition-all duration-300 group/btn"
-              >
-                <span>Abrir no Microscópio Óptico</span>
-                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-              </a>
-
-              <!-- Miniaturas do Carrossel Inferior -->
-              <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/[0.04]">
-                <button
-                  type="button"
-                  onclick="window.__selectVitrineSlide(0)"
-                  class="vitrine-thumb-btn flex flex-col items-center gap-1 p-1 rounded-lg border border-[#d4af37]/60 bg-[#d4af37]/10 transition-all cursor-pointer opacity-100"
-                  data-index="0"
+              <!-- Rodapé Interativo: Link CTA e Seletor Fluido -->
+              <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+                <!-- Botão Link Interativo Avançado (Sem Caixa Pesada) -->
+                <a
+                  id="vitrineActionBtn"
+                  href="microscopio.html?id=muscular-esqueletico-he"
+                  class="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-200 hover:text-[#d4af37] transition-colors duration-300 group/link"
                 >
-                  <div class="w-full aspect-[16/10] rounded-md overflow-hidden bg-neutral-900">
-                    <img src="assets/histologia/muscular-esqueletico-he.jpg" alt="Músculo" class="w-full h-full object-cover">
-                  </div>
-                  <span class="text-[9px] font-mono text-neutral-300 truncate w-full text-center">Músculo HE</span>
-                </button>
+                  <span class="tracking-wide">Abrir no Microscópio Óptico</span>
+                  <svg class="w-4 h-4 text-neutral-400 group-hover/link:text-[#d4af37] group-hover/link:translate-x-1.5 transition-all duration-300" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                  </svg>
+                </a>
 
-                <button
-                  type="button"
-                  onclick="window.__selectVitrineSlide(1)"
-                  class="vitrine-thumb-btn flex flex-col items-center gap-1 p-1 rounded-lg border border-white/[0.05] hover:border-white/20 bg-transparent transition-all cursor-pointer opacity-60 hover:opacity-90"
-                  data-index="1"
-                >
-                  <div class="w-full aspect-[16/10] rounded-md overflow-hidden bg-neutral-900">
-                    <img src="assets/histologia/medula-espinal-he.png" alt="Medula" class="w-full h-full object-cover">
+                <!-- Seletor de Lâminas e Controles Discretos -->
+                <div class="flex items-center gap-3">
+                  <!-- Miniaturas Circulares Flutuantes (Sem Caixas ou Bordas Rígidas) -->
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onclick="window.__selectVitrineSlide(0)"
+                      class="vitrine-thumb-btn relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden focus:outline-none cursor-pointer transition-all duration-300 ring-2 ring-[#d4af37] opacity-100 scale-105"
+                      title="Músculo Estriado Esquelético"
+                      data-index="0"
+                    >
+                      <img src="assets/histologia/muscular-esqueletico-he.jpg" alt="Músculo" class="w-full h-full object-cover">
+                    </button>
+                    <button
+                      type="button"
+                      onclick="window.__selectVitrineSlide(1)"
+                      class="vitrine-thumb-btn relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden focus:outline-none cursor-pointer transition-all duration-300 ring-1 ring-white/10 opacity-40 hover:opacity-80"
+                      title="Medula Espinal"
+                      data-index="1"
+                    >
+                      <img src="assets/histologia/medula-espinal-he.png" alt="Medula" class="w-full h-full object-cover">
+                    </button>
+                    <button
+                      type="button"
+                      onclick="window.__selectVitrineSlide(2)"
+                      class="vitrine-thumb-btn relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden focus:outline-none cursor-pointer transition-all duration-300 ring-1 ring-white/10 opacity-40 hover:opacity-80"
+                      title="Osso Compacto"
+                      data-index="2"
+                    >
+                      <img src="assets/histologia/osso_compacto_dzi_files/9/0_0.png" alt="Osso" class="w-full h-full object-cover">
+                    </button>
                   </div>
-                  <span class="text-[9px] font-mono text-neutral-300 truncate w-full text-center">Medula HE</span>
-                </button>
 
-                <button
-                  type="button"
-                  onclick="window.__selectVitrineSlide(2)"
-                  class="vitrine-thumb-btn flex flex-col items-center gap-1 p-1 rounded-lg border border-white/[0.05] hover:border-white/20 bg-transparent transition-all cursor-pointer opacity-60 hover:opacity-90"
-                  data-index="2"
-                >
-                  <div class="w-full aspect-[16/10] rounded-md overflow-hidden bg-neutral-900">
-                    <img src="assets/histologia/osso_compacto_dzi_files/9/0_0.png" alt="Osso" class="w-full h-full object-cover">
+                  <!-- Indicador de Página (01 / 03 com setas finas) -->
+                  <div class="flex items-center gap-0.5 text-xs font-mono text-neutral-400 select-none pl-1">
+                    <button type="button" id="vitrinePrevBtn" class="text-neutral-500 hover:text-neutral-200 transition-colors p-1 cursor-pointer focus:outline-none" aria-label="Lâmina anterior">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <span id="vitrineCounter" class="text-[11px] tracking-widest text-neutral-400 font-mono px-1">01 / 03</span>
+                    <button type="button" id="vitrineNextBtn" class="text-neutral-500 hover:text-neutral-200 transition-colors p-1 cursor-pointer focus:outline-none" aria-label="Próxima lâmina">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    </button>
                   </div>
-                  <span class="text-[9px] font-mono text-neutral-300 truncate w-full text-center">Osso Compacto</span>
-                </button>
+                </div>
               </div>
 
             </div>
@@ -561,14 +560,18 @@
             if (specEl) specEl.textContent = slide.specimen;
             if (descEl) descEl.textContent = slide.desc;
             if (actionEl) actionEl.href = slide.link;
-            if (counterEl) counterEl.textContent = (currentIndex + 1) + ' / ' + slides.length;
+            if (counterEl) {
+              const cur = String(currentIndex + 1).padStart(2, '0');
+              const tot = String(slides.length).padStart(2, '0');
+              counterEl.textContent = cur + ' / ' + tot;
+            }
 
             const thumbBtns = document.querySelectorAll('.vitrine-thumb-btn');
             thumbBtns.forEach((btn, i) => {
               if (i === currentIndex) {
-                btn.className = 'vitrine-thumb-btn flex flex-col items-center gap-1 p-1 rounded-lg border border-[#d4af37]/60 bg-[#d4af37]/10 transition-all cursor-pointer opacity-100';
+                btn.className = 'vitrine-thumb-btn relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden focus:outline-none cursor-pointer transition-all duration-300 ring-2 ring-[#d4af37] opacity-100 scale-105';
               } else {
-                btn.className = 'vitrine-thumb-btn flex flex-col items-center gap-1 p-1 rounded-lg border border-white/[0.05] hover:border-white/20 bg-transparent transition-all cursor-pointer opacity-60 hover:opacity-90';
+                btn.className = 'vitrine-thumb-btn relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden focus:outline-none cursor-pointer transition-all duration-300 ring-1 ring-white/10 opacity-40 hover:opacity-80';
               }
             });
           }
