@@ -160,7 +160,6 @@ function renderView(state) {
   const headerMin = document.getElementById("palasMinimalHeader");
   const brandLogo = document.querySelector("#palasMinimalHeader brand-logo");
   const btnOpenDrawer = document.getElementById("btnOpenDrawer");
-  const btnOpenSettings = document.getElementById("btnOpenSettings");
   const btnVoltarGlobal = document.getElementById("btnVoltarGlobal");
   
   const isHomePage = !state.frenteAtiva;
@@ -183,39 +182,36 @@ function renderView(state) {
 
   if (isHomePage) {
     // HOME: emblema dourado + header transparente flutuante
-    if (headerMin) headerMin.className = "fixed left-0 w-full top-0 h-24 bg-transparent border border-transparent z-50 px-6 flex items-center justify-between transition-all duration-300";
+    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "true");
       brandLogo.setAttribute("theme", "dark-bg");
     }
-    if (btnOpenDrawer) btnOpenDrawer.className = "p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
-    if (btnOpenSettings) btnOpenSettings.className = "p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
+    if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.add("hidden");
       btnVoltarGlobal.classList.remove("flex");
     }
   } else if (isDashboard) {
     // DASHBOARD CMS: monocromático claro + header escuro fixo
-    if (headerMin) headerMin.className = "fixed left-0 w-full top-0 h-[88px] bg-neutral-950 border-b border-neutral-800/80 z-50 px-6 flex items-center justify-between transition-all duration-300";
+    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
       brandLogo.setAttribute("theme", "dark-bg");
     }
-    if (btnOpenDrawer) btnOpenDrawer.className = "p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
-    if (btnOpenSettings) btnOpenSettings.className = "p-2 text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
+    if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.add("hidden");
       btnVoltarGlobal.classList.remove("flex");
     }
   } else {
-    // PÁGINAS INTERNAS: monocromático escuro + header claro fixo
-    if (headerMin) headerMin.className = "sticky top-0 left-0 w-full h-[88px] bg-white/90 backdrop-blur-md border-b border-slate-200 z-50 px-6 flex items-center justify-between transition-all duration-300";
+    // PÁGINAS INTERNAS: monocromático escuro + header flutuante com botão voltar
+    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
-      brandLogo.setAttribute("theme", "light-bg");
+      brandLogo.setAttribute("theme", "dark-bg");
     }
-    if (btnOpenDrawer) btnOpenDrawer.className = "p-2 text-slate-800 hover:text-sky-600 text-xl transition-colors focus:outline-none cursor-pointer flex items-center hidden";
-    if (btnOpenSettings) btnOpenSettings.className = "p-2 text-slate-800 hover:text-sky-600 text-xl transition-colors focus:outline-none cursor-pointer flex items-center";
+    if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.remove("hidden");
       btnVoltarGlobal.classList.add("flex");
