@@ -444,7 +444,7 @@
                 <!-- Seletor de Lâminas e Controles Discretos -->
                 <div class="flex items-center gap-3">
                   <!-- Miniaturas Circulares Flutuantes (Sem Caixas ou Bordas Rígidas) -->
-                  <div class="flex items-center gap-2">
+                  <div id="vitrineThumbsContainer" class="flex items-center gap-1.5 sm:gap-2">
                     <button
                       type="button"
                       onclick="window.__selectVitrineSlide(0)"
@@ -472,14 +472,32 @@
                     >
                       <img src="assets/histologia/osso_compacto_dzi_files/9/0_0.png" alt="Osso" class="w-full h-full object-cover">
                     </button>
+                    <button
+                      type="button"
+                      onclick="window.__selectVitrineSlide(3)"
+                      class="vitrine-thumb-btn relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden focus:outline-none cursor-pointer transition-all duration-300 ring-1 ring-white/10 opacity-40 hover:opacity-80"
+                      title="Epitélio Pavimentoso Simples"
+                      data-index="3"
+                    >
+                      <img src="assets/histologia/epitelio-simples-escamoso_files/9/0_0.jpg" alt="Epitélio" class="w-full h-full object-cover">
+                    </button>
+                    <button
+                      type="button"
+                      onclick="window.__selectVitrineSlide(4)"
+                      class="vitrine-thumb-btn relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden focus:outline-none cursor-pointer transition-all duration-300 ring-1 ring-white/10 opacity-40 hover:opacity-80"
+                      title="Preparação Histológica Digital Matriz"
+                      data-index="4"
+                    >
+                      <img src="assets/histologia/lamina-real1_files/9/0_0.jpg" alt="Lâmina Digital" class="w-full h-full object-cover">
+                    </button>
                   </div>
 
-                  <!-- Indicador de Página (01 / 03 com setas finas) -->
+                  <!-- Indicador de Página (01 / 05 com setas finas) -->
                   <div class="flex items-center gap-0.5 text-xs font-mono text-neutral-400 select-none pl-1">
                     <button type="button" id="vitrinePrevBtn" class="text-neutral-500 hover:text-neutral-200 transition-colors p-1 cursor-pointer focus:outline-none" aria-label="Lâmina anterior">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <span id="vitrineCounter" class="text-[11px] tracking-widest text-neutral-400 font-mono px-1">01 / 03</span>
+                    <span id="vitrineCounter" class="text-[11px] tracking-widest text-neutral-400 font-mono px-1">01 / 05</span>
                     <button type="button" id="vitrineNextBtn" class="text-neutral-500 hover:text-neutral-200 transition-colors p-1 cursor-pointer focus:outline-none" aria-label="Próxima lâmina">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -496,7 +514,7 @@
       <!-- Script da Vitrine Interativa de Lâminas -->
       <script>
         (function() {
-          const slides = [
+          const baseSlides = [
             {
               id: 'muscular-esqueletico-he',
               title: 'Músculo Estriado Esquelético',
@@ -505,6 +523,7 @@
               specimen: 'Corte Longitudinal',
               desc: 'Fibras multinucleadas cilíndricas com estriações transversais evidentes e núcleos periféricos.',
               image: 'assets/histologia/muscular-esqueletico-he.jpg',
+              thumb: 'assets/histologia/muscular-esqueletico-he.jpg',
               link: 'microscopio.html?id=muscular-esqueletico-he'
             },
             {
@@ -515,6 +534,7 @@
               specimen: 'Substância H',
               desc: 'Organização em substância cinzenta central em formato de H e substância branca periférica com motoneurônios.',
               image: 'assets/histologia/medula-espinal-he.png',
+              thumb: 'assets/histologia/medula-espinal-he.png',
               link: 'microscopio.html?id=medula-espinal-he'
             },
             {
@@ -525,14 +545,64 @@
               specimen: 'Canal de Havers',
               desc: 'Ósteons concêntricos com lamelas ósseas, canalículos e lacunas de osteócitos perfeitamente preservados.',
               image: 'assets/histologia/osso_compacto_dzi_files/9/0_0.png',
+              thumb: 'assets/histologia/osso_compacto_dzi_files/9/0_0.png',
               link: 'microscopio.html?id=osso_compacto_dzi'
+            },
+            {
+              id: 'epitelio-simples-escamoso',
+              title: 'Epitélio Pavimentoso Simples',
+              category: 'Histologia • Tecido Epitelial',
+              stain: 'HE • 40x',
+              specimen: 'Células Endoteliais',
+              desc: 'Camada única de células epiteliais pavimentosas com núcleos ovais centrais, adaptadas para difusão e filtração seletiva.',
+              image: 'assets/histologia/epitelio-simples-escamoso_files/9/0_0.jpg',
+              thumb: 'assets/histologia/epitelio-simples-escamoso_files/9/0_0.jpg',
+              link: 'microscopio.html?id=epitelio-simples-escamoso'
+            },
+            {
+              id: 'lamina-real1',
+              title: 'Preparação Histológica Digital Matriz',
+              category: 'Histologia • Lâmina Completa WSI',
+              stain: 'HE • Deep Zoom',
+              specimen: 'Varredura Panorâmica',
+              desc: 'Varredura panorâmica digitalizada em alta resolução com pirâmide multiescala para exploração histológica detalhada.',
+              image: 'assets/histologia/lamina-real1_files/9/0_0.jpg',
+              thumb: 'assets/histologia/lamina-real1_files/9/0_0.jpg',
+              link: 'microscopio.html?id=lamina-real1'
             }
           ];
 
+          let slides = [...baseSlides];
           let currentIndex = 0;
           let autoSlideTimer = null;
+          let isHovered = false;
+          const AUTO_SLIDE_INTERVAL = 8000;
+
+          function renderThumbs() {
+            const container = document.getElementById('vitrineThumbsContainer');
+            if (!container) return;
+            container.innerHTML = slides.map((slide, i) => {
+              const isActive = (i === currentIndex);
+              const activeClass = isActive
+                ? 'ring-2 ring-[#d4af37] opacity-100 scale-105'
+                : 'ring-1 ring-white/10 opacity-40 hover:opacity-80';
+              return `
+                <button
+                  type="button"
+                  onclick="window.__selectVitrineSlide(${i})"
+                  class="vitrine-thumb-btn relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden focus:outline-none cursor-pointer transition-all duration-300 ${activeClass}"
+                  title="${slide.title.replace(/"/g, '&quot;')}"
+                  data-index="${i}"
+                  aria-label="Ir para a lâmina ${i + 1}: ${slide.title.replace(/"/g, '&quot;')}"
+                >
+                  <img src="${slide.thumb || slide.image}" alt="${slide.title.replace(/"/g, '&quot;')}" class="w-full h-full object-cover">
+                </button>
+              `;
+            }).join('');
+          }
 
           function renderSlide(idx) {
+            if (!slides.length) return;
             currentIndex = (idx + slides.length) % slides.length;
             const slide = slides[currentIndex];
 
@@ -581,11 +651,86 @@
             resetAutoSlide();
           };
 
-          function resetAutoSlide() {
+          function startAutoSlide() {
             clearInterval(autoSlideTimer);
-            autoSlideTimer = setInterval(() => {
-              renderSlide(currentIndex + 1);
-            }, 5000);
+            if (!isHovered) {
+              autoSlideTimer = setInterval(() => {
+                renderSlide(currentIndex + 1);
+              }, AUTO_SLIDE_INTERVAL);
+            }
+          }
+
+          function stopAutoSlide() {
+            clearInterval(autoSlideTimer);
+            autoSlideTimer = null;
+          }
+
+          function resetAutoSlide() {
+            stopAutoSlide();
+            startAutoSlide();
+          }
+
+          async function carregarLaminasFirestore() {
+            try {
+              if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) return;
+              const db = firebase.firestore();
+              const snapshot = await db.collection('laminas').get();
+              if (snapshot.empty) return;
+
+              const firestoreSlides = [];
+              snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.status === 'ativa') {
+                  let img = data.thumbnailUrl || data.imagemUrl || data.imageUrl || data.caminhoImagemBase || data.dziUrl || '';
+                  if (img.toLowerCase().endsWith('.dzi')) {
+                    const basePath = img.substring(0, img.lastIndexOf('.dzi'));
+                    img = `${basePath}_files/9/0_0.jpg`;
+                  }
+                  const disciplina = data.disciplina 
+                    ? data.disciplina.charAt(0).toUpperCase() + data.disciplina.slice(1) 
+                    : 'Histologia';
+                  const topico = data.topico 
+                    ? data.topico.charAt(0).toUpperCase() + data.topico.slice(1) 
+                    : 'Geral';
+
+                  let descTexto = data.resumo || data.descricao || '';
+                  if (!descTexto && data.descricaoHTML) {
+                    descTexto = data.descricaoHTML.replace(/<[^>]*>/g, '').trim();
+                  }
+                  if (descTexto.length > 130) {
+                    descTexto = descTexto.slice(0, 130) + '...';
+                  }
+
+                  firestoreSlides.push({
+                    id: doc.id,
+                    title: data.nome || 'Lâmina Histológica',
+                    category: `${disciplina} • ${topico}`,
+                    stain: data.coloracao || 'HE • 40x',
+                    specimen: data.especime || data.corte || 'Campo Microscópico',
+                    desc: descTexto || 'Lâmina digitalizada em alta resolução para estudo morfológico.',
+                    image: img || 'assets/histologia/muscular-esqueletico-he.jpg',
+                    thumb: img || 'assets/histologia/muscular-esqueletico-he.jpg',
+                    link: `microscopio.html?id=${doc.id}`
+                  });
+                }
+              });
+
+              if (firestoreSlides.length > 0) {
+                const existingIds = new Set(firestoreSlides.map(s => s.id));
+                const merged = [...firestoreSlides];
+                baseSlides.forEach(b => {
+                  if (!existingIds.has(b.id)) {
+                    merged.push(b);
+                  }
+                });
+                slides = merged;
+                if (currentIndex >= slides.length) currentIndex = 0;
+                renderThumbs();
+                renderSlide(currentIndex);
+              }
+            } catch (err) {
+              console.warn('[Vitrine] Não foi possível carregar lâminas do Firestore:', err);
+            }
           }
 
           document.addEventListener('DOMContentLoaded', () => {
@@ -610,12 +755,23 @@
             }
 
             if (cardEl) {
-              cardEl.addEventListener('mouseenter', () => clearInterval(autoSlideTimer));
-              cardEl.addEventListener('mouseleave', () => resetAutoSlide());
+              cardEl.addEventListener('mouseenter', () => {
+                isHovered = true;
+                stopAutoSlide();
+              });
+              cardEl.addEventListener('mouseleave', () => {
+                isHovered = false;
+                startAutoSlide();
+              });
             }
 
+            renderThumbs();
             renderSlide(0);
-            resetAutoSlide();
+            startAutoSlide();
+
+            // Tenta sincronizar com o Firestore após inicialização
+            carregarLaminasFirestore();
+            setTimeout(carregarLaminasFirestore, 1500);
           });
         })();
       </script>
