@@ -69,27 +69,52 @@ function init() {
     }
   });
 
-  // Listener de Scroll para Header Dinâmico (Shrink & Blur)
+  // Listener de Scroll para Header Dinâmico (Compactação da Navbar e Desaparecimento da Coruja)
   const headerMin = document.getElementById("palasMinimalHeader");
   
   if (headerMin) {
-    window.addEventListener("scroll", () => {
-      // O header de páginas internas é estático (fundo claro), então não deve mudar no scroll
+    const handleDynamicNavbarScroll = () => {
+      // O header de páginas internas é estático, então não deve mudar no scroll
       if (getState().frenteAtiva) return; // Se houver frente ativa, não está na Home
 
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const brandLogo = document.querySelector("#palasMinimalHeader brand-logo");
+      const owlWrapper = document.getElementById("brandLogoOwlWrapper");
+      const logoPill = document.querySelector("#palasMinimalHeader a");
 
-      if (scrollY > 50) {
+      if (scrollY > 20) {
+        if (owlWrapper) {
+          owlWrapper.style.opacity = "0";
+          owlWrapper.style.transform = "scale(0.75)";
+          owlWrapper.style.maxWidth = "0px";
+          owlWrapper.style.marginRight = "-10px";
+          owlWrapper.style.pointerEvents = "none";
+        }
+        if (logoPill) {
+          logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-4 sm:px-5 py-2 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
+        }
         if (brandLogo && brandLogo.getAttribute("show-subtitle") !== "false") {
           brandLogo.setAttribute("show-subtitle", "false");
         }
       } else {
+        if (owlWrapper) {
+          owlWrapper.style.opacity = "1";
+          owlWrapper.style.transform = "scale(1)";
+          owlWrapper.style.maxWidth = "48px";
+          owlWrapper.style.marginRight = "0px";
+          owlWrapper.style.pointerEvents = "auto";
+        }
+        if (logoPill) {
+          logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-5 sm:px-6 py-3 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
+        }
         if (brandLogo && brandLogo.getAttribute("show-subtitle") !== "true") {
           brandLogo.setAttribute("show-subtitle", "true");
         }
       }
-    });
+    };
+
+    window.addEventListener("scroll", handleDynamicNavbarScroll, { passive: true });
+    handleDynamicNavbarScroll();
   }
 
   // Inscreve a função de renderização no gerenciador reativo
