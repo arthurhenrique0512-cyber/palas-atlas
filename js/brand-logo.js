@@ -67,21 +67,21 @@ class BrandLogo extends HTMLElement {
         subtitleMt:    'mt-0.5',
       },
       md: {
-        imgClass:      'h-10 md:h-12',
-        textClass:     'text-base md:text-lg',
+        imgClass:      'h-4 sm:h-5',
+        textClass:     'text-sm sm:text-base',
         trackingPalas: 'tracking-[0.2em]',
         trackingAtlas: 'tracking-[0.2em]',
-        subtitleClass: 'text-[9px] md:text-[10px] tracking-[0.32em]',
-        gap:           'gap-2.5',
-        subtitleMt:    'mt-0.5',
+        subtitleClass: 'text-[9px] tracking-[0.2em]',
+        gap:           'gap-2',
+        subtitleMt:    'mt-1',
       },
       lg: {
-        imgClass:      'h-14 md:h-16',
-        textClass:     'text-lg md:text-xl',
+        imgClass:      'h-10 md:h-12',
+        textClass:     'text-base md:text-lg',
         trackingPalas: 'tracking-[0.22em]',
         trackingAtlas: 'tracking-[0.22em]',
-        subtitleClass: 'text-[10px] md:text-[11px] tracking-[0.34em]',
-        gap:           'gap-3',
+        subtitleClass: 'text-[9px] md:text-[10px] tracking-[0.25em]',
+        gap:           'gap-2.5',
         subtitleMt:    'mt-1',
       },
     };
@@ -94,14 +94,13 @@ class BrandLogo extends HTMLElement {
     let imgStyle      = '';
 
     if (isHome) {
-      // HOME: emblema colorido dourado
-      // PALAS: gradiente dourado quente
-      palasStyle    = 'background: linear-gradient(to right, #f5d98b, #e8b84b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;';
-      // ATLAS: dourado levemente mais claro
-      atlasStyle    = 'color: #d4a843;';
-      // DIRETRIZ 1: Subtítulo branco total na Home Page
-      subtitleStyle = 'color: #ffffff;';
-      // Emblema: filtro para tom dourado
+      // HOME: Ouro-champanhe fosco para PALAS e emblema
+      palasStyle    = 'color: #d4af37;';
+      // ATLAS: Off-white / azul-gelo suave
+      atlasStyle    = 'color: #f1f5f9;';
+      // Subtítulo neutro e elegante
+      subtitleStyle = 'color: #a3a3a3;';
+      // Emblema sincronizado ao tom ouro-champanhe
       imgStyle      = 'filter: sepia(1) saturate(3) hue-rotate(5deg) brightness(1.05);';
     } else if (theme === 'light-bg') {
       // PÁGINAS INTERNAS (fundo claro): monocromático escuro
@@ -130,7 +129,7 @@ class BrandLogo extends HTMLElement {
 
     // ─── Template ───────────────────────────────────────────────────────────
     this.innerHTML = `
-      <div class="flex flex-col items-center text-center select-none cursor-pointer group" style="text-decoration:none;">
+      <div class="flex flex-col ${showSubtitle ? 'items-start text-left' : 'items-center text-center'} select-none cursor-pointer group" style="text-decoration:none;">
         <div class="flex items-center ${s.gap}">
 
           <span
@@ -154,7 +153,7 @@ class BrandLogo extends HTMLElement {
 
         ${showSubtitle ? `
           <span
-            class="font-sans uppercase ${s.subtitleClass} ${s.subtitleMt} leading-none font-medium tracking-widest transition-all duration-300 block"
+            class="font-sans uppercase ${s.subtitleClass} ${s.subtitleMt} leading-none font-medium tracking-widest transition-all duration-300 hidden md:block"
             style="${subtitleStyle}"
           >Atlas Morfológico Digital</span>
         ` : ''}

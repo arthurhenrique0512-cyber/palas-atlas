@@ -104,33 +104,44 @@
     });
   </script>
 
-  <header id="palasMinimalHeader" class="fixed left-0 w-full top-0 h-20 md:h-24 bg-transparent border border-transparent z-50 px-4 md:px-6 flex items-center justify-between transition-all duration-300">
-    
-    <!-- Lado Esquerdo (Botão Voltar) -->
-    <div class="w-24 md:w-32 flex items-center">
-      <button id="btnVoltarGlobal" onclick="window.App.voltarGlobal()" class="hidden p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-200/50 rounded-lg transition-all text-lg font-bold items-center gap-1">
-        &larr; <span class="text-xs font-sans font-normal hidden sm:inline">Voltar</span>
-      </button>
-    </div>
-    
-    <!-- Centro: Branding Centralizado (PALAS [LOGO] ATLAS) -->
-    <div class="flex items-center justify-center">
-      <a href="index.html" class="cursor-pointer select-none no-underline block" style="text-decoration: none;">
-        <brand-logo id="globalBrandLogo" is-home="true" theme="dark-bg" show-subtitle="true" size="md"></brand-logo>
-      </a>
-    </div>
-    
-    <!-- Lado Direito: Botão Menu Lateral e Configurações -->
-    <div class="w-24 md:w-32 flex justify-end items-center gap-2">
-      <!-- Botão Configurações -->
-      <button id="btnOpenSettings" onclick="window.App.openSettings()" class="p-3 md:p-2 w-11 h-11 md:w-auto md:h-auto text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center justify-center rounded-full" aria-label="Configurações do Site" title="Configurações">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-      </button>
+  <header id="palasMinimalHeader" class="sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      
+      <!-- Lado Esquerdo: Botão Voltar + Cápsula Flutuante do Logotipo (Top-Left) -->
+      <div class="flex items-center gap-2 pointer-events-auto">
+        <button id="btnVoltarGlobal" onclick="window.App.voltarGlobal()" class="hidden p-2 text-slate-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] rounded-full transition-all text-sm font-bold items-center gap-1.5 px-3 py-2 cursor-pointer shadow-sm" aria-label="Voltar">
+          &larr; <span class="text-xs font-sans font-normal hidden sm:inline">Voltar</span>
+        </button>
 
-      <!-- Botão Menu Drawer -->
-      <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="p-3 md:p-2 w-11 h-11 md:w-auto md:h-auto text-white hover:text-sky-400 text-xl transition-colors focus:outline-none cursor-pointer flex items-center justify-center rounded-full" aria-label="Abrir Menu Lateral" title="Menu">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
+        <a href="index.html" class="group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-4 sm:px-5 py-2 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline" style="text-decoration: none;" aria-label="Palas Atlas - Início">
+          <brand-logo id="globalBrandLogo" is-home="true" theme="dark-bg" show-subtitle="true" size="md"></brand-logo>
+        </a>
+      </div>
+
+      <!-- Centro do Topo: Totalmente desobstruído -->
+      <div class="flex-1"></div>
+
+      <!-- Lado Direito: Cápsula Flutuante Simétrica de Ações -->
+      <div class="pointer-events-auto flex items-center gap-1 rounded-full bg-white/[0.03] backdrop-blur-md border border-white/[0.08] p-1.5 sm:p-2 transition-all duration-300 shadow-sm">
+        <!-- Botão Configurações -->
+        <button id="btnOpenSettings" onclick="window.App.openSettings()" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.06] active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none" aria-label="Configurações do Site" title="Configurações">
+          <svg class="w-5 h-5 transition-transform duration-300 hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </button>
+
+        <!-- Divisor sutil entre os botões -->
+        <div class="w-[1px] h-4 bg-white/[0.08]"></div>
+
+        <!-- Botão Menu Drawer -->
+        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/[0.06] active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none" aria-label="Abrir Menu Lateral" title="Menu">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+
     </div>
   </header>
 

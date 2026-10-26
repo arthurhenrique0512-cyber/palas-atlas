@@ -80,17 +80,11 @@ function init() {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const brandLogo = document.querySelector("#palasMinimalHeader brand-logo");
 
-      if (scrollY > 20) {
-        headerMin.classList.remove("h-24", "bg-transparent", "border-transparent");
-        headerMin.classList.add("h-16", "bg-neutral-950/90", "backdrop-blur-md", "border-b", "border-neutral-800", "shadow-md");
-        
+      if (scrollY > 50) {
         if (brandLogo && brandLogo.getAttribute("show-subtitle") !== "false") {
           brandLogo.setAttribute("show-subtitle", "false");
         }
       } else {
-        headerMin.classList.add("h-24", "bg-transparent", "border-transparent");
-        headerMin.classList.remove("h-16", "bg-neutral-950/90", "backdrop-blur-md", "border-b", "border-neutral-800", "shadow-md");
-        
         if (brandLogo && brandLogo.getAttribute("show-subtitle") !== "true") {
           brandLogo.setAttribute("show-subtitle", "true");
         }
