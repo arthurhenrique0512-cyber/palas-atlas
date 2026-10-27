@@ -21,6 +21,9 @@ if (!firebase.apps.length) {
 
 // Instância oficial do Cloud Firestore para o ecossistema do Palas Atlas
 const db = firebase.firestore();
+try {
+  window.dispatchEvent(new CustomEvent('palas-firebase-ready', { detail: { db } }));
+} catch (e) {}
 
 // Limpeza definitiva dos dados antigos do localStorage para evitar duplicidades ou conflitos com a nuvem
 try {

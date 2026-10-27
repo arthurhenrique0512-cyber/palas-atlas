@@ -77,43 +77,29 @@ function init() {
       // O header de páginas internas é estático, então não deve mudar no scroll
       if (getState().frenteAtiva) return; // Se houver frente ativa, não está na Home
 
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       const brandLogo = document.querySelector("#palasMinimalHeader brand-logo");
-      const owlWrapper = document.getElementById("brandLogoOwlWrapper");
       const logoPill = document.querySelector("#palasMinimalHeader a");
 
       if (scrollY > 20) {
-        if (owlWrapper) {
-          owlWrapper.style.opacity = "0";
-          owlWrapper.style.transform = "scale(0.75)";
-          owlWrapper.style.maxWidth = "0px";
-          owlWrapper.style.marginRight = "-10px";
-          owlWrapper.style.pointerEvents = "none";
+        if (brandLogo && brandLogo.getAttribute("compact") !== "true") {
+          brandLogo.setAttribute("compact", "true");
         }
-        if (logoPill) {
+        if (logoPill && !logoPill.classList.contains("py-2")) {
           logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-4 sm:px-5 py-2 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
         }
-        if (brandLogo && brandLogo.getAttribute("show-subtitle") !== "false") {
-          brandLogo.setAttribute("show-subtitle", "false");
-        }
       } else {
-        if (owlWrapper) {
-          owlWrapper.style.opacity = "1";
-          owlWrapper.style.transform = "scale(1)";
-          owlWrapper.style.maxWidth = "48px";
-          owlWrapper.style.marginRight = "0px";
-          owlWrapper.style.pointerEvents = "auto";
+        if (brandLogo && brandLogo.getAttribute("compact") === "true") {
+          brandLogo.setAttribute("compact", "false");
         }
-        if (logoPill) {
+        if (logoPill && !logoPill.classList.contains("py-3")) {
           logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-5 sm:px-6 py-3 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
-        }
-        if (brandLogo && brandLogo.getAttribute("show-subtitle") !== "true") {
-          brandLogo.setAttribute("show-subtitle", "true");
         }
       }
     };
 
     window.addEventListener("scroll", handleDynamicNavbarScroll, { passive: true });
+    document.addEventListener("scroll", handleDynamicNavbarScroll, { passive: true });
     handleDynamicNavbarScroll();
   }
 
@@ -183,9 +169,18 @@ function renderView(state) {
   const logoPill = document.querySelector("#palasMinimalHeader a");
   const drawerPill = document.querySelector("#palasMinimalHeader .pointer-events-auto:last-child");
 
+  const mainContainer = document.getElementById("mainRouterContainer");
+  if (mainContainer) {
+    if (isHomePage) {
+      mainContainer.className = "flex-1 w-full flex flex-col justify-center transition-all duration-300 pt-0";
+    } else {
+      mainContainer.className = "flex-1 w-full flex flex-col justify-center transition-all duration-300 pt-16 sm:pt-20";
+    }
+  }
+
   if (isHomePage) {
-    // HOME: emblema dourado + header transparente flutuante
-    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none";
+    // HOME: emblema dourado + header transparente flutuante sempre fixo no topo da viewport
+    if (headerMin) headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 pointer-events-none";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "true");
       brandLogo.setAttribute("theme", "dark-bg");
@@ -203,7 +198,7 @@ function renderView(state) {
     }
   } else if (isDashboard) {
     // DASHBOARD CMS: monocromático claro + header escuro fixo
-    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full bg-neutral-950 border-b border-neutral-800/80 transition-all duration-300 pointer-events-auto shadow-md";
+    if (headerMin) headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-neutral-950 border-b border-neutral-800/80 transition-all duration-300 pointer-events-auto shadow-md";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
       brandLogo.setAttribute("theme", "dark-bg");
@@ -220,8 +215,8 @@ function renderView(state) {
       btnVoltarGlobal.classList.remove("flex");
     }
   } else {
-    // PÁGINAS INTERNAS (fundo claro): header claro com contraste clínico perfeito
-    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all duration-300 pointer-events-auto shadow-sm";
+    // PÁGINAS INTERNAS (fundo claro): header claro fixo com contraste clínico perfeito
+    if (headerMin) headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all duration-300 pointer-events-auto shadow-sm";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
       brandLogo.setAttribute("theme", "light-bg");

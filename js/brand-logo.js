@@ -31,7 +31,7 @@ class BrandLogo extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['is-home', 'theme', 'size', 'show-subtitle', 'variant'];
+    return ['is-home', 'theme', 'size', 'show-subtitle', 'variant', 'compact'];
   }
 
   attributeChangedCallback() {
@@ -43,9 +43,10 @@ class BrandLogo extends HTMLElement {
     const isHome       = this.getAttribute('is-home') === 'true'
                          // retrocompatibilidade: variant="dark" sem is-home → monocromático escuro
                          || false;
+    const isCompact    = this.getAttribute('compact') === 'true';
     const rawTheme     = this.getAttribute('theme') || 'dark-bg';
     const size         = this.getAttribute('size') || 'md';
-    const showSubtitle = this.getAttribute('show-subtitle') !== 'false';
+    const showSubtitle = (this.getAttribute('show-subtitle') !== 'false') && !isCompact;
     // Retrocompatibilidade com o atributo legado "variant"
     const legacyVariant = this.getAttribute('variant'); // 'dark' | 'light' | null
 
@@ -141,7 +142,7 @@ class BrandLogo extends HTMLElement {
           <span
             id="brandLogoOwlWrapper"
             class="flex items-center justify-center transition-all duration-300 ease-in-out overflow-hidden"
-            style="max-width: 48px; opacity: 1; transform: scale(1); color: #d4af37;"
+            style="max-width: ${isCompact ? '0px' : '48px'}; opacity: ${isCompact ? '0' : '1'}; transform: ${isCompact ? 'scale(0.75)' : 'scale(1)'}; margin-right: ${isCompact ? '-10px' : '0px'}; color: #d4af37; pointer-events: ${isCompact ? 'none' : 'auto'};"
           >
             <svg
               class="w-6 h-6 sm:w-7 sm:h-7 shrink-0 transition-transform duration-300 group-hover:scale-105"

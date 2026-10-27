@@ -136,8 +136,9 @@ async function carregarLaminaNoMicroscopio(laminaId) {
       const docRef = await db.collection("laminas").doc(laminaId).get();
       if (docRef.exists) {
         laminaAtualData = { id: docRef.id, ...docRef.data() };
-        if (laminaAtualData.imagemUrl) {
-          laminaAtualData.imagemUrl = laminaAtualData.imagemUrl.replace(/^\/+/, '');
+        let img = laminaAtualData.imagemUrl || laminaAtualData.imageUrl || laminaAtualData.caminhoImagemBase || laminaAtualData.dziUrl || "";
+        if (img) {
+          laminaAtualData.imagemUrl = img.replace(/^\/+/, '');
         }
         listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
         renderizarMetadadosDaLamina();
