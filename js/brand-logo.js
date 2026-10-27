@@ -156,8 +156,8 @@ class BrandLogo extends HTMLElement {
 
     if (isHome) {
       // HOME: Ouro-champanhe fosco para PALAS e emblema
-      palasStyle    = '';
-      atlasStyle    = '';
+      palasStyle    = 'background: linear-gradient(115deg, #c9a227 0%, #dfbe53 25%, #fff6c8 50%, #d4af37 75%, #b89728 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: #d4af37;';
+      atlasStyle    = 'background: linear-gradient(115deg, #e2e8f0 0%, #f8fafc 40%, #ffffff 50%, #f1f5f9 60%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: #ffffff;';
       subtitleStyle = 'color: #94a3b8;';
       imgStyle      = 'filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.22));';
     } else if (theme === 'light-bg') {

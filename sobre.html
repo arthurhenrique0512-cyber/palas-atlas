@@ -22,7 +22,8 @@
       }
     }
   </script>
-  <script src="js/brand-logo.js?v=5"></script>
+  <link rel="stylesheet" href="css/styles.css?v=6">
+  <script src="js/brand-logo.js?v=6"></script>
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans selection:bg-[#d4af37]/30 selection:text-slate-900">
@@ -47,11 +48,15 @@
   </header>
 
   <!-- HERO INSTITUCIONAL PREMIUM -->
-  <section class="w-full bg-[#0a0a0a] text-white border-b border-white/[0.08] relative overflow-hidden py-16 sm:py-20 px-6" style="background: radial-gradient(circle at 50% 0%, rgba(212,175,55,0.08) 0%, #0a0a0a 75%);">
+  <section class="w-full bg-[#0a0a0a] text-white border-b border-white/[0.08] relative overflow-hidden py-16 sm:py-20 px-6">
+    <!-- Fundo Preto Puro e Ambient Glow Dourado Sutil -->
+    <div class="absolute inset-0 bg-[#0a0a0a] pointer-events-none"></div>
+    <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[320px] bg-[#d4af37]/[0.08] blur-[120px] rounded-full pointer-events-none"></div>
+
     <div class="max-w-4xl mx-auto relative z-10">
       
       <!-- Breadcrumb Sóbrio -->
-      <nav class="flex items-center gap-2 text-xs font-mono text-zinc-500 mb-6 flex-wrap" aria-label="Navegação">
+      <nav class="flex items-center gap-2 text-xs font-mono text-zinc-400 mb-6 flex-wrap" aria-label="Navegação">
         <a href="index.html" class="hover:text-[#d4af37] transition-colors">Início</a>
         <span class="text-zinc-600 select-none">&rsaquo;</span>
         <span class="text-zinc-300 font-medium">Sobre o Projeto</span>
