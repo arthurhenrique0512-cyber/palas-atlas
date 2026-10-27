@@ -24,18 +24,78 @@
 class BrandLogo extends HTMLElement {
   constructor() {
     super();
+    this._mounted = false;
+    this._hasAnimated = false;
+    this._animTimer = null;
   }
 
   connectedCallback() {
+    this._mounted = true;
     this.render();
+
+    // Coreografia de Entrada: escalona e remove classes após conclusão (~900ms)
+    // para permitir transições fluidas no hover e no scroll sem re-execuções bruscas
+    const isHome = this.getAttribute('is-home') === 'true';
+    if (isHome && !this._hasAnimated) {
+      this._animTimer = setTimeout(() => {
+        this._hasAnimated = true;
+        const animatedEls = this.querySelectorAll(
+          '.logo-palas-reveal, .logo-owl-reveal, .logo-atlas-reveal, .logo-subtitle-reveal'
+        );
+        animatedEls.forEach(el => {
+          el.classList.remove(
+            'logo-palas-reveal',
+            'logo-owl-reveal',
+            'logo-atlas-reveal',
+            'logo-subtitle-reveal'
+          );
+        });
+      }, 900);
+    }
+  }
+
+  disconnectedCallback() {
+    this._mounted = false;
+    if (this._animTimer) {
+      clearTimeout(this._animTimer);
+      this._animTimer = null;
+    }
   }
 
   static get observedAttributes() {
     return ['is-home', 'theme', 'size', 'show-subtitle', 'variant', 'compact'];
   }
 
-  attributeChangedCallback() {
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+
+    // Transição de scroll da Navbar: altera propriedades CSS diretamente sem reconstruir a árvore DOM
+    if (name === 'compact' && this._mounted) {
+      this.updateCompactState(newValue === 'true');
+      return;
+    }
+
     this.render();
+  }
+
+  updateCompactState(isCompact) {
+    const owlWrapper = this.querySelector('#brandLogoOwlWrapper');
+    if (owlWrapper) {
+      owlWrapper.style.maxWidth = isCompact ? '0px' : '48px';
+      owlWrapper.style.opacity = isCompact ? '0' : '1';
+      owlWrapper.style.transform = isCompact ? 'scale(0.72) translateY(-1px)' : 'scale(1) translateY(0)';
+      owlWrapper.style.marginRight = isCompact ? '-10px' : '0px';
+      owlWrapper.style.filter = isCompact ? 'blur(1px)' : 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.22))';
+      owlWrapper.style.pointerEvents = isCompact ? 'none' : 'auto';
+    }
+
+    const subtitle = this.querySelector('.brand-logo-subtitle');
+    if (subtitle) {
+      subtitle.style.opacity = isCompact ? '0' : '1';
+      subtitle.style.maxHeight = isCompact ? '0px' : '20px';
+      subtitle.style.transform = isCompact ? 'translateY(-3px)' : 'translateY(0)';
+      subtitle.style.pointerEvents = isCompact ? 'none' : 'auto';
+    }
   }
 
   render() {
@@ -96,13 +156,10 @@ class BrandLogo extends HTMLElement {
 
     if (isHome) {
       // HOME: Ouro-champanhe fosco para PALAS e emblema
-      palasStyle    = 'color: #d4af37;';
-      // ATLAS: Off-white / azul-gelo suave
-      atlasStyle    = 'color: #f1f5f9;';
-      // Subtítulo neutro e elegante
-      subtitleStyle = 'color: #a3a3a3;';
-      // Emblema sincronizado ao tom ouro-champanhe
-      imgStyle      = 'filter: sepia(1) saturate(3) hue-rotate(5deg) brightness(1.05);';
+      palasStyle    = '';
+      atlasStyle    = '';
+      subtitleStyle = 'color: #94a3b8;';
+      imgStyle      = 'filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.22));';
     } else if (theme === 'light-bg') {
       // PÁGINAS INTERNAS (fundo claro): monocromático escuro
       palasStyle    = 'background: linear-gradient(to right, #1e293b, #334155); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;';
@@ -134,18 +191,18 @@ class BrandLogo extends HTMLElement {
         <div class="flex items-center ${s.gap}">
 
           <span
-            class="font-serif font-bold ${s.textClass} ${s.trackingPalas} leading-none m-0 transition-all duration-300"
+            class="font-serif font-bold ${s.textClass} ${s.trackingPalas} leading-none m-0 transition-all duration-300 ${isHome ? 'brand-shimmer-palas' : ''} ${isHome && !this._hasAnimated ? 'logo-palas-reveal' : ''}"
             style="${palasStyle}"
           >PALAS</span>
 
           ${isHome ? `
           <span
             id="brandLogoOwlWrapper"
-            class="flex items-center justify-center transition-all duration-300 ease-in-out overflow-hidden"
-            style="max-width: ${isCompact ? '0px' : '48px'}; opacity: ${isCompact ? '0' : '1'}; transform: ${isCompact ? 'scale(0.75)' : 'scale(1)'}; margin-right: ${isCompact ? '-10px' : '0px'}; color: #d4af37; pointer-events: ${isCompact ? 'none' : 'auto'};"
+            class="brand-owl-wrapper flex items-center justify-center overflow-hidden ${!this._hasAnimated ? 'logo-owl-reveal' : ''}"
+            style="max-width: ${isCompact ? '0px' : '48px'}; opacity: ${isCompact ? '0' : '1'}; transform: ${isCompact ? 'scale(0.72) translateY(-1px)' : 'scale(1) translateY(0)'}; margin-right: ${isCompact ? '-10px' : '0px'}; color: #d4af37; filter: ${isCompact ? 'blur(1px)' : 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.22))'}; pointer-events: ${isCompact ? 'none' : 'auto'};"
           >
             <svg
-              class="w-6 h-6 sm:w-7 sm:h-7 shrink-0 transition-transform duration-300 group-hover:scale-105"
+              class="brand-owl-icon w-6 h-6 sm:w-7 sm:h-7 shrink-0"
               viewBox="0 0 400 400"
               fill="currentColor"
             >
@@ -155,7 +212,7 @@ class BrandLogo extends HTMLElement {
           ` : ''}
 
           <span
-            class="font-serif font-normal ${s.textClass} ${s.trackingAtlas} leading-none m-0 transition-all duration-300"
+            class="font-serif font-normal ${s.textClass} ${s.trackingAtlas} leading-none m-0 transition-all duration-300 ${isHome ? 'brand-shimmer-atlas' : ''} ${isHome && !this._hasAnimated ? 'logo-atlas-reveal' : ''}"
             style="${atlasStyle}"
           >ATLAS</span>
 
@@ -163,8 +220,8 @@ class BrandLogo extends HTMLElement {
 
         ${showSubtitle ? `
           <span
-            class="font-sans uppercase ${s.subtitleClass} ${s.subtitleMt} leading-none font-medium tracking-widest transition-all duration-300 hidden md:block"
-            style="${subtitleStyle}"
+            class="brand-logo-subtitle font-sans uppercase ${s.subtitleClass} ${s.subtitleMt} leading-none font-medium tracking-widest transition-all duration-300 hidden md:block ${isHome && !this._hasAnimated ? 'logo-subtitle-reveal' : ''}"
+            style="${subtitleStyle}; ${isCompact ? 'opacity: 0; max-height: 0px; transform: translateY(-3px);' : 'opacity: 1; max-height: 20px; transform: translateY(0);'}"
           >Atlas Morfológico Digital</span>
         ` : ''}
       </div>
