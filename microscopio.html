@@ -39,19 +39,28 @@
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
 
-    /* Prose do texto descritivo lateral */
-    .prose-atlas h3       { color:#e5e5e5; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
-    .prose-atlas p        { color:#d4d4d4; line-height:1.8; margin-bottom:1rem; }
-    .prose-atlas strong   { color:#fff; font-weight:600; }
+    /* Prose do texto descritivo lateral (off-white + detalhes em ouro-champanhe) */
+    .prose-atlas h3       { color:#f5f5f4; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
+    .prose-atlas p        { color:#d6d3d1; line-height:1.8; margin-bottom:1rem; }
+    .prose-atlas strong   { color:#fafaf9; font-weight:600; }
     .prose-atlas .pin-link {
-      color: #38bdf8;
+      color: #c8ad5f;
       text-decoration: underline;
+      text-decoration-color: rgba(200, 173, 95, 0.4);
+      text-underline-offset: 3px;
       font-weight: 500;
       cursor: pointer;
       padding: 0 2px;
       transition: color .15s;
     }
-    .prose-atlas .pin-link:hover { color: #7dd3fc; }
+    .prose-atlas .pin-link:hover { color: #e0c97f; }
+
+    /* Botão de recolher painel: preenchimento do painel indica estado aberto */
+    .viewer-sidebar-toggle .sidebar-icon-fill { opacity: .35; transition: opacity .3s ease; }
+    .viewer-sidebar-toggle[aria-expanded="false"] .sidebar-icon-fill { opacity: 0; }
+
+    /* Logo do cabeçalho: ATLAS em ouro-champanhe discreto */
+    header brand-logo span.font-normal { color: #c8ad5f !important; }
 
     /* Scrollbar minimalista */
     ::-webkit-scrollbar       { width: 5px; }
@@ -67,7 +76,7 @@
        BARRA SUPERIOR DO LEITOR (item 1)
        bg-neutral-950 | borda inferior | Studio Dark
        ════════════════════════════════════════════════════════════════════ -->
-  <header class="shrink-0 w-full bg-neutral-950 border-b border-neutral-800 px-4 py-2.5 flex items-center justify-between z-50 relative">
+  <header class="shrink-0 w-full bg-neutral-950 px-5 py-3 flex items-center justify-between z-50 relative">
 
     <!-- Esquerda: Voltar + Breadcrumb -->
     <div class="flex items-center gap-3 min-w-0 z-10">
@@ -91,28 +100,25 @@
       <brand-logo theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
     </div>
 
-    <!-- Direita: Ações rápidas do viewer -->
+    <!-- Direita: Recolher painel + Configurações -->
     <div class="flex items-center gap-4 shrink-0 z-10">
       <button
+        id="btnToggleSidebar"
         type="button"
-        onclick="window.osdViewerAction('reset')"
-        class="text-[11px] font-mono text-slate-400 hover:text-white transition-all duration-200 cursor-pointer"
-        title="Resetar visualização"
-      >1:1</button>
-      <button
-        type="button"
-        onclick="window.osdViewerAction('fullpage')"
-        class="text-slate-400 hover:text-white transition-all duration-200 cursor-pointer"
-        title="Tela cheia"
-        aria-label="Tela cheia"
+        class="viewer-sidebar-toggle text-neutral-400 hover:text-[#c8ad5f] transition-colors duration-200 cursor-pointer"
+        aria-label="Recolher painel de informações"
+        aria-controls="viewerSidebar"
+        aria-expanded="true"
+        title="Recolher painel"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4.5" width="18" height="15" rx="2.5"></rect>
+          <path d="M15 4.5v15"></path>
+          <rect class="sidebar-icon-fill" x="15" y="4.5" width="6" height="15" rx="2" fill="currentColor" stroke="none"></rect>
         </svg>
       </button>
       <!-- Botão Configurações -->
-      <button id="btnOpenSettings" onclick="if(window.App && window.App.openSettings) window.App.openSettings(); else window.dispatchEvent(new Event('open-settings-panel'));" class="text-slate-400 hover:text-white transition-all duration-200 cursor-pointer" aria-label="Configurações do Site" title="Configurações">
+      <button id="btnOpenSettings" onclick="if(window.App && window.App.openSettings) window.App.openSettings(); else window.dispatchEvent(new Event('open-settings-panel'));" class="text-neutral-400 hover:text-[#c8ad5f] transition-colors duration-200 cursor-pointer" aria-label="Configurações do Site" title="Configurações">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
       </button>
     </div>
@@ -124,8 +130,8 @@
        ════════════════════════════════════════════════════════════════════ -->
   <div class="flex flex-1 overflow-hidden">
 
-    <!-- 70% Esquerda — Estúdio Óptico -->
-    <main class="relative flex-1 h-full bg-neutral-900 border-r border-neutral-800 overflow-hidden flex items-center justify-center">
+    <!-- Esquerda — Estúdio Óptico (expande quando o painel lateral é recolhido) -->
+    <main id="viewerStage" class="relative flex-1 min-w-0 h-full bg-neutral-950 overflow-hidden flex items-center justify-center">
 
       <!-- Skeleton / Splash de carregamento Vetorial -->
       <div id="osdSkeleton" class="fixed inset-0 splash-container flex flex-col items-center justify-center z-[99999] select-none">
@@ -167,8 +173,8 @@
         class="w-full h-full bg-neutral-950 relative overflow-hidden transition-opacity duration-500 opacity-0"
       ></div>
 
-      <!-- REVÓLVER DE OBJETIVAS + ZOOM DINÂMICO (Canto inferior esquerdo) -->
-      <div class="absolute bottom-4 left-4 z-20 flex items-center gap-2 p-1.5 rounded-xl bg-zinc-900/95 border border-zinc-700/80 backdrop-blur-md shadow-2xl text-xs font-mono select-none">
+      <!-- REVÓLVER DE OBJETIVAS + ZOOM DINÂMICO (oculto no modo de lâmina estática) -->
+      <div id="viewerLensPanel" class="absolute bottom-4 left-4 z-20 flex items-center gap-2 p-1.5 rounded-xl bg-neutral-900/50 backdrop-blur-md shadow-2xl text-xs font-mono select-none">
         <!-- Valores nominais das objetivas -->
         <button type="button" onclick="window.trocarLente(4, this)"    class="lens-btn bg-amber-600 text-white shadow-md font-semibold px-3 py-1 rounded-lg transition-all active-lens" data-mag="4">4x</button>
         <button type="button" onclick="window.trocarLente(10, this)"   class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="10">10x</button>
@@ -187,37 +193,42 @@
       </div>
 
       <!-- Dica operacional -->
-      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none text-[10px] text-neutral-600 whitespace-nowrap z-10">
+      <div id="viewerHint" class="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none text-[10px] text-neutral-600 whitespace-nowrap z-10">
         Scroll → Zoom &bull; Arrastar → Pan
       </div>
 
     </main>
 
-    <!-- 30% Direita — Painel de Informações -->
-    <aside class="w-[380px] h-full bg-neutral-950 text-slate-300 border-l border-neutral-800/80 text-sm leading-relaxed overflow-hidden flex flex-col z-40 shrink-0">
+    <!-- Direita — Painel de Informações (retrátil) -->
+    <aside id="viewerSidebar"
+      class="h-full bg-neutral-950 text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 w-[380px] opacity-100 transition-[width,opacity] duration-500 ease-in-out"
+      aria-hidden="false"
+    >
+      <div class="w-[380px] h-full flex flex-col">
 
-      <!-- Cabeçalho do Painel: Título e Coloração (item 2) -->
-      <div class="p-6 border-b border-neutral-800 bg-neutral-900/40 shrink-0">
-        <h2 id="slideTitle" class="text-xl font-serif font-bold text-white leading-tight tracking-tight">
-          Carregando lâmina...
-        </h2>
-        <p id="slideColoracao" class="mt-2 text-xs font-mono text-neutral-400">
-          Hematoxilina e Eosina (H&amp;E)
-        </p>
-        <span id="slideDisciplina" class="hidden">—</span>
-      </div>
-
-      <!-- Descrição completa com hiperlinks de pinos (item 2) -->
-      <div
-        id="slideDescriptionContainer"
-        class="p-6 flex-1 overflow-y-auto bg-neutral-950"
-        style="-webkit-overflow-scrolling:touch;"
-      >
-        <div class="text-sm text-neutral-500 font-sans italic">
-          As informações desta lâmina serão renderizadas aqui.
+        <!-- Cabeçalho do Painel: Título e Coloração -->
+        <div class="px-7 pt-7 pb-5 shrink-0">
+          <h2 id="slideTitle" class="text-xl font-serif font-bold text-neutral-100 leading-tight tracking-tight">
+            Carregando lâmina...
+          </h2>
+          <p id="slideColoracao" class="mt-2 text-[11px] font-mono tracking-wide text-[#c8ad5f]/80">
+            Hematoxilina e Eosina (H&amp;E)
+          </p>
+          <span id="slideDisciplina" class="hidden">—</span>
         </div>
-      </div>
 
+        <!-- Descrição completa com hiperlinks de pinos -->
+        <div
+          id="slideDescriptionContainer"
+          class="px-7 pb-7 flex-1 overflow-y-auto bg-neutral-950"
+          style="-webkit-overflow-scrolling:touch;"
+        >
+          <div class="text-sm text-neutral-500 font-sans italic">
+            As informações desta lâmina serão renderizadas aqui.
+          </div>
+        </div>
+
+      </div>
     </aside>
 
   </div><!-- /workspace -->

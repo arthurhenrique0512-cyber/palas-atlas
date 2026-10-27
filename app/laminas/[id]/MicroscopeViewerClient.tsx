@@ -37,6 +37,10 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [currentZoom, setCurrentZoom] = useState<string>('4.0x');
   const [activeObjective, setActiveObjective] = useState<number>(4);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+
+  // Lâmina estática e travada (sem pan/zoom livre)
+  const isStaticSlide = true;
 
   const viewerContainerRef = useRef<HTMLDivElement>(null);
   const osdViewerRef = useRef<any>(null);
@@ -102,31 +106,32 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
         showHomeControl: false,
         showFullPageControl: false,
         showZoomControl: false,
-        showNavigator: true,
+        showNavigator: !isStaticSlide,
         navigatorPosition: 'BOTTOM_RIGHT',
         navigatorWidth: '120px',
         navigatorHeight: '90px',
         navigatorBackground: 'rgba(10,10,10,0.9)',
-        navigatorBorderColor: 'rgba(59,130,246,0.35)',
+        navigatorBorderColor: 'rgba(200,173,95,0.35)',
         navigatorAutoFade: false,
         animationTime: 0.45,
         blendTime: 0.1,
         maxZoomPixelRatio: maxZoomPixelRatio,
-        panHorizontal: true,
-        panVertical: true,
+        mouseNavEnabled: !isStaticSlide,
+        panHorizontal: !isStaticSlide,
+        panVertical: !isStaticSlide,
         constrainDuringPan: true,
-        visibilityRatio: 0.8,
-        minZoomImageRatio: 0.9,
+        visibilityRatio: isStaticSlide ? 1 : 0.8,
+        minZoomImageRatio: isStaticSlide ? 1 : 0.9,
         gestureSettingsMouse: {
-          scrollToZoom: true,
+          scrollToZoom: !isStaticSlide,
           clickToZoom: false,
           dblClickToZoom: false,
-          dragToPan: true
+          dragToPan: !isStaticSlide
         },
         gestureSettingsTouch: {
-          pinchToZoom: true,
+          pinchToZoom: !isStaticSlide,
           flickEnabled: false,
-          dragToPan: true,
+          dragToPan: !isStaticSlide,
           dblClickToZoom: false,
           pinchRotate: false
         }
@@ -142,9 +147,15 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
         if (viewer.viewport) {
           const home = viewer.viewport.getHomeZoom();
           homeZoomRef.current = home;
-          viewer.viewport.minZoomLevel = home * 0.9;
-          viewer.viewport.maxZoomLevel = home * (maxMag / 4);
+          if (isStaticSlide) {
+            viewer.viewport.minZoomLevel = home;
+            viewer.viewport.maxZoomLevel = home;
+          } else {
+            viewer.viewport.minZoomLevel = home * 0.9;
+            viewer.viewport.maxZoomLevel = home * (maxMag / 4);
+          }
           viewer.viewport.zoomTo(home, null, true);
+          if (isStaticSlide) viewer.viewport.goHome(true);
         }
       });
 
@@ -211,15 +222,67 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
     if (!osdViewerRef.current || !osdViewerRef.current.viewport) return;
     const base = homeZoomRef.current || osdViewerRef.current.viewport.getHomeZoom();
     const targetZoom = base * (targetMag / 4);
-    osdViewerRef.current.viewport.zoomTo(targetZoom, null, false);
     setActiveObjective(targetMag);
   };
 
   return (
-    <div className="flex flex-col w-full h-[calc(100vh-64px)] overflow-hidden bg-neutral-950 font-sans text-slate-200">
+    <div className="flex flex-col w-full h-[calc(100vh-64px)] overflow-hidden bg-neutral-950 font-sans text-neutral-200">
+      {/* Barra Superior do Viewer */}
+      <header className="shrink-0 w-full bg-neutral-950 px-5 py-3 flex items-center justify-between z-50 relative">
+        {/* Esquerda: Voltar */}
+        <div className="flex items-center gap-3 min-w-0 z-10">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer shrink-0"
+            aria-label="Voltar para Tecido"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Voltar para Tecido
+          </Link>
+          <span className="text-neutral-700 select-none hidden sm:block">|</span>
+          <span className="text-xs text-neutral-500 font-sans tracking-wide truncate max-w-[160px] md:max-w-xs">
+            {slide?.title}
+          </span>
+        </div>
+
+        {/* Centro: Logo limpa PALAS ATLAS (sem coruja) */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 select-none pointer-events-none">
+          <span className="font-serif font-bold text-sm tracking-[0.2em] text-neutral-100">PALAS</span>
+          <span className="font-serif font-normal text-sm tracking-[0.2em] text-[#c8ad5f]">ATLAS</span>
+        </div>
+
+        {/* Direita: Botão de Recolher/Expandir Barra Lateral */}
+        <div className="flex items-center gap-4 shrink-0 z-10">
+          <button
+            type="button"
+            onClick={() => {
+              setIsSidebarOpen(!isSidebarOpen);
+              setTimeout(() => {
+                if (osdViewerRef.current && osdViewerRef.current.viewport) {
+                  osdViewerRef.current.forceResize();
+                  if (isStaticSlide) osdViewerRef.current.viewport.goHome(true);
+                  osdViewerRef.current.forceRedraw();
+                }
+              }, 50);
+            }}
+            className="text-neutral-400 hover:text-[#c8ad5f] transition-colors duration-200 cursor-pointer"
+            aria-label={isSidebarOpen ? "Recolher painel de informações" : "Expandir painel de informações"}
+            title={isSidebarOpen ? "Recolher painel" : "Expandir painel"}
+          >
+            <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4.5" width="18" height="15" rx="2.5"></rect>
+              <path d="M15 4.5v15"></path>
+              <rect x="15" y="4.5" width="6" height="15" rx="2" fill="currentColor" stroke="none" className={`transition-opacity duration-300 ${isSidebarOpen ? 'opacity-35' : 'opacity-0'}`}></rect>
+            </svg>
+          </button>
+        </div>
+      </header>
+
       <div className="flex flex-1 overflow-hidden">
-        {/* Workspace do Microscópio */}
-        <main className="relative flex-1 h-full bg-neutral-900 border-r border-neutral-800 overflow-hidden flex items-center justify-center">
+        {/* Workspace do Microscópio (expansão fluida ao fechar a barra lateral) */}
+        <main className="relative flex-1 min-w-0 h-full bg-neutral-950 overflow-hidden flex items-center justify-center">
           
           {/* Skeleton / Preloader com Batimento Orgânico de Asas */}
           {isLoading && (
@@ -261,7 +324,7 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral-950/90 backdrop-blur-md p-6 text-center z-30">
               <div className="w-14 h-14 rounded-2xl bg-rose-950/40 border border-rose-900/60 flex items-center justify-center shadow-lg shadow-rose-950/20 mb-4">
                 <svg className="w-7 h-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
               </div>
               <h3 className="text-base font-semibold text-white tracking-wide">Falha no Carregamento</h3>
@@ -286,80 +349,89 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
             </div>
           )}
 
-          {/* Revólver de Objetivas */}
-          <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2 p-1.5 rounded-xl bg-zinc-900/95 border border-zinc-700/80 backdrop-blur-md shadow-2xl text-xs font-mono select-none">
-            {[4, 10, 40, 60, 100].map(mag => {
-              const maxMag = Number(slide?.maxMagnification) || 40;
-              const isDisabled = mag > maxMag;
-              const isSelected = activeObjective === mag;
+          {/* Revólver de Objetivas (apenas se não for lâmina estática) */}
+          {!isStaticSlide && (
+            <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2 p-1.5 rounded-xl bg-neutral-900/50 backdrop-blur-md shadow-2xl text-xs font-mono select-none">
+              {[4, 10, 40, 60, 100].map(mag => {
+                const maxMag = Number(slide?.maxMagnification) || 40;
+                const isDisabled = mag > maxMag;
+                const isSelected = activeObjective === mag;
 
-              return (
-                <button
-                  key={mag}
-                  type="button"
-                  disabled={isDisabled}
-                  onClick={() => switchObjective(mag)}
-                  className={`font-semibold px-3 py-1 rounded-lg transition-all ${
-                    isDisabled
-                      ? 'bg-zinc-800/40 text-zinc-600 cursor-not-allowed opacity-30'
-                      : isSelected
-                      ? 'bg-amber-600 text-white shadow-md'
-                      : 'bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 cursor-pointer'
-                  }`}
-                  title={isDisabled ? `Objetiva não disponível (Máx: ${maxMag}x)` : `${mag}x`}
-                >
-                  {mag}x
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={mag}
+                    type="button"
+                    disabled={isDisabled}
+                    onClick={() => switchObjective(mag)}
+                    className={`font-semibold px-3 py-1 rounded-lg transition-all ${
+                      isDisabled
+                        ? 'bg-zinc-800/40 text-zinc-600 cursor-not-allowed opacity-30'
+                        : isSelected
+                        ? 'bg-[#c8ad5f] text-neutral-950 font-bold shadow-md'
+                        : 'bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 cursor-pointer'
+                    }`}
+                    title={isDisabled ? `Objetiva não disponível (Máx: ${maxMag}x)` : `${mag}x`}
+                  >
+                    {mag}x
+                  </button>
+                );
+              })}
 
-            <div className="w-[1px] h-4 bg-zinc-700/80 my-auto"></div>
+              <div className="w-[1px] h-4 bg-zinc-700/80 my-auto"></div>
 
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-zinc-950/60 border border-zinc-800">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-amber-500 font-bold">{currentZoom}</span>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-zinc-950/60 border border-zinc-800">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-[#c8ad5f] font-bold">{currentZoom}</span>
+              </div>
             </div>
-          </div>
+          )}
         </main>
 
-        {/* Barra Lateral Histológica */}
-        <aside className="w-[380px] h-full bg-neutral-950 text-slate-300 border-l border-neutral-800/80 text-sm leading-relaxed overflow-hidden flex flex-col z-40 shrink-0">
-          <div className="p-6 border-b border-neutral-800 bg-neutral-900/40 shrink-0">
-            <h2 className="text-xl font-serif font-bold text-white leading-tight tracking-tight">
-              {slide?.title || 'Visualizador Histológico'}
-            </h2>
-            <p className="mt-2 text-xs font-mono text-neutral-400">
-              {slide?.stain || 'Hematoxilina e Eosina (H&E)'}
-            </p>
-          </div>
+        {/* Barra Lateral Histológica Retrátil */}
+        <aside
+          className={`h-full bg-neutral-950 text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 transition-[width,opacity] duration-500 ease-in-out ${
+            isSidebarOpen ? 'w-[380px] opacity-100' : 'w-0 opacity-0'
+          }`}
+          aria-hidden={!isSidebarOpen}
+        >
+          <div className="w-[380px] h-full flex flex-col">
+            <div className="px-7 pt-7 pb-5 shrink-0">
+              <h2 className="text-xl font-serif font-bold text-neutral-100 leading-tight tracking-tight">
+                {slide?.title || 'Visualizador Histológico'}
+              </h2>
+              <p className="mt-2 text-[11px] font-mono tracking-wide text-[#c8ad5f]/80">
+                {slide?.stain || 'Hematoxilina e Eosina (H&E)'}
+              </p>
+            </div>
 
-          <div className="p-6 flex-1 overflow-y-auto bg-neutral-950 space-y-4">
-            <p className="text-neutral-300 text-sm font-sans leading-loose">
-              {slide?.desc || 'Estruturas histológicas digitalizadas em alta resolução.'}
-            </p>
+            <div className="px-7 pb-7 flex-1 overflow-y-auto bg-neutral-950 space-y-4">
+              <p className="text-neutral-300 text-sm font-sans leading-loose">
+                {slide?.desc || 'Estruturas histológicas digitalizadas em alta resolução.'}
+              </p>
 
-            {slide?.pinos && slide.pinos.length > 0 && (
-              <div className="mt-8 border-t border-neutral-800 pt-6">
-                <h4 className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-4 font-mono">
-                  Pontos de Interesse
-                </h4>
-                <div className="flex flex-col gap-2">
-                  {slide.pinos.map(pin => (
-                    <div
-                      key={pin.id}
-                      className="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 text-left"
-                    >
-                      <div className="flex items-center gap-2.5 truncate">
-                        <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
-                        <span className="text-sm font-medium text-slate-200 truncate">
-                          {pin.rotulo || 'Marcador'}
-                        </span>
+              {slide?.pinos && slide.pinos.length > 0 && (
+                <div className="mt-8 border-t border-white/[0.06] pt-6">
+                  <h4 className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-4 font-mono">
+                    Pontos de Interesse
+                  </h4>
+                  <div className="flex flex-col gap-2">
+                    {slide.pinos.map(pin => (
+                      <div
+                        key={pin.id}
+                        className="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 border border-white/[0.04] text-left"
+                      >
+                        <div className="flex items-center gap-2.5 truncate">
+                          <span className="w-2 h-2 rounded-full bg-[#c8ad5f] shrink-0"></span>
+                          <span className="text-sm font-medium text-neutral-200 truncate">
+                            {pin.rotulo || 'Marcador'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </aside>
       </div>

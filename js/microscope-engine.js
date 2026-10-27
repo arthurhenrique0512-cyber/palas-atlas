@@ -27,6 +27,76 @@ let laminaAtualData = null;
 let pinAtivo     = null;
 let homeZoomRef  = null; // Zoom de referencia para mapeamento 4x/10x/40x/100x
 
+// Lâmina estática: true = trava pan/zoom/navegador; false = microscópio interativo completo.
+const LAMINA_ESTATICA = true;
+
+// ---------------------------------------------------------------------------
+// Barra lateral retrátil (painel de informações e pontos de interesse)
+// ---------------------------------------------------------------------------
+const SIDEBAR_STORAGE_KEY = "palasAtlas.sidebarCollapsed";
+
+function sincronizarTamanhoDoViewer() {
+  if (!viewer || !viewer.viewport) return;
+  try {
+    if (typeof viewer.forceResize === "function") viewer.forceResize();
+    else viewer.viewport.resize(viewer.viewport.getContainerSize(), true);
+    if (LAMINA_ESTATICA) viewer.viewport.goHome(true);
+    viewer.forceRedraw();
+  } catch (e) { /* viewer em transição: ignora */ }
+}
+
+function aplicarEstadoSidebar(recolhida, persistir) {
+  const sidebar = document.getElementById("viewerSidebar");
+  const botao   = document.getElementById("btnToggleSidebar");
+  if (!sidebar) return;
+
+  sidebar.classList.toggle("w-[380px]", !recolhida);
+  sidebar.classList.toggle("opacity-100", !recolhida);
+  sidebar.classList.toggle("w-0", recolhida);
+  sidebar.classList.toggle("opacity-0", recolhida);
+  sidebar.setAttribute("aria-hidden", String(recolhida));
+  if (recolhida) sidebar.setAttribute("inert", ""); else sidebar.removeAttribute("inert");
+
+  if (botao) {
+    botao.setAttribute("aria-expanded", String(!recolhida));
+    const rotulo = recolhida ? "Expandir painel" : "Recolher painel";
+    botao.setAttribute("title", rotulo);
+    botao.setAttribute("aria-label", recolhida ? "Expandir painel de informações" : "Recolher painel de informações");
+  }
+  if (persistir) {
+    try { localStorage.setItem(SIDEBAR_STORAGE_KEY, recolhida ? "1" : "0"); } catch (e) {}
+  }
+}
+
+function iniciarSidebarRetratil() {
+  const sidebar = document.getElementById("viewerSidebar");
+  const botao   = document.getElementById("btnToggleSidebar");
+  if (!sidebar || !botao) return;
+
+  let recolhidaInicial = false;
+  try { recolhidaInicial = localStorage.getItem(SIDEBAR_STORAGE_KEY) === "1"; } catch (e) {}
+  aplicarEstadoSidebar(recolhidaInicial, false);
+
+  botao.addEventListener("click", () => {
+    aplicarEstadoSidebar(!sidebar.classList.contains("w-0"), true);
+  });
+
+  // O palco redimensiona durante a transição CSS: mantém o OpenSeadragon ajustado quadro a quadro.
+  const palco = document.getElementById("viewerStage");
+  if (palco && typeof ResizeObserver === "function") {
+    new ResizeObserver(() => sincronizarTamanhoDoViewer()).observe(palco);
+  }
+}
+
+// Oculta controles que não fazem sentido com a lâmina travada
+function aplicarModoLaminaEstatica() {
+  if (!LAMINA_ESTATICA) return;
+  ["viewerLensPanel", "viewerHint"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Acervo Base Local (Fallback de Resiliência Clínica)
 // ---------------------------------------------------------------------------
@@ -125,6 +195,8 @@ const fallbackLaminas = {
 // 1. Disparo automatico ao carregar a pagina
 // ---------------------------------------------------------------------------
 function iniciarMicroscopio() {
+  iniciarSidebarRetratil();
+  aplicarModoLaminaEstatica();
   const urlParams = new URLSearchParams(window.location.search);
   const laminaId  = urlParams.get("id") || urlParams.get("laminaId");
   if (laminaId) {
@@ -295,8 +367,8 @@ function renderizarDescricaoETextos() {
   let secaoPinos = "";
   if (listaPinosAtual.length > 0) {
     secaoPinos = `
-      <div class="mt-8 border-t border-neutral-800 pt-6">
-        <h4 class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-4 font-mono">
+      <div class="mt-8 border-t border-white/[0.06] pt-6">
+        <h4 class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-4 font-mono">
           Pontos de Interesse
         </h4>
         <div class="flex flex-col gap-2">
@@ -304,13 +376,13 @@ function renderizarDescricaoETextos() {
             <button
               type="button"
               onclick="window.focarPinoNoViewer('${pin.id}')"
-              class="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 hover:border-amber-500/50 text-left transition-all group cursor-pointer"
+              class="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 hover:bg-neutral-900/70 border border-white/[0.04] hover:border-[#c8ad5f]/40 text-left transition-all group cursor-pointer"
             >
               <div class="flex items-center gap-2.5 truncate pr-2">
-                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0 animate-pulse"></span>
-                <span class="text-sm font-medium text-slate-200 truncate">${pin.rotulo || "Estrutura"}</span>
+                <span class="w-2 h-2 rounded-full bg-[#c8ad5f] shrink-0 animate-pulse"></span>
+                <span class="text-sm font-medium text-neutral-200 truncate">${pin.rotulo || "Estrutura"}</span>
               </div>
-              <span class="text-xs text-neutral-500 group-hover:text-amber-400 shrink-0 transition-colors">Focar &rarr;</span>
+              <span class="text-xs text-neutral-500 group-hover:text-[#c8ad5f] shrink-0 transition-colors">Focar &rarr;</span>
             </button>
           `).join('')}
         </div>
@@ -325,7 +397,7 @@ function renderizarDescricaoETextos() {
     ${secaoPinos}
     <a
       href="mailto:contato@palasatlas.com?subject=Correção sugerida na peça: ${encodeURIComponent(tituloPeca)}"
-      class="text-xs text-neutral-500 hover:text-red-400 transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-neutral-800/50 pt-4 w-fit"
+      class="text-xs text-neutral-500 hover:text-[#c8ad5f] transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-white/[0.06] pt-4 w-fit"
     >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -337,7 +409,7 @@ function renderizarDescricaoETextos() {
 
   // Estiliza pin-links inline injetados pelo CMS no descricaoHTML
   container.querySelectorAll('.pin-link, [data-pin-id]').forEach(el => {
-    el.className = "pin-link text-amber-500 hover:text-amber-400 underline font-medium cursor-pointer transition-colors px-0.5";
+    el.className = "pin-link text-[#c8ad5f] hover:text-[#e0c97f] underline underline-offset-2 font-medium cursor-pointer transition-colors px-0.5";
   });
 }
 
@@ -409,38 +481,41 @@ function inicializarOpenSeadragon() {
       showHomeControl:          false,
       showFullPageControl:      false,
       showZoomControl:          false,
-      showNavigator:            true,
+      showNavigator:            !LAMINA_ESTATICA,
       navigatorPosition:        "BOTTOM_RIGHT",
       navigatorWidth:           "120px",
       navigatorHeight:          "90px",
       navigatorBackground:      "rgba(10,10,10,0.9)",
-      navigatorBorderColor:     "rgba(59,130,246,0.35)",
+      navigatorBorderColor:     "rgba(200,173,95,0.35)",
       navigatorAutoFade:        false,
       showReferenceStrip:       false,
       animationTime:            0.45,
       blendTime:                0.1,
       maxZoomPixelRatio:        maxZoomPixelRatio,
 
+      // Lâmina estática: desativa toda a navegação por mouse/toque
+      mouseNavEnabled:          !LAMINA_ESTATICA,
+
       // Trava de pan
-      panHorizontal:            true,
-      panVertical:              true,
+      panHorizontal:            !LAMINA_ESTATICA,
+      panVertical:              !LAMINA_ESTATICA,
       constrainDuringPan:       true,
-      visibilityRatio:          0.8,
-      minZoomImageRatio:        0.9,
+      visibilityRatio:          LAMINA_ESTATICA ? 1 : 0.8,
+      minZoomImageRatio:        LAMINA_ESTATICA ? 1 : 0.9,
 
       // Gestos de Mouse (Desktop)
       gestureSettingsMouse: {
-        scrollToZoom:   true,
+        scrollToZoom:   !LAMINA_ESTATICA,
         clickToZoom:    false,
         dblClickToZoom: false,
-        dragToPan:      true
+        dragToPan:      !LAMINA_ESTATICA
       },
 
       // Gestos de Toque (Mobile)
       gestureSettingsTouch: {
-        pinchToZoom:    true,
+        pinchToZoom:    !LAMINA_ESTATICA,
         flickEnabled:   false,
-        dragToPan:      true,
+        dragToPan:      !LAMINA_ESTATICA,
         dblClickToZoom: false,
         pinchRotate:    false
       }
@@ -510,9 +585,15 @@ function inicializarOpenSeadragon() {
 
     if (viewer && viewer.viewport) {
       homeZoomRef = viewer.viewport.getHomeZoom();
-      viewer.viewport.minZoomLevel = homeZoomRef * 0.9;
-      viewer.viewport.maxZoomLevel = homeZoomRef * (maxMag / 4);
+      if (LAMINA_ESTATICA) {
+        viewer.viewport.minZoomLevel = homeZoomRef;
+        viewer.viewport.maxZoomLevel = homeZoomRef;
+      } else {
+        viewer.viewport.minZoomLevel = homeZoomRef * 0.9;
+        viewer.viewport.maxZoomLevel = homeZoomRef * (maxMag / 4);
+      }
       viewer.viewport.zoomTo(homeZoomRef, null, true);
+      if (LAMINA_ESTATICA) viewer.viewport.goHome(true);
     }
 
     aplicarBloqueioObjetivas(maxMag);
@@ -681,8 +762,8 @@ function focarPinoNoViewer(pinIdRaw) {
   pinElem.id    = `viewer-pin-${pinId}`;
   pinElem.style.cssText = "pointer-events:none; position:relative; display:flex; align-items:center; justify-content:center; width:32px; height:32px;";
   pinElem.innerHTML = `
-    <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(56,189,248,0.4);border-radius:50%;"></div>
-    <div style="position:relative;width:12px;height:12px;background:#0ea5e9;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 3px rgba(14,165,233,0.4),0 4px 12px rgba(0,0,0,0.5);"></div>
+    <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(200,173,95,0.45);border-radius:50%;"></div>
+    <div style="position:relative;width:12px;height:12px;background:#c8ad5f;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 3px rgba(200,173,95,0.4),0 4px 12px rgba(0,0,0,0.6);"></div>
   `;
 
   // Adiciona overlay ancorado no ponto exato da imagem (item 6 — fix de posicionamento)
