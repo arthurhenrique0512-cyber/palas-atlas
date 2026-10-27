@@ -15,9 +15,9 @@ import { getState, subscribe } from "./state.js";
 
 let disciplinaAtual = "histologia";
 
-function gerarIndiceLateral(modulo, topicoAtivoId) {
+function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   let htmlItens = "";
-  if (modulo && modulo.topicos) {
+  if (exibirSubtopicos && modulo && modulo.topicos) {
     modulo.topicos.forEach(topico => {
       const isAtivo = topico.id === topicoAtivoId;
       if (isAtivo) {
@@ -140,7 +140,7 @@ function renderizarCatalogoHistologia(disciplina) {
 
   c1.innerHTML = `
     <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-10">
-      ${gerarIndiceLateral(modulo, null)}
+      ${gerarIndiceLateral(modulo, null, false)}
       
       <div class="w-full">
         <div class="mb-8 pb-5 border-b border-slate-200/70">
@@ -181,6 +181,9 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     history.pushState({ frente: disc, nivel: 2, topico: idTopico }, "", `?frente=${disc}&topico=${idTopico}`);
   }
 
+  // Rola suavemente para o topo absoluto da página
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
   const c1 = document.getElementById("histoCatalog");
   const c2 = document.getElementById("histoSubCatalog");
   const c3 = document.getElementById("histoMicroscope");
@@ -189,12 +192,12 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
   if (c2) c2.classList.remove("hidden");
   if (c3) c3.classList.add("hidden");
 
-  // (O header global será mantido no topo da página)
+  // Garante que o header global e o espaçamento adequado sob ele permaneçam ativos
   const minimalHeader = document.getElementById("palasMinimalHeader");
+  if (minimalHeader) minimalHeader.classList.remove("hidden");
 
-  // Remove o espaçamento de topo do conteiner principal para que o novo header encoste perfeitamente na janela
   const pgHistologia = document.getElementById("pgHistologia");
-  if (pgHistologia) pgHistologia.classList.remove("pt-14");
+  if (pgHistologia) pgHistologia.classList.add("pt-14");
 
   // Limpeza de resquícios de armazenamento local para garantir pureza de dados via Cloud Firestore
   try {
@@ -217,10 +220,10 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     return html;
   };
 
-  // Renderização 2 Colunas Limpas (Índice + Texto)
+  // Renderização 2 Colunas Limpas (Índice + Texto) com espaçamento superior confortável
   c2.innerHTML = `
-    <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-10">
-      ${gerarIndiceLateral(modulo, topico.id)}
+    <div class="w-full px-6 sm:px-10 pt-6 md:pt-8 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-10">
+      ${gerarIndiceLateral(modulo, topico.id, true)}
 
       <div class="w-full">
       
@@ -430,13 +433,18 @@ function voltarNivel(nivelDestino) {
   const pgHistologia = document.getElementById("pgHistologia");
 
   if (nivelDestino === 1) {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     if (minimalHeader) minimalHeader.classList.remove("hidden");
     if (pgHistologia) pgHistologia.classList.add("pt-14");
     c1.classList.remove("hidden");
     renderizarCatalogoHistologia(disciplinaAtual);
   } else if (nivelDestino === 2) {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    if (minimalHeader) minimalHeader.classList.remove("hidden");
+    if (pgHistologia) pgHistologia.classList.add("pt-14");
     c2.classList.remove("hidden");
   } else if (nivelDestino === 3) {
+    if (pgHistologia) pgHistologia.classList.remove("pt-14");
     c3.classList.remove("hidden");
   }
 }

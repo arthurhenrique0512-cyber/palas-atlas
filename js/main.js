@@ -85,15 +85,9 @@ function init() {
         if (brandLogo && brandLogo.getAttribute("compact") !== "true") {
           brandLogo.setAttribute("compact", "true");
         }
-        if (logoPill && !logoPill.classList.contains("py-2")) {
-          logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-4 sm:px-5 py-2 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
-        }
       } else {
         if (brandLogo && brandLogo.getAttribute("compact") === "true") {
           brandLogo.setAttribute("compact", "false");
-        }
-        if (logoPill && !logoPill.classList.contains("py-3")) {
-          logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-5 sm:px-6 py-3 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
         }
       }
     };
@@ -189,7 +183,7 @@ function renderView(state) {
       brandLogo.setAttribute("theme", "dark-bg");
     }
     if (logoPill) {
-      logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-5 sm:px-6 py-3 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
+      logoPill.className = "inline-flex items-center cursor-pointer select-none no-underline py-1 transition-opacity duration-200 hover:opacity-90";
     }
     if (drawerPill) {
       drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] p-1 sm:p-1.5 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)]";
@@ -207,7 +201,7 @@ function renderView(state) {
       brandLogo.setAttribute("theme", "dark-bg");
     }
     if (logoPill) {
-      logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] px-4 sm:px-5 py-2 transition-all duration-300 cursor-pointer select-none no-underline";
+      logoPill.className = "inline-flex items-center cursor-pointer select-none no-underline py-1 transition-opacity duration-200 hover:opacity-90";
     }
     if (drawerPill) {
       drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] p-1 transition-all duration-300";
@@ -225,7 +219,7 @@ function renderView(state) {
       brandLogo.setAttribute("theme", "light-bg");
     }
     if (logoPill) {
-      logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 px-4 sm:px-5 py-2 transition-all duration-300 ease-in-out cursor-pointer select-none no-underline";
+      logoPill.className = "inline-flex items-center cursor-pointer select-none no-underline py-1 transition-opacity duration-200 hover:opacity-90";
     }
     if (drawerPill) {
       drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 p-1 sm:p-1.5 transition-all duration-300";
