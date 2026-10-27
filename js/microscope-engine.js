@@ -31,48 +31,91 @@ let homeZoomRef  = null; // Zoom de referencia para mapeamento 4x/10x/40x/100x
 // Acervo Base Local (Fallback de Resiliência Clínica)
 // ---------------------------------------------------------------------------
 const fallbackLaminas = {
-  'muscular-esqueletico-he': {
-    id: 'muscular-esqueletico-he',
-    nome: 'Tecido Muscular Estriado Esquelético',
-    disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E)',
-    imagemUrl: 'assets/histologia/muscular-esqueletico-he.jpg',
-    descricaoHTML: '<p>Corte longitudinal de músculo estriado esquelético. Fibras musculares multinucleadas com núcleos periféricos achatados e estriações transversais de actina e miosina.</p>',
-    pinos: []
-  },
-  'medula-espinal-he': {
-    id: 'medula-espinal-he',
+  '5kqs5Qv9fvWlpNSJoyPG': {
+    id: '5kqs5Qv9fvWlpNSJoyPG',
+    aliases: ['medula-espinal-he', 'medula-espinal', 'medula'],
     nome: 'Medula Espinal (Corte Transversal)',
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E)',
     imagemUrl: 'assets/histologia/medula-espinal-he.png',
+    previewImage: 'assets/histologia/medula-espinal-he.png',
+    thumbnailUrl: 'assets/histologia/medula-espinal-he.png',
     descricaoHTML: '<p>Corte transversal de medula espinal exibindo substância cinzenta central em forma de "H" com motoneurônios no corno anterior e substância branca periférica contendo tratos mielinizados.</p>',
+    pinos: []
+  },
+  'a3oRvXvJpMKAtU2RE85q': {
+    id: 'a3oRvXvJpMKAtU2RE85q',
+    aliases: ['lamina-real1', 'lamina-real-1', 'matriz', 'teste'],
+    nome: 'Preparação Histológica Digital Matriz',
+    disciplina: 'histologia',
+    coloracao: 'Hematoxilina e Eosina (H&E)',
+    imagemUrl: 'assets/histologia/lamina-real1.dzi',
+    previewImage: 'assets/histologia/lamina-real1-preview.jpg',
+    thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
+    dziUrl: 'assets/histologia/lamina-real1.dzi',
+    descricaoHTML: '<p>Lâmina completa digitalizada em altíssima resolução com pirâmide de Deep Zoom (DZI) para exploração microscópica multiescala.</p>',
+    pinos: []
+  },
+  'medula-espinal-he': {
+    id: 'medula-espinal-he',
+    aliases: ['5kqs5Qv9fvWlpNSJoyPG', 'medula-espinal', 'medula'],
+    nome: 'Medula Espinal (Corte Transversal)',
+    disciplina: 'histologia',
+    coloracao: 'Hematoxilina e Eosina (H&E)',
+    imagemUrl: 'assets/histologia/medula-espinal-he.png',
+    previewImage: 'assets/histologia/medula-espinal-he.png',
+    thumbnailUrl: 'assets/histologia/medula-espinal-he.png',
+    descricaoHTML: '<p>Corte transversal de medula espinal exibindo substância cinzenta central em forma de "H" com motoneurônios no corno anterior e substância branca periférica contendo tratos mielinizados.</p>',
+    pinos: []
+  },
+  'muscular-esqueletico-he': {
+    id: 'muscular-esqueletico-he',
+    aliases: ['musculo-esqueletico', 'tecido-muscular'],
+    nome: 'Tecido Muscular Estriado Esquelético',
+    disciplina: 'histologia',
+    coloracao: 'Hematoxilina e Eosina (H&E)',
+    imagemUrl: 'assets/histologia/muscular-esqueletico-he.jpg',
+    previewImage: 'assets/histologia/muscular-esqueletico-he.jpg',
+    thumbnailUrl: 'assets/histologia/muscular-esqueletico-he.jpg',
+    descricaoHTML: '<p>Corte longitudinal de músculo estriado esquelético. Fibras musculares multinucleadas com núcleos periféricos achatados e estriações transversais de actina e miosina.</p>',
     pinos: []
   },
   'osso_compacto_dzi': {
     id: 'osso_compacto_dzi',
+    aliases: ['osso-compacto', 'osso-compacto-he', 'osso_compacto'],
     nome: 'Osso Compacto Desgastado',
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
     imagemUrl: 'assets/histologia/osso_compacto_dzi.dzi',
+    previewImage: 'assets/histologia/osso-compacto-preview.jpg',
+    thumbnailUrl: 'assets/histologia/osso-compacto-preview.jpg',
+    dziUrl: 'assets/histologia/osso_compacto_dzi.dzi',
     descricaoHTML: '<p>Tecido ósseo compacto evidenciando sistemas de Havers (ósteons), canais centrais vasculares, lamelas concêntricas e lacunas comunicantes com canalículos de osteócitos.</p>',
     pinos: []
   },
   'epitelio-simples-escamoso': {
     id: 'epitelio-simples-escamoso',
+    aliases: ['epitelio-pavimentoso', 'epitelio-simples'],
     nome: 'Epitélio Pavimentoso Simples',
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E)',
     imagemUrl: 'assets/histologia/epitelio-simples-escamoso.dzi',
+    previewImage: 'assets/histologia/epitelio-simples-escamoso-preview.jpg',
+    thumbnailUrl: 'assets/histologia/epitelio-simples-escamoso-preview.jpg',
+    dziUrl: 'assets/histologia/epitelio-simples-escamoso.dzi',
     descricaoHTML: '<p>Camada única de células epiteliais pavimentosas (achatadas) com núcleos elípticos proeminentes, adaptadas para transporte passivo e difusão de solutos.</p>',
     pinos: []
   },
   'lamina-real1': {
     id: 'lamina-real1',
+    aliases: ['a3oRvXvJpMKAtU2RE85q', 'lamina-real-1', 'matriz'],
     nome: 'Preparação Histológica Digital Matriz',
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E)',
     imagemUrl: 'assets/histologia/lamina-real1.dzi',
+    previewImage: 'assets/histologia/lamina-real1-preview.jpg',
+    thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
+    dziUrl: 'assets/histologia/lamina-real1.dzi',
     descricaoHTML: '<p>Lâmina completa digitalizada em altíssima resolução com pirâmide de Deep Zoom (DZI) para exploração microscópica multiescala.</p>',
     pinos: []
   }
@@ -88,7 +131,7 @@ function iniciarMicroscopio() {
     carregarLaminaNoMicroscopio(laminaId);
   } else {
     console.warn("[Palas Atlas] Nenhum ID de lamina passado na URL (?id=...).");
-    exibirErroMicroscopio("Nenhuma lamina selecionada. Acesse pelo Catalogo de Topicos.");
+    exibirErroMicroscopio("Nenhuma lâmina selecionada. Acesse pelo Catálogo de Tópicos.");
   }
   registrarDelegacaoGlobalDePinos();
 }
@@ -103,10 +146,21 @@ if (document.readyState === "loading") {
 // 2. Carrega a lamina pelo ID (Instantâneo no Acervo Base + Firestore)
 // ---------------------------------------------------------------------------
 async function carregarLaminaNoMicroscopio(laminaId) {
-  if (!laminaId) return;
+  if (!laminaId) {
+    exibirErroMicroscopio("Nenhuma lâmina selecionada.");
+    return;
+  }
+
+  const idBuscado = String(laminaId).trim();
 
   // 1. Se for uma das lâminas base conhecidas do acervo, carrega imediatamente
-  const fallback = fallbackLaminas[laminaId] || Object.values(fallbackLaminas).find(l => l.id.toLowerCase() === laminaId.toLowerCase());
+  const fallback = fallbackLaminas[idBuscado] || 
+                   fallbackLaminas[idBuscado.toLowerCase()] || 
+                   Object.values(fallbackLaminas).find(l => 
+                     l.id.toLowerCase() === idBuscado.toLowerCase() ||
+                     (Array.isArray(l.aliases) && l.aliases.some(a => a.toLowerCase() === idBuscado.toLowerCase()))
+                   );
+
   if (fallback) {
     laminaAtualData = { ...fallback };
     listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
@@ -116,13 +170,12 @@ async function carregarLaminaNoMicroscopio(laminaId) {
 
     // Sincroniza em background caso haja dados customizados ou pinos no Firestore
     if (typeof db !== "undefined" && db) {
-      db.collection("laminas").doc(laminaId).get().then(docRef => {
+      db.collection("laminas").doc(idBuscado).get().then(docRef => {
         if (docRef.exists) {
           const dados = docRef.data();
           if (dados && Array.isArray(dados.pinos) && dados.pinos.length > 0) {
             listaPinosAtual = dados.pinos;
             renderizarDescricaoETextos();
-            if (viewer && viewer.isOpen()) gerarMarcadoresDePinos();
           }
         }
       }).catch(() => {});
@@ -133,8 +186,15 @@ async function carregarLaminaNoMicroscopio(laminaId) {
   // 2. Se for uma lâmina dinâmica cadastrada pelo CMS no Firestore
   if (typeof db !== "undefined" && db) {
     try {
-      const docRef = await db.collection("laminas").doc(laminaId).get();
-        laminaAtualData = { id: docRef.id, ...docRef.data() };
+      const fetchPromise = db.collection("laminas").doc(idBuscado).get();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Timeout Firestore")), 5000)
+      );
+
+      const docRef = await Promise.race([fetchPromise, timeoutPromise]);
+      if (docRef && docRef.exists) {
+        const dados = docRef.data() || {};
+        laminaAtualData = { id: docRef.id, ...dados };
         let dziCandidate = laminaAtualData.dziUrl || (laminaAtualData.imagemUrl && laminaAtualData.imagemUrl.toLowerCase().endsWith('.dzi') ? laminaAtualData.imagemUrl : '');
         let img = dziCandidate || laminaAtualData.imagemUrl || laminaAtualData.imageUrl || laminaAtualData.caminhoImagemBase || '';
         if (img) {
@@ -147,13 +207,27 @@ async function carregarLaminaNoMicroscopio(laminaId) {
         return;
       }
     } catch (err) {
-      console.warn("[Palas Atlas] Aviso ao consultar Firestore para ID:", laminaId, err);
+      console.warn("[Palas Atlas] Aviso ao consultar Firestore para ID:", idBuscado, err);
     }
   }
 
-  // 3. Se realmente não for encontrada
-  console.error("[Palas Atlas] Lamina nao encontrada para ID:", laminaId);
-  exibirErroMicroscopio("Lâmina não encontrada no acervo. Retorne ao Catálogo de Lâminas.");
+  // 3. Fallback secundário por correspondência parcial de nome/slug
+  const fallbackSecundario = Object.values(fallbackLaminas).find(l => 
+    idBuscado.toLowerCase().includes(l.id.toLowerCase()) || 
+    l.id.toLowerCase().includes(idBuscado.toLowerCase())
+  );
+  if (fallbackSecundario) {
+    laminaAtualData = { ...fallbackSecundario };
+    listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
+    renderizarMetadadosDaLamina();
+    renderizarDescricaoETextos();
+    inicializarOpenSeadragon();
+    return;
+  }
+
+  // 4. Se realmente não for encontrada
+  console.error("[Palas Atlas] Lâmina não encontrada para ID:", idBuscado);
+  exibirErroMicroscopio(`Lâmina não encontrada no acervo (${idBuscado}). Retorne ao Catálogo.`);
 }
 
 // ---------------------------------------------------------------------------
@@ -259,16 +333,27 @@ function inicializarOpenSeadragon() {
   }
   if (typeof window.OpenSeadragon !== "function") {
     console.error("[Palas Atlas] Biblioteca OpenSeadragon nao carregada.");
+    exibirErroMicroscopio("Biblioteca OpenSeadragon não carregada. Atualize a página.");
     return;
   }
 
-  const imagemUrl = laminaAtualData.imagemUrl || laminaAtualData.imageUrl || laminaAtualData.dziUrl || "";
+  let imagemUrl = laminaAtualData.imagemUrl || laminaAtualData.imageUrl || laminaAtualData.dziUrl || "";
+  if (typeof imagemUrl === "string") {
+    imagemUrl = imagemUrl.trim();
+  }
   if (!imagemUrl) {
-    exibirErroMicroscopio("Esta lamina nao possui URL de imagem cadastrada. Edite-a no Painel Dev.");
+    exibirErroMicroscopio("Esta lâmina não possui URL de imagem cadastrada.");
     return;
   }
 
-  if (viewer && typeof viewer.destroy === "function") { viewer.destroy(); viewer = null; }
+  const previewFallback = laminaAtualData.previewImage || laminaAtualData.thumbnailUrl || "";
+
+  if (viewer && typeof viewer.destroy === "function") {
+    try {
+      viewer.destroy();
+    } catch (e) {}
+    viewer = null;
+  }
 
   const isDzi = imagemUrl.endsWith(".dzi") || imagemUrl.includes(".dzi?");
   const tileSourcesConfig = isDzi ? imagemUrl : { type: "image", url: imagemUrl };
@@ -277,69 +362,76 @@ function inicializarOpenSeadragon() {
   const mpp = Number(laminaAtualData.mpp) || 0.25;
   const pixelsPerMeter = Math.round(1e6 / mpp);
 
-  // Req 2: Limite de zoom máximo baseado na objetiva real da lâmina
-  // Mapeamento: 40x→1.2, 60x→1.8, 100x→2.5 (evita pixelização além da resolução física)
+  // Limite de zoom máximo baseado na objetiva real da lâmina
   const maxMag = Number(laminaAtualData.maxMagnification) || 40;
   const maxZoomPixelRatioMap = { 40: 1.2, 60: 1.8, 100: 2.5 };
   const maxZoomPixelRatio = maxZoomPixelRatioMap[maxMag] || 1.2;
 
-  // FIX BUG 1: Garantir min-height no container para evitar colapso no Safari iOS
-  if (container) {
-    container.style.minHeight = container.style.minHeight || "300px";
-  }
+  // Garantir dimensões explícitas no container
+  container.style.width = "100%";
+  container.style.height = "100%";
+  container.style.minHeight = "400px";
 
   // Registra o tempo de início do carregamento da imagem
   window.__microscopeStartTime = Date.now();
 
-  viewer = window.OpenSeadragon({
-    id:                       containerId,
-    prefixUrl:                "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
-    tileSources:              tileSourcesConfig,
-    showNavigationControl:    false,
-    showSequenceControl:      false,
-    showHomeControl:          false,
-    showFullPageControl:      false,
-    showZoomControl:          false,
-    showNavigator:            true,
-    navigatorPosition:        "BOTTOM_RIGHT",
-    navigatorWidth:           "120px",
-    navigatorHeight:          "90px",
-    navigatorBackground:      "rgba(10,10,10,0.9)",
-    navigatorBorderColor:     "rgba(59,130,246,0.35)",
-    navigatorAutoFade:        false,
-    showReferenceStrip:       false,
-    animationTime:            0.45,
-    blendTime:                0.1,
-    maxZoomPixelRatio:        maxZoomPixelRatio,
+  let hasFailed = false;
+  let fallbackAttempted = false;
 
-    // ── TRAVA DE PAN ──────────────────────────────────────────────────
-    panHorizontal:            true,
-    panVertical:              true,
-    constrainDuringPan:       true,
-    visibilityRatio:          0.8,
-    minZoomImageRatio:        0.9,
-    // ─────────────────────────────────────────────────────────────────
+  try {
+    viewer = window.OpenSeadragon({
+      id:                       containerId,
+      prefixUrl:                "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+      tileSources:              tileSourcesConfig,
+      showNavigationControl:    false,
+      showSequenceControl:      false,
+      showHomeControl:          false,
+      showFullPageControl:      false,
+      showZoomControl:          false,
+      showNavigator:            true,
+      navigatorPosition:        "BOTTOM_RIGHT",
+      navigatorWidth:           "120px",
+      navigatorHeight:          "90px",
+      navigatorBackground:      "rgba(10,10,10,0.9)",
+      navigatorBorderColor:     "rgba(59,130,246,0.35)",
+      navigatorAutoFade:        false,
+      showReferenceStrip:       false,
+      animationTime:            0.45,
+      blendTime:                0.1,
+      maxZoomPixelRatio:        maxZoomPixelRatio,
 
-    // Gestos de Mouse (Desktop)
-    gestureSettingsMouse: {
-      scrollToZoom:   true,
-      clickToZoom:    false,
-      dblClickToZoom: false,
-      dragToPan:      true
-    },
+      // Trava de pan
+      panHorizontal:            true,
+      panVertical:              true,
+      constrainDuringPan:       true,
+      visibilityRatio:          0.8,
+      minZoomImageRatio:        0.9,
 
-    // FIX BUG 1: Gestos de Toque (Mobile) — ausentes anteriormente
-    gestureSettingsTouch: {
-      pinchToZoom:    true,
-      flickEnabled:   false,
-      dragToPan:      true,
-      dblClickToZoom: false,
-      pinchRotate:    false
-    }
-  });
+      // Gestos de Mouse (Desktop)
+      gestureSettingsMouse: {
+        scrollToZoom:   true,
+        clickToZoom:    false,
+        dblClickToZoom: false,
+        dragToPan:      true
+      },
+
+      // Gestos de Toque (Mobile)
+      gestureSettingsTouch: {
+        pinchToZoom:    true,
+        flickEnabled:   false,
+        dragToPan:      true,
+        dblClickToZoom: false,
+        pinchRotate:    false
+      }
+    });
+  } catch (err) {
+    console.error("[Palas Atlas] Erro fatal ao instanciar OpenSeadragon:", err);
+    exibirErroMicroscopio("Falha na inicialização do visualizador óptico.");
+    return;
+  }
 
   // Configuração base da régua
-  if (window.OpenSeadragon.ScalebarType) {
+  if (window.OpenSeadragon.ScalebarType && viewer) {
     viewer.scalebar({
       type:            window.OpenSeadragon.ScalebarType.MICROSCOPE,
       location:        window.OpenSeadragon.ScalebarLocation.TOP_RIGHT,
@@ -353,43 +445,57 @@ function inicializarOpenSeadragon() {
     });
   }
 
-  // ── Evento: imagem aberta com sucesso ────────────────────────────────
+  // Tratamento de falha no carregamento do DZI/imagem (Tratamento Robusto)
+  const onOpenFailed = (event) => {
+    console.warn("[Palas Atlas] OpenSeadragon open-failed:", event);
+    if (!fallbackAttempted && isDzi && previewFallback && previewFallback !== imagemUrl) {
+      fallbackAttempted = true;
+      console.info("[Palas Atlas] Tentando fallback para imagem estática:", previewFallback);
+      try {
+        viewer.open({ type: "image", url: previewFallback });
+        return;
+      } catch (err) {
+        console.error("[Palas Atlas] Falha ao tentar abrir fallback:", err);
+      }
+    }
+    hasFailed = true;
+    exibirErroMicroscopio(`Não foi possível carregar o arquivo da lâmina digital. Verifique sua conexão ou tente novamente.`);
+  };
+
+  viewer.addHandler("open-failed", onOpenFailed);
+
+  // Evento: imagem aberta com sucesso
   const onOpenSuccess = () => {
+    if (hasFailed) return;
     const elapsed = Date.now() - (window.__microscopeStartTime || Date.now());
-    const remainingTime = Math.max(0, 400 - elapsed); // Fade out suave e responsivo
+    const remainingTime = Math.max(0, 200 - elapsed);
 
     setTimeout(() => {
-      // Remove skeleton de carregamento com fade out suave
+      // Remove skeleton de carregamento com transição rápida e limpa
       const skeleton  = document.getElementById("osdSkeleton");
       const osdCanvas = document.getElementById("osd-viewer");
       if (skeleton) {
+        skeleton.style.transition = 'opacity 350ms ease-out';
         skeleton.style.opacity = '0';
         skeleton.style.pointerEvents = 'none';
         setTimeout(() => {
           skeleton.style.display = 'none';
           skeleton.classList.add("hidden");
           skeleton.classList.remove("flex");
-        }, 300);
+        }, 360);
       }
       if (osdCanvas) osdCanvas.classList.remove("opacity-0");
     }, remainingTime);
 
     if (viewer && viewer.viewport) {
-      // Salva zoom home como baseline 4x (item 4)
       homeZoomRef = viewer.viewport.getHomeZoom();
       viewer.viewport.minZoomLevel = homeZoomRef * 0.9;
-
-      // Req 1: Trava rígida de zoom exata (sem ultrapassar a objetiva física)
       viewer.viewport.maxZoomLevel = homeZoomRef * (maxMag / 4);
-
-      // Inicia na visao geral (4x baseline)
       viewer.viewport.zoomTo(homeZoomRef, null, true);
     }
 
-    // Req 2: Desabilita botoes de objetiva acima do maxMagnification
     aplicarBloqueioObjetivas(maxMag);
 
-    // Estiliza navigator e scalebar via DOM (item 5 e HUD Unificado)
     setTimeout(() => {
       const navParent = document.querySelector(".openseadragon-navigator");
       if (navParent) {
@@ -401,14 +507,13 @@ function inicializarOpenSeadragon() {
         });
       }
 
-      // Estiliza a régua no seu local nativo
       const scalebarEl = document.querySelector(".openseadragon-scalebar");
       if (scalebarEl) {
         Object.assign(scalebarEl.style, {
           borderRadius: "8px",
           padding:      "4px 12px",
           backdropFilter: "blur(8px)",
-          border:       "1px solid rgba(63, 63, 70, 0.8)", // border-zinc-700/80
+          border:       "1px solid rgba(63, 63, 70, 0.8)",
           fontSize:     "10px",
           fontWeight:   "600"
         });
@@ -421,23 +526,24 @@ function inicializarOpenSeadragon() {
     onOpenSuccess();
   }
 
-  // Garantia absoluta contra travamentos no carregador
+  // Garantia absoluta contra travamentos no carregador (Timeout de segurança)
   setTimeout(() => {
     const skeleton = document.getElementById("osdSkeleton");
     if (skeleton && skeleton.style.display !== "none" && !skeleton.classList.contains("hidden")) {
-      skeleton.style.opacity = '0';
-      skeleton.style.pointerEvents = 'none';
-      setTimeout(() => {
+      if (!viewer || !viewer.isOpen()) {
+        exibirErroMicroscopio("Tempo limite excedido ao carregar a lâmina. Tente recarregar a página.");
+      } else {
+        skeleton.style.opacity = '0';
+        skeleton.style.pointerEvents = 'none';
         skeleton.style.display = 'none';
         skeleton.classList.add("hidden");
-        skeleton.classList.remove("flex");
-      }, 300);
-      const osdCanvas = document.getElementById("osd-viewer");
-      if (osdCanvas) osdCanvas.classList.remove("opacity-0");
+        const osdCanvas = document.getElementById("osd-viewer");
+        if (osdCanvas) osdCanvas.classList.remove("opacity-0");
+      }
     }
-  }, 2200);
+  }, 4500);
 
-  // ── Req 2: Função unificada de Indicador Dinâmico de Zoom ────────────
+  // Função unificada de Indicador Dinâmico de Zoom
   const updateZoomDisplay = () => {
     if (!viewer || !viewer.viewport) return;
     const currentOSDZoom = viewer.viewport.getZoom(true);
@@ -453,7 +559,6 @@ function inicializarOpenSeadragon() {
   viewer.addHandler("open", updateZoomDisplay);
   viewer.addHandler("animation", updateZoomDisplay);
 
-  // ── Trava: impede subir abaixo do zoom home (item 3) ─────────────────
   viewer.addHandler("zoom", (event) => {
     if (!homeZoomRef) return;
     if (viewer.viewport.getZoom() < homeZoomRef * 0.9) {
@@ -461,11 +566,6 @@ function inicializarOpenSeadragon() {
     }
     atualizarLenteBotaoAtivo();
     updateZoomDisplay();
-  });
-
-  viewer.addHandler("open-failed", (event) => {
-    console.error("[Palas Atlas] OpenSeadragon falhou ao carregar imagem:", event);
-    exibirErroMicroscopio(`Nao foi possivel carregar a imagem: ${imagemUrl}`);
   });
 }
 
@@ -627,24 +727,38 @@ function exibirErroMicroscopio(msg) {
   if (skeleton) {
     skeleton.style.opacity = '0';
     skeleton.style.pointerEvents = 'none';
-    setTimeout(() => {
-      skeleton.style.display = 'none';
-      skeleton.classList.add("hidden");
-      skeleton.classList.remove("flex");
-    }, 300);
+    skeleton.style.display = 'none';
+    skeleton.classList.add("hidden");
+    skeleton.classList.remove("flex");
   }
+  const tituloEl = document.getElementById("slideTitle");
+  if (tituloEl) tituloEl.textContent = "Lâmina Indisponível";
+  const descEl = document.getElementById("slideDescriptionContainer");
+  if (descEl) descEl.innerHTML = `<p class="text-neutral-500 italic text-sm font-sans">Não foi possível recuperar os dados morfológicos desta peça.</p>`;
+
   const container = document.getElementById("osd-viewer");
   if (!container) return;
   container.classList.remove("opacity-0");
   container.innerHTML = `
     <div class="flex flex-col items-center justify-center w-full h-full text-center gap-4 p-8">
-      <div class="w-14 h-14 rounded-2xl bg-rose-950/40 border border-rose-900/60 flex items-center justify-center">
+      <div class="w-14 h-14 rounded-2xl bg-rose-950/40 border border-rose-900/60 flex items-center justify-center shadow-lg shadow-rose-950/20">
         <svg class="w-7 h-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
       </div>
-      <p class="text-rose-400 text-sm font-mono font-semibold max-w-xs">${msg}</p>
+      <div class="space-y-1">
+        <h3 class="text-sm font-semibold text-white tracking-wide">Falha no Carregamento</h3>
+        <p class="text-rose-400 text-xs font-mono max-w-sm leading-relaxed">${msg}</p>
+      </div>
+      <div class="flex items-center gap-3 mt-3">
+        <button type="button" onclick="window.location.reload()" class="px-4 py-2 text-xs font-mono font-medium text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl transition-all cursor-pointer">
+          Recarregar
+        </button>
+        <a href="index.html" class="px-4 py-2 text-xs font-mono font-medium text-zinc-300 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 rounded-xl transition-all">
+          Voltar ao Início
+        </a>
+      </div>
     </div>
   `;
 }
