@@ -568,9 +568,66 @@ button:active {
     filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.55)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.2));
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.04);
     filter: drop-shadow(0 0 24px rgba(212, 175, 55, 0.85)) drop-shadow(0 0 48px rgba(212, 175, 55, 0.38));
   }
+}
+
+/* Batimento de Asas da Coruja (Organic Academic Wing Flapping) */
+@keyframes owlFlapLeft {
+  0%, 100% {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  24% {
+    transform: rotate(2deg) scale(1.02, 0.98);
+  }
+  48% {
+    transform: rotate(-4.5deg) scale(0.90, 1.02);
+  }
+  64% {
+    transform: rotate(-1.5deg) scale(0.94, 1.01);
+  }
+  82% {
+    transform: rotate(2.5deg) scale(1.02, 0.99);
+  }
+  92% {
+    transform: rotate(0.8deg) scale(1.01, 1);
+  }
+}
+
+@keyframes owlFlapRight {
+  0%, 100% {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  24% {
+    transform: rotate(-2deg) scale(1.02, 0.98);
+  }
+  48% {
+    transform: rotate(4.5deg) scale(0.90, 1.02);
+  }
+  64% {
+    transform: rotate(1.5deg) scale(0.94, 1.01);
+  }
+  82% {
+    transform: rotate(-2.5deg) scale(1.02, 0.99);
+  }
+  92% {
+    transform: rotate(-0.8deg) scale(1.01, 1);
+  }
+}
+
+.owl-wing-left {
+  transform-box: fill-box;
+  transform-origin: 77.2% 54.6%;
+  animation: owlFlapLeft 3.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+.owl-wing-right {
+  transform-box: fill-box;
+  transform-origin: 22.8% 54.6%;
+  animation: owlFlapRight 3.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
 }
 
 @keyframes splashGoldSheenSweep {
@@ -604,7 +661,7 @@ button:active {
 }
 
 .splash-owl-anim {
-  animation: splashOwlPulseGlow 3.2s ease-in-out infinite;
+  animation: splashOwlPulseGlow 3.6s ease-in-out infinite;
   will-change: transform, filter;
 }
 
@@ -657,6 +714,8 @@ button:active {
 @media (prefers-reduced-motion: reduce) {
   .splash-logo-reveal,
   .splash-owl-anim,
+  .owl-wing-left,
+  .owl-wing-right,
   .splash-shimmer-palas,
   .splash-progress-bar {
     animation: none !important;
