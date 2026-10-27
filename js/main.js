@@ -180,12 +180,21 @@ function renderView(state) {
     if (footerLight) footerLight.classList.add("hidden");
   }
 
+  const logoPill = document.querySelector("#palasMinimalHeader a");
+  const drawerPill = document.querySelector("#palasMinimalHeader .pointer-events-auto:last-child");
+
   if (isHomePage) {
     // HOME: emblema dourado + header transparente flutuante
     if (headerMin) headerMin.className = "sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "true");
       brandLogo.setAttribute("theme", "dark-bg");
+    }
+    if (logoPill) {
+      logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-5 sm:px-6 py-3 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
+    }
+    if (drawerPill) {
+      drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] p-1 sm:p-1.5 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)]";
     }
     if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
     if (btnVoltarGlobal) {
@@ -194,10 +203,16 @@ function renderView(state) {
     }
   } else if (isDashboard) {
     // DASHBOARD CMS: monocromático claro + header escuro fixo
-    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none";
+    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full bg-neutral-950 border-b border-neutral-800/80 transition-all duration-300 pointer-events-auto shadow-md";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
       brandLogo.setAttribute("theme", "dark-bg");
+    }
+    if (logoPill) {
+      logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] px-4 sm:px-5 py-2 transition-all duration-300 cursor-pointer select-none no-underline";
+    }
+    if (drawerPill) {
+      drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] p-1 transition-all duration-300";
     }
     if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
     if (btnVoltarGlobal) {
@@ -205,14 +220,21 @@ function renderView(state) {
       btnVoltarGlobal.classList.remove("flex");
     }
   } else {
-    // PÁGINAS INTERNAS: monocromático escuro + header flutuante com botão voltar
-    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none";
+    // PÁGINAS INTERNAS (fundo claro): header claro com contraste clínico perfeito
+    if (headerMin) headerMin.className = "sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all duration-300 pointer-events-auto shadow-sm";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
-      brandLogo.setAttribute("theme", "dark-bg");
+      brandLogo.setAttribute("theme", "light-bg");
     }
-    if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
+    if (logoPill) {
+      logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 px-4 sm:px-5 py-2 transition-all duration-300 ease-in-out cursor-pointer select-none no-underline";
+    }
+    if (drawerPill) {
+      drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 p-1 sm:p-1.5 transition-all duration-300";
+    }
+    if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-700 hover:text-[#d4af37] active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
     if (btnVoltarGlobal) {
+      btnVoltarGlobal.className = "p-2 text-slate-700 hover:text-slate-900 bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 rounded-full transition-all text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 cursor-pointer shadow-sm";
       btnVoltarGlobal.classList.remove("hidden");
       btnVoltarGlobal.classList.add("flex");
     }

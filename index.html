@@ -90,18 +90,28 @@
     </div>
   </div>
   <script>
-    // Remove o preloader assim que o DOM estiver pronto
+    // Remove o preloader assim que a aplicação estiver pronta
     window.__appReady = function() {
       var s = document.getElementById('preloader');
-      if (!s) return;
+      if (!s || s.__dismissed) return;
+      s.__dismissed = true;
       s.style.opacity = '0';
       s.style.pointerEvents = 'none';
-      setTimeout(function() { if(s && s.parentNode) s.parentNode.removeChild(s); }, 1200);
+      setTimeout(function() { if (s && s.parentNode) s.parentNode.removeChild(s); }, 800);
     };
-    document.addEventListener('DOMContentLoaded', function() {
-      // Garante no mínimo 2 segundos antes de iniciar o fade-out, como pedido pelo usuário
-      setTimeout(window.__appReady, 3000);
-    });
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(window.__appReady, 600);
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(window.__appReady, 600);
+      });
+      window.addEventListener('load', function() {
+        setTimeout(window.__appReady, 400);
+      });
+    }
+    // Fallback de segurança absoluto para garantir que a tela nunca permaneça congelada
+    setTimeout(window.__appReady, 1800);
   </script>
 
   <header id="palasMinimalHeader" class="sticky top-0 z-50 w-full transition-all duration-300 pointer-events-none">
@@ -382,6 +392,7 @@
                     src="assets/histologia/muscular-esqueletico-he.jpg"
                     alt="Lâmina Morfológica"
                     class="w-full h-full object-cover transition-opacity duration-300 ease-in-out group-hover/preview:scale-[1.03] transition-transform duration-700"
+                    onerror="this.onerror=null; this.src='assets/histologia/muscular-esqueletico-he.jpg';"
                   />
                   <!-- Sombra/gradiente sutil nas bordas internas para profundidade -->
                   <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none"></div>
@@ -587,7 +598,12 @@
                   data-index="${i}"
                   aria-label="Ir para a lâmina ${i + 1}: ${slide.title.replace(/"/g, '&quot;')}"
                 >
-                  <img src="${slide.thumb || slide.image}" alt="${slide.title.replace(/"/g, '&quot;')}" class="w-full h-full object-cover">
+                  <img
+                    src="${slide.thumb || slide.image}"
+                    alt="${slide.title.replace(/"/g, '&quot;')}"
+                    class="w-full h-full object-cover"
+                    onerror="this.onerror=null; this.src='assets/histologia/muscular-esqueletico-he.jpg';"
+                  >
                 </button>
               `;
             }).join('');
@@ -609,6 +625,10 @@
 
             if (imgEl) {
               imgEl.style.opacity = '0';
+              imgEl.onerror = function() {
+                this.onerror = null;
+                this.src = 'assets/histologia/muscular-esqueletico-he.jpg';
+              };
               setTimeout(() => {
                 imgEl.src = slide.image;
                 imgEl.alt = slide.title;
@@ -616,11 +636,18 @@
               }, 150);
             }
 
-            if (titleEl) titleEl.textContent = slide.title;
-            if (catEl) catEl.textContent = slide.category;
-            if (stainEl) stainEl.textContent = slide.stain;
-            if (specEl) specEl.textContent = slide.specimen;
-            if (descEl) descEl.textContent = slide.desc;
+            // Decodifica entidades HTML como &amp; para exibição correta
+            const decodificarTexto = (t) => {
+              if (!t) return '';
+              const doc = new DOMParser().parseFromString(t, 'text/html');
+              return doc.body.textContent || '';
+            };
+
+            if (titleEl) titleEl.textContent = decodificarTexto(slide.title);
+            if (catEl) catEl.textContent = decodificarTexto(slide.category);
+            if (stainEl) stainEl.textContent = decodificarTexto(slide.stain);
+            if (specEl) specEl.textContent = decodificarTexto(slide.specimen);
+            if (descEl) descEl.textContent = decodificarTexto(slide.desc);
             if (actionEl) actionEl.href = slide.link;
             if (counterEl) {
               const cur = String(currentIndex + 1).padStart(2, '0');
@@ -673,7 +700,13 @@
               snapshot.forEach(doc => {
                 const data = doc.data();
                 if (data.status === 'ativa') {
+                  const nome = (data.nome || '').trim();
+                  // Ignora registros de teste ou incompletos
+                  if (!nome || nome.toLowerCase() === 'teste') return;
+
                   let img = data.thumbnailUrl || data.imagemUrl || data.imageUrl || data.caminhoImagemBase || data.dziUrl || '';
+                  if (!img) return;
+                  img = img.replace(/^\/+/, ''); // Remove barras iniciais
                   if (img.toLowerCase().endsWith('.dzi')) {
                     const basePath = img.substring(0, img.lastIndexOf('.dzi'));
                     img = `${basePath}_files/9/0_0.jpg`;
@@ -695,28 +728,29 @@
 
                   firestoreSlides.push({
                     id: doc.id,
-                    title: data.nome || 'Lâmina Histológica',
+                    title: nome,
                     category: `${disciplina} • ${topico}`,
                     stain: data.coloracao || 'HE • 40x',
                     specimen: data.especime || data.corte || 'Campo Microscópico',
                     desc: descTexto || 'Lâmina digitalizada em alta resolução para estudo morfológico.',
-                    image: img || 'assets/histologia/muscular-esqueletico-he.jpg',
-                    thumb: img || 'assets/histologia/muscular-esqueletico-he.jpg',
+                    image: img,
+                    thumb: img,
                     link: `microscopio.html?id=${doc.id}`
                   });
                 }
               });
 
               if (firestoreSlides.length > 0) {
-                const existingIds = new Set(firestoreSlides.map(s => s.id));
-                const merged = [...firestoreSlides];
-                baseSlides.forEach(b => {
-                  if (!existingIds.has(b.id)) {
-                    merged.push(b);
+                // Mantém baseSlides de alta definição como primárias e mescla novas lâminas do Firestore
+                const existingTitles = new Set(baseSlides.map(b => b.title.toLowerCase()));
+                const existingIds = new Set(baseSlides.map(b => b.id.toLowerCase()));
+                const merged = [...baseSlides];
+                firestoreSlides.forEach(f => {
+                  if (!existingTitles.has(f.title.toLowerCase()) && !existingIds.has(f.id.toLowerCase())) {
+                    merged.push(f);
                   }
                 });
                 slides = merged;
-                if (currentIndex >= slides.length) currentIndex = 0;
                 renderThumbs();
                 renderSlide(currentIndex);
               }

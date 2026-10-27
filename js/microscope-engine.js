@@ -28,9 +28,60 @@ let pinAtivo     = null;
 let homeZoomRef  = null; // Zoom de referencia para mapeamento 4x/10x/40x/100x
 
 // ---------------------------------------------------------------------------
+// Acervo Base Local (Fallback de Resiliência Clínica)
+// ---------------------------------------------------------------------------
+const fallbackLaminas = {
+  'muscular-esqueletico-he': {
+    id: 'muscular-esqueletico-he',
+    nome: 'Tecido Muscular Estriado Esquelético',
+    disciplina: 'histologia',
+    coloracao: 'Hematoxilina e Eosina (H&E)',
+    imagemUrl: 'assets/histologia/muscular-esqueletico-he.jpg',
+    descricaoHTML: '<p>Corte longitudinal de músculo estriado esquelético. Fibras musculares multinucleadas com núcleos periféricos achatados e estriações transversais de actina e miosina.</p>',
+    pinos: []
+  },
+  'medula-espinal-he': {
+    id: 'medula-espinal-he',
+    nome: 'Medula Espinal (Corte Transversal)',
+    disciplina: 'histologia',
+    coloracao: 'Hematoxilina e Eosina (H&E)',
+    imagemUrl: 'assets/histologia/medula-espinal-he.png',
+    descricaoHTML: '<p>Corte transversal de medula espinal exibindo substância cinzenta central em forma de "H" com motoneurônios no corno anterior e substância branca periférica contendo tratos mielinizados.</p>',
+    pinos: []
+  },
+  'osso_compacto_dzi': {
+    id: 'osso_compacto_dzi',
+    nome: 'Osso Compacto Desgastado',
+    disciplina: 'histologia',
+    coloracao: 'Desgaste • 40x',
+    imagemUrl: 'assets/histologia/osso_compacto_dzi.dzi',
+    descricaoHTML: '<p>Tecido ósseo compacto evidenciando sistemas de Havers (ósteons), canais centrais vasculares, lamelas concêntricas e lacunas comunicantes com canalículos de osteócitos.</p>',
+    pinos: []
+  },
+  'epitelio-simples-escamoso': {
+    id: 'epitelio-simples-escamoso',
+    nome: 'Epitélio Pavimentoso Simples',
+    disciplina: 'histologia',
+    coloracao: 'Hematoxilina e Eosina (H&E)',
+    imagemUrl: 'assets/histologia/epitelio-simples-escamoso.dzi',
+    descricaoHTML: '<p>Camada única de células epiteliais pavimentosas (achatadas) com núcleos elípticos proeminentes, adaptadas para transporte passivo e difusão de solutos.</p>',
+    pinos: []
+  },
+  'lamina-real1': {
+    id: 'lamina-real1',
+    nome: 'Preparação Histológica Digital Matriz',
+    disciplina: 'histologia',
+    coloracao: 'Hematoxilina e Eosina (H&E)',
+    imagemUrl: 'assets/histologia/lamina-real1.dzi',
+    descricaoHTML: '<p>Lâmina completa digitalizada em altíssima resolução com pirâmide de Deep Zoom (DZI) para exploração microscópica multiescala.</p>',
+    pinos: []
+  }
+};
+
+// ---------------------------------------------------------------------------
 // 1. Disparo automatico ao carregar a pagina
 // ---------------------------------------------------------------------------
-document.addEventListener("DOMContentLoaded", () => {
+function iniciarMicroscopio() {
   const urlParams = new URLSearchParams(window.location.search);
   const laminaId  = urlParams.get("id") || urlParams.get("laminaId");
   if (laminaId) {
@@ -40,33 +91,68 @@ document.addEventListener("DOMContentLoaded", () => {
     exibirErroMicroscopio("Nenhuma lamina selecionada. Acesse pelo Catalogo de Topicos.");
   }
   registrarDelegacaoGlobalDePinos();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", iniciarMicroscopio);
+} else {
+  iniciarMicroscopio();
+}
 
 // ---------------------------------------------------------------------------
-// 2. Carrega a lamina pelo ID do Firestore
+// 2. Carrega a lamina pelo ID (Instantâneo no Acervo Base + Firestore)
 // ---------------------------------------------------------------------------
 async function carregarLaminaNoMicroscopio(laminaId) {
   if (!laminaId) return;
-  if (typeof db === "undefined" || !db) {
-    exibirErroMicroscopio("Falha de conexao com o banco de dados (Firestore nao inicializado).");
-    return;
-  }
-  try {
-    const docRef = await db.collection("laminas").doc(laminaId).get();
-    if (!docRef.exists) {
-      console.error("[Palas Atlas] Lamina nao encontrada no Firestore para ID:", laminaId);
-      exibirErroMicroscopio("Lamina nao encontrada no banco de dados.");
-      return;
-    }
-    laminaAtualData    = { id: docRef.id, ...docRef.data() };
-    listaPinosAtual    = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
+
+  // 1. Se for uma das lâminas base conhecidas do acervo, carrega imediatamente
+  const fallback = fallbackLaminas[laminaId] || Object.values(fallbackLaminas).find(l => l.id.toLowerCase() === laminaId.toLowerCase());
+  if (fallback) {
+    laminaAtualData = { ...fallback };
+    listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
     renderizarMetadadosDaLamina();
     renderizarDescricaoETextos();
     inicializarOpenSeadragon();
-  } catch (err) {
-    console.error("[Palas Atlas] Erro ao buscar lamina no Firestore:", err);
-    exibirErroMicroscopio("Falha ao carregar os dados da lamina. Verifique sua conexao.");
+
+    // Sincroniza em background caso haja dados customizados ou pinos no Firestore
+    if (typeof db !== "undefined" && db) {
+      db.collection("laminas").doc(laminaId).get().then(docRef => {
+        if (docRef.exists) {
+          const dados = docRef.data();
+          if (dados && Array.isArray(dados.pinos) && dados.pinos.length > 0) {
+            listaPinosAtual = dados.pinos;
+            renderizarDescricaoETextos();
+            if (viewer && viewer.isOpen()) gerarMarcadoresDePinos();
+          }
+        }
+      }).catch(() => {});
+    }
+    return;
   }
+
+  // 2. Se for uma lâmina dinâmica cadastrada pelo CMS no Firestore
+  if (typeof db !== "undefined" && db) {
+    try {
+      const docRef = await db.collection("laminas").doc(laminaId).get();
+      if (docRef.exists) {
+        laminaAtualData = { id: docRef.id, ...docRef.data() };
+        if (laminaAtualData.imagemUrl) {
+          laminaAtualData.imagemUrl = laminaAtualData.imagemUrl.replace(/^\/+/, '');
+        }
+        listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
+        renderizarMetadadosDaLamina();
+        renderizarDescricaoETextos();
+        inicializarOpenSeadragon();
+        return;
+      }
+    } catch (err) {
+      console.warn("[Palas Atlas] Aviso ao consultar Firestore para ID:", laminaId, err);
+    }
+  }
+
+  // 3. Se realmente não for encontrada
+  console.error("[Palas Atlas] Lamina nao encontrada para ID:", laminaId);
+  exibirErroMicroscopio("Lâmina não encontrada no acervo. Retorne ao Catálogo de Lâminas.");
 }
 
 // ---------------------------------------------------------------------------
@@ -267,9 +353,9 @@ function inicializarOpenSeadragon() {
   }
 
   // ── Evento: imagem aberta com sucesso ────────────────────────────────
-  viewer.addHandler("open", () => {
-    const elapsed = Date.now() - window.__microscopeStartTime;
-    const remainingTime = Math.max(0, 3000 - elapsed); // Garante no min 3 segundos
+  const onOpenSuccess = () => {
+    const elapsed = Date.now() - (window.__microscopeStartTime || Date.now());
+    const remainingTime = Math.max(0, 400 - elapsed); // Fade out suave e responsivo
 
     setTimeout(() => {
       // Remove skeleton de carregamento com fade out suave
@@ -279,23 +365,25 @@ function inicializarOpenSeadragon() {
         skeleton.style.opacity = '0';
         skeleton.style.pointerEvents = 'none';
         setTimeout(() => {
+          skeleton.style.display = 'none';
           skeleton.classList.add("hidden");
-          skeleton.style.opacity = '';
-          skeleton.style.pointerEvents = '';
-        }, 1000); // 1s da animacao css
+          skeleton.classList.remove("flex");
+        }, 300);
       }
       if (osdCanvas) osdCanvas.classList.remove("opacity-0");
     }, remainingTime);
 
-    // Salva zoom home como baseline 4x (item 4)
-    homeZoomRef = viewer.viewport.getHomeZoom();
-    viewer.viewport.minZoomLevel = homeZoomRef * 0.9;
+    if (viewer && viewer.viewport) {
+      // Salva zoom home como baseline 4x (item 4)
+      homeZoomRef = viewer.viewport.getHomeZoom();
+      viewer.viewport.minZoomLevel = homeZoomRef * 0.9;
 
-    // Req 1: Trava rígida de zoom exata (sem ultrapassar a objetiva física)
-    viewer.viewport.maxZoomLevel = homeZoomRef * (maxMag / 4);
+      // Req 1: Trava rígida de zoom exata (sem ultrapassar a objetiva física)
+      viewer.viewport.maxZoomLevel = homeZoomRef * (maxMag / 4);
 
-    // Inicia na visao geral (4x baseline)
-    viewer.viewport.zoomTo(homeZoomRef, null, true);
+      // Inicia na visao geral (4x baseline)
+      viewer.viewport.zoomTo(homeZoomRef, null, true);
+    }
 
     // Req 2: Desabilita botoes de objetiva acima do maxMagnification
     aplicarBloqueioObjetivas(maxMag);
@@ -324,8 +412,29 @@ function inicializarOpenSeadragon() {
           fontWeight:   "600"
         });
       }
-    }, 600);
-  });
+    }, 400);
+  };
+
+  viewer.addHandler("open", onOpenSuccess);
+  if (typeof viewer.isOpen === "function" && viewer.isOpen()) {
+    onOpenSuccess();
+  }
+
+  // Garantia absoluta contra travamentos no carregador
+  setTimeout(() => {
+    const skeleton = document.getElementById("osdSkeleton");
+    if (skeleton && skeleton.style.display !== "none" && !skeleton.classList.contains("hidden")) {
+      skeleton.style.opacity = '0';
+      skeleton.style.pointerEvents = 'none';
+      setTimeout(() => {
+        skeleton.style.display = 'none';
+        skeleton.classList.add("hidden");
+        skeleton.classList.remove("flex");
+      }, 300);
+      const osdCanvas = document.getElementById("osd-viewer");
+      if (osdCanvas) osdCanvas.classList.remove("opacity-0");
+    }
+  }, 2200);
 
   // ── Req 2: Função unificada de Indicador Dinâmico de Zoom ────────────
   const updateZoomDisplay = () => {
@@ -513,8 +622,19 @@ export function trocarLente(objetivaDesejada, btnElement) {
 // 10. Exibir mensagem de erro no container do viewer
 // ---------------------------------------------------------------------------
 function exibirErroMicroscopio(msg) {
+  const skeleton = document.getElementById("osdSkeleton");
+  if (skeleton) {
+    skeleton.style.opacity = '0';
+    skeleton.style.pointerEvents = 'none';
+    setTimeout(() => {
+      skeleton.style.display = 'none';
+      skeleton.classList.add("hidden");
+      skeleton.classList.remove("flex");
+    }, 300);
+  }
   const container = document.getElementById("osd-viewer");
   if (!container) return;
+  container.classList.remove("opacity-0");
   container.innerHTML = `
     <div class="flex flex-col items-center justify-center w-full h-full text-center gap-4 p-8">
       <div class="w-14 h-14 rounded-2xl bg-rose-950/40 border border-rose-900/60 flex items-center justify-center">
