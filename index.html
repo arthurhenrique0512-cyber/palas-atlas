@@ -491,8 +491,9 @@
               stain: 'H&E • 40x',
               specimen: 'Corte Transversal',
               desc: 'Substância cinzenta central em formato de H e substância branca periférica com motoneurônios.',
+              thumbnailUrl: 'assets/histologia/medula-espinal-he.png',
+              previewImage: 'assets/histologia/medula-espinal-he.png',
               image: 'assets/histologia/medula-espinal-he.png',
-              thumb: 'assets/histologia/medula-espinal-he.png',
               link: 'microscopio.html?id=5kqs5Qv9fvWlpNSJoyPG'
             },
             {
@@ -502,8 +503,10 @@
               stain: 'H&E • 40x',
               specimen: 'Varredura Panorâmica',
               desc: 'Preparação histológica digitalizada em alta resolução com pirâmide multiescala Deep Zoom para estudo morfológico.',
-              image: 'assets/histologia/lamina-real1_files/9/0_0.jpg',
-              thumb: 'assets/histologia/lamina-real1_files/9/0_0.jpg',
+              thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
+              previewImage: 'assets/histologia/lamina-real1-preview.jpg',
+              image: 'assets/histologia/lamina-real1-preview.jpg',
+              dziUrl: 'assets/histologia/lamina-real1.dzi',
               link: 'microscopio.html?id=a3oRvXvJpMKAtU2RE85q'
             }
           ];
@@ -544,7 +547,8 @@
             const applyContent = () => {
               currentIndex = nextIndex;
               if (imgEl) {
-                imgEl.src = slide.image;
+                const coverImage = slide.thumbnailUrl || slide.previewImage || slide.image;
+                imgEl.src = coverImage;
                 imgEl.alt = slide.title;
                 imgEl.onerror = function() {
                   this.onerror = null;
@@ -640,13 +644,34 @@
                     const nome = (data.nome || '').trim();
                     if (!nome) return;
 
-                    let img = data.thumbnailUrl || data.imagemUrl || data.imageUrl || data.caminhoImagemBase || data.dziUrl || '';
-                    if (!img) return;
-                    img = img.replace(/^\/+/, ''); // Remove barras iniciais
-                    if (img.toLowerCase().endsWith('.dzi')) {
-                      const basePath = img.substring(0, img.lastIndexOf('.dzi'));
-                      img = `${basePath}_files/9/0_0.jpg`;
+                    // Imagem de Capa Dedicada em Alta Resolução (Zero DZI Tiles)
+                    let previewImg = data.thumbnailUrl || data.previewImage || data.imagemCapa || data.capaUrl || '';
+                    if (previewImg) {
+                      previewImg = previewImg.replace(/^\/+/, '');
                     }
+
+                    let rawSource = data.imagemUrl || data.imageUrl || data.caminhoImagemBase || data.dziUrl || '';
+                    rawSource = rawSource.replace(/^\/+/, '');
+
+                    // Se não houver previewImg explícito ou se apontar para um .dzi:
+                    if (!previewImg || previewImg.toLowerCase().endsWith('.dzi')) {
+                      if (rawSource.toLowerCase().endsWith('.dzi')) {
+                        const baseDzi = rawSource.replace(/\.dzi$/i, '');
+                        if (baseDzi.includes('lamina-real1')) {
+                          previewImg = 'assets/histologia/lamina-real1-preview.jpg';
+                        } else if (baseDzi.includes('osso_compacto') || baseDzi.includes('osso-compacto')) {
+                          previewImg = 'assets/histologia/osso-compacto-preview.jpg';
+                        } else if (baseDzi.includes('epitelio-simples') || baseDzi.includes('epitelio_simples')) {
+                          previewImg = 'assets/histologia/epitelio-simples-escamoso-preview.jpg';
+                        } else {
+                          previewImg = `${baseDzi}-preview.jpg`;
+                        }
+                      } else {
+                        previewImg = rawSource;
+                      }
+                    }
+
+                    if (!previewImg) return;
                     const disciplina = data.disciplina 
                       ? data.disciplina.charAt(0).toUpperCase() + data.disciplina.slice(1) 
                       : 'Histologia';
@@ -669,8 +694,10 @@
                       stain: data.coloracao || 'HE • 40x',
                       specimen: data.especime || data.corte || 'Campo Microscópico',
                       desc: descTexto || 'Lâmina digitalizada em alta resolução para estudo morfológico.',
-                      image: img,
-                      thumb: img,
+                      thumbnailUrl: previewImg,
+                      previewImage: previewImg,
+                      image: previewImg,
+                      dziUrl: data.dziUrl || (rawSource.toLowerCase().endsWith('.dzi') ? rawSource : ''),
                       link: `microscopio.html?id=${doc.id}`
                     });
                   }

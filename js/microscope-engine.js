@@ -134,9 +134,9 @@ async function carregarLaminaNoMicroscopio(laminaId) {
   if (typeof db !== "undefined" && db) {
     try {
       const docRef = await db.collection("laminas").doc(laminaId).get();
-      if (docRef.exists) {
         laminaAtualData = { id: docRef.id, ...docRef.data() };
-        let img = laminaAtualData.imagemUrl || laminaAtualData.imageUrl || laminaAtualData.caminhoImagemBase || laminaAtualData.dziUrl || "";
+        let dziCandidate = laminaAtualData.dziUrl || (laminaAtualData.imagemUrl && laminaAtualData.imagemUrl.toLowerCase().endsWith('.dzi') ? laminaAtualData.imagemUrl : '');
+        let img = dziCandidate || laminaAtualData.imagemUrl || laminaAtualData.imageUrl || laminaAtualData.caminhoImagemBase || '';
         if (img) {
           laminaAtualData.imagemUrl = img.replace(/^\/+/, '');
         }
