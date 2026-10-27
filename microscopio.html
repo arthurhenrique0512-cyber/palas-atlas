@@ -173,28 +173,36 @@
         class="w-full h-full bg-neutral-950 relative overflow-hidden transition-opacity duration-500 opacity-0"
       ></div>
 
-      <!-- REVÓLVER DE OBJETIVAS + ZOOM DINÂMICO (oculto no modo de lâmina estática) -->
-      <div id="viewerLensPanel" class="absolute bottom-4 left-4 z-20 flex items-center gap-2 p-1.5 rounded-xl bg-neutral-900/50 backdrop-blur-md shadow-2xl text-xs font-mono select-none">
+      <!-- REVÓLVER DE OBJETIVAS + CONTROLES DE ZOOM DINÂMICOS -->
+      <div id="viewerLensPanel" class="absolute bottom-5 left-5 z-20 flex items-center gap-2 p-1.5 rounded-2xl bg-neutral-900/60 backdrop-blur-md border border-white/[0.08] shadow-2xl text-xs font-mono select-none">
         <!-- Valores nominais das objetivas -->
-        <button type="button" onclick="window.trocarLente(4, this)"    class="lens-btn bg-amber-600 text-white shadow-md font-semibold px-3 py-1 rounded-lg transition-all active-lens" data-mag="4">4x</button>
-        <button type="button" onclick="window.trocarLente(10, this)"   class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="10">10x</button>
-        <button type="button" onclick="window.trocarLente(40, this)"   class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="40">40x</button>
-        <button type="button" onclick="window.trocarLente(60, this)"   class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="60">60x</button>
-        <button type="button" onclick="window.trocarLente(100, this)"  class="lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all" data-mag="100">100x</button>
+        <button type="button" onclick="window.trocarLente(4, this)"    class="lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs transition-all active-lens cursor-pointer" data-mag="4">4x</button>
+        <button type="button" onclick="window.trocarLente(10, this)"   class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="10">10x</button>
+        <button type="button" onclick="window.trocarLente(40, this)"   class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="40">40x</button>
+        <button type="button" onclick="window.trocarLente(60, this)"   class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="60">60x</button>
+        <button type="button" onclick="window.trocarLente(100, this)"  class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="100">100x</button>
         
-        <!-- Divisor -->
-        <div class="w-[1px] h-4 bg-zinc-700/80 my-auto"></div>
+        <!-- Divisor sutil -->
+        <div class="w-px h-4 bg-white/[0.08]"></div>
+
+        <!-- Controles manuais de Zoom (+ / - / Home) -->
+        <button type="button" onclick="window.alterarZoom(1.35)" class="w-6 h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-all text-xs font-bold cursor-pointer" title="Aproximar (+)">+</button>
+        <button type="button" onclick="window.alterarZoom(0.75)" class="w-6 h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-all text-xs font-bold cursor-pointer" title="Afastar (&minus;)">&minus;</button>
+        <button type="button" onclick="window.osdViewerAction('home')" class="px-2 py-0.5 flex items-center justify-center rounded-lg text-neutral-400 hover:text-[#c8ad5f] hover:bg-white/[0.06] transition-all text-[10px] tracking-wider uppercase font-medium cursor-pointer" title="Enquadramento geral">1:1</button>
+
+        <!-- Divisor sutil -->
+        <div class="w-px h-4 bg-white/[0.08]"></div>
 
         <!-- Display do Zoom Dinâmico em Tempo Real -->
-        <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-zinc-950/60 border border-zinc-800">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-amber-500 font-bold" id="zoomIndicatorDisplay">4.0x</span>
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-950/70 border border-white/[0.06]">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#c8ad5f] animate-pulse"></span>
+          <span class="text-[#c8ad5f] font-bold text-xs" id="zoomIndicatorDisplay">4.0x</span>
         </div>
       </div>
 
       <!-- Dica operacional -->
-      <div id="viewerHint" class="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none text-[10px] text-neutral-600 whitespace-nowrap z-10">
-        Scroll → Zoom &bull; Arrastar → Pan
+      <div id="viewerHint" class="absolute bottom-5 right-36 pointer-events-none text-[10px] text-neutral-400 font-mono tracking-wider uppercase whitespace-nowrap z-10 hidden lg:block bg-neutral-900/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/[0.06] shadow-lg">
+        Scroll &rarr; Zoom &bull; Arrastar &rarr; Pan &bull; Clique duplo &rarr; Ampliar
       </div>
 
     </main>

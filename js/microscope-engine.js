@@ -27,8 +27,8 @@ let laminaAtualData = null;
 let pinAtivo     = null;
 let homeZoomRef  = null; // Zoom de referencia para mapeamento 4x/10x/40x/100x
 
-// Lâmina estática: true = trava pan/zoom/navegador; false = microscópio interativo completo.
-const LAMINA_ESTATICA = true;
+// Motor do Microscópio: Interatividade completa e ampliação profunda ativa
+const LAMINA_ESTATICA = false;
 
 // ---------------------------------------------------------------------------
 // Barra lateral retrátil (painel de informações e pontos de interesse)
@@ -39,8 +39,7 @@ function sincronizarTamanhoDoViewer() {
   if (!viewer || !viewer.viewport) return;
   try {
     if (typeof viewer.forceResize === "function") viewer.forceResize();
-    else viewer.viewport.resize(viewer.viewport.getContainerSize(), true);
-    if (LAMINA_ESTATICA) viewer.viewport.goHome(true);
+    else viewer.viewport.resize(viewer.viewport.getContainerSize(), false);
     viewer.forceRedraw();
   } catch (e) { /* viewer em transição: ignora */ }
 }
@@ -86,15 +85,6 @@ function iniciarSidebarRetratil() {
   if (palco && typeof ResizeObserver === "function") {
     new ResizeObserver(() => sincronizarTamanhoDoViewer()).observe(palco);
   }
-}
-
-// Oculta controles que não fazem sentido com a lâmina travada
-function aplicarModoLaminaEstatica() {
-  if (!LAMINA_ESTATICA) return;
-  ["viewerLensPanel", "viewerHint"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.add("hidden");
-  });
 }
 
 // ---------------------------------------------------------------------------
@@ -196,7 +186,6 @@ const fallbackLaminas = {
 // ---------------------------------------------------------------------------
 function iniciarMicroscopio() {
   iniciarSidebarRetratil();
-  aplicarModoLaminaEstatica();
   const urlParams = new URLSearchParams(window.location.search);
   const laminaId  = urlParams.get("id") || urlParams.get("laminaId");
   if (laminaId) {
@@ -481,42 +470,42 @@ function inicializarOpenSeadragon() {
       showHomeControl:          false,
       showFullPageControl:      false,
       showZoomControl:          false,
-      showNavigator:            !LAMINA_ESTATICA,
+      showNavigator:            true,
       navigatorPosition:        "BOTTOM_RIGHT",
       navigatorWidth:           "120px",
       navigatorHeight:          "90px",
-      navigatorBackground:      "rgba(10,10,10,0.9)",
+      navigatorBackground:      "rgba(10,10,10,0.85)",
       navigatorBorderColor:     "rgba(200,173,95,0.35)",
-      navigatorAutoFade:        false,
+      navigatorAutoFade:        true,
       showReferenceStrip:       false,
       animationTime:            0.45,
       blendTime:                0.1,
-      maxZoomPixelRatio:        maxZoomPixelRatio,
+      maxZoomPixelRatio:        Math.max(maxZoomPixelRatio, 3.5),
 
-      // Lâmina estática: desativa toda a navegação por mouse/toque
-      mouseNavEnabled:          !LAMINA_ESTATICA,
+      // Motor de Ampliação e Navegação Totalmente Ativo
+      mouseNavEnabled:          true,
 
-      // Trava de pan
-      panHorizontal:            !LAMINA_ESTATICA,
-      panVertical:              !LAMINA_ESTATICA,
+      // Pan livre com limites suaves
+      panHorizontal:            true,
+      panVertical:              true,
       constrainDuringPan:       true,
-      visibilityRatio:          LAMINA_ESTATICA ? 1 : 0.8,
-      minZoomImageRatio:        LAMINA_ESTATICA ? 1 : 0.9,
+      visibilityRatio:          0.75,
+      minZoomImageRatio:        0.8,
 
       // Gestos de Mouse (Desktop)
       gestureSettingsMouse: {
-        scrollToZoom:   !LAMINA_ESTATICA,
+        scrollToZoom:   true,
         clickToZoom:    false,
-        dblClickToZoom: false,
-        dragToPan:      !LAMINA_ESTATICA
+        dblClickToZoom: true,
+        dragToPan:      true
       },
 
-      // Gestos de Toque (Mobile)
+      // Gestos de Toque (Mobile/Tablet)
       gestureSettingsTouch: {
-        pinchToZoom:    !LAMINA_ESTATICA,
-        flickEnabled:   false,
-        dragToPan:      !LAMINA_ESTATICA,
-        dblClickToZoom: false,
+        pinchToZoom:    true,
+        flickEnabled:   true,
+        dragToPan:      true,
+        dblClickToZoom: true,
         pinchRotate:    false
       }
     });
@@ -585,15 +574,10 @@ function inicializarOpenSeadragon() {
 
     if (viewer && viewer.viewport) {
       homeZoomRef = viewer.viewport.getHomeZoom();
-      if (LAMINA_ESTATICA) {
-        viewer.viewport.minZoomLevel = homeZoomRef;
-        viewer.viewport.maxZoomLevel = homeZoomRef;
-      } else {
-        viewer.viewport.minZoomLevel = homeZoomRef * 0.9;
-        viewer.viewport.maxZoomLevel = homeZoomRef * (maxMag / 4);
-      }
+      viewer.viewport.minZoomLevel = homeZoomRef * 0.7;
+      viewer.viewport.maxZoomLevel = Math.max(homeZoomRef * (maxMag / 4) * 2.5, homeZoomRef * 35);
       viewer.viewport.zoomTo(homeZoomRef, null, true);
-      if (LAMINA_ESTATICA) viewer.viewport.goHome(true);
+      viewer.viewport.goHome(true);
     }
 
     aplicarBloqueioObjetivas(maxMag);
@@ -679,11 +663,12 @@ function atualizarLenteBotaoAtivo() {
   const currentZoom = viewer.viewport.getZoom(true);
   const ratio       = currentZoom / homeZoomRef;
 
-  // Mapeamento: 4x=baseline, 10x=~2.5x, 40x=~10x, 100x=~25x
+  // Mapeamento: 4x=baseline, 10x=~2.5x, 40x=~10x, 60x=~15x, 100x=~25x
   let objetivo = "4x";
-  if      (ratio >= 18)  objetivo = "100x";
-  else if (ratio >= 7)   objetivo = "40x";
-  else if (ratio >= 2.2) objetivo = "10x";
+  if      (ratio >= 20)  objetivo = "100x";
+  else if (ratio >= 13)  objetivo = "60x";
+  else if (ratio >= 6)   objetivo = "40x";
+  else if (ratio >= 1.8) objetivo = "10x";
 
   document.querySelectorAll(".lens-btn").forEach(btn => {
     // Pula botões bloqueados (disabled) para não sobrescrever classes
@@ -691,8 +676,8 @@ function atualizarLenteBotaoAtivo() {
 
     const isAtivo = btn.textContent.trim() === objetivo;
     btn.className = isAtivo
-      ? "lens-btn bg-amber-600 text-white shadow-md font-semibold px-3 py-1 rounded-lg transition-all active-lens"
-      : "lens-btn bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 font-semibold px-3 py-1 rounded-lg transition-all";
+      ? "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens"
+      : "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
   });
 }
 
@@ -705,13 +690,14 @@ function aplicarBloqueioObjetivas(maxMag) {
     const magBotao = Number(btn.getAttribute("data-mag")) || 4;
     if (magBotao > limiteMag) {
       btn.disabled = true;
-      btn.className = "lens-btn bg-zinc-800/80 text-zinc-300 font-semibold px-3 py-1 rounded-lg cursor-not-allowed opacity-30";
+      btn.className = "lens-btn text-neutral-600 font-medium px-2.5 py-1 rounded-lg text-xs font-mono cursor-not-allowed opacity-25";
       btn.title = `Objetiva não disponível (Máx: ${limiteMag}x)`;
     } else {
       btn.disabled = false;
-      btn.title = "";
+      btn.title = `Lente ${magBotao}x`;
     }
   });
+  atualizarLenteBotaoAtivo();
 }
 
 // ---------------------------------------------------------------------------
@@ -729,8 +715,7 @@ function registrarDelegacaoGlobalDePinos() {
 }
 
 // ---------------------------------------------------------------------------
-// 8. Foca o pino no viewer com overlay neon (item 6)
-//    Coordenadas calculadas APOS o evento open (nunca antes da imagem estar pronta)
+// 8. Foca o pino no viewer com zoom real e overlay neon
 // ---------------------------------------------------------------------------
 function focarPinoNoViewer(pinIdRaw) {
   const pino = listaPinosAtual.find(p => String(p.id) === String(pinIdRaw));
@@ -754,53 +739,71 @@ function focarPinoNoViewer(pinIdRaw) {
     if (anterior) { try { viewer.removeOverlay(anterior); } catch (e) {} }
   }
 
-  // Cria elemento do pino neon pulsante
-  // FIX BUG 5: Removido <style> injetado via innerHTML a cada chamada.
-  // A keyframe @keyframes ping já está disponível via Tailwind (animate-ping).
+  // Cria elemento do pino neon pulsante em ouro-champanhe
   const pinId   = String(pino.id);
   const pinElem = document.createElement("div");
   pinElem.id    = `viewer-pin-${pinId}`;
-  pinElem.style.cssText = "pointer-events:none; position:relative; display:flex; align-items:center; justify-content:center; width:32px; height:32px;";
+  pinElem.style.cssText = "pointer-events:none; position:relative; display:flex; align-items:center; justify-content:center; width:36px; height:36px; z-index:40;";
   pinElem.innerHTML = `
     <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(200,173,95,0.45);border-radius:50%;"></div>
-    <div style="position:relative;width:12px;height:12px;background:#c8ad5f;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 3px rgba(200,173,95,0.4),0 4px 12px rgba(0,0,0,0.6);"></div>
+    <div style="position:relative;width:14px;height:14px;background:#c8ad5f;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(200,173,95,0.45),0 4px 16px rgba(0,0,0,0.8);"></div>
   `;
 
-  // Adiciona overlay ancorado no ponto exato da imagem (item 6 — fix de posicionamento)
+  // Adiciona overlay ancorado no ponto exato da imagem
   viewer.addOverlay({
     element:   pinElem,
     location:  pontoViewport,
     placement: window.OpenSeadragon.Placement.CENTER
   });
 
-  // Pan suave ate o pino (sem ultrapassar os limites)
+  // Zoom no ponto de interesse: amplia para visualização celular detalhada (~3.5x do home zoom ou valor configurado no pino)
+  const homeZoom = homeZoomRef || viewer.viewport.getHomeZoom();
+  let targetZoom = homeZoom * 3.5;
+  if (pino.zoom && Number(pino.zoom) > 0) {
+    targetZoom = Number(pino.zoom);
+  } else {
+    targetZoom = Math.max(viewer.viewport.getZoom(), homeZoom * 3.2);
+  }
+  if (viewer.viewport.maxZoomLevel) {
+    targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
+  }
+
+  // Aproximação suave e centralização no pino
+  viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
   viewer.viewport.panTo(pontoViewport, false);
 
   pinAtivo = pinId;
 
-  // Auto-remove apos 4s
+  // Auto-remove o marcador após 8s
   setTimeout(() => {
     if (pinElem && viewer) {
       try { viewer.removeOverlay(pinElem); } catch (e) {}
       if (pinAtivo === pinId) pinAtivo = null;
     }
-  }, 4000);
+  }, 8000);
 }
 
 // ---------------------------------------------------------------------------
-// 9. Controles publicos de navegacao (zoom, reset, center)
+// 9. Controles de navegação e ampliação (zoom, reset, center)
 // ---------------------------------------------------------------------------
+export function alterarZoom(fator) {
+  if (!viewer || !viewer.viewport) return;
+  const currentZoom = viewer.viewport.getZoom();
+  const targetZoom  = currentZoom * (Number(fator) || 1.25);
+  viewer.viewport.zoomTo(targetZoom, null, false);
+}
+
 export function osdViewerAction(acao) {
   if (!viewer || !viewer.viewport) return;
-  if      (acao === "zoomIn")  viewer.viewport.zoomTo(viewer.viewport.getZoom() * 1.5);
-  else if (acao === "zoomOut") viewer.viewport.zoomTo(viewer.viewport.getZoom() * 0.67);
-  else if (acao === "reset") {
+  const acaoNorm = String(acao).toLowerCase();
+  if      (acaoNorm === "zoomin")  alterarZoom(1.35);
+  else if (acaoNorm === "zoomout") alterarZoom(0.75);
+  else if (acaoNorm === "reset" || acaoNorm === "home") {
     viewer.viewport.goHome();
     atualizarLenteBotaoAtivo();
   }
-  else if (acao === "center")  viewer.viewport.panTo(viewer.viewport.getCenter());
-  else if (acao === "home")    viewer.viewport.goHome();
-  else if (acao === "fullpage") viewer.setFullPage(!viewer.isFullPage());
+  else if (acaoNorm === "center")   viewer.viewport.panTo(viewer.viewport.getCenter());
+  else if (acaoNorm === "fullpage") viewer.setFullPage(!viewer.isFullPage());
 }
 
 // ---------------------------------------------------------------------------
@@ -815,9 +818,10 @@ export function trocarLente(objetivaDesejada, btnElement) {
 
   if (btnElement) {
     document.querySelectorAll(".lens-btn").forEach(l => {
-      l.className = "lens-btn text-slate-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all duration-200 cursor-pointer";
+      if (l.disabled) return;
+      l.className = "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
     });
-    btnElement.className = "lens-btn bg-amber-500/20 text-amber-500 border border-amber-500/40 font-bold px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer active-lens";
+    btnElement.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens";
   }
 }
 
@@ -869,7 +873,8 @@ function exibirErroMicroscopio(msg) {
 // Exposicao global (compatibilidade com onclick no HTML)
 // ---------------------------------------------------------------------------
 window.App = window.App || {};
-Object.assign(window.App, { osdViewerAction, focarPinoNoViewer, trocarLente });
+Object.assign(window.App, { osdViewerAction, focarPinoNoViewer, trocarLente, alterarZoom });
 window.osdViewerAction    = osdViewerAction;
 window.focarPinoNoViewer  = focarPinoNoViewer;
 window.trocarLente        = trocarLente;
+window.alterarZoom        = alterarZoom;

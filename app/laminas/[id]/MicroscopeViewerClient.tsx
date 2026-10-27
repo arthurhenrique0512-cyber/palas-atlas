@@ -39,8 +39,8 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
   const [activeObjective, setActiveObjective] = useState<number>(4);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
-  // Lâmina estática e travada (sem pan/zoom livre)
-  const isStaticSlide = true;
+  // Motor de Ampliação e Navegação Ativo
+  const isStaticSlide = false;
 
   const viewerContainerRef = useRef<HTMLDivElement>(null);
   const osdViewerRef = useRef<any>(null);
@@ -125,14 +125,14 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
         gestureSettingsMouse: {
           scrollToZoom: !isStaticSlide,
           clickToZoom: false,
-          dblClickToZoom: false,
+          dblClickToZoom: true,
           dragToPan: !isStaticSlide
         },
         gestureSettingsTouch: {
           pinchToZoom: !isStaticSlide,
-          flickEnabled: false,
+          flickEnabled: true,
           dragToPan: !isStaticSlide,
-          dblClickToZoom: false,
+          dblClickToZoom: true,
           pinchRotate: false
         }
       });
@@ -151,11 +151,11 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
             viewer.viewport.minZoomLevel = home;
             viewer.viewport.maxZoomLevel = home;
           } else {
-            viewer.viewport.minZoomLevel = home * 0.9;
-            viewer.viewport.maxZoomLevel = home * (maxMag / 4);
+            viewer.viewport.minZoomLevel = home * 0.7;
+            viewer.viewport.maxZoomLevel = Math.max(home * (maxMag / 4) * 2.5, home * 35);
           }
           viewer.viewport.zoomTo(home, null, true);
-          if (isStaticSlide) viewer.viewport.goHome(true);
+          viewer.viewport.goHome(true);
         }
       });
 
@@ -222,7 +222,32 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
     if (!osdViewerRef.current || !osdViewerRef.current.viewport) return;
     const base = homeZoomRef.current || osdViewerRef.current.viewport.getHomeZoom();
     const targetZoom = base * (targetMag / 4);
+    osdViewerRef.current.viewport.zoomTo(targetZoom, null, false);
     setActiveObjective(targetMag);
+  };
+
+  const changeZoom = (factor: number) => {
+    if (!osdViewerRef.current || !osdViewerRef.current.viewport) return;
+    const current = osdViewerRef.current.viewport.getZoom();
+    osdViewerRef.current.viewport.zoomTo(current * factor, null, false);
+  };
+
+  const resetView = () => {
+    if (!osdViewerRef.current || !osdViewerRef.current.viewport) return;
+    osdViewerRef.current.viewport.goHome();
+  };
+
+  const focusPin = (pin: any) => {
+    if (!osdViewerRef.current || !osdViewerRef.current.viewport) return;
+    const OSD = (window as any).OpenSeadragon;
+    if (!OSD) return;
+    const pt = osdViewerRef.current.viewport.imageToViewportCoordinates(
+      new OSD.Point(Number(pin.x) || 0, Number(pin.y) || 0)
+    );
+    const homeZoom = homeZoomRef.current || osdViewerRef.current.viewport.getHomeZoom();
+    const targetZoom = Math.max(osdViewerRef.current.viewport.getZoom(), homeZoom * 3.5);
+    osdViewerRef.current.viewport.zoomTo(targetZoom, pt, false);
+    osdViewerRef.current.viewport.panTo(pt, false);
   };
 
   return (
@@ -349,9 +374,9 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
             </div>
           )}
 
-          {/* Revólver de Objetivas (apenas se não for lâmina estática) */}
+          {/* Revólver de Objetivas + Controles Dinâmicos de Zoom */}
           {!isStaticSlide && (
-            <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2 p-1.5 rounded-xl bg-neutral-900/50 backdrop-blur-md shadow-2xl text-xs font-mono select-none">
+            <div className="absolute bottom-5 left-5 z-20 flex items-center gap-2 p-1.5 rounded-2xl bg-neutral-900/60 backdrop-blur-md border border-white/[0.08] shadow-2xl text-xs font-mono select-none">
               {[4, 10, 40, 60, 100].map(mag => {
                 const maxMag = Number(slide?.maxMagnification) || 40;
                 const isDisabled = mag > maxMag;
@@ -363,12 +388,12 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
                     type="button"
                     disabled={isDisabled}
                     onClick={() => switchObjective(mag)}
-                    className={`font-semibold px-3 py-1 rounded-lg transition-all ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all ${
                       isDisabled
-                        ? 'bg-zinc-800/40 text-zinc-600 cursor-not-allowed opacity-30'
+                        ? 'text-neutral-600 font-medium cursor-not-allowed opacity-25'
                         : isSelected
-                        ? 'bg-[#c8ad5f] text-neutral-950 font-bold shadow-md'
-                        : 'bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 cursor-pointer'
+                        ? 'bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 cursor-pointer'
+                        : 'text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium cursor-pointer'
                     }`}
                     title={isDisabled ? `Objetiva não disponível (Máx: ${maxMag}x)` : `${mag}x`}
                   >
@@ -377,14 +402,48 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
                 );
               })}
 
-              <div className="w-[1px] h-4 bg-zinc-700/80 my-auto"></div>
+              <div className="w-px h-4 bg-white/[0.08]" />
 
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-zinc-950/60 border border-zinc-800">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-[#c8ad5f] font-bold">{currentZoom}</span>
+              {/* Controles manuais de Zoom (+ / - / Home) */}
+              <button
+                type="button"
+                onClick={() => changeZoom(1.35)}
+                className="w-6 h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-all text-xs font-bold cursor-pointer"
+                title="Aproximar (+)"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                onClick={() => changeZoom(0.75)}
+                className="w-6 h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-all text-xs font-bold cursor-pointer"
+                title="Afastar (-)"
+              >
+                &minus;
+              </button>
+              <button
+                type="button"
+                onClick={resetView}
+                className="px-2 py-0.5 flex items-center justify-center rounded-lg text-neutral-400 hover:text-[#c8ad5f] hover:bg-white/[0.06] transition-all text-[10px] tracking-wider uppercase font-medium cursor-pointer"
+                title="Enquadramento geral"
+              >
+                1:1
+              </button>
+
+              <div className="w-px h-4 bg-white/[0.08]" />
+
+              {/* Display do Zoom Dinâmico em Tempo Real */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-950/70 border border-white/[0.06]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c8ad5f] animate-pulse"></span>
+                <span className="text-[#c8ad5f] font-bold text-xs">{currentZoom}</span>
               </div>
             </div>
           )}
+
+          {/* Dica operacional discreta */}
+          <div className="absolute bottom-5 right-36 pointer-events-none text-[10px] text-neutral-400 font-mono tracking-wider uppercase whitespace-nowrap z-10 hidden lg:block bg-neutral-900/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/[0.06] shadow-lg">
+            Scroll &rarr; Zoom &bull; Arrastar &rarr; Pan &bull; Clique duplo &rarr; Ampliar
+          </div>
         </main>
 
         {/* Barra Lateral Histológica Retrátil */}
@@ -416,17 +475,22 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
                   </h4>
                   <div className="flex flex-col gap-2">
                     {slide.pinos.map(pin => (
-                      <div
+                      <button
                         key={pin.id}
-                        className="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 border border-white/[0.04] text-left"
+                        type="button"
+                        onClick={() => focusPin(pin)}
+                        className="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 hover:bg-neutral-900/70 border border-white/[0.04] hover:border-[#c8ad5f]/40 text-left transition-all group cursor-pointer"
                       >
-                        <div className="flex items-center gap-2.5 truncate">
-                          <span className="w-2 h-2 rounded-full bg-[#c8ad5f] shrink-0"></span>
+                        <div className="flex items-center gap-2.5 truncate pr-2">
+                          <span className="w-2 h-2 rounded-full bg-[#c8ad5f] shrink-0 animate-pulse"></span>
                           <span className="text-sm font-medium text-neutral-200 truncate">
                             {pin.rotulo || 'Marcador'}
                           </span>
                         </div>
-                      </div>
+                        <span className="text-xs text-neutral-500 group-hover:text-[#c8ad5f] shrink-0 transition-colors">
+                          Focar &rarr;
+                        </span>
+                      </button>
                     ))}
                   </div>
                 </div>
