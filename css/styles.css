@@ -544,3 +544,125 @@ button:active {
     opacity: 1 !important;
   }
 }
+
+/* ==========================================================================
+   8. VECTOR SPLASH SCREEN & PRELOADER (Immersive Dark & Retina Precision)
+   ========================================================================== */
+
+@keyframes splashFadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes splashOwlPulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.55)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.2));
+  }
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 24px rgba(212, 175, 55, 0.85)) drop-shadow(0 0 48px rgba(212, 175, 55, 0.38));
+  }
+}
+
+@keyframes splashGoldSheenSweep {
+  0% {
+    background-position: 220% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes splashSweepLine {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(220%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.splash-container {
+  background: radial-gradient(circle at center, #0e0e0e 0%, #050505 55%, #000000 100%) !important;
+  color: #f8fafc;
+}
+
+.splash-logo-reveal {
+  animation: splashFadeInScale 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.splash-owl-anim {
+  animation: splashOwlPulseGlow 3.2s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+.splash-shimmer-palas {
+  background: linear-gradient(
+    115deg,
+    #c9a227 0%,
+    #e5c761 25%,
+    #fff9dd 50%,
+    #d4af37 75%,
+    #b89728 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #d4af37;
+  animation: splashGoldSheenSweep 3.2s ease-in-out infinite;
+  display: inline-block;
+}
+
+.splash-shimmer-atlas {
+  background: linear-gradient(
+    115deg,
+    #cbd5e1 0%,
+    #f1f5f9 40%,
+    #ffffff 50%,
+    #f8fafc 60%,
+    #94a3b8 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #f1f5f9;
+  display: inline-block;
+}
+
+.splash-progress-track {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.splash-progress-bar {
+  background: linear-gradient(90deg, transparent, #d4af37, #fff2a8, #d4af37, transparent);
+  animation: splashSweepLine 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo-reveal,
+  .splash-owl-anim,
+  .splash-shimmer-palas,
+  .splash-progress-bar {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
