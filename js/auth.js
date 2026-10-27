@@ -3,8 +3,8 @@
  * Carregado como script clássico após os SDKs do Firebase via CDN.
  */
 
-// Configuração Firebase (inline para uso como script clássico, sem ES module)
-const _firebaseConfig = {
+// Configuração Firebase compartilhada do Palas Atlas
+window.__PALAS_FIREBASE_CONFIG__ = window.__PALAS_FIREBASE_CONFIG__ || {
   apiKey:            "AIzaSyAv68_VWTEPFoDOyKrvz-jmPRycVNek_2M",
   authDomain:        "palas-atlas.firebaseapp.com",
   projectId:         "palas-atlas",
@@ -14,7 +14,7 @@ const _firebaseConfig = {
 };
 
 if (!firebase.apps.length) {
-  firebase.initializeApp(_firebaseConfig);
+  firebase.initializeApp(window.__PALAS_FIREBASE_CONFIG__);
 }
 
 const _auth = firebase.auth();

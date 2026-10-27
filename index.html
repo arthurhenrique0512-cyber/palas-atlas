@@ -19,8 +19,8 @@
   <meta name="twitter:description" content="Explore lâminas histológicas digitais e peças de dissecação anatômica em alta resolução." />
   <meta name="twitter:image" content="https://palasatlas.com/og-preview.png" />
 
-  <!-- Favicon Genérico -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+  <!-- Favicon Oficial Palas Atlas -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
 
   <!-- Preconnect para reduzir latência nas fontes (deve vir ANTES dos links de fonte) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,28 +29,15 @@
   <!-- Google Fonts — UMA única requisição combinada (Inter + Merriweather) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
 
-  <!-- Folha de Estilos Principal -->
+  <!-- Folha de Estilos Tailwind Compilada + Estilos Customizados -->
+  <link rel="stylesheet" href="css/tailwind.min.css?v=1">
   <link rel="stylesheet" href="css/styles.css?v=7">
   <link rel="stylesheet" href="css/splash.css?v=1">
 
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
   <script src="js/brand-logo.js?v=4"></script>
   <script src="js/settings-panel.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            serif: ['Merriweather', 'serif'],
-          }
-        }
-      }
-    }
-  </script>
 
   <!-- Firebase SDK v8: carregado no final do body em ordem correta -->
   <!-- NÃO carregar aqui para evitar duplicata. Ver final do </body> -->

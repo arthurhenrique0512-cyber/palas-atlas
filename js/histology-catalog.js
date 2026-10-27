@@ -456,7 +456,7 @@ subscribe((state) => {
   }
 });
 
-// Expõe métodos ao namespace global window.App e inicializa na carga
+// Expõe métodos ao namespace global window.App
 window.App = {
   ...window.App,
   renderizarCatalogoHistologia,
@@ -465,7 +465,3 @@ window.App = {
   abrirLamina,
   voltarNivel
 };
-
-document.addEventListener("DOMContentLoaded", () => {
-  renderizarCatalogoHistologia("histologia");
-});

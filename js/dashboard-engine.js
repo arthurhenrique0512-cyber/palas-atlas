@@ -22,6 +22,7 @@ let viewerInstance = null;
 let laminaEmEdicaoId = null;
 let acervoFirestoreCache = [];
 let filtroStatusAtual = "todos";
+let _unsubDashboardAcervo = null;
 
 const topicosCurriculares = {
   anatomia: [
@@ -145,7 +146,11 @@ export function inicializarPainelCms() {
     }
   }, 200);
   if (typeof db !== "undefined" && db) {
-    db.collection("laminas").onSnapshot(
+    if (typeof _unsubDashboardAcervo === "function") {
+      try { _unsubDashboardAcervo(); } catch (e) {}
+      _unsubDashboardAcervo = null;
+    }
+    _unsubDashboardAcervo = db.collection("laminas").onSnapshot(
       (snapshot) => {
         acervoFirestoreCache = [];
         snapshot.forEach((doc) => {
@@ -691,6 +696,17 @@ export async function publicarLaminaCms() {
 /* =========================================================
    ========================================================= */
 
+export function encerrarPainelCms() {
+  if (typeof _unsubDashboardAcervo === "function") {
+    try { _unsubDashboardAcervo(); } catch (e) {}
+    _unsubDashboardAcervo = null;
+  }
+  if (viewerInstance && typeof viewerInstance.destroy === "function") {
+    try { viewerInstance.destroy(); } catch (e) {}
+    viewerInstance = null;
+  }
+}
+
 window.osdEditorAction = osdEditorAction;
 window.publicarLaminaCms = publicarLaminaCms;
 
@@ -699,7 +715,7 @@ window.publicarLaminaCms = publicarLaminaCms;
 
 window.App = window.App || {};
 Object.assign(window.App, {
-  inicializarPainelCms, toggleDashboard, alternarTopicoCms, filtroAcervoCms,
+  inicializarPainelCms, encerrarPainelCms, toggleDashboard, alternarTopicoCms, filtroAcervoCms,
   alternarStatusCms, renderizarTabelaAcervo, renderizarAcervoCms,
   editarLaminaCms, excluirLaminaCms, resetarFormularioDashboard,
   atualizarTopicosCms, carregarImagemNoEditor, adicionarPinoEditor,
@@ -707,6 +723,7 @@ Object.assign(window.App, {
   inicializarEventosPreviewInterativo, osdEditorAction, publicarLaminaCms
 });
 window.inicializarPainelCms = inicializarPainelCms;
+window.encerrarPainelCms = encerrarPainelCms;
 window.toggleDashboard = toggleDashboard;
 window.alternarTopicoCms = alternarTopicoCms;
 window.filtroAcervoCms = filtroAcervoCms;

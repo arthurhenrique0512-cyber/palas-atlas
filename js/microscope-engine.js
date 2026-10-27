@@ -248,29 +248,35 @@ async function carregarLaminaNoMicroscopio(laminaId) {
         .filter((v, i, arr) => v && arr.indexOf(v) === i);
 
       (async () => {
-        for (const candidatoId of candidatos) {
-          try {
-            const docRef = await db.collection("laminas").doc(candidatoId).get();
-            if (!docRef.exists) continue;
-            const dados = docRef.data() || {};
-            const textoValido = (v) => typeof v === "string" && v.replace(/<[^>]*>/g, "").trim().length > 0;
+        try {
+          const docSnapshots = await Promise.all(
+            candidatos.map((cid) =>
+              db.collection("laminas").doc(cid).get().catch((err) => {
+                console.warn("[Palas Atlas] Falha ao sincronizar lâmina do Firestore:", cid, err);
+                return null;
+              })
+            )
+          );
+          const docRef = docSnapshots.find((d) => d && d.exists);
+          if (!docRef) return;
 
-            if (textoValido(dados.nome)) laminaAtualData.nome = dados.nome;
-            if (textoValido(dados.coloracao)) laminaAtualData.coloracao = dados.coloracao;
-            if (textoValido(dados.disciplina)) laminaAtualData.disciplina = dados.disciplina;
-            if (textoValido(dados.descricaoHTML)) laminaAtualData.descricaoHTML = dados.descricaoHTML;
-            else if (textoValido(dados.descricao)) laminaAtualData.descricaoHTML = dados.descricao;
-            if (Array.isArray(dados.pinos)) {
-              laminaAtualData.pinos = dados.pinos;
-              listaPinosAtual = dados.pinos;
-            }
+          const dados = docRef.data() || {};
+          const textoValido = (v) => typeof v === "string" && v.replace(/<[^>]*>/g, "").trim().length > 0;
 
-            renderizarMetadadosDaLamina();
-            renderizarDescricaoETextos();
-            return;
-          } catch (err) {
-            console.warn("[Palas Atlas] Falha ao sincronizar lâmina do Firestore:", candidatoId, err);
+          if (textoValido(dados.nome)) laminaAtualData.nome = dados.nome;
+          if (textoValido(dados.coloracao)) laminaAtualData.coloracao = dados.coloracao;
+          if (textoValido(dados.disciplina)) laminaAtualData.disciplina = dados.disciplina;
+          if (textoValido(dados.descricaoHTML)) laminaAtualData.descricaoHTML = dados.descricaoHTML;
+          else if (textoValido(dados.descricao)) laminaAtualData.descricaoHTML = dados.descricao;
+          if (Array.isArray(dados.pinos)) {
+            laminaAtualData.pinos = dados.pinos;
+            listaPinosAtual = dados.pinos;
           }
+
+          renderizarMetadadosDaLamina();
+          renderizarDescricaoETextos();
+        } catch (err) {
+          console.warn("[Palas Atlas] Erro geral na sincronização paralela do Firestore:", err);
         }
       })();
     }

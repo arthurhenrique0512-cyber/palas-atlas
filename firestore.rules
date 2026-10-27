@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Coleção oficial de lâminas e espécimes do Palas Atlas
+    match /laminas/{laminaId} {
+      // Leitura permitida para lâminas com status 'ativa' aos estudantes e visitantes,
+      // ou qualquer status para administradores autenticados no painel CMS.
+      allow read: if resource == null || resource.data.status == 'ativa' || request.auth != null;
+      
+      // Criação, atualização e exclusão restritas exclusivamente a administradores autenticados
+      allow write: if request.auth != null;
+    }
+    
+    // Regra padrão de segurança: nega qualquer acesso a coleções não declaradas
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

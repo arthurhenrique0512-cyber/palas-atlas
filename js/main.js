@@ -4,8 +4,25 @@
  */
 import { db } from "./firebase-config.js";
 import { setFrenteAtiva, subscribe, getState } from "./state.js";
-import { toggleDashboard } from "./dashboard-engine.js";
 import { initGlobalSearch } from "./search-engine.js";
+
+// Lazy loading sob demanda do dashboard-engine para otimizar o bundle do aluno
+let _dashboardEnginePromise = null;
+function carregarDashboardEngine() {
+  if (!_dashboardEnginePromise) {
+    _dashboardEnginePromise = import("./dashboard-engine.js");
+  }
+  return _dashboardEnginePromise;
+}
+
+function toggleDashboard() {
+  const currentState = getState();
+  if (currentState && currentState.frenteAtiva === "dashboard") {
+    goHome();
+  } else {
+    selecionarFrente("dashboard");
+  }
+}
 
 // Cache dos nós do DOM
 const elements = {
@@ -93,7 +110,6 @@ function init() {
     };
 
     window.addEventListener("scroll", handleDynamicNavbarScroll, { passive: true });
-    document.addEventListener("scroll", handleDynamicNavbarScroll, { passive: true });
     handleDynamicNavbarScroll();
   }
 
@@ -237,6 +253,11 @@ function renderView(state) {
 
   const minimalHeader = document.getElementById("palasMinimalHeader");
   
+  // Encerra listeners e instâncias do CMS se não estiver no dashboard
+  if (state.frenteAtiva !== "dashboard" && window.App && typeof window.App.encerrarPainelCms === "function") {
+    window.App.encerrarPainelCms();
+  }
+
   // Renderização do Hub de Acesso (Home)
   if (!state.frenteAtiva) {
     if (elements.pgHome) elements.pgHome.classList.remove("hidden");
@@ -253,9 +274,13 @@ function renderView(state) {
     }
   } else if (state.frenteAtiva === "dashboard") {
     if (elements.pgDashboard) elements.pgDashboard.classList.remove("hidden");
-    if (window.App && typeof window.App.inicializarPainelCms === "function") {
-      window.App.inicializarPainelCms();
-    }
+    carregarDashboardEngine().then(() => {
+      if (window.App && typeof window.App.inicializarPainelCms === "function") {
+        window.App.inicializarPainelCms();
+      }
+    }).catch(err => {
+      console.error("[Palas Atlas] Falha ao carregar dashboard-engine.js sob demanda:", err);
+    });
   }
 }
 

@@ -1,0 +1,13 @@
+{
+  "name": "palas-atlas",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Palas Atlas - Plataforma Morfológica de Alta Fidelidade",
+  "scripts": {
+    "build:css": "tailwindcss -i css/input.css -o css/tailwind.min.css --minify",
+    "watch:css": "tailwindcss -i css/input.css -o css/tailwind.min.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
