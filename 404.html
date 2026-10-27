@@ -2,28 +2,65 @@
 <html lang="pt-BR" class="dark">
 <head>
   <meta charset="UTF-8">
-  <title>Página não encontrada - Palas Atlas</title>
+  <title>Estrutura não localizada — Palas Atlas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/brand-logo.js?v=4"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Merriweather', 'serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
 </head>
 
-<body class="min-h-screen flex flex-col items-center justify-center bg-black font-sans text-center p-8">
+<body class="min-h-screen flex flex-col items-center justify-center bg-neutral-950 font-sans text-center p-6 text-neutral-200 selection:bg-neutral-800 selection:text-white">
 
-  <img src="assets/logo-transparente.png?v=4" alt="Palas Atlas Logo" class="h-24 w-auto mb-6 drop-shadow-[0_0_15px_rgba(30,58,138,0.3)]" style="filter: hue-rotate(180deg) saturate(100%);" />
-  <h1 class="text-6xl text-blue-500 font-bold mb-4">404</h1>
-  <h2 class="text-2xl text-white mb-2 font-medium">Estrutura não localizada.</h2>
-  <p class="text-neutral-400 mb-8 max-w-md mx-auto leading-relaxed">
-    Parece que a lâmina ou a peça anatômica que você procura não está neste quadrante.
-  </p>
-  
-  <a href="index.html" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-    Voltar aos Módulos de Estudo
-  </a>
+  <div class="max-w-md w-full flex flex-col items-center">
+    <!-- Logotipo da Marca -->
+    <div class="mb-8 cursor-pointer">
+      <brand-logo theme="dark-bg" show-subtitle="false" size="md"></brand-logo>
+    </div>
+
+    <!-- Badge de Erro 404 -->
+    <span class="text-xs font-mono tracking-[0.25em] text-[#d4af37] uppercase bg-[#d4af37]/10 border border-[#d4af37]/25 px-3 py-1 rounded-full mb-4">
+      Erro 404 &bull; Quadrante Vazio
+    </span>
+
+    <h1 class="font-serif text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
+      Estrutura não localizada
+    </h1>
+
+    <p class="text-neutral-400 text-sm leading-relaxed mb-8 max-w-sm">
+      A lâmina histológica, peça anatômica ou recurso solicitado não foi encontrado no acervo do atlas.
+    </p>
+    
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="inline-flex items-center gap-2 bg-[#d4af37] hover:bg-[#e0c97f] text-neutral-950 px-6 py-3 rounded-full text-xs font-mono uppercase tracking-wider font-semibold transition-all duration-200 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_25px_rgba(212,175,55,0.35)]">
+        &larr; Retornar ao Início
+      </a>
+      <button onclick="window.history.back()" type="button" class="inline-flex items-center gap-2 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 hover:text-white border border-white/[0.08] px-5 py-3 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer">
+        Voltar
+      </button>
+    </div>
+  </div>
+
+  <footer class="mt-16 text-center text-[10px] text-neutral-600 font-mono tracking-widest uppercase">
+    Palas Atlas &bull; Acervo Morfológico Digital
+  </footer>
 
 </body>
 </html>

@@ -21,7 +21,6 @@
 
   <!-- Favicon Genérico -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
-  <link rel="preload" as="video" href="assets/logo-animada.webm" type="video/webm">
 
   <!-- Preconnect para reduzir latência nas fontes (deve vir ANTES dos links de fonte) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -79,7 +78,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-blue-600 selection:text-white antialiased">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-[#d4af37]/30 selection:text-slate-900 antialiased">
 
   <!-- ============================================================
        TELA DE CARREGAMENTO VETORIAL (SPLASH SCREEN IMERSIVA)
@@ -277,14 +276,15 @@
                 <span class="ml-auto text-[10px] font-mono uppercase tracking-wider text-[#d4af37]/80 border border-[#d4af37]/30 bg-[#d4af37]/10 px-2 py-0.5 rounded-full">Guia</span>
               </button>
 
-              <a
-                href="topicos.html"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
+              <button
+                type="button"
+                onclick="window.App.selecionarFrente('histologia'); window.App.fecharMenuLateral();"
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
                 <span>Catálogo de Lâminas</span>
-              </a>
+              </button>
             </div>
           </div>
 
@@ -307,9 +307,7 @@
               </a>
 
               <a
-                href="colaboradores.html"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="sobre.html#equipe"
                 onclick="window.App.fecharMenuLateral();"
                 class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
                 <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
@@ -887,7 +885,7 @@
           O Palas Atlas nasceu da necessidade de integrar a teoria morfológica à rotina prática laboratorial. Unimos a precisão científica dos principais manuais à curadoria acadêmica de estudantes, monitores e professores de Medicina.
         </p>
         <a href="sobre.html" 
-           class="inline-flex items-center gap-2 text-sky-400 hover:text-sky-300 font-medium text-sm transition-all group no-underline">
+           class="inline-flex items-center gap-2 text-[#d4af37] hover:text-[#e0c97f] font-medium text-sm transition-all group no-underline">
           <span>Conhecer a história, proposta e corpo editorial</span>
           <span class="transition-transform group-hover:translate-x-1">&rarr;</span>
         </a>
@@ -935,7 +933,7 @@
 
           <!-- REVOLVER DE OBJETIVAS (Canto Inferior Esquerdo) -->
           <div class="absolute bottom-4 left-4 z-20 bg-neutral-950/90 border border-neutral-800 backdrop-blur-md p-1.5 rounded-xl shadow-2xl flex items-center gap-1">
-            <button type="button" onclick="window.App.trocarLente(1, this)" class="lens-btn bg-sky-500/20 text-sky-400 border border-sky-500/40 font-bold px-3 py-1.5 rounded-lg text-xs transition-all">4x</button>
+            <button type="button" onclick="window.App.trocarLente(1, this)" class="lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-3 py-1.5 rounded-lg text-xs transition-all">4x</button>
             <button type="button" onclick="window.App.trocarLente(2.5, this)" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">10x</button>
             <button type="button" onclick="window.App.trocarLente(10, this)" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">40x</button>
             <button type="button" onclick="window.App.trocarLente(25, this)" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">100x</button>
@@ -964,7 +962,7 @@
               <label for="seletorLaminas" class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest block font-mono">Acervo da Disciplina</label>
               <select 
                 id="seletorLaminas" 
-                class="w-full bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs rounded-lg p-3 font-medium focus:ring-1 focus:ring-sky-500/50 focus:border-sky-500/50 focus:outline-none transition-all font-mono">
+                class="w-full bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs rounded-lg p-3 font-medium focus:ring-1 focus:ring-[#d4af37]/50 focus:border-[#d4af37]/50 focus:outline-none transition-all font-mono">
                 <option value="">Carregando lâminas...</option>
               </select>
             </div>
@@ -1297,7 +1295,7 @@
           <!-- CONTROLES FLUTUANTES SOBRE O CANVAS (Ultra-sutil & Borderless) -->
           <div class="absolute top-5 right-5 z-20 flex items-center gap-2 bg-neutral-950/70 backdrop-blur-xl border border-white/[0.08] p-1.5 rounded-xl shadow-2xl pointer-events-auto">
             <span class="text-neutral-400 font-mono text-[10px] uppercase flex items-center gap-1.5 px-2 py-1 select-none">
-              <span class="w-1.5 h-1.5 rounded-full bg-sky-400 inline-block animate-pulse"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] inline-block animate-pulse"></span>
               Inspeção
             </span>
             <div class="h-4 w-px bg-white/10"></div>
@@ -1436,13 +1434,13 @@
             Atlas Morfológico Digital. Integração científica e prática laboratorial para o ciclo básico da saúde.
           </p>
           <div class="flex items-center gap-3 pt-2">
-            <a href="#" class="hover:text-blue-400 transition-colors text-xs text-zinc-400" aria-label="Twitter">
+            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400" aria-label="Twitter">
               <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
-            <a href="#" class="hover:text-blue-400 transition-colors text-xs text-zinc-400" aria-label="Instagram">
+            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400" aria-label="Instagram">
               <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             </a>
-            <a href="mailto:contato@palasatlas.com" class="hover:text-blue-400 transition-colors text-xs text-zinc-400" aria-label="Email">
+            <a href="mailto:contato@palasatlas.com" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400" aria-label="Email">
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </a>
           </div>
@@ -1452,11 +1450,11 @@
         <div class="space-y-3">
           <h4 class="text-white font-bold tracking-wider text-xs uppercase">Módulos</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="index.html">Histologia</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="index.html">Anatomia Macroscópica</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="index.html">Patologia Geral</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="index.html">Parasitologia</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="index.html">Microbiologia</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Histologia</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Anatomia Macroscópica</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Patologia Geral</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Parasitologia</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Microbiologia</a></li>
           </ul>
         </div>
 
@@ -1464,8 +1462,8 @@
         <div class="space-y-3">
           <h4 class="text-white font-bold tracking-wider text-xs uppercase">Plataforma</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="index.html">Início (Home)</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Início (Home)</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
           </ul>
         </div>
 
@@ -1473,10 +1471,10 @@
         <div class="space-y-3">
           <h4 class="text-white font-bold tracking-wider text-xs uppercase">Suporte &amp; Legal</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="mailto:contato@palasatlas.com">Reportar Erro</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="termos.html">Termos de Uso</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="privacidade.html">Privacidade</a></li>
-            <li><a class="hover:text-blue-400 transition-colors text-xs text-zinc-400 block" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="mailto:contato@palasatlas.com">Reportar Erro</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="termos.html">Termos de Uso</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="privacidade.html">Privacidade</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
           </ul>
         </div>
 
@@ -1504,13 +1502,13 @@
             Atlas Morfológico Digital. Integração científica e prática laboratorial para o ciclo básico da saúde.
           </p>
           <div class="flex items-center gap-3 pt-2">
-            <a href="#" class="hover:text-blue-600 transition-colors text-xs text-zinc-700" aria-label="Twitter">
+            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Twitter">
               <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
-            <a href="#" class="hover:text-blue-600 transition-colors text-xs text-zinc-700" aria-label="Instagram">
+            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Instagram">
               <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             </a>
-            <a href="mailto:contato@palasatlas.com" class="hover:text-blue-600 transition-colors text-xs text-zinc-700" aria-label="Email">
+            <a href="mailto:contato@palasatlas.com" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Email">
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </a>
           </div>
@@ -1520,11 +1518,11 @@
         <div class="space-y-3">
           <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Módulos</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="index.html">Histologia</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="index.html">Anatomia Macroscópica</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="index.html">Patologia Geral</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="index.html">Parasitologia</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="index.html">Microbiologia</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Histologia</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Anatomia Macroscópica</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Patologia Geral</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Parasitologia</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Microbiologia</a></li>
           </ul>
         </div>
 
@@ -1532,8 +1530,8 @@
         <div class="space-y-3">
           <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Plataforma</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="index.html">Início (Home)</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Início (Home)</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
           </ul>
         </div>
 
@@ -1541,10 +1539,10 @@
         <div class="space-y-3">
           <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Suporte &amp; Legal</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="mailto:contato@palasatlas.com">Reportar Erro</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="termos.html">Termos de Uso</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="privacidade.html">Privacidade</a></li>
-            <li><a class="hover:text-blue-600 transition-colors text-xs text-zinc-700 block" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="mailto:contato@palasatlas.com">Reportar Erro</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="termos.html">Termos de Uso</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="privacidade.html">Privacidade</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
           </ul>
         </div>
 
@@ -1683,7 +1681,7 @@
   <!-- COOKIE CONSENT BANNER -->
   <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[9999] bg-neutral-900/95 backdrop-blur-md border border-neutral-800 p-5 rounded-2xl shadow-2xl text-neutral-300 text-xs leading-relaxed hidden">
     <p>Utilizamos cookies essenciais para otimizar sua experiência de estudo no visualizador morfológico. Ao continuar navegando, você concorda com nossa Política de Privacidade.</p>
-    <button id="btnAcceptCookies" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg transition-colors cursor-pointer w-full mt-3">Aceitar</button>
+    <button id="btnAcceptCookies" class="bg-[#d4af37] hover:bg-[#e6ca65] text-neutral-950 font-medium px-4 py-2 rounded-xl transition-all duration-200 cursor-pointer w-full mt-3 shadow-md shadow-[#d4af37]/20">Aceitar e Continuar</button>
   </div>
 
   <script>

@@ -49,10 +49,13 @@ function aplicarEstadoSidebar(recolhida, persistir) {
   const botao   = document.getElementById("btnToggleSidebar");
   if (!sidebar) return;
 
-  sidebar.classList.toggle("w-[380px]", !recolhida);
+  sidebar.classList.toggle("w-[85vw]", !recolhida);
+  sidebar.classList.toggle("sm:w-[380px]", !recolhida);
   sidebar.classList.toggle("opacity-100", !recolhida);
+  sidebar.classList.toggle("pointer-events-auto", !recolhida);
   sidebar.classList.toggle("w-0", recolhida);
   sidebar.classList.toggle("opacity-0", recolhida);
+  sidebar.classList.toggle("pointer-events-none", recolhida);
   sidebar.setAttribute("aria-hidden", String(recolhida));
   if (recolhida) sidebar.setAttribute("inert", ""); else sidebar.removeAttribute("inert");
 
@@ -73,7 +76,16 @@ function iniciarSidebarRetratil() {
   if (!sidebar || !botao) return;
 
   let recolhidaInicial = false;
-  try { recolhidaInicial = localStorage.getItem(SIDEBAR_STORAGE_KEY) === "1"; } catch (e) {}
+  try {
+    const salvo = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    if (salvo !== null) {
+      recolhidaInicial = salvo === "1";
+    } else {
+      recolhidaInicial = window.innerWidth < 768;
+    }
+  } catch (e) {
+    recolhidaInicial = window.innerWidth < 768;
+  }
   aplicarEstadoSidebar(recolhidaInicial, false);
 
   botao.addEventListener("click", () => {

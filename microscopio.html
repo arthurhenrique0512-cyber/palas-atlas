@@ -128,7 +128,7 @@
   <!-- ════════════════════════════════════════════════════════════════════
        WORKSPACE: Canvas (esq.) + Painel lateral (dir.)
        ════════════════════════════════════════════════════════════════════ -->
-  <div class="flex flex-1 overflow-hidden">
+  <div class="flex flex-1 overflow-hidden relative">
 
     <!-- Esquerda — Estúdio Óptico (expande quando o painel lateral é recolhido) -->
     <main id="viewerStage" class="relative flex-1 min-w-0 h-full bg-neutral-950 overflow-hidden flex items-center justify-center">
@@ -174,7 +174,7 @@
       ></div>
 
       <!-- REVÓLVER DE OBJETIVAS + CONTROLES DE ZOOM DINÂMICOS -->
-      <div id="viewerLensPanel" class="absolute bottom-5 left-5 z-20 flex items-center gap-2 p-1.5 rounded-2xl bg-neutral-900/60 backdrop-blur-md border border-white/[0.08] shadow-2xl text-xs font-mono select-none">
+      <div id="viewerLensPanel" class="absolute bottom-3 sm:bottom-5 left-3 sm:left-5 z-20 flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-neutral-900/80 backdrop-blur-md border border-white/[0.08] shadow-2xl text-xs font-mono select-none max-w-[calc(100vw-24px)] overflow-x-auto">
         <!-- Valores nominais das objetivas -->
         <button type="button" onclick="window.trocarLente(4, this)"    class="lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs transition-all active-lens cursor-pointer" data-mag="4">4x</button>
         <button type="button" onclick="window.trocarLente(10, this)"   class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="10">10x</button>
@@ -209,20 +209,25 @@
 
     <!-- Direita — Painel de Informações (retrátil) -->
     <aside id="viewerSidebar"
-      class="h-full bg-neutral-950 text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 w-[380px] opacity-100 transition-[width,opacity] duration-500 ease-in-out"
+      class="h-full bg-neutral-950/95 md:bg-neutral-950 backdrop-blur-md md:backdrop-blur-none border-l border-white/[0.08] text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 md:relative w-[85vw] sm:w-[380px] opacity-100 transition-[width,opacity] duration-500 ease-in-out shadow-2xl md:shadow-none"
       aria-hidden="false"
     >
-      <div class="w-[380px] h-full flex flex-col">
+      <div class="w-[85vw] sm:w-[380px] h-full flex flex-col">
 
         <!-- Cabeçalho do Painel: Título e Coloração -->
-        <div class="px-7 pt-7 pb-5 shrink-0">
-          <h2 id="slideTitle" class="text-xl font-serif font-bold text-neutral-100 leading-tight tracking-tight">
-            Carregando lâmina...
-          </h2>
-          <p id="slideColoracao" class="mt-2 text-[11px] font-mono tracking-wide text-[#c8ad5f]/80">
-            Hematoxilina e Eosina (H&amp;E)
-          </p>
-          <span id="slideDisciplina" class="hidden">—</span>
+        <div class="px-7 pt-7 pb-5 shrink-0 flex items-start justify-between gap-3">
+          <div>
+            <h2 id="slideTitle" class="text-xl font-serif font-bold text-neutral-100 leading-tight tracking-tight">
+              Carregando lâmina...
+            </h2>
+            <p id="slideColoracao" class="mt-2 text-[11px] font-mono tracking-wide text-[#c8ad5f]/80">
+              Hematoxilina e Eosina (H&amp;E)
+            </p>
+            <span id="slideDisciplina" class="hidden">—</span>
+          </div>
+          <button type="button" onclick="document.getElementById('btnToggleSidebar').click()" class="md:hidden p-1.5 text-neutral-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors shrink-0" aria-label="Fechar painel">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
 
         <!-- Descrição completa com hiperlinks de pinos -->
