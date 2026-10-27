@@ -544,3 +544,14 @@ button:active {
     opacity: 1 !important;
   }
 }
+
+/* Previne autofill com fundo claro/azul do Chrome no campo de busca escuro */
+input#global-search-input:-webkit-autofill,
+input#global-search-input:-webkit-autofill:hover,
+input#global-search-input:-webkit-autofill:focus,
+input#global-search-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #171717 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #ffffff;
+}

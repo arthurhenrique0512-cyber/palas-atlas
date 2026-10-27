@@ -81,12 +81,13 @@ class BrandLogo extends HTMLElement {
   updateCompactState(isCompact) {
     const owlWrapper = this.querySelector('#brandLogoOwlWrapper');
     if (owlWrapper) {
-      owlWrapper.style.maxWidth = isCompact ? '0px' : '48px';
-      owlWrapper.style.opacity = isCompact ? '0' : '1';
-      owlWrapper.style.transform = isCompact ? 'scale(0.72) translateY(-1px)' : 'scale(1) translateY(0)';
-      owlWrapper.style.marginRight = isCompact ? '-10px' : '0px';
-      owlWrapper.style.filter = isCompact ? 'blur(1px)' : 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.22))';
-      owlWrapper.style.pointerEvents = isCompact ? 'none' : 'auto';
+      // O emblema da coruja nunca deve desaparecer — é a assinatura do Palas Atlas
+      owlWrapper.style.maxWidth = '48px';
+      owlWrapper.style.opacity = '1';
+      owlWrapper.style.transform = isCompact ? 'scale(0.88)' : 'scale(1)';
+      owlWrapper.style.marginRight = '0px';
+      owlWrapper.style.filter = 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.22))';
+      owlWrapper.style.pointerEvents = 'auto';
     }
 
     const subtitle = this.querySelector('.brand-logo-subtitle');
@@ -199,7 +200,7 @@ class BrandLogo extends HTMLElement {
           <span
             id="brandLogoOwlWrapper"
             class="brand-owl-wrapper flex items-center justify-center overflow-hidden ${!this._hasAnimated ? 'logo-owl-reveal' : ''}"
-            style="max-width: ${isCompact ? '0px' : '48px'}; opacity: ${isCompact ? '0' : '1'}; transform: ${isCompact ? 'scale(0.72) translateY(-1px)' : 'scale(1) translateY(0)'}; margin-right: ${isCompact ? '-10px' : '0px'}; color: #d4af37; filter: ${isCompact ? 'blur(1px)' : 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.22))'}; pointer-events: ${isCompact ? 'none' : 'auto'};"
+            style="max-width: 48px; opacity: 1; transform: ${isCompact ? 'scale(0.88)' : 'scale(1)'}; margin-right: 0px; color: #d4af37; filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.22)); pointer-events: auto;"
           >
             <svg
               class="brand-owl-icon w-6 h-6 sm:w-7 sm:h-7 shrink-0"

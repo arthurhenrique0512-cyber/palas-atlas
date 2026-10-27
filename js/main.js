@@ -86,7 +86,7 @@ function init() {
     }
   });
 
-  // Listener de Scroll para Header Dinâmico (Compactação da Navbar e Desaparecimento da Coruja)
+  // Listener de Scroll para Header Dinâmico (Backdrop blur protetor e elevação suave)
   const headerMin = document.getElementById("palasMinimalHeader");
   
   if (headerMin) {
@@ -96,16 +96,17 @@ function init() {
 
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       const brandLogo = document.querySelector("#palasMinimalHeader brand-logo");
-      const logoPill = document.querySelector("#palasMinimalHeader a");
 
       if (scrollY > 20) {
         if (brandLogo && brandLogo.getAttribute("compact") !== "true") {
           brandLogo.setAttribute("compact", "true");
         }
+        headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-neutral-950/85 backdrop-blur-xl border-b border-white/[0.08] shadow-lg transition-all duration-300 pointer-events-auto";
       } else {
         if (brandLogo && brandLogo.getAttribute("compact") === "true") {
           brandLogo.setAttribute("compact", "false");
         }
+        headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-transparent border-b border-transparent transition-all duration-300 pointer-events-none";
       }
     };
 
@@ -184,16 +185,23 @@ function renderView(state) {
 
   const mainContainer = document.getElementById("mainRouterContainer");
   if (mainContainer) {
-    if (isHomePage || isDashboard) {
-      mainContainer.className = "flex-1 w-full flex flex-col justify-center transition-all duration-300 pt-0";
+    if (isDashboard) {
+      mainContainer.className = "flex-1 w-full flex flex-col transition-all duration-300 pt-0";
     } else {
-      mainContainer.className = "flex-1 w-full flex flex-col justify-center transition-all duration-300 pt-16 sm:pt-20";
+      mainContainer.className = "flex-1 w-full flex flex-col transition-all duration-300 pt-16 sm:pt-20";
     }
   }
 
   if (isHomePage) {
-    // HOME: emblema dourado + header transparente flutuante sempre fixo no topo da viewport
-    if (headerMin) headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 pointer-events-none";
+    // HOME: emblema dourado + header com elevação suave
+    const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    if (headerMin) {
+      if (scrollY > 20) {
+        headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-neutral-950/85 backdrop-blur-xl border-b border-white/[0.08] shadow-lg transition-all duration-300 pointer-events-auto";
+      } else {
+        headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-transparent border-b border-transparent transition-all duration-300 pointer-events-none";
+      }
+    }
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "true");
       brandLogo.setAttribute("theme", "dark-bg");
