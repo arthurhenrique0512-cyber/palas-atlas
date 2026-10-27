@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistente de Varredura — Palas Atlas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col p-4 md:p-6 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Cabeçalho -->
+  <header class="max-w-5xl mx-auto w-full flex items-center justify-between pb-4 border-b border-slate-800">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
+        🔬
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-white">Palas Atlas <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 font-mono ml-1">Copiloto de Bancada</span></h1>
+        <p class="text-xs text-slate-400">Guia passo a passo para varredura em serpente no microscópio</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-slate-400 hidden sm:inline">Atalho:</span>
+      <kbd class="px-2 py-1 text-xs bg-slate-800 border border-slate-700 rounded text-slate-300 font-mono shadow-sm">Espaço</kbd>
+      <span class="text-xs text-slate-400 hidden sm:inline">ou clique para avançar</span>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="max-w-5xl mx-auto w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 items-start">
+    
+    <!-- Painel de Configuração e Matriz -->
+    <section class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-5">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">Configuração da Grade</h2>
+      
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Colunas (X - Horizontal)</label>
+          <input type="number" id="colsInput" value="3" min="1" max="15" 
+                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Linhas (Y - Vertical)</label>
+          <input type="number" id="rowsInput" value="4" min="1" max="25" 
+                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-indigo-500">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-slate-400 bg-slate-800/50 p-3 rounded-lg border border-slate-800">
+        <span>Total de Fotos Estimadas:</span>
+        <span id="totalFotosLabel" class="font-bold text-indigo-400 font-mono text-sm">12 fotos</span>
+      </div>
+
+      <!-- Representação Gráfica da Matriz -->
+      <div class="mt-2">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-slate-400 uppercase">Mapa da Lâmina</span>
+          <span id="gridProgressText" class="text-xs font-mono text-indigo-400">0 / 12 concluídas</span>
+        </div>
+        <div id="gridContainer" class="grid gap-1.5 p-3 bg-slate-950 rounded-xl border border-slate-800 max-h-72 overflow-auto">
+          <!-- Células geradas dinamicamente via JS -->
+        </div>
+      </div>
+
+      <!-- Botões de Controle -->
+      <div class="flex gap-2 pt-2">
+        <button id="btnReset" class="flex-1 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">
+          🔄 Reiniciar
+        </button>
+        <button id="btnPrev" class="py-2 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">
+          ⬅️ Voltar
+        </button>
+      </div>
+    </section>
+
+    <!-- Painel de Ação Atual e Guia Visual de Overlap -->
+    <section class="lg:col-span-7 flex flex-col gap-5">
+      
+      <!-- Card da Ação Imediata -->
+      <div id="actionCard" class="bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-900 border-2 border-indigo-500/50 rounded-2xl p-6 shadow-2xl relative overflow-hidden cursor-pointer select-none">
+        <div class="flex items-center justify-between">
+          <span id="stepCounterBadge" class="px-3 py-1 bg-indigo-500 text-white font-mono text-xs font-bold rounded-full uppercase tracking-wider">
+            Foto 1 de 12
+          </span>
+          <span class="text-xs text-slate-400 font-mono">Clique aqui ou [Espaço] após disparar</span>
+        </div>
+
+        <div class="my-6 text-center">
+          <div id="directionIcon" class="text-6xl mb-2 animate-bounce">⬇️</div>
+          <h3 id="actionHeading" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Desça na Vertical
+          </h3>
+          <p id="actionSubtext" class="text-slate-300 text-sm mt-2 max-w-md mx-auto">
+            Inicie no canto superior esquerdo do tecido. Tire a foto e depois desça mantendo 15% de sobreposição.
+          </p>
+        </div>
+
+        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+          <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <!-- Guia Visual do Overlap 15% (Mira de Bancada) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+            <span>🎯</span> Mira de Sobreposição (Overlap 15%)
+          </h3>
+          <span class="text-xs text-indigo-400 font-medium">Margem de Segurança Fiji</span>
+        </div>
+
+        <div class="relative w-full aspect-video bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center overflow-hidden">
+          
+          <!-- Faixas de 15% de Overlap -->
+          <!-- Topo -->
+          <div class="absolute top-0 left-0 right-0 h-[15%] bg-indigo-500/15 border-b border-dashed border-indigo-400/50 flex items-center justify-center text-[10px] font-mono text-indigo-300">
+            ▲ 15% de Overlap com a foto de CIMA
+          </div>
+          <!-- Fundo -->
+          <div class="absolute bottom-0 left-0 right-0 h-[15%] bg-indigo-500/15 border-t border-dashed border-indigo-400/50 flex items-center justify-center text-[10px] font-mono text-indigo-300">
+            ▼ 15% de Overlap com a foto de BAIXO
+          </div>
+          <!-- Esquerda -->
+          <div class="absolute top-[15%] bottom-[15%] left-0 w-[15%] bg-emerald-500/15 border-r border-dashed border-emerald-400/50 flex items-center justify-center text-[9px] font-mono text-emerald-300 write-vertical">
+            ◄ 15%
+          </div>
+          <!-- Direita -->
+          <div class="absolute top-[15%] bottom-[15%] right-0 w-[15%] bg-emerald-500/15 border-l border-dashed border-emerald-400/50 flex items-center justify-center text-[9px] font-mono text-emerald-300 write-vertical">
+            15% ►
+          </div>
+
+          <!-- Centro Seguro -->
+          <div class="text-center p-4">
+            <span class="text-slate-500 font-mono text-xs block mb-1">CAMPO CENTRAL (85% × 85%)</span>
+            <p class="text-xs text-slate-400 max-w-xs">
+              Ache uma estrutura marcante na borda pontilhada e faça ela reaparecer na borda oposta do próximo campo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    let cols = 3;
+    let rows = 4;
+    let currentStep = 0; // 0 to (cols * rows - 1)
+    let sequence = []; // array of { col, row, action, icon, title, desc }
+
+    const colsInput = document.getElementById('colsInput');
+    const rowsInput = document.getElementById('rowsInput');
+    const totalFotosLabel = document.getElementById('totalFotosLabel');
+    const gridContainer = document.getElementById('gridContainer');
+    const gridProgressText = document.getElementById('gridProgressText');
+    const actionCard = document.getElementById('actionCard');
+    const stepCounterBadge = document.getElementById('stepCounterBadge');
+    const directionIcon = document.getElementById('directionIcon');
+    const actionHeading = document.getElementById('actionHeading');
+    const actionSubtext = document.getElementById('actionSubtext');
+    const progressBar = document.getElementById('progressBar');
+    const btnReset = document.getElementById('btnReset');
+    const btnPrev = document.getElementById('btnPrev');
+
+    function generateSequence(c, r) {
+      const seq = [];
+      let stepNum = 1;
+      const total = c * r;
+
+      for (let col = 0; col < c; col++) {
+        const isGoingDown = (col % 2 === 0);
+        
+        for (let stepInCol = 0; stepInCol < r; stepInCol++) {
+          const row = isGoingDown ? stepInCol : (r - 1 - stepInCol);
+          const isLastInCol = (stepInCol === r - 1);
+          const isLastOverall = (stepNum === total);
+
+          let icon = '⬇️';
+          let title = 'Desça na Vertical';
+          let desc = 'Tire a foto. Mova o charriot para baixo com 15% de sobreposição.';
+
+          if (isLastOverall) {
+            icon = '🎉';
+            title = 'Varredura Concluída!';
+            desc = 'Última foto disparada! Salve as fotos na pasta para renomear e costurar no Fiji.';
+          } else if (isLastInCol) {
+            icon = '➡️';
+            title = 'Mova para a DIREITA';
+            desc = `Fim da Coluna ${col + 1}! Ande um campo para a direita (15% overlap) para iniciar a subida/descida.`;
+          } else if (!isGoingDown) {
+            icon = '⬆️';
+            title = 'Suba na Vertical';
+            desc = 'Tire a foto. Mova o charriot para cima com 15% de sobreposição.';
+          }
+
+          seq.push({
+            stepNum,
+            col,
+            row,
+            icon,
+            title,
+            desc
+          });
+
+          stepNum++;
+        }
+      }
+      return seq;
+    }
+
+    function renderGrid() {
+      cols = parseInt(colsInput.value) || 3;
+      rows = parseInt(rowsInput.value) || 4;
+      sequence = generateSequence(cols, rows);
+
+      totalFotosLabel.textContent = `${cols * rows} fotos`;
+      gridContainer.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+      gridContainer.innerHTML = '';
+
+      // Matriz de r x c para mapear as células na tela
+      const matrix = Array.from({ length: rows }, () => Array(cols).fill(null));
+      sequence.forEach((item, idx) => {
+        matrix[item.row][item.col] = { ...item, idx };
+      });
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const item = matrix[r][c];
+          const div = document.createElement('div');
+          div.id = `cell-${item.idx}`;
+          div.className = `aspect-square rounded-lg flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border ${
+            item.idx === currentStep 
+              ? 'bg-indigo-600 border-indigo-400 text-white scale-105 shadow-md shadow-indigo-500/30' 
+              : item.idx < currentStep 
+                ? 'bg-emerald-950/60 border-emerald-600 text-emerald-400' 
+                : 'bg-slate-900 border-slate-800 text-slate-500'
+          }`;
+          div.innerHTML = `<span>#${item.stepNum}</span>`;
+          div.onclick = (e) => {
+            e.stopPropagation();
+            setStep(item.idx);
+          };
+          gridContainer.appendChild(div);
+        }
+      }
+
+      updateUI();
+    }
+
+    function updateUI() {
+      const total = sequence.length;
+      if (currentStep >= total) currentStep = total - 1;
+      if (currentStep < 0) currentStep = 0;
+
+      const current = sequence[currentStep];
+      stepCounterBadge.textContent = `Foto ${current.stepNum} de ${total}`;
+      directionIcon.textContent = current.icon;
+      actionHeading.textContent = current.title;
+      actionSubtext.textContent = current.desc;
+
+      const pct = Math.round(((currentStep + 1) / total) * 100);
+      progressBar.style.width = `${pct}%`;
+      gridProgressText.textContent = `${currentStep + 1} / ${total} fotos (${pct}%)`;
+
+      // Atualizar classes das células
+      sequence.forEach((item, idx) => {
+        const cell = document.getElementById(`cell-${idx}`);
+        if (!cell) return;
+        if (idx === currentStep) {
+          cell.className = 'aspect-square rounded-lg flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border bg-indigo-600 border-indigo-400 text-white scale-105 shadow-md shadow-indigo-500/30';
+        } else if (idx < currentStep) {
+          cell.className = 'aspect-square rounded-lg flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border bg-emerald-950/60 border-emerald-600 text-emerald-400';
+        } else {
+          cell.className = 'aspect-square rounded-lg flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border bg-slate-900 border-slate-800 text-slate-500';
+        }
+      });
+    }
+
+    function nextStep() {
+      if (currentStep < sequence.length - 1) {
+        currentStep++;
+        updateUI();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 0) {
+        currentStep--;
+        updateUI();
+      }
+    }
+
+    function setStep(idx) {
+      currentStep = idx;
+      updateUI();
+    }
+
+    colsInput.addEventListener('change', renderGrid);
+    rowsInput.addEventListener('change', renderGrid);
+    actionCard.addEventListener('click', nextStep);
+    btnPrev.addEventListener('click', (e) => { e.stopPropagation(); prevStep(); });
+    btnReset.addEventListener('click', (e) => { e.stopPropagation(); currentStep = 0; updateUI(); });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        nextStep();
+      } else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
+        nextStep();
+      } else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
+        prevStep();
+      }
+    });
+
+    renderGrid();
+  </script>
+</body>
+</html>

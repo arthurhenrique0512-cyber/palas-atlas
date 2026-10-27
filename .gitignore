@@ -2,3 +2,13 @@
 **/.DS_Store
 node_modules/
 .npm/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Local binaries / apps
+app/
+
+# OS metadata
+Thumbs.db

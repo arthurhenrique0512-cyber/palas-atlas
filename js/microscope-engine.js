@@ -199,8 +199,38 @@ const fallbackLaminas = {
 function iniciarMicroscopio() {
   iniciarSidebarRetratil();
   const urlParams = new URLSearchParams(window.location.search);
+  const dziParam  = urlParams.get("dzi") || urlParams.get("file");
   const laminaId  = urlParams.get("id") || urlParams.get("laminaId");
-  if (laminaId) {
+
+  if (dziParam) {
+    laminaAtualData = {
+      id: "local-dzi",
+      nome: urlParams.get("nome") || "Osso Maduro (Desgaste - Corte Transversal)",
+      disciplina: urlParams.get("disciplina") || "histologia",
+      coloracao: urlParams.get("coloracao") || "Corte por Desgaste (Sem Coloracao)",
+      imagemUrl: dziParam,
+      descricaoHTML: `
+        <div class="prose-atlas">
+          <h3>Tecido Osseo Maduro — Corte por Desgaste</h3>
+          <p>Preparacao histologica de osso compacto maduro obtida pela tecnica de desgaste fisico. Por nao utilizar descalcificacao nem corantes histologicos, a matriz ossea mineralizada (hidroxiapatita) e preservada intacta, permitindo a observacao direta dos canais vasculares e do sistema canalicular preenchido por ar ou residuos refrateis.</p>
+          <p><strong>Estruturas Morfologicas Visiveis:</strong></p>
+          <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
+            <li><strong>Sistemas de Havers (Osteons):</strong> Unidades cilindricas formadas por lamelas concentricas de matriz mineralizada dispostas em torno de um canal central.</li>
+            <li><strong>Canais de Havers:</strong> Tuneis longitudinais centrais que alojavam vasos sanguineos e nervos in vivo.</li>
+            <li><strong>Lacunas de Osteocitos:</strong> Pequenas cavidades lenticulares onde residiam os corpos celulares dos osteocitos.</li>
+            <li><strong>Canaliculos Osseos:</strong> Delicadas ramificacoes radiadas que interconectam as lacunas entre si e com os canais vasculares para nutricao celular.</li>
+            <li><strong>Lamelas Intersticiais:</strong> Remanescentes angulares de osteons antigos degradados pelo remodelamento osseo continuo.</li>
+            <li><strong>Canais de Volkmann:</strong> Canais perfurantes transversais/obliquos que conectam canais de Havers adjacentes e o periosteo.</li>
+          </ul>
+        </div>
+      `,
+      pinos: []
+    };
+    listaPinosAtual = [];
+    renderizarMetadadosDaLamina();
+    renderizarDescricaoETextos();
+    inicializarOpenSeadragon();
+  } else if (laminaId) {
     carregarLaminaNoMicroscopio(laminaId);
   } else {
     console.warn("[Palas Atlas] Nenhum ID de lamina passado na URL (?id=...).");
