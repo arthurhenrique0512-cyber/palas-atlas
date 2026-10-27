@@ -108,7 +108,10 @@ function init() {
 
   // Verifica parâmetros de rota (Deep Linking)
   const urlParams = new URLSearchParams(window.location.search);
-  const frenteParam = urlParams.get("frente");
+  let frenteParam = urlParams.get("frente");
+  if (frenteParam === "admin" || frenteParam === "cms") {
+    frenteParam = "dashboard";
+  }
   if (frenteParam && ["anatomia", "histologia", "patologia", "parasitologia", "microbiologia", "dashboard"].includes(frenteParam)) {
     setFrenteAtiva(frenteParam);
   } else {
@@ -171,7 +174,7 @@ function renderView(state) {
 
   const mainContainer = document.getElementById("mainRouterContainer");
   if (mainContainer) {
-    if (isHomePage) {
+    if (isHomePage || isDashboard) {
       mainContainer.className = "flex-1 w-full flex flex-col justify-center transition-all duration-300 pt-0";
     } else {
       mainContainer.className = "flex-1 w-full flex flex-col justify-center transition-all duration-300 pt-16 sm:pt-20";
@@ -398,7 +401,13 @@ window.addEventListener("popstate", (event) => {
       goHome(true);
     }
   } else {
-    goHome(true);
+    const urlParams = new URLSearchParams(window.location.search);
+    const frente = urlParams.get("frente");
+    if (frente) {
+      selecionarFrente(frente === "admin" || frente === "cms" ? "dashboard" : frente, true);
+    } else {
+      goHome(true);
+    }
   }
 });
 

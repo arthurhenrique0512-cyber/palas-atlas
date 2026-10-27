@@ -965,17 +965,17 @@
     </section>
 
     <!-- CONTAINER 3: Dashboard / CMS de Acervo & Pinos (#pgDashboard) -->
-    <section id="pgDashboard" class="hidden h-screen pt-[88px] w-full bg-neutral-950 text-slate-100 overflow-hidden flex flex-col">
+    <section id="pgDashboard" class="hidden h-screen pt-20 sm:pt-24 w-full bg-neutral-950 text-slate-100 overflow-hidden flex flex-col">
 
       <!-- ── MODAL DE LOGIN DO ADMINISTRADOR ─────────────────────────────── -->
       <!-- Exibido quando o usuário não está autenticado. Sobrepõe o CMS. -->
-      <div id="dashLoginOverlay" class="absolute inset-0 z-50 bg-neutral-950/95 backdrop-blur-sm flex items-center justify-center hidden" style="top: 88px;">
-        <div class="w-full max-w-sm mx-4 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl p-8 flex flex-col gap-5">
+      <div id="dashLoginOverlay" class="absolute inset-0 z-50 bg-neutral-950/80 backdrop-blur-xl flex items-center justify-center hidden">
+        <div class="w-full max-w-sm mx-4 bg-neutral-900/60 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-8 flex flex-col gap-6">
 
           <!-- Cabeçalho do Modal -->
           <div class="flex flex-col items-center gap-2 text-center">
-            <div class="w-12 h-12 rounded-full bg-neutral-800/50 border border-neutral-700/50 flex items-center justify-center mb-1">
-              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-1">
+              <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
               </svg>
             </div>
@@ -984,71 +984,73 @@
           </div>
 
           <!-- Formulário -->
-          <div class="flex flex-col gap-3">
+          <div class="flex flex-col gap-4">
             <div>
-              <label class="text-xs text-neutral-400 font-medium mb-1 block" for="dashLoginEmail">E-mail</label>
+              <label class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono mb-1.5 block" for="dashLoginEmail">E-mail</label>
               <input
                 id="dashLoginEmail"
                 type="email"
                 autocomplete="email"
                 placeholder="admin@palasatlas.com"
-                class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/40 transition-all"
+                class="w-full bg-neutral-950/50 border border-white/[0.08] rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37]/40 transition-colors"
               />
             </div>
             <div>
-              <label class="text-xs text-neutral-400 font-medium mb-1 block" for="dashLoginPassword">Senha</label>
+              <label class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono mb-1.5 block" for="dashLoginPassword">Senha</label>
               <input
                 id="dashLoginPassword"
                 type="password"
                 autocomplete="current-password"
                 placeholder="••••••••"
-                class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/40 transition-all"
+                class="w-full bg-neutral-950/50 border border-white/[0.08] rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37]/40 transition-colors"
               />
             </div>
           </div>
 
           <!-- Mensagem de erro -->
-          <p id="dashLoginError" class="hidden text-xs text-red-400 bg-red-950/30 border border-red-900/40 rounded-lg px-3 py-2 text-center"></p>
+          <p id="dashLoginError" class="hidden text-xs text-rose-400 bg-rose-950/30 border border-rose-900/40 rounded-xl px-3.5 py-2.5 text-center font-mono"></p>
 
           <!-- Botão de entrar -->
           <button
             id="btnDashLogin"
             type="button"
             onclick="window.App.dashboardLogin()"
-            class="w-full bg-blue-700 hover:bg-blue-600 active:bg-blue-800 text-white font-medium text-sm rounded-xl py-3 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+            class="w-full bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 font-mono tracking-widest uppercase text-xs rounded-xl py-3.5 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg"
           >
             <span id="dashLoginBtnText">Entrar no Painel</span>
             <span id="dashLoginSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
           </button>
 
-          <p class="text-center text-[10px] text-neutral-600">Palas Atlas &mdash; Sistema Restrito</p>
+          <p class="text-center text-[10px] text-neutral-600 font-mono tracking-wider">Palas Atlas &mdash; Sistema Restrito</p>
         </div>
       </div>
       <!-- ── FIM DO MODAL DE LOGIN ────────────────────────────────────────── -->
 
 
       <!-- NAVEGAÇÃO INTERNA DO PAINEL DEV (TÓPICOS DO CMS) -->
-      <div class="flex items-center justify-between border-b border-neutral-800 px-6 py-4 shrink-0 w-full bg-neutral-950 z-10">
-        <div class="flex items-center gap-2">
+      <div class="flex items-center justify-between px-6 py-3 shrink-0 w-full border-b border-white/[0.06] bg-neutral-950/80 backdrop-blur-md z-10">
+        <!-- Cápsula de Abas Minimalista -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-900/40 border border-white/[0.06] backdrop-blur-md">
           <button
             type="button"
             id="btnTopicoEditor"
             onclick="window.App.alternarTopicoCms('editor')"
-            class="border-b-2 border-sky-500 text-sky-400 font-medium px-4 py-2.5 text-xs flex items-center gap-2 transition-colors cursor-pointer">
-            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-            Editor &amp; Cadastro
+            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer bg-white/[0.06] text-white border border-white/[0.08] shadow-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37]"></span>
+            <span>Editor &amp; Cadastro</span>
           </button>
           <button
             type="button"
             id="btnTopicoAcervo"
             onclick="window.App.alternarTopicoCms('acervo')"
-            class="text-neutral-400 hover:text-white px-4 py-2.5 text-xs flex items-center gap-2 transition-colors cursor-pointer border-b-2 border-transparent">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-            Lâminas &amp; Acervo
+            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.03]">
+            <span class="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
+            <span>Lâminas &amp; Acervo</span>
           </button>
         </div>
+
         <div class="flex items-center gap-3 font-mono">
-          <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+          <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm font-mono tracking-wider uppercase">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             Firestore Sync
           </span>
@@ -1056,82 +1058,82 @@
       </div>
 
       <!-- TÓPICO 1: EDITOR DO ACERVO & MAPEAMENTO OPTICO (#topicoCmsEditor) -->
-      <div id="topicoCmsEditor" class="w-full flex-1 grid grid-cols-1 md:grid-cols-[400px_1fr] overflow-hidden bg-neutral-950">
+      <div id="topicoCmsEditor" class="w-full flex-1 grid grid-cols-1 md:grid-cols-[420px_1fr] overflow-hidden bg-neutral-950">
         
         <!-- COLUNA DA ESQUERDA - FORMULÁRIO E EDITOR (Scroll Independente) -->
-        <div class="h-full overflow-y-auto p-6 space-y-6 border-r border-neutral-800/80 bg-neutral-900/40 custom-scrollbar pb-12">
+        <div class="h-full overflow-y-auto p-6 space-y-6 border-r border-white/[0.06] bg-neutral-950 custom-scrollbar pb-16">
           
           <!-- Cabeçalho Institucional do Editor CMS e Botão Voltar -->
-          <div class="pb-4 border-b border-white/10 flex flex-col gap-3 shrink-0">
+          <div class="pb-4 border-b border-white/[0.06] flex flex-col gap-3 shrink-0">
             <div class="flex items-center justify-between">
               <div>
-                <span class="text-[10px] font-bold uppercase tracking-widest bg-cyan-950 text-cyan-400 border border-cyan-800/50 px-3 py-1 rounded-full font-mono">CMS Palas Atlas</span>
-                <h2 class="text-2xl font-light text-white tracking-wide mt-2 font-sans">Editor de Acervo &amp; Pinos</h2>
+                <span class="text-[10px] font-mono tracking-widest uppercase text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/30 px-2.5 py-0.5 rounded-full">CMS Palas Atlas</span>
+                <h2 class="text-xl font-light text-white tracking-wide mt-2 font-sans">Editor de Acervo &amp; Pinos</h2>
               </div>
               <button 
                 type="button" 
                 onclick="window.App.carregarImagemNoEditor()" 
-                class="bg-neutral-800/80 hover:bg-neutral-700 text-neutral-300 border border-neutral-700 hover:border-neutral-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                class="bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 px-3.5 py-1.5 rounded-xl text-xs font-mono tracking-wider uppercase transition-all duration-200 shadow-sm cursor-pointer">
                 Recarregar
               </button>
             </div>
           </div>
 
           <!-- BLOCO A: FONTE DA IMAGEM E DZI -->
-          <div class="bg-neutral-900/60 backdrop-blur-md rounded-xl border border-neutral-800/80 p-5 space-y-4 shrink-0">
-            <h3 class="text-[10px] font-mono text-neutral-400 uppercase">A. Fonte da Imagem e Leitor</h3>
+          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
+            <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">A. Fonte da Imagem e Leitor</h3>
             
-            <div class="flex flex-wrap items-center gap-6 bg-neutral-950/80 p-3.5 rounded-xl border border-white/5">
-              <label class="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-300 font-medium font-mono select-none">
-                <input type="radio" name="dashImgType" value="dzi" class="w-4 h-4 text-cyan-500 bg-neutral-900 border-neutral-700 focus:ring-cyan-500 focus:ring-offset-neutral-900">
+            <div class="flex flex-wrap items-center gap-6 bg-neutral-950/40 p-3 rounded-xl border border-white/[0.06]">
+              <label class="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-300 font-mono select-none">
+                <input type="radio" name="dashImgType" value="dzi" class="w-4 h-4 text-[#d4af37] bg-neutral-900 border-white/20 focus:ring-0 focus:ring-offset-0 accent-[#d4af37]">
                 <span>Arquivo Piramidal (.dzi)</span>
               </label>
-              <label class="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-300 font-medium font-mono select-none">
-                <input type="radio" name="dashImgType" value="static" checked class="w-4 h-4 text-cyan-500 bg-neutral-900 border-neutral-700 focus:ring-cyan-500 focus:ring-offset-neutral-900">
+              <label class="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-300 font-mono select-none">
+                <input type="radio" name="dashImgType" value="static" checked class="w-4 h-4 text-[#d4af37] bg-neutral-900 border-white/20 focus:ring-0 focus:ring-offset-0 accent-[#d4af37]">
                 <span>Imagem Estática (.jpg / .png)</span>
               </label>
             </div>
 
             <div>
-              <label for="dashImgUrl" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Caminho do arquivo ou pasta</label>
+              <label for="dashImgUrl" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Caminho do arquivo ou pasta</label>
               <input 
                 type="text" 
                 id="dashImgUrl" 
                 value="/assets/histologia/muscular-esqueletico-he.jpg"
                 placeholder="Ex: /assets/dzi/lamina_rim_cortex.dzi ou /assets/histologia/muscular-esqueletico-he.jpg" 
-                class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors">
+                class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors font-mono">
             </div>
 
             <button 
               type="button" 
               onclick="window.App.carregarImagemNoEditor()" 
-              class="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-xl py-3 px-4 text-xs font-semibold shadow-md hover:shadow-blue-900/30 transition-all font-mono uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
+              class="w-full bg-white/[0.04] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 rounded-xl py-3 px-4 text-xs font-mono tracking-widest uppercase transition-all duration-300 shadow-lg flex items-center justify-center gap-2 cursor-pointer group">
               <span>Carregar no Canvas</span>
-              <span>&rarr;</span>
+              <span class="group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
             </button>
           </div>
 
           <!-- BLOCO B: METADADOS CLÍNICOS E ACADÊMICOS -->
-          <div class="bg-neutral-900/60 backdrop-blur-md rounded-xl border border-neutral-800/80 p-5 space-y-4 shrink-0">
-            <h3 class="text-[10px] font-mono text-neutral-400 uppercase">B. Metadados Clínicos e Acadêmicos</h3>
+          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
+            <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">B. Metadados Clínicos e Acadêmicos</h3>
             
             <div>
-              <label for="dashNomeLamina" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Nome da Peça / Lâmina</label>
+              <label for="dashNomeLamina" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Nome da Peça / Lâmina</label>
               <input 
                 type="text" 
                 id="dashNomeLamina" 
                 value="Músculo Estriado Esquelético HE"
                 placeholder="Ex: Músculo Estriado Esquelético HE ou Rim Córtex Renal" 
-                class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors">
+                class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
             </div>
 
             <div class="grid grid-cols-1 gap-4">
               <div>
-                <label for="dashSelectDisciplina" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Disciplina</label>
+                <label for="dashSelectDisciplina" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Disciplina</label>
                 <select 
                   id="dashSelectDisciplina" 
                   onchange="window.App.atualizarTopicosCms(this.value)" 
-                  class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer appearance-none">
+                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
                   <option value="histologia" selected>Histologia</option>
                   <option value="anatomia">Anatomia</option>
                   <option value="patologia">Patologia</option>
@@ -1141,22 +1143,22 @@
               </div>
 
               <div>
-                <label for="dashSelectTopico" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Tópico</label>
+                <label for="dashSelectTopico" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Tópico</label>
                 <select 
                   id="dashSelectTopico" 
-                  class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer appearance-none">
+                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
                   <option value="muscular" selected>Tecido Muscular Estriado Esquelético, Cardíaco e Liso</option>
                   <option value="epitelial">Tecido Epitelial de Revestimento e Glandular</option>
                 </select>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label for="dashSelectColoracao" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Coloração / Técnica</label>
+                <label for="dashSelectColoracao" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Coloração / Técnica</label>
                 <select 
                   id="dashSelectColoracao" 
-                  class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer appearance-none">
+                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
                   <option value="H&E" selected>H&amp;E (Hematoxilina e Eosina)</option>
                   <option value="PAS">PAS (Ácido Periódico-Schiff)</option>
                   <option value="Gram">Gram (Coloração Diferencial)</option>
@@ -1168,12 +1170,11 @@
                 </select>
               </div>
 
-              <!-- NOVO: Objetiva Máxima (maxMagnification) -->
               <div>
-                <label for="dashMaxMagnification" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Objetiva Máxima</label>
+                <label for="dashMaxMagnification" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Objetiva Máxima</label>
                 <select
                   id="dashMaxMagnification"
-                  class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer appearance-none"
+                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer appearance-none"
                   title="Limite físico de aumento da digitalização desta lâmina">
                   <option value="40" selected>40x (padrão)</option>
                   <option value="60">60x</option>
@@ -1181,35 +1182,35 @@
                 </select>
               </div>
 
-              <div class="flex flex-col gap-1.5 justify-end">
-                <label for="statusLamina" class="block text-[10px] text-neutral-400 uppercase mb-1.5 font-mono">Status da Lâmina</label>
-                <select id="statusLamina" class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer appearance-none">
-                  <option value="inativa">Inativa (Apenas no Painel Dev)</option>
-                  <option value="ativa">Ativa (Publicada para Alunos)</option>
+              <div class="flex flex-col justify-end">
+                <label for="statusLamina" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Status da Lâmina</label>
+                <select id="statusLamina" class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
+                  <option value="inativa">Inativa (Rascunho)</option>
+                  <option value="ativa">Ativa (Publicada)</option>
                 </select>
               </div>
             </div>
           </div>
 
           <!-- BLOCO C: EDITOR DE TEXTO DESCRITIVO COM VÍNCULO DE PINOS -->
-          <div class="bg-neutral-900/60 backdrop-blur-md rounded-xl border border-neutral-800/80 p-5 space-y-4 shrink-0">
+          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <h3 class="text-[10px] font-mono text-neutral-400 uppercase">C. Descrição Histopatológica / Anatômica</h3>
-              <span class="text-[10px] font-mono text-neutral-500">Interativo: Passe o mouse para testar</span>
+              <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">C. Descrição Histopatológica / Anatômica</h3>
+              <span class="text-[10px] font-mono text-neutral-500">Interativo: passe o cursor</span>
             </div>
 
             <!-- BARRA DE FERRAMENTAS TEXTO-PINO -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
               <select 
                 id="dashSelectPinoVinculo" 
-                class="w-full bg-neutral-900 border border-neutral-800 focus:border-sky-500 text-xs text-white rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer flex-1 appearance-none">
+                class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors cursor-pointer flex-1 appearance-none font-mono">
                 <option value="">Selecione um pino no canvas ao lado...</option>
               </select>
               <button 
                 type="button" 
                 onclick="window.App.vincularTextoAoPino()" 
-                class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-4 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0">
-                Vincular Pino Selecionado
+                class="bg-white/[0.04] hover:bg-[#d4af37]/10 text-neutral-300 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 px-3.5 py-2.5 rounded-xl text-xs font-mono tracking-wider uppercase transition-all duration-200 cursor-pointer shrink-0">
+                Vincular
               </button>
             </div>
 
@@ -1217,32 +1218,32 @@
             <div 
               id="dashEditorTexto" 
               contenteditable="true" 
-              class="w-full min-h-[160px] max-h-[300px] overflow-y-auto bg-neutral-950/50 border border-neutral-800 rounded-lg p-4 text-xs text-neutral-300 focus:outline-none focus:border-sky-500 leading-relaxed shadow-inner">
-              Corte longitudinal de parênquima de <span class="pin-link inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-200 hover:bg-neutral-700 hover:text-white transition-colors cursor-pointer font-medium" data-pin-id="pin_demo" contenteditable="false" title="Clique ou deslize para inspecionar no canvas"><span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span><span>Músculo Estriado Esquelético</span></span> sob coloração H&E demonstrando fibras musculares cilíndricas, longas e multinucleadas, com núcleos periféricos basófilos situados na borda do sarcolema e estriações transversais resultantes da organização dos sarcômeros. Entre os feixes de contratação voluntária, observa-se o endomísio e perimísio intersticiais.
+              class="w-full min-h-[160px] max-h-[280px] overflow-y-auto bg-neutral-950/40 border border-white/[0.08] rounded-xl p-4 text-xs text-neutral-300 focus:outline-none focus:border-white/20 leading-relaxed shadow-inner">
+              Corte longitudinal de parênquima de <span class="pin-link inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-white/[0.06] border border-white/[0.1] text-neutral-200 hover:text-white transition-colors cursor-pointer font-medium" data-pin-id="pin_demo" contenteditable="false" title="Clique ou deslize para inspecionar no canvas"><span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] shrink-0"></span><span>Músculo Estriado Esquelético</span></span> sob coloração H&E demonstrando fibras musculares cilíndricas, longas e multinucleadas, com núcleos periféricos basófilos situados na borda do sarcolema e estriações transversais resultantes da organização dos sarcômeros. Entre os feixes de contratação voluntária, observa-se o endomísio e perimísio intersticiais.
             </div>
-            <p class="text-[10px] text-neutral-500 font-mono">Selecione com o cursor uma palavra no texto acima e clique em "Vincular" para apontar o pino.</p>
+            <p class="text-[10px] text-neutral-500 font-mono">Selecione uma palavra no texto acima e clique em "Vincular" para apontar o pino.</p>
           </div>
 
           <!-- BLOCO D: LISTA DE PINOS ATIVOS -->
-          <div class="bg-neutral-900/60 backdrop-blur-md rounded-xl border border-neutral-800/80 p-5 space-y-4 shrink-0">
+          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
             <div class="flex items-center justify-between">
-              <h3 class="text-[10px] font-mono text-neutral-400 uppercase">D. Lista de Pinos Ativos no Canvas</h3>
-              <span id="dashTotalPinosBadge" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-1 rounded-full font-mono">0 Pinos</span>
+              <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">D. Lista de Pinos Ativos</h3>
+              <span id="dashTotalPinosBadge" class="bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Pinos</span>
             </div>
 
             <div id="dashListaPinos" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-              <p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-neutral-800 rounded-lg">Nenhum pino marcado na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações de diagnóstico.</p>
+              <p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl">Nenhum pino marcado na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações de diagnóstico.</p>
             </div>
           </div>
 
           <!-- BLOCO E: AÇÕES DE PUBLICAÇÃO -->
-          <div class="bg-neutral-900/60 backdrop-blur-md rounded-xl border border-neutral-800/80 p-5 shrink-0 mb-6">
+          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shrink-0 shadow-2xl mb-6">
             <div class="flex flex-col sm:flex-row items-center gap-3">
               <button 
                 type="button" 
                 id="btnPublicarCms"
                 onclick="window.App.publicarLaminaCms()" 
-                class="flex-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg py-2.5 px-4 text-xs font-medium transition-colors w-full cursor-pointer">
+                class="flex-1 w-full bg-white/[0.05] hover:bg-emerald-500/10 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500/60 rounded-xl py-3 px-4 text-xs font-mono tracking-widest uppercase transition-all duration-300 cursor-pointer shadow-lg flex items-center justify-center gap-2">
                 <span id="txtBtnPublicar">Cadastrar Lâmina</span>
               </button>
               
@@ -1250,115 +1251,113 @@
                 type="button" 
                 id="btnCancelarEdicao" 
                 onclick="window.App.resetarFormularioDashboard()" 
-                class="hidden px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-xs font-medium transition-colors cursor-pointer w-full sm:w-auto">
+                class="hidden px-4 py-3 bg-white/[0.03] hover:bg-white/[0.08] text-neutral-400 hover:text-white border border-white/[0.08] rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer w-full sm:w-auto">
                 Cancelar
               </button>
             </div>
             
-            <div id="dashCmsStatus" class="hidden p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/60 text-emerald-200 text-xs font-mono text-center space-y-3 shadow"></div>
+            <div id="dashCmsStatus" class="hidden p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-xs font-mono text-center space-y-3 mt-3 shadow-lg"></div>
           </div>
 
         </div>
 
-        <!-- COLUNA DA DIREITA - CANVAS INTERATIVO OPENSEADRAGON -->
-        <div class="h-full w-full relative bg-neutral-900 overflow-hidden flex flex-col border-none rounded-none shadow-none">
-          <!-- TOPO DO CANVAS (BARRA DE CONTROLE EXTERNA) -->
-          <div class="bg-neutral-950 px-4 py-3 border-b border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between z-20 shrink-0 gap-3">
-            <span class="text-neutral-400 font-mono text-[10px] uppercase flex items-center gap-2">
-              <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>
-              Modo de Inspeção Ativo
+        <!-- COLUNA DA DIREITA - CANVAS INTERATIVO OPENSEADRAGON (Área Limpa, 100% Imersiva) -->
+        <div class="h-full w-full relative bg-[#0a0a0a] overflow-hidden flex flex-col border-none">
+          
+          <!-- CONTROLES FLUTUANTES SOBRE O CANVAS (Ultra-sutil & Borderless) -->
+          <div class="absolute top-5 right-5 z-20 flex items-center gap-2 bg-neutral-950/70 backdrop-blur-xl border border-white/[0.08] p-1.5 rounded-xl shadow-2xl pointer-events-auto">
+            <span class="text-neutral-400 font-mono text-[10px] uppercase flex items-center gap-1.5 px-2 py-1 select-none">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-400 inline-block animate-pulse"></span>
+              Inspeção
             </span>
-            
-            <!-- PAINEL DE CONTROLE DE ZOOM EXTERNO -->
-            <div class="flex items-center gap-1.5">
-              <button 
-                type="button" 
-                onclick="window.App.osdEditorAction('zoomIn')" 
-                class="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-800 px-3 py-1.5 rounded-md text-xs font-mono transition-colors" 
-                title="Zoom In">&plus;</button>
-              <button 
-                type="button" 
-                onclick="window.App.osdEditorAction('zoomOut')" 
-                class="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-800 px-3 py-1.5 rounded-md text-xs font-mono transition-colors" 
-                title="Zoom Out">&minus;</button>
-              <button 
-                type="button" 
-                onclick="window.App.osdEditorAction('reset')" 
-                class="bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-800 px-3 py-1.5 rounded-md text-[10px] font-mono transition-colors" 
-                title="Resetar para Visão Original 100%">100%</button>
-              <button 
-                type="button" 
-                onclick="window.App.osdEditorAction('center')" 
-                class="bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 px-3 py-1.5 rounded-md text-[10px] font-mono transition-colors uppercase ml-1" 
-                title="Centralizar Peça no Canvas">Centralizar</button>
-            </div>
+            <div class="h-4 w-px bg-white/10"></div>
+            <button 
+              type="button" 
+              onclick="window.App.osdEditorAction('zoomIn')" 
+              class="w-7 h-7 flex items-center justify-center bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-[#d4af37] border border-white/[0.06] hover:border-[#d4af37]/30 rounded-lg text-xs font-mono transition-all cursor-pointer" 
+              title="Zoom In">&plus;</button>
+            <button 
+              type="button" 
+              onclick="window.App.osdEditorAction('zoomOut')" 
+              class="w-7 h-7 flex items-center justify-center bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-[#d4af37] border border-white/[0.06] hover:border-[#d4af37]/30 rounded-lg text-xs font-mono transition-all cursor-pointer" 
+              title="Zoom Out">&minus;</button>
+            <button 
+              type="button" 
+              onclick="window.App.osdEditorAction('reset')" 
+              class="px-2 h-7 flex items-center justify-center bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-[#d4af37] border border-white/[0.06] hover:border-[#d4af37]/30 rounded-lg text-[10px] font-mono transition-all cursor-pointer" 
+              title="Resetar para Visão Original 100%">100%</button>
+            <button 
+              type="button" 
+              onclick="window.App.osdEditorAction('center')" 
+              class="px-2.5 h-7 flex items-center justify-center bg-white/[0.03] hover:bg-[#d4af37]/10 text-neutral-300 hover:text-[#d4af37] border border-white/[0.06] hover:border-[#d4af37]/30 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer" 
+              title="Centralizar Peça no Canvas">Centralizar</button>
           </div>
 
-          <!-- CONTAINER DO LEITOR OPENSEADRAGON -->
-          <div id="osd-editor-viewer" class="w-full flex-1 bg-[#0a0a0a] relative overflow-hidden cursor-crosshair"></div>
+          <!-- CONTAINER DO LEITOR OPENSEADRAGON (Preenchimento Total) -->
+          <div id="osd-editor-viewer" class="w-full h-full flex-1 bg-[#0a0a0a] relative overflow-hidden cursor-crosshair"></div>
         </div>
 
       </div>
 
       <!-- TÓPICO 2: LÂMINAS & STATUS DO ACERVO (#topicoCmsAcervo) -->
-      <div id="topicoCmsAcervo" class="hidden w-full flex-1 overflow-y-auto pb-16 pr-2">
+      <div id="topicoCmsAcervo" class="hidden w-full flex-1 overflow-y-auto p-6 md:p-8 pb-16 custom-scrollbar">
         
         <!-- PAINEL DE ESTATÍSTICAS E RESUMO CLÍNICO -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div class="p-5 rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800/80 flex items-center justify-between">
+          <div class="p-5 rounded-2xl bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] shadow-2xl flex items-center justify-between">
             <div>
-              <span class="text-xs text-neutral-400 block mb-1">Total de Lâminas</span>
-              <span id="statTotalLaminas" class="text-2xl font-mono font-bold text-white">0</span>
+              <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Total de Lâminas</span>
+              <span id="statTotalLaminas" class="text-2xl font-mono font-light text-white">0</span>
             </div>
-            <div class="px-2.5 py-1 rounded bg-neutral-800 text-[10px] font-mono text-neutral-400 uppercase">Geral</div>
+            <div class="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-neutral-400 uppercase tracking-wider">Geral</div>
           </div>
 
-          <div class="p-5 rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800/80 flex items-center justify-between">
+          <div class="p-5 rounded-2xl bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] shadow-2xl flex items-center justify-between">
             <div>
-              <span class="text-xs text-neutral-400 block mb-1">Lâminas Ativas</span>
-              <span id="statAtivas" class="text-2xl font-mono font-bold text-white">0</span>
+              <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Lâminas Ativas</span>
+              <span id="statAtivas" class="text-2xl font-mono font-light text-emerald-400">0</span>
             </div>
-            <div class="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400 uppercase">Publicadas</div>
+            <div class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400 uppercase tracking-wider">Publicadas</div>
           </div>
 
-          <div class="p-5 rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800/80 flex items-center justify-between">
+          <div class="p-5 rounded-2xl bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] shadow-2xl flex items-center justify-between">
             <div>
-              <span class="text-xs text-neutral-400 block mb-1">Lâminas Inativas</span>
-              <span id="statInativas" class="text-2xl font-mono font-bold text-white">0</span>
+              <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Lâminas Inativas</span>
+              <span id="statInativas" class="text-2xl font-mono font-light text-rose-400">0</span>
             </div>
-            <div class="px-2.5 py-1 rounded bg-rose-500/10 border border-rose-500/20 text-[10px] font-mono text-rose-400 uppercase">Rascunho</div>
+            <div class="px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-[10px] font-mono text-rose-400 uppercase tracking-wider">Rascunho</div>
           </div>
         </div>
 
         <!-- TABELA / LISTA DO ACERVO COM CLASSIFICAÇÃO ATIVA/INATIVA -->
-        <div class="bg-neutral-900/60 backdrop-blur-md border border-neutral-800/80 rounded-xl p-6 shadow-2xl relative">
-          <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-neutral-800 pb-5 mb-5 gap-4">
+        <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-6 shadow-2xl relative">
+          <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-white/[0.06] pb-5 mb-5 gap-4">
             <div>
-              <span class="text-[10px] tracking-widest text-sky-400 font-mono uppercase block mb-1">Gestão de Peças e Lâminas</span>
-              <h3 class="text-xl font-light text-white">Acervo Cadastrado e Controle de Publicação</h3>
+              <span class="text-[10px] tracking-widest text-[#d4af37] font-mono uppercase block mb-1">Gestão de Peças e Lâminas</span>
+              <h3 class="text-xl font-light text-white tracking-wide">Acervo Cadastrado e Controle de Publicação</h3>
             </div>
             
             <!-- FILTROS DE VISUALIZAÇÃO -->
-            <div class="flex items-center gap-1 p-1 rounded-lg bg-neutral-950 border border-neutral-800 text-xs font-mono">
+            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-950/60 border border-white/[0.06] text-xs font-mono">
               <button
                 type="button"
                 id="btnFiltroTodos"
                 onclick="window.App.filtroAcervoCms('todos')"
-                class="px-3 py-1.5 rounded-md transition-colors bg-neutral-800 text-white cursor-pointer shadow-sm">
+                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 bg-white/[0.06] text-white border border-white/[0.08] cursor-pointer shadow-sm tracking-wider uppercase text-[10px]">
                 Todas
               </button>
               <button
                 type="button"
                 id="btnFiltroAtivas"
                 onclick="window.App.filtroAcervoCms('ativa')"
-                class="px-3 py-1.5 rounded-md transition-colors text-neutral-400 hover:text-white cursor-pointer">
+                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.03] cursor-pointer tracking-wider uppercase text-[10px]">
                 Ativas
               </button>
               <button
                 type="button"
                 id="btnFiltroInativas"
                 onclick="window.App.filtroAcervoCms('inativa')"
-                class="px-3 py-1.5 rounded-md transition-colors text-neutral-400 hover:text-white cursor-pointer">
+                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.03] cursor-pointer tracking-wider uppercase text-[10px]">
                 Inativas
               </button>
             </div>
@@ -1367,17 +1366,17 @@
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="bg-neutral-900/80 text-[10px] font-mono uppercase text-neutral-400 border-b border-neutral-800">
-                  <th class="py-3 px-4 font-medium">Peça / Lâmina</th>
-                  <th class="py-3 px-4 font-medium">Disciplina</th>
-                  <th class="py-3 px-4 font-medium">Tópico</th>
-                  <th class="py-3 px-4 font-medium">Coloração</th>
-                  <th class="py-3 px-4 font-medium text-center">Status</th>
-                  <th class="py-3 px-4 font-medium text-center">Pinos</th>
-                  <th class="py-3 px-4 font-medium text-right">Ações</th>
+                <tr class="text-[10px] font-mono uppercase text-neutral-400 border-b border-white/[0.06]">
+                  <th class="py-3 px-4 font-normal tracking-widest">Peça / Lâmina</th>
+                  <th class="py-3 px-4 font-normal tracking-widest">Disciplina</th>
+                  <th class="py-3 px-4 font-normal tracking-widest">Tópico</th>
+                  <th class="py-3 px-4 font-normal tracking-widest">Coloração</th>
+                  <th class="py-3 px-4 font-normal tracking-widest text-center">Status</th>
+                  <th class="py-3 px-4 font-normal tracking-widest text-center">Pinos</th>
+                  <th class="py-3 px-4 font-normal tracking-widest text-right">Ações</th>
                 </tr>
               </thead>
-              <tbody id="tabelaAcervoCms" class="divide-y divide-neutral-800/60 text-sm text-neutral-300 font-medium">
+              <tbody id="tabelaAcervoCms" class="divide-y divide-white/[0.04] text-xs text-neutral-300">
                 <tr>
                   <td colspan="7" class="py-8 text-center text-xs font-mono text-neutral-500">Conectando ao Google Cloud Firestore e sincronizando lâminas...</td>
                 </tr>

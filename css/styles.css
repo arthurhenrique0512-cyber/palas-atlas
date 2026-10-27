@@ -147,60 +147,56 @@ button:active {
 }
 
 /* ==========================================================================
-   3. DASHBOARD E FORMULÁRIOS (UI Administrativa "Clean Lab")
+   3. DASHBOARD E FORMULÁRIOS (Design System Minimalista & Imersivo)
    ========================================================================== */
 
-/* Padronização de Inputs — escopo LIMITADO ao painel do Dashboard para não
-   sobrescrever o tema escuro do Simulado e outras seções com !important */
 #pgDashboard input[type="text"],
 #pgDashboard input[type="number"],
 #pgDashboard input[type="email"],
+#pgDashboard input[type="password"],
 #pgDashboard select,
 #pgDashboard textarea {
-  background-color: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.5rem;
-  color: #0f172a;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  font-weight: 500;
+  background-color: rgba(10, 10, 10, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 0.75rem !important;
+  color: #f3f4f6 !important;
+  transition: all 0.2s ease !important;
+  font-weight: 400 !important;
 }
 
 #pgDashboard input[type="text"]::placeholder,
 #pgDashboard input[type="number"]::placeholder,
+#pgDashboard input[type="email"]::placeholder,
+#pgDashboard input[type="password"]::placeholder,
 #pgDashboard textarea::placeholder {
-  color: #94a3b8;
-  font-weight: 400;
+  color: #737373 !important;
+  font-weight: 400 !important;
 }
 
-/* Anel de foco clínico de alta precisão ao focar (Focus Ring) */
 #pgDashboard input[type="text"]:focus,
 #pgDashboard input[type="number"]:focus,
 #pgDashboard input[type="email"]:focus,
+#pgDashboard input[type="password"]:focus,
 #pgDashboard select:focus,
 #pgDashboard textarea:focus {
-  background-color: #ffffff;
-  border-color: #2563eb;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  background-color: rgba(15, 15, 15, 0.85) !important;
+  border-color: rgba(212, 175, 55, 0.4) !important;
+  outline: none !important;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.08) !important;
 }
 
-/* Datagrid (Tabela de Acervo): Linhas Divisórias e Hover na Linha Inteira */
 #tableAcervoBody tr {
-  border-bottom: 1px solid #e2e8f0;
-  transition: background-color 0.15s ease-in-out, transform 0.15s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background-color 0.15s ease-in-out;
 }
 
 #tableAcervoBody tr:hover {
-  background-color: #f1f5f9 !important;
-  color: #0f172a;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: #ffffff;
 }
 
 #tableAcervoBody tr:last-child {
   border-bottom: none;
-}
-
-#tableAcervoBody td {
-  transition: color 0.15s ease;
 }
 
 /* ==========================================================================

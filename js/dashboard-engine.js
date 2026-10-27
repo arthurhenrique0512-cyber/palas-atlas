@@ -87,22 +87,37 @@ export function alternarTopicoCms(topico) {
   const btnEditor = document.getElementById("btnTopicoEditor");
   const btnAcervo = document.getElementById("btnTopicoAcervo");
   
-  const clsAtivo = "border-b-2 border-sky-500 text-sky-400 font-medium px-4 py-2.5 text-xs flex items-center gap-2 transition-colors cursor-pointer";
-  const clsInativo = "text-neutral-400 hover:text-white px-4 py-2.5 text-xs flex items-center gap-2 transition-colors cursor-pointer border-b-2 border-transparent";
+  const clsAtivo = "px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer bg-white/[0.06] text-white border border-white/[0.08] shadow-sm";
+  const clsInativo = "px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.03]";
   
   if (contEditor) contEditor.classList.add("hidden");
   if (contAcervo) contAcervo.classList.add("hidden");
-  
-  if (btnEditor) btnEditor.className = clsInativo;
-  if (btnAcervo) btnAcervo.className = clsInativo;
 
   if (topico === "acervo" || topico === "laminas") {
     if (contAcervo) contAcervo.classList.remove("hidden");
-    if (btnAcervo) btnAcervo.className = clsAtivo.replace('border-sky-500 text-sky-400', 'border-blue-500 text-blue-400');
+    if (btnAcervo) {
+      btnAcervo.className = clsAtivo;
+      const dot = btnAcervo.querySelector("span");
+      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37]";
+    }
+    if (btnEditor) {
+      btnEditor.className = clsInativo;
+      const dot = btnEditor.querySelector("span");
+      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-neutral-600";
+    }
     renderizarTabelaAcervo();
   } else {
     if (contEditor) contEditor.classList.remove("hidden");
-    if (btnEditor) btnEditor.className = clsAtivo;
+    if (btnEditor) {
+      btnEditor.className = clsAtivo;
+      const dot = btnEditor.querySelector("span");
+      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37]";
+    }
+    if (btnAcervo) {
+      btnAcervo.className = clsInativo;
+      const dot = btnAcervo.querySelector("span");
+      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-neutral-600";
+    }
   }
 }
 
@@ -111,8 +126,8 @@ export function filtroAcervoCms(filtro) {
   const btnTodos = document.getElementById("btnFiltroTodos");
   const btnAtivas = document.getElementById("btnFiltroAtivas");
   const btnInativas = document.getElementById("btnFiltroInativas");
-  const clsAtivo = "px-4 py-2 rounded-xl font-medium transition-colors bg-neutral-800 text-white cursor-pointer shadow";
-  const clsInativo = "px-4 py-2 rounded-xl font-medium transition-colors text-neutral-400 hover:text-white cursor-pointer";
+  const clsAtivo = "px-3.5 py-1.5 rounded-lg transition-all duration-200 bg-white/[0.06] text-white border border-white/[0.08] cursor-pointer shadow-sm tracking-wider uppercase text-[10px]";
+  const clsInativo = "px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.03] cursor-pointer tracking-wider uppercase text-[10px]";
   if (btnTodos) btnTodos.className = filtroStatusAtual === "todos" ? clsAtivo : clsInativo;
   if (btnAtivas) btnAtivas.className = filtroStatusAtual === "ativa" ? clsAtivo : clsInativo;
   if (btnInativas) btnInativas.className = filtroStatusAtual === "inativa" ? clsAtivo : clsInativo;
@@ -183,23 +198,23 @@ export function renderizarTabelaAcervo() {
     const nomeSeguro = (lamina.nome || "Peca sem titulo").replace(/'/g, "\\'");
     const isAtiva = lamina.status === "ativa";
     const badgeStatus = isAtiva
-      ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold uppercase"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Ativa</span>`
-      : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-mono font-bold uppercase"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inativa</span>`;
+      ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Ativa</span>`
+      : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-mono uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inativa</span>`;
     const botaoAlternar = isAtiva
-      ? `<button type="button" class="text-neutral-400 hover:text-neutral-200 px-2 py-1 rounded transition-colors text-xs font-medium cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Ocultar</button>`
-      : `<button type="button" class="text-emerald-400 hover:text-emerald-300 px-2 py-1 rounded transition-colors text-xs font-medium cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Publicar</button>`;
+      ? `<button type="button" class="text-neutral-400 hover:text-neutral-200 px-2.5 py-1 rounded-lg hover:bg-white/[0.04] transition-all text-xs font-mono tracking-wider uppercase cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Ocultar</button>`
+      : `<button type="button" class="text-emerald-400 hover:text-emerald-300 px-2.5 py-1 rounded-lg hover:bg-emerald-500/10 transition-all text-xs font-mono tracking-wider uppercase cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Publicar</button>`;
     rowsHtml += `
-      <tr class="hover:bg-neutral-900/40 transition-colors border-b border-neutral-800/50 group">
-        <td class="py-3 px-4"><div class="flex flex-col"><span class="text-xs text-neutral-200 font-sans">${lamina.nome || "Peça Morfológica"}</span><span class="text-[10px] text-neutral-500 font-mono mt-0.5">${lamina.id}</span></div></td>
-        <td class="py-3 px-4 text-[11px] text-neutral-400 uppercase font-mono">${lamina.disciplina || "histologia"}</td>
-        <td class="py-3 px-4 text-xs text-neutral-400 font-sans">${lamina.topico || "geral"}</td>
-        <td class="py-3 px-4 text-[11px] text-neutral-400 font-mono">${lamina.coloracao || "Padrão"}</td>
-        <td class="py-3 px-4 text-center whitespace-nowrap">${badgeStatus}</td>
-        <td class="py-3 px-4 text-center flex justify-center"><span class="flex items-center justify-center w-6 h-6 rounded bg-neutral-800 border border-neutral-700 text-neutral-400 text-[10px] font-medium">${totalPinos}</span></td>
-        <td class="py-3 px-4 text-right whitespace-nowrap space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button type="button" class="text-sky-400 hover:text-sky-300 px-2 py-1 rounded transition-colors text-xs font-medium cursor-pointer" data-id="${lamina.id}" onclick="window.App.editarLaminaCms('${lamina.id}')">Editar</button>
+      <tr class="hover:bg-white/[0.02] transition-colors border-b border-white/[0.04] group">
+        <td class="py-3.5 px-4"><div class="flex flex-col"><span class="text-xs text-neutral-200 font-sans">${lamina.nome || "Peça Morfológica"}</span><span class="text-[10px] text-neutral-500 font-mono mt-0.5">${lamina.id}</span></div></td>
+        <td class="py-3.5 px-4 text-[10px] text-neutral-400 uppercase font-mono tracking-wider">${lamina.disciplina || "histologia"}</td>
+        <td class="py-3.5 px-4 text-xs text-neutral-400 font-sans">${lamina.topico || "geral"}</td>
+        <td class="py-3.5 px-4 text-[10px] text-neutral-400 font-mono">${lamina.coloracao || "Padrão"}</td>
+        <td class="py-3.5 px-4 text-center whitespace-nowrap">${badgeStatus}</td>
+        <td class="py-3.5 px-4 text-center flex justify-center"><span class="flex items-center justify-center w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.08] text-neutral-300 text-[10px] font-mono font-medium">${totalPinos}</span></td>
+        <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button type="button" class="text-neutral-400 hover:text-[#d4af37] px-2.5 py-1 rounded-lg hover:bg-white/[0.04] transition-all text-xs font-mono tracking-wider uppercase cursor-pointer" data-id="${lamina.id}" onclick="window.App.editarLaminaCms('${lamina.id}')">Editar</button>
           ${botaoAlternar}
-          <button type="button" class="text-rose-400 hover:text-rose-300 px-2 py-1 rounded transition-colors text-xs font-medium cursor-pointer ml-2" data-id="${lamina.id}" onclick="window.App.excluirLaminaCms('${lamina.id}', '${nomeSeguro}')">Excluir</button>
+          <button type="button" class="text-rose-400/80 hover:text-rose-400 px-2.5 py-1 rounded-lg hover:bg-rose-500/10 transition-all text-xs font-mono tracking-wider uppercase cursor-pointer ml-1" data-id="${lamina.id}" onclick="window.App.excluirLaminaCms('${lamina.id}', '${nomeSeguro}')">Excluir</button>
         </td>
       </tr>
     `;
@@ -344,7 +359,7 @@ function exibirToastDiscreto(mensagem, tipo) {
   if (!toast) {
     toast = document.createElement("div");
     toast.id = toastId;
-    toast.className = "fixed bottom-6 right-6 z-[100] px-5 py-3.5 rounded-2xl bg-neutral-900 border border-neutral-700 text-neutral-200 text-xs font-mono font-medium shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none flex items-center gap-3";
+    toast.className = "fixed bottom-6 right-6 z-[100] px-5 py-3.5 rounded-2xl bg-neutral-950/80 backdrop-blur-2xl border border-white/[0.08] text-neutral-200 text-xs font-mono font-medium shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none flex items-center gap-3";
     document.body.appendChild(toast);
   }
   let corPonto = "bg-emerald-500";
@@ -462,7 +477,7 @@ function renderizarPinoNoCanvas(pinoData) {
   // HTML do Pino (Ponto luminoso + Tooltip flutuante)
   pinElem.innerHTML = `
     <div class="w-4 h-4 bg-sky-500 border-2 border-white rounded-full shadow-[0_0_15px_rgba(14,165,233,0.6)] animate-pulse"></div>
-    <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/90 text-white text-xs px-2.5 py-1 rounded-md border border-neutral-700 shadow-xl font-medium backdrop-blur-md">
+    <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/90 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl">
       ${pinoData.rotulo}
     </div>
   `;
@@ -499,24 +514,24 @@ function atualizarInterfaceListaPinos() {
   if (contadorBadge) contadorBadge.textContent = `${editorPins.length} ${editorPins.length === 1 ? "Pino" : "Pinos"}`;
   if (!containerLista) return;
   if (editorPins.length === 0) {
-    containerLista.innerHTML = `<p class="text-neutral-500 italic font-sans py-6 text-center border border-dashed border-white/10 rounded-xl">Nenhum pino marcado na imagem. Carregue uma lamina e clique em pontos morfologicos para fixar marcacoes.</p>`;
+    containerLista.innerHTML = `<p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl font-mono">Nenhum pino marcado na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações de diagnóstico.</p>`;
     return;
   }
   let html = `<div class="space-y-2">`;
   editorPins.forEach((p) => {
     html += `
-      <div class="p-2.5 flex items-center justify-between bg-neutral-900/40 border border-neutral-800/80 rounded-lg hover:bg-neutral-800/50 transition-colors">
+      <div class="p-3 flex items-center justify-between bg-white/[0.02] border border-white/[0.06] rounded-xl hover:bg-white/[0.04] transition-colors">
         <div class="flex items-center gap-3">
-          <div class="w-6 h-6 rounded bg-neutral-800 text-sky-400 font-mono text-[10px] font-bold flex items-center justify-center shadow-sm shrink-0">${p.rotulo}</div>
+          <div class="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[#d4af37] font-mono text-[10px] font-bold flex items-center justify-center shadow-sm shrink-0">${p.rotulo}</div>
           <div class="flex flex-col">
-            <span class="text-[10px] text-neutral-400 font-mono">Pino Ativo</span>
+            <span class="text-[10px] text-neutral-300 font-mono">Pino Ativo</span>
             <span class="text-[10px] text-neutral-500 font-mono">X: ${Math.round(p.x)} &bull; Y: ${Math.round(p.y)}</span>
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <button type="button" onclick="window.App.editarRotuloPinoCms('${p.id}')" class="text-sky-400 hover:text-sky-300 text-[10px] font-mono cursor-pointer transition-colors">Editar</button>
-          <span class="text-neutral-700 text-[10px]">|</span>
-          <button type="button" onclick="window.App.excluirPinoCms('${p.id}')" class="text-rose-400 hover:text-rose-300 text-[10px] font-mono cursor-pointer transition-colors">Excluir</button>
+          <button type="button" onclick="window.App.editarRotuloPinoCms('${p.id}')" class="text-neutral-400 hover:text-[#d4af37] text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Editar</button>
+          <span class="text-white/10 text-[10px]">|</span>
+          <button type="button" onclick="window.App.excluirPinoCms('${p.id}')" class="text-rose-400/80 hover:text-rose-400 text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Excluir</button>
         </div>
       </div>
     `;
@@ -568,10 +583,10 @@ export function vincularTextoAoPino() {
   const range = selecao.getRangeAt(0);
   const textoSelecionado = range.toString();
   const spanLink = document.createElement("span");
-  spanLink.className = "pin-link inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-neutral-800/90 border border-neutral-700 text-neutral-200 hover:bg-neutral-700 hover:text-white transition-colors cursor-pointer text-xs font-medium";
+  spanLink.className = "pin-link inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-white/[0.06] border border-white/[0.1] text-neutral-200 hover:text-white transition-colors cursor-pointer text-xs font-medium";
   spanLink.setAttribute("data-pin-id", pinId);
   spanLink.contentEditable = "false";
-  spanLink.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span><span>${textoSelecionado}</span>`;
+  spanLink.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] shrink-0"></span><span>${textoSelecionado}</span>`;
   spanLink.title = `Vinculo ativo com ${pinoVerificado.rotulo}`;
   range.deleteContents();
   range.insertNode(spanLink);
@@ -653,10 +668,11 @@ export async function publicarLaminaCms() {
         if (statusBox) {
           const corBadge = status === "ativa" ? "emerald" : "rose";
           statusBox.innerHTML = `
-            <div class="font-bold uppercase tracking-wider text-${corBadge}-300">Lamina Sincronizada (${status.toUpperCase()})</div>
+            <div class="font-bold uppercase tracking-wider text-${corBadge}-300">Lâmina Sincronizada (${status.toUpperCase()})</div>
             <div class="mt-1 text-neutral-300 text-xs font-mono">ID: ${novoId} (${pinos.length} pinos vinculados)</div>
-            <a href="microscopio.html?id=${novoId}" target="_blank" rel="noopener noreferrer" class="mt-3 px-5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs uppercase tracking-wider shadow inline-block border border-neutral-600 cursor-pointer transition-colors">
-              Testar Lamina no Microscopio &rarr;
+            <a href="microscopio.html?id=${novoId}" target="_blank" rel="noopener noreferrer" class="mt-3 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 text-xs font-mono uppercase tracking-wider shadow-lg inline-flex items-center gap-2 cursor-pointer transition-all duration-300">
+              <span>Testar no Microscópio</span>
+              <span>&rarr;</span>
             </a>
           `;
           statusBox.classList.remove("hidden");
