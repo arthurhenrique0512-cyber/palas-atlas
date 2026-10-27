@@ -107,18 +107,18 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <!-- Membro 1: Arthur Ribeiro -->
-        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 transition-all shadow-sm hover:shadow-md">
+        <!-- Membro 1 (Card de Destaque Principal): Arthur Ribeiro -->
+        <div class="md:col-span-2 flex flex-col justify-between p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group">
           <div class="space-y-4">
             <!-- Cabeçalho Limpo: Foto e Nome -->
             <div class="flex items-center gap-4">
               <!-- Foto Avatar -->
-              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden shadow-sm">
-                <svg class="w-8 h-8 absolute z-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                <img src="assets/equipe/arthur.png" alt="Arthur Ribeiro" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10">
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden shadow-sm aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <img src="images/team/arthur.png" alt="Arthur Ribeiro" onerror="this.src='assets/equipe/arthur.png'; this.onerror=function(){this.style.display='none';};" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
               </div>
               <div>
-                <h3 class="text-lg font-bold text-slate-900">Arthur Ribeiro</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-slate-950 transition-colors">Arthur Ribeiro</h3>
                 <p class="text-xs text-slate-500 font-sans">Idealização e Desenvolvimento</p>
               </div>
             </div>
@@ -146,18 +146,79 @@
           </button>
         </div>
 
-        <!-- Card Institucional Colaborativo -->
-        <div class="flex flex-col justify-between p-6 rounded-2xl bg-slate-50/70 border border-dashed border-slate-300 text-slate-600">
-          <div class="space-y-3">
-            <p class="text-xs text-slate-500 font-sans">Conselho Consultivo e Orientação</p>
-            <h3 class="text-lg font-serif font-bold text-slate-900">Validação Acadêmica</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              O Palas Atlas conta com a revisão de monitores, residentes e docentes de Medicina para assegurar o rigor terminológico, correlação clínica e precisão diagnóstica de cada lâmina do acervo.
+        <!-- Membro 2: Prof. Dr. Fernando Fellicioni -->
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group">
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden shadow-sm aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <img src="images/team/fernando.jpg" alt="Prof. Dr. Fernando Fellicioni" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
+              </div>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-slate-950 transition-colors">Prof. Dr. Fernando Fellicioni</h3>
+                <p class="text-xs text-slate-500 font-sans">Orientação Acadêmica &amp; Consultoria</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed pt-1">
+              Docente e orientador acadêmico, responsável pelo direcionamento pedagógico, rigor científico e consultoria institucional às atividades do Palas Atlas.
             </p>
           </div>
-          <div class="pt-4 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-500 font-sans">
-            <span>Novos membros em breve</span>
-            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+        </div>
+
+        <!-- Membro 3: Iago Mutti -->
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group">
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden shadow-sm aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <img src="images/team/iago.png" alt="Iago Mutti" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
+              </div>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-slate-950 transition-colors">Iago Mutti</h3>
+                <p class="text-xs text-slate-500 font-sans">Corpo Editorial &amp; Curadoria</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed pt-1">
+              Membro do corpo editorial e acadêmico do Palas Atlas, dedicado à revisão morfológica, estruturação e catalogação do acervo digital.
+            </p>
+          </div>
+        </div>
+
+        <!-- Membro 4: Carolina Tatagiba -->
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group">
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden shadow-sm aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <img src="images/team/carolina.jpg" alt="Carolina Tatagiba" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
+              </div>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-slate-950 transition-colors">Carolina Tatagiba</h3>
+                <p class="text-xs text-slate-500 font-sans">Corpo Editorial &amp; Curadoria</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed pt-1">
+              Membro do corpo editorial e acadêmico do Palas Atlas, dedicada à curadoria científica, análise tecidual e validação de correlações clínicas.
+            </p>
+          </div>
+        </div>
+
+        <!-- Membro 5: Guilherme Berto -->
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group">
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden shadow-sm aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <img src="images/team/guilherme.jpg" alt="Guilherme Berto" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
+              </div>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-slate-950 transition-colors">Guilherme Berto</h3>
+                <p class="text-xs text-slate-500 font-sans">Corpo Editorial &amp; Curadoria</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed pt-1">
+              Membro do corpo editorial e acadêmico do Palas Atlas, dedicado ao suporte metodológico, organização do conteúdo didático e precisão terminológica.
+            </p>
           </div>
         </div>
 
