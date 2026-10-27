@@ -1,0 +1,112 @@
+/* ==========================================================================
+   8. VECTOR SPLASH SCREEN & PRELOADER (Immersive Dark & Retina Precision)
+   ========================================================================== */
+
+@keyframes splashFadeInScale {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Batimento de asas contido: rotação mínima e ciclo lento (6s) */
+@keyframes owlFlapLeft {
+  0%, 100% {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  50% {
+    transform: rotate(-1.6deg) scale(0.975, 1.005);
+  }
+}
+
+@keyframes owlFlapRight {
+  0%, 100% {
+    transform: rotate(0deg) scale(1, 1);
+  }
+  50% {
+    transform: rotate(1.6deg) scale(0.975, 1.005);
+  }
+}
+
+.owl-wing-left {
+  transform-box: fill-box;
+  transform-origin: 77.2% 54.6%;
+  animation: owlFlapLeft 6s ease-in-out infinite;
+}
+
+.owl-wing-right {
+  transform-box: fill-box;
+  transform-origin: 22.8% 54.6%;
+  animation: owlFlapRight 6s ease-in-out infinite;
+}
+
+@keyframes splashGoldSheenSweep {
+  0% {
+    background-position: 220% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes splashSweepLine {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(220%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Splash sóbria: preto profundo, tipografia fosca, ouro-champanhe apenas como toque */
+.splash-container {
+  background: #000000 !important;
+  color: #e5e5e5;
+}
+
+.splash-logo-reveal {
+  animation: splashFadeInScale 0.35s ease-out both;
+}
+
+/* Coruja: acabamento fosco, contorno de luz quase imperceptível */
+.splash-owl-anim {
+  color: #c8ad5f !important;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 1.5px rgba(212, 175, 55, 0.22));
+}
+
+.splash-shimmer-palas {
+  color: #c8ad5f;
+  display: inline-block;
+}
+
+.splash-shimmer-atlas {
+  color: #d4d4d8;
+  display: inline-block;
+}
+
+.splash-progress-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.splash-progress-bar {
+  background: rgba(200, 173, 95, 0.55);
+  animation: splashSweepLine 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo-reveal,
+  .splash-owl-anim,
+  .owl-wing-left,
+  .owl-wing-right,
+  .splash-progress-bar {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}

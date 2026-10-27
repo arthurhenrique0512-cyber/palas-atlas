@@ -489,21 +489,21 @@ function inicializarOpenSeadragon() {
   const onOpenSuccess = () => {
     if (hasFailed) return;
     const elapsed = Date.now() - (window.__microscopeStartTime || Date.now());
-    const remainingTime = Math.max(0, 200 - elapsed);
+    const remainingTime = 0;
 
     setTimeout(() => {
-      // Remove skeleton de carregamento com transição rápida e limpa
+      // Remove skeleton de carregamento de forma imediata e limpa
       const skeleton  = document.getElementById("osdSkeleton");
       const osdCanvas = document.getElementById("osd-viewer");
       if (skeleton) {
-        skeleton.style.transition = 'opacity 350ms ease-out';
+        skeleton.style.transition = 'opacity 200ms ease-out';
         skeleton.style.opacity = '0';
         skeleton.style.pointerEvents = 'none';
         setTimeout(() => {
           skeleton.style.display = 'none';
           skeleton.classList.add("hidden");
           skeleton.classList.remove("flex");
-        }, 360);
+        }, 210);
       }
       if (osdCanvas) osdCanvas.classList.remove("opacity-0");
     }, remainingTime);

@@ -31,7 +31,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
 
   <!-- Folha de Estilos Principal -->
-  <link rel="stylesheet" href="css/styles.css?v=5">
+  <link rel="stylesheet" href="css/styles.css?v=7">
+  <link rel="stylesheet" href="css/splash.css?v=1">
 
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -83,10 +84,7 @@
   <!-- ============================================================
        TELA DE CARREGAMENTO VETORIAL (SPLASH SCREEN IMERSIVA)
   ============================================================ -->
-  <div id="preloader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center splash-container transition-all duration-700 select-none">
-    
-    <!-- Efeito de Iluminação Ambiente Dourada Sutil -->
-    <div class="absolute w-96 h-96 rounded-full bg-[#d4af37]/[0.03] blur-3xl pointer-events-none -z-10"></div>
+  <div id="preloader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center splash-container select-none">
 
     <div class="flex flex-col items-center text-center splash-logo-reveal">
       
@@ -117,36 +115,33 @@
       <!-- Subtítulo de Precisão Clínica -->
       <span class="font-mono text-[9px] sm:text-[10px] md:text-xs tracking-[0.32em] uppercase text-neutral-400 mt-3 font-medium">Atlas Morfológico Digital</span>
 
-      <!-- Barra de Progresso em Linha Dourada Minimalista -->
-      <div class="w-44 sm:w-52 h-[2px] splash-progress-track rounded-full overflow-hidden relative mt-8">
-        <div class="absolute top-0 left-0 h-full w-2/3 splash-progress-bar rounded-full"></div>
+      <!-- Linha de progresso discreta -->
+      <div class="w-44 sm:w-52 h-px splash-progress-track overflow-hidden relative mt-8">
+        <div class="absolute top-0 left-0 h-full w-2/3 splash-progress-bar"></div>
       </div>
     </div>
   </div>
   <script>
-    // Remove o preloader com transição fluida assim que a aplicação estiver pronta
+    // Remove o preloader de forma imediata e limpa assim que a aplicação estiver pronta
     window.__appReady = function() {
       var s = document.getElementById('preloader');
       if (!s || s.__dismissed) return;
       s.__dismissed = true;
+      s.style.transition = 'opacity 200ms ease-out';
       s.style.opacity = '0';
-      s.style.transform = 'scale(1.02)';
       s.style.pointerEvents = 'none';
-      setTimeout(function() { if (s && s.parentNode) s.parentNode.removeChild(s); }, 750);
+      setTimeout(function() { if (s && s.parentNode) s.parentNode.removeChild(s); }, 220);
     };
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      setTimeout(window.__appReady, 700);
+      window.__appReady();
     } else {
       document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(window.__appReady, 700);
-      });
-      window.addEventListener('load', function() {
-        setTimeout(window.__appReady, 650);
+        window.__appReady();
       });
     }
     // Fallback de segurança absoluto para garantir que a tela nunca permaneça congelada
-    setTimeout(window.__appReady, 2000);
+    setTimeout(window.__appReady, 1200);
   </script>
 
   <header id="palasMinimalHeader" class="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 pointer-events-none">

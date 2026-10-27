@@ -35,6 +35,7 @@
   <script src="js/brand-logo.js?v=4"></script>
   <script src="js/settings-panel.js"></script>
 
+  <link rel="stylesheet" href="css/splash.css?v=1">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
 
@@ -127,10 +128,7 @@
     <main class="relative flex-1 h-full bg-neutral-900 border-r border-neutral-800 overflow-hidden flex items-center justify-center">
 
       <!-- Skeleton / Splash de carregamento Vetorial -->
-      <div id="osdSkeleton" class="fixed inset-0 splash-container flex flex-col items-center justify-center z-[99999] transition-all duration-700 select-none">
-        
-        <!-- Efeito de Iluminação Ambiente Dourada Sutil -->
-        <div class="absolute w-96 h-96 rounded-full bg-[#d4af37]/[0.03] blur-3xl pointer-events-none -z-10"></div>
+      <div id="osdSkeleton" class="fixed inset-0 splash-container flex flex-col items-center justify-center z-[99999] select-none">
 
         <div class="flex flex-col items-center text-center splash-logo-reveal">
           <div class="flex items-center gap-3 sm:gap-4 md:gap-5">
@@ -158,8 +156,8 @@
 
           <p class="text-[10px] sm:text-[11px] text-neutral-400 tracking-[0.25em] font-mono uppercase font-normal mt-4">Mapeando estruturas morfológicas...</p>
           
-          <div class="w-44 sm:w-52 h-[2px] splash-progress-track rounded-full overflow-hidden relative mt-6">
-            <div class="absolute top-0 left-0 h-full w-2/3 splash-progress-bar rounded-full"></div>
+          <div class="w-44 sm:w-52 h-px splash-progress-track overflow-hidden relative mt-6">
+            <div class="absolute top-0 left-0 h-full w-2/3 splash-progress-bar"></div>
           </div>
         </div>
       </div>

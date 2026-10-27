@@ -5,7 +5,7 @@ export default function Loading() {
     <div className="fixed inset-0 splash-container flex flex-col items-center justify-center z-[99999] bg-neutral-950 text-slate-200 select-none">
       <div className="flex flex-col items-center text-center splash-logo-reveal">
         <div className="flex items-center gap-3 sm:gap-4">
-          <span className="font-serif font-bold text-2xl tracking-[0.24em] text-white splash-shimmer-palas">PALAS</span>
+          <span className="font-serif font-bold text-2xl tracking-[0.24em] splash-shimmer-palas">PALAS</span>
           
           <div className="splash-owl-anim flex items-center justify-center text-[#d4af37] shrink-0">
             <svg className="w-9 h-9 sm:w-11 sm:h-11" viewBox="0 0 400 400" fill="currentColor">
