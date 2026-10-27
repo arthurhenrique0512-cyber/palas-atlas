@@ -168,17 +168,38 @@ async function carregarLaminaNoMicroscopio(laminaId) {
     renderizarDescricaoETextos();
     inicializarOpenSeadragon();
 
-    // Sincroniza em background caso haja dados customizados ou pinos no Firestore
+    // Sincroniza em background: textos e pinos editados no CMS (Firestore)
+    // têm prioridade sobre os valores padrão do acervo local.
     if (typeof db !== "undefined" && db) {
-      db.collection("laminas").doc(idBuscado).get().then(docRef => {
-        if (docRef.exists) {
-          const dados = docRef.data();
-          if (dados && Array.isArray(dados.pinos) && dados.pinos.length > 0) {
-            listaPinosAtual = dados.pinos;
+      const candidatos = [idBuscado, fallback.id, ...(Array.isArray(fallback.aliases) ? fallback.aliases : [])]
+        .filter((v, i, arr) => v && arr.indexOf(v) === i);
+
+      (async () => {
+        for (const candidatoId of candidatos) {
+          try {
+            const docRef = await db.collection("laminas").doc(candidatoId).get();
+            if (!docRef.exists) continue;
+            const dados = docRef.data() || {};
+            const textoValido = (v) => typeof v === "string" && v.replace(/<[^>]*>/g, "").trim().length > 0;
+
+            if (textoValido(dados.nome)) laminaAtualData.nome = dados.nome;
+            if (textoValido(dados.coloracao)) laminaAtualData.coloracao = dados.coloracao;
+            if (textoValido(dados.disciplina)) laminaAtualData.disciplina = dados.disciplina;
+            if (textoValido(dados.descricaoHTML)) laminaAtualData.descricaoHTML = dados.descricaoHTML;
+            else if (textoValido(dados.descricao)) laminaAtualData.descricaoHTML = dados.descricao;
+            if (Array.isArray(dados.pinos)) {
+              laminaAtualData.pinos = dados.pinos;
+              listaPinosAtual = dados.pinos;
+            }
+
+            renderizarMetadadosDaLamina();
             renderizarDescricaoETextos();
+            return;
+          } catch (err) {
+            console.warn("[Palas Atlas] Falha ao sincronizar lâmina do Firestore:", candidatoId, err);
           }
         }
-      }).catch(() => {});
+      })();
     }
     return;
   }
