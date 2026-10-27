@@ -134,7 +134,7 @@ export function initGlobalSearch() {
           <span class="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">${topico}</span>
         </div>
         <div class="text-xs text-zinc-500 font-mono flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-blue-500/50"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37]/50"></span>
           ${coloracao}
         </div>
       `;

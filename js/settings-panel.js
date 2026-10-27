@@ -159,13 +159,13 @@ class SettingsPanel extends HTMLElement {
       
       // Reseta classes ativas
       if (btn.tagName.toLowerCase() === 'button') {
-        btn.classList.remove('bg-sky-600', 'text-white', 'border-sky-500');
+        btn.classList.remove('bg-[#c8ad5f]', 'text-neutral-950', 'border-[#d4af37]', 'font-semibold', 'bg-sky-600', 'text-white', 'border-sky-500');
         btn.classList.add('bg-neutral-800/50', 'text-neutral-400', 'border-transparent');
         
         // Ativa o selecionado
         if (this.settings[key] === val || (val === 'true' && this.settings[key] === true) || (val === 'false' && this.settings[key] === false)) {
           btn.classList.remove('bg-neutral-800/50', 'text-neutral-400', 'border-transparent');
-          btn.classList.add('bg-sky-600', 'text-white', 'border-sky-500', 'border');
+          btn.classList.add('bg-[#c8ad5f]', 'text-neutral-950', 'border-[#d4af37]', 'font-semibold', 'border');
         }
       }
     });
@@ -174,11 +174,11 @@ class SettingsPanel extends HTMLElement {
     const toggleMotion = this.querySelector('#btn-reduce-motion');
     if (toggleMotion) {
       if (this.settings.reduceMotion) {
-        toggleMotion.classList.add('bg-sky-500');
-        toggleMotion.classList.remove('bg-neutral-600');
+        toggleMotion.classList.add('bg-[#c8ad5f]');
+        toggleMotion.classList.remove('bg-neutral-600', 'bg-sky-500');
         toggleMotion.firstElementChild.classList.add('translate-x-4');
       } else {
-        toggleMotion.classList.remove('bg-sky-500');
+        toggleMotion.classList.remove('bg-[#c8ad5f]', 'bg-sky-500');
         toggleMotion.classList.add('bg-neutral-600');
         toggleMotion.firstElementChild.classList.remove('translate-x-4');
       }

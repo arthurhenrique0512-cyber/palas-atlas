@@ -476,7 +476,7 @@ function renderizarPinoNoCanvas(pinoData) {
   
   // HTML do Pino (Ponto luminoso + Tooltip flutuante)
   pinElem.innerHTML = `
-    <div class="w-4 h-4 bg-sky-500 border-2 border-white rounded-full shadow-[0_0_15px_rgba(14,165,233,0.6)] animate-pulse"></div>
+    <div class="w-4 h-4 bg-[#d4af37] border-2 border-white rounded-full shadow-[0_0_15px_rgba(212,175,55,0.6)] animate-pulse"></div>
     <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/90 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl">
       ${pinoData.rotulo}
     </div>
