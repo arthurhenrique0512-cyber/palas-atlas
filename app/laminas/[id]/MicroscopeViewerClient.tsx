@@ -23,6 +23,9 @@ export interface SlideData {
   thumbnailUrl?: string;
   pinos?: PinItem[];
   maxMagnification?: number;
+  minMagnification?: number;
+  minZoomLevel?: number;
+  maxZoomLevel?: number;
   mpp?: number;
 }
 
@@ -147,14 +150,16 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
         if (viewer.viewport) {
           const home = viewer.viewport.getHomeZoom();
           homeZoomRef.current = home;
-          if (isStaticSlide) {
-            viewer.viewport.minZoomLevel = home;
-            viewer.viewport.maxZoomLevel = home;
-          } else {
-            viewer.viewport.minZoomLevel = home * 0.7;
-            viewer.viewport.maxZoomLevel = Math.max(home * (maxMag / 4) * 2.5, home * 35);
-          }
-          viewer.viewport.zoomTo(home, null, true);
+
+          const minMag = Number(targetSlide.minMagnification || (targetSlide as any).minZoomLevel) || 4;
+          const maxMag = Number(targetSlide.maxMagnification || (targetSlide as any).maxZoomLevel) || 40;
+
+          const minOSDZoom = home * (minMag / 4);
+          const maxOSDZoom = home * (maxMag / 4);
+
+          viewer.viewport.minZoomLevel = minOSDZoom;
+          viewer.viewport.maxZoomLevel = maxOSDZoom;
+          viewer.viewport.zoomTo(minOSDZoom, null, true);
           viewer.viewport.goHome(true);
         }
       });
@@ -179,13 +184,41 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
         const currentOSDZoom = viewer.viewport.getZoom(true);
         const homeZoom = homeZoomRef.current || viewer.viewport.getHomeZoom();
         if (homeZoom > 0) {
-          const mag = Math.min((currentOSDZoom / homeZoom) * 4, maxMag);
-          setCurrentZoom(`${mag.toFixed(1)}x`);
+          const minMag = Number(targetSlide.minMagnification || (targetSlide as any).minZoomLevel) || 4;
+          const maxMag = Number(targetSlide.maxMagnification || (targetSlide as any).maxZoomLevel) || 40;
+          const magRaw = (currentOSDZoom / homeZoom) * 4;
+          const mag = Math.max(minMag, Math.min(maxMag, magRaw));
+          const rounded = Math.round(mag * 10) / 10;
+          const label = Math.abs(rounded - Math.round(rounded)) < 0.05
+            ? `${Math.round(rounded)}x`
+            : `${rounded.toFixed(1)}x`;
+          setCurrentZoom(label);
+
+          if (mag >= 75) setActiveObjective(100);
+          else if (mag >= 48) setActiveObjective(60);
+          else if (mag >= 18) setActiveObjective(40);
+          else if (mag >= 6.5) setActiveObjective(10);
+          else setActiveObjective(4);
         }
       };
 
-      viewer.addHandler('zoom', updateZoom);
+      viewer.addHandler('open', updateZoom);
       viewer.addHandler('animation', updateZoom);
+      viewer.addHandler('zoom', () => {
+        if (!viewer || !viewer.viewport || !homeZoomRef.current) return;
+        const minMag = Number(targetSlide.minMagnification || (targetSlide as any).minZoomLevel) || 4;
+        const maxMag = Number(targetSlide.maxMagnification || (targetSlide as any).maxZoomLevel) || 40;
+        const minOSDZoom = homeZoomRef.current * (minMag / 4);
+        const maxOSDZoom = homeZoomRef.current * (maxMag / 4);
+
+        const current = viewer.viewport.getZoom();
+        if (current < minOSDZoom) {
+          viewer.viewport.zoomTo(minOSDZoom, null, true);
+        } else if (current > maxOSDZoom) {
+          viewer.viewport.zoomTo(maxOSDZoom, null, true);
+        }
+        updateZoom();
+      });
 
       // Timeout preventivo para desativar loading caso trave
       setTimeout(() => {
@@ -221,15 +254,25 @@ export default function MicroscopeViewerClient({ initialSlide, slideId }: Micros
   const switchObjective = (targetMag: number) => {
     if (!osdViewerRef.current || !osdViewerRef.current.viewport) return;
     const base = homeZoomRef.current || osdViewerRef.current.viewport.getHomeZoom();
-    const targetZoom = base * (targetMag / 4);
+    const minMag = Number(slide?.minMagnification || (slide as any)?.minZoomLevel) || 4;
+    const maxMag = Number(slide?.maxMagnification || (slide as any)?.maxZoomLevel) || 40;
+    const clampedMag = Math.max(minMag, Math.min(maxMag, targetMag));
+    const targetZoom = base * (clampedMag / 4);
     osdViewerRef.current.viewport.zoomTo(targetZoom, null, false);
-    setActiveObjective(targetMag);
+    setActiveObjective(clampedMag);
   };
 
   const changeZoom = (factor: number) => {
     if (!osdViewerRef.current || !osdViewerRef.current.viewport) return;
     const current = osdViewerRef.current.viewport.getZoom();
-    osdViewerRef.current.viewport.zoomTo(current * factor, null, false);
+    let targetZoom = current * factor;
+    if (osdViewerRef.current.viewport.minZoomLevel) {
+      targetZoom = Math.max(osdViewerRef.current.viewport.minZoomLevel, targetZoom);
+    }
+    if (osdViewerRef.current.viewport.maxZoomLevel) {
+      targetZoom = Math.min(osdViewerRef.current.viewport.maxZoomLevel, targetZoom);
+    }
+    osdViewerRef.current.viewport.zoomTo(targetZoom, null, false);
   };
 
   const resetView = () => {
