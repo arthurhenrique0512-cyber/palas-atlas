@@ -79,4 +79,5 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`[Palas Atlas Server] Running at:`);
   console.log(`  - Local:   http://localhost:${PORT}/microscopio_teste.html`);
   console.log(`  - Padrão:  http://localhost:${PORT}/microscopio.html?dzi=assets/histologia/osso_maduro_desgaste_ct_crop_teste.dzi`);
+  console.log(`  - Captura: http://localhost:${PORT}/tools/fiji/assistente_captura.html`);
 });
