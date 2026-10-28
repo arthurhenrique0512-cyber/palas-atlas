@@ -155,7 +155,7 @@ const fallbackLaminas = {
   },
   'osso_maduro_desgaste_ct': {
     id: 'osso_maduro_desgaste_ct',
-    aliases: ['osso-maduro', 'osso_maduro', 'osso-maduro-desgaste', 'osso-desgaste', 'osso_compacto_dzi', 'osso-compacto'],
+    aliases: ['96ZYqoM2SV8p4fB2QgeM', 'osso-maduro', 'osso_maduro', 'osso-maduro-desgaste', 'osso-desgaste', 'osso_compacto_dzi', 'osso-compacto'],
     nome: 'Osso Maduro (Lamelar) por Desgaste',
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
@@ -324,6 +324,10 @@ async function carregarLaminaNoMicroscopio(laminaId) {
             laminaAtualData.pinos = dados.pinos;
             listaPinosAtual = dados.pinos;
           }
+          if (dados.maxMagnification) {
+            laminaAtualData.maxMagnification = Number(dados.maxMagnification) || 40;
+            aplicarBloqueioObjetivas(laminaAtualData.maxMagnification);
+          }
 
           renderizarMetadadosDaLamina();
           renderizarDescricaoETextos();
@@ -406,6 +410,44 @@ function renderizarMetadadosDaLamina() {
 // ---------------------------------------------------------------------------
 // 4. Injeta descricaoHTML na barra lateral com hiperlinks inline de pinos
 // ---------------------------------------------------------------------------
+/**
+ * Sanitiza o HTML da descrição, removendo artefatos poluentes copiados de chats de IA
+ * (como spans parasitas com inline styles de tailwind, animações, blockquotes e &nbsp;)
+ * garantindo quebra natural de linha (word-wrap) sem cortar texto à direita.
+ * Preserva estritamente os links de pinos (.pin-link ou data-pin-id) e formatações legítimas.
+ */
+export function sanitizarHTMLDescricao(html) {
+  if (!html || typeof html !== "string") return "";
+
+  // 1. Substitui espaços não-quebráveis (&nbsp; e \u00a0) por espaço comum para permitir quebra de linha
+  let limpo = html.replace(/&nbsp;/g, " ").replace(/\u00a0/g, " ");
+
+  // 2. Remove tags blockquote mantendo o conteúdo interno
+  limpo = limpo.replace(/<\/?blockquote[^>]*>/gi, "");
+
+  // 3. Remove spans aninhados parasitas com inline styles (de streaming de IA como ChatGPT)
+  // Preserva estritamente spans que sejam pin-link ou tenham data-pin-id
+  for (let i = 0; i < 6; i++) {
+    limpo = limpo.replace(/<span\s+(?![^>]*class=["'][^"']*pin-link[^"']*["'])(?![^>]*data-pin-id)[^>]*>([\s\S]*?)<\/span>/gi, "$1");
+  }
+
+  // 4. Remove atributos poluentes de bibliotecas externas (ex: node="[object Object]")
+  limpo = limpo.replace(/<(p|div|h1|h2|h3|h4|h5|h6)\s+[^>]*node=[^>]*>/gi, "<$1>");
+  limpo = limpo.replace(/style=["'][^"']*--tw-[^"']*["']/gi, "");
+  limpo = limpo.replace(/style=["'][^"']*animation:[^"']*["']/gi, "");
+
+  // 5. Ajusta pontuações acidentalmente presas dentro ou com espaços antes de vírgula/ponto/parêntese
+  limpo = limpo.replace(/([a-zA-ZÀ-ÿ0-9]+)\)([ \t]*<\/span>)/gi, "$1$2)");
+  limpo = limpo.replace(/([a-zA-ZÀ-ÿ0-9]+),([ \t]*<\/span>)/gi, "$1$2,");
+  limpo = limpo.replace(/\s+([,.;:)])/g, "$1");
+  limpo = limpo.replace(/([(])\s+/g, "$1");
+
+  // 6. Normaliza múltiplos espaços e quebras consecutivas
+  limpo = limpo.replace(/[ \t]{2,}/g, " ");
+
+  return limpo.trim();
+}
+
 function renderizarDescricaoETextos() {
   if (!laminaAtualData) return;
   const container = document.getElementById("slideDescriptionContainer");
@@ -415,7 +457,8 @@ function renderizarDescricaoETextos() {
   }
 
   const tituloPeca = document.getElementById("slideTitle")?.textContent || "Lamina Histologica";
-  let html = laminaAtualData.descricaoHTML || laminaAtualData.descricao || "";
+  const rawHtml = laminaAtualData.descricaoHTML || laminaAtualData.descricao || "";
+  const html = sanitizarHTMLDescricao(rawHtml);
 
   if (!html) {
     container.innerHTML = `<p class="text-neutral-500 italic text-sm font-sans">Nenhum texto descritivo cadastrado para esta lamina.</p>`;
@@ -1046,7 +1089,8 @@ Object.assign(window.App, {
   trocarLente,
   alterarZoom,
   calcularMagnificacaoOtica,
-  formatarMagnificacaoOtica
+  formatarMagnificacaoOtica,
+  sanitizarHTMLDescricao
 });
 window.osdViewerAction          = osdViewerAction;
 window.focarPinoNoViewer        = focarPinoNoViewer;
@@ -1054,3 +1098,4 @@ window.trocarLente              = trocarLente;
 window.alterarZoom              = alterarZoom;
 window.calcularMagnificacaoOtica = calcularMagnificacaoOtica;
 window.formatarMagnificacaoOtica = formatarMagnificacaoOtica;
+window.sanitizarHTMLDescricao   = sanitizarHTMLDescricao;

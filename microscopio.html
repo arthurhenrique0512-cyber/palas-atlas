@@ -28,9 +28,14 @@
     body { font-family: 'Inter', system-ui, sans-serif; }
 
     /* Prose do texto descritivo lateral (off-white + detalhes em ouro-champanhe) */
+    .prose-atlas {
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
     .prose-atlas h3       { color:#f5f5f4; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
     .prose-atlas p        { color:#d6d3d1; line-height:1.8; margin-bottom:1rem; }
     .prose-atlas strong   { color:#fafaf9; font-weight:600; }
+    .prose-atlas blockquote { border: none !important; margin: 0 !important; padding: 0 !important; }
     .prose-atlas .pin-link {
       color: #c8ad5f;
       text-decoration: underline;
@@ -40,6 +45,7 @@
       cursor: pointer;
       padding: 0 2px;
       transition: color .15s;
+      white-space: normal;
     }
     .prose-atlas .pin-link:hover { color: #e0c97f; }
 
@@ -235,7 +241,7 @@
   </div><!-- /workspace -->
 
   <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/microscope-engine.js?v=6"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261028_101"></script>
 
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>

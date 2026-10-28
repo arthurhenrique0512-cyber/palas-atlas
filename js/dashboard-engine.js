@@ -16,6 +16,7 @@
 
 import { db } from "./firebase-config.js";
 import { getState, setFrenteAtiva } from "./state.js";
+import { sanitizarHTMLDescricao } from "./microscope-engine.js";
 
 let editorPins = [];
 let viewerInstance = null;
