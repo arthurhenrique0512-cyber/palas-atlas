@@ -1265,7 +1265,30 @@
             </div>
           </div>
 
-          <!-- BLOCO E: AÇÕES DE PUBLICAÇÃO -->
+          <!-- BLOCO E: QUESTÕES PRÁTICAS / SIMULADO DE BANCADA -->
+          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
+            <div class="flex items-center justify-between">
+              <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">E. Questões Práticas / Simulado de Bancada</h3>
+              <span id="dashTotalQuestoesBadge" class="bg-amber-400/10 text-amber-300 border border-amber-400/30 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Questões</span>
+            </div>
+
+            <!-- Botão para Ativar Modo de Nova Questão -->
+            <button 
+              type="button" 
+              id="btnAtivarModoQuestao" 
+              onclick="window.App.ativarModoNovaQuestao()" 
+              class="w-full bg-white/[0.04] hover:bg-amber-400/10 text-neutral-300 hover:text-amber-300 border border-white/[0.08] hover:border-amber-400/40 rounded-xl py-2.5 px-4 text-xs font-mono tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm group">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400/80 group-hover:scale-125 transition-transform shrink-0"></span>
+              <span id="txtBtnAtivarModoQuestao">+ Nova Questão na Lâmina</span>
+            </button>
+
+            <!-- Container da Lista de Questões -->
+            <div id="dashListaQuestoes" class="space-y-3 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+              <p class="text-neutral-500 text-xs py-6 px-4 text-center border border-dashed border-white/[0.08] rounded-xl font-mono leading-relaxed">Nenhuma questão cadastrada para esta lâmina. Clique em '+ Nova Questão na Lâmina' e marque o ponto no canvas à direita.</p>
+            </div>
+          </div>
+
+          <!-- BLOCO F: AÇÕES DE PUBLICAÇÃO -->
           <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shrink-0 shadow-2xl mb-6">
             <div class="flex flex-col sm:flex-row items-center gap-3">
               <button 

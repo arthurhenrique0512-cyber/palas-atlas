@@ -19,6 +19,8 @@ import { getState, setFrenteAtiva } from "./state.js";
 import { sanitizarHTMLDescricao } from "./microscope-engine.js";
 
 let editorPins = [];
+let editorQuestoes = [];
+let modoCriacaoQuestao = false;
 let viewerInstance = null;
 let laminaEmEdicaoId = null;
 let acervoFirestoreCache = [];
@@ -140,6 +142,8 @@ export function inicializarPainelCms() {
   atualizarTopicosCms("histologia");
   const seletorTopico = document.getElementById("dashSelectTopico");
   if (seletorTopico) seletorTopico.value = "muscular";
+  atualizarInterfaceListaQuestoes();
+  atualizarEstadoBotaoModoQuestao();
   inicializarEventosPreviewInterativo();
   setTimeout(() => {
     if (!viewerInstance && document.getElementById("osd-editor-viewer") && !laminaEmEdicaoId) {
@@ -296,6 +300,24 @@ export async function editarLaminaCms(id) {
     }
     atualizarInterfaceListaPinos();
     atualizarDropdownPinosVinculacao();
+    editorQuestoes = [];
+    modoCriacaoQuestao = false;
+    atualizarEstadoBotaoModoQuestao();
+    const questoesOrigem = (lamina.questoes || []);
+    if (questoesOrigem.length > 0) {
+      questoesOrigem.forEach((q, i) => {
+        const questaoData = {
+          id: q.id || `q_${Date.now()}_${i}`,
+          numero: q.numero || (i + 1),
+          titulo: q.titulo || q.enunciado || "",
+          x: q.x || 0,
+          y: q.y || 0
+        };
+        editorQuestoes.push(questaoData);
+        renderizarQuestaoNoCanvas(questaoData);
+      });
+    }
+    atualizarInterfaceListaQuestoes();
     inicializarEventosPreviewInterativo();
   }, 350);
   const txtBtnPublicar = document.getElementById("txtBtnPublicar");
@@ -351,8 +373,12 @@ export function resetarFormularioDashboard() {
   if (txtBtnPublicar) txtBtnPublicar.textContent = "Cadastrar Lamina";
   if (btnCancelar) btnCancelar.classList.add("hidden");
   editorPins = [];
+  editorQuestoes = [];
+  modoCriacaoQuestao = false;
+  atualizarEstadoBotaoModoQuestao();
   atualizarInterfaceListaPinos();
   atualizarDropdownPinosVinculacao();
+  atualizarInterfaceListaQuestoes();
   if (viewerInstance && typeof viewerInstance.clearOverlays === "function") viewerInstance.clearOverlays();
   carregarImagemNoEditor("/assets/histologia/muscular-esqueletico-he.jpg", false, true);
   exibirToastDiscreto("Formulario redefinido para o modo de novo cadastro.", "emerald");
@@ -409,7 +435,15 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
   const container = document.getElementById(containerId);
   if (!container) { console.warn(`[Palas Atlas CMS] Container #${containerId} nao encontrado.`); return; }
   if (viewerInstance && typeof viewerInstance.destroy === "function") { viewerInstance.destroy(); viewerInstance = null; }
-  if (!laminaEmEdicaoId && !isAutoLoad) { editorPins = []; atualizarInterfaceListaPinos(); atualizarDropdownPinosVinculacao(); }
+  if (!laminaEmEdicaoId && !isAutoLoad) {
+    editorPins = [];
+    editorQuestoes = [];
+    modoCriacaoQuestao = false;
+    atualizarEstadoBotaoModoQuestao();
+    atualizarInterfaceListaPinos();
+    atualizarDropdownPinosVinculacao();
+    atualizarInterfaceListaQuestoes();
+  }
   const tileSourcesConfig = isDzi ? url : { type: "image", url: url };
   if (typeof window.OpenSeadragon !== "function") { console.error("[Palas Atlas CMS] Biblioteca OpenSeadragon nao carregada."); return; }
   viewerInstance = window.OpenSeadragon({
@@ -450,12 +484,38 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
     if (isAutoLoad && url.includes("muscular-esqueletico-he") && editorPins.length === 0 && !laminaEmEdicaoId) {
       adicionarPinoEditor(550, 280, "Estriacoes HE", "pin_demo");
     }
+    if (editorQuestoes.length > 0) {
+      editorQuestoes.forEach((q) => renderizarQuestaoNoCanvas(q));
+    }
   });
   viewerInstance.addHandler("canvas-click", (event) => {
     if (!event.quick) return;
     const viewportPoint = viewerInstance.viewport.pointFromPixel(event.position);
     const imagePoint = viewerInstance.viewport.viewportToImageCoordinates(viewportPoint);
-    adicionarPinoEditor(imagePoint.x, imagePoint.y);
+    if (modoCriacaoQuestao) {
+      const novaQuestao = {
+        id: 'q_' + Date.now(),
+        numero: editorQuestoes.length + 1,
+        titulo: '',
+        x: Math.round(imagePoint.x * 100) / 100,
+        y: Math.round(imagePoint.y * 100) / 100
+      };
+      editorQuestoes.push(novaQuestao);
+      modoCriacaoQuestao = false;
+      atualizarEstadoBotaoModoQuestao();
+      renderizarQuestaoNoCanvas(novaQuestao);
+      atualizarInterfaceListaQuestoes();
+      setTimeout(() => {
+        const inputElem = document.getElementById(`dashQuestaoTitulo_${novaQuestao.id}`);
+        if (inputElem) {
+          inputElem.focus();
+          inputElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 50);
+      exibirToastDiscreto(`Questão Q${novaQuestao.numero} adicionada. Digite o enunciado.`, "emerald");
+    } else {
+      adicionarPinoEditor(imagePoint.x, imagePoint.y);
+    }
   });
 }
 
@@ -663,10 +723,29 @@ export async function publicarLaminaCms() {
   const descricaoHTML = sanitizarHTMLDescricao(rawDescHTML);
   if (!nome || !imagemUrl) { alert("Os campos 'Nome da Peca / Lamina' e 'Caminho do arquivo / pasta' sao obrigatorios para gravacao."); return; }
   const pinos = editorPins.map((p) => ({ id: p.id, rotulo: p.rotulo, x: p.x, y: p.y }));
+  const questoes = editorQuestoes.map((q) => ({
+    id: q.id,
+    numero: q.numero,
+    titulo: (q.titulo || "").trim(),
+    x: q.x,
+    y: q.y
+  }));
   // Req 1: Coleta maxMagnification do novo campo e converte para número
   const maxMagEl = document.getElementById("dashMaxMagnification");
   const maxMagnification = maxMagEl ? Number(maxMagEl.value) || 40 : 40;
-  const laminaData = { nome, disciplina, topico, coloracao, imagemUrl, descricaoHTML, status, pinos, maxMagnification, dataModificacao: new Date().toISOString() };
+  const laminaData = {
+    nome,
+    disciplina,
+    topico,
+    coloracao,
+    imagemUrl,
+    descricaoHTML,
+    status,
+    pinos,
+    questoes,
+    maxMagnification,
+    dataModificacao: new Date().toISOString()
+  };
   const statusBox = document.getElementById("dashCmsStatus");
   try {
     if (typeof db !== "undefined" && db) {
@@ -684,7 +763,7 @@ export async function publicarLaminaCms() {
           const corBadge = status === "ativa" ? "emerald" : "rose";
           statusBox.innerHTML = `
             <div class="font-bold uppercase tracking-wider text-${corBadge}-300">Lâmina Sincronizada (${status.toUpperCase()})</div>
-            <div class="mt-1 text-neutral-300 text-xs font-mono">ID: ${novoId} (${pinos.length} pinos vinculados)</div>
+            <div class="mt-1 text-neutral-300 text-xs font-mono">ID: ${novoId} (${pinos.length} pinos, ${questoes.length} questões vinculadas)</div>
             <a href="microscopio.html?id=${novoId}" target="_blank" rel="noopener noreferrer" class="mt-3 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 text-xs font-mono uppercase tracking-wider shadow-lg inline-flex items-center gap-2 cursor-pointer transition-all duration-300">
               <span>Testar no Microscópio</span>
               <span>&rarr;</span>
@@ -703,10 +782,237 @@ export async function publicarLaminaCms() {
   }
 }
 
+/* ============================================================================
+ * SISTEMA DE QUESTÕES PRÁTICAS / SIMULADO DE BANCADA (PALAS ATLAS)
+ * ============================================================================ */
+
+export function ativarModoNovaQuestao() {
+  if (!viewerInstance || !viewerInstance.viewport) {
+    alert("Carregue uma lâmina no canvas antes de posicionar uma questão.");
+    modoCriacaoQuestao = false;
+    atualizarEstadoBotaoModoQuestao();
+    return;
+  }
+  modoCriacaoQuestao = !modoCriacaoQuestao;
+  atualizarEstadoBotaoModoQuestao();
+  if (modoCriacaoQuestao) {
+    exibirToastDiscreto("Modo de questão ativo: clique na lâmina para posicionar a questão.", "amber");
+  }
+}
+
+function atualizarEstadoBotaoModoQuestao() {
+  const btn = document.getElementById("btnAtivarModoQuestao");
+  if (!btn) return;
+  if (modoCriacaoQuestao) {
+    btn.className = "w-full bg-amber-500/20 text-amber-300 border border-amber-400/60 ring-2 ring-amber-400/30 rounded-xl py-2.5 px-4 text-xs font-mono tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg animate-pulse";
+    btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0"></span><span id="txtBtnAtivarModoQuestao">Clique na lâmina para posicionar a questão</span>`;
+  } else {
+    btn.className = "w-full bg-white/[0.04] hover:bg-amber-400/10 text-neutral-300 hover:text-amber-300 border border-white/[0.08] hover:border-amber-400/40 rounded-xl py-2.5 px-4 text-xs font-mono tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm group";
+    btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400/80 group-hover:scale-125 transition-transform shrink-0"></span><span id="txtBtnAtivarModoQuestao">+ Nova Questão na Lâmina</span>`;
+  }
+}
+
+function renderizarQuestaoNoCanvas(q) {
+  if (!viewerInstance || !viewerInstance.viewport || !window.OpenSeadragon) return;
+
+  const elemExistente = document.getElementById(`editor-qpin-${q.id}`);
+  if (elemExistente) {
+    try { viewerInstance.removeOverlay(elemExistente); } catch (e) {}
+    if (elemExistente.parentNode) elemExistente.parentNode.removeChild(elemExistente);
+  }
+
+  const qElem = document.createElement("div");
+  qElem.id = `editor-qpin-${q.id}`;
+  qElem.className = "editor-qpin group relative flex items-center justify-center cursor-pointer z-40 transition-transform duration-200 hover:scale-125 select-none";
+  qElem.title = `Questão Q${q.numero}: ${q.titulo || 'Clique para focar'} (X: ${q.x}, Y: ${q.y})`;
+
+  qElem.innerHTML = `
+    <div class="qpin-badge px-2 py-0.5 rounded-full bg-amber-400 text-neutral-950 font-mono font-bold text-[10px] tracking-wider border-2 border-white shadow-[0_0_16px_rgba(245,158,11,0.7)] flex items-center gap-1 animate-pulse transition-all">
+      <span>Q${q.numero}</span>
+    </div>
+    <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/95 text-neutral-200 text-[11px] px-3 py-1.5 rounded-xl border border-amber-400/30 shadow-2xl font-mono backdrop-blur-xl max-w-xs truncate">
+      <span class="text-amber-400 font-bold mr-1">Q${q.numero}:</span>
+      <span class="qpin-title">${escaparHtml(q.titulo || 'Questão sem enunciado')}</span>
+    </div>
+  `;
+
+  new window.OpenSeadragon.MouseTracker({
+    element: qElem,
+    clickHandler: (e) => {
+      e.originalEvent.stopPropagation();
+      e.originalEvent.preventDefault();
+      focarQuestaoNoEditor(q.id);
+    }
+  });
+
+  const location = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(q.x, q.y));
+  viewerInstance.addOverlay({
+    element: qElem,
+    location: location,
+    placement: window.OpenSeadragon.Placement.CENTER
+  });
+}
+
+function destacarQuestaoTemporariamente(id) {
+  const qElem = document.getElementById(`editor-qpin-${id}`);
+  if (!qElem) return;
+  const badge = qElem.querySelector(".qpin-badge");
+  if (!badge) return;
+  badge.classList.add("ring-4", "ring-amber-300", "ring-offset-2", "ring-offset-black", "!scale-125");
+  setTimeout(() => {
+    if (badge) badge.classList.remove("ring-4", "ring-amber-300", "ring-offset-2", "ring-offset-black", "!scale-125");
+  }, 1600);
+}
+
+export function focarQuestaoNoEditor(id) {
+  const q = editorQuestoes.find((item) => item.id === id);
+  if (!q) return;
+
+  if (viewerInstance && viewerInstance.viewport) {
+    const point = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(q.x, q.y));
+    viewerInstance.viewport.panTo(point);
+    destacarQuestaoTemporariamente(q.id);
+  }
+
+  const card = document.getElementById(`card-questao-${q.id}`);
+  if (card) {
+    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    card.classList.add("ring-2", "ring-amber-400/70", "!bg-white/[0.08]");
+    setTimeout(() => {
+      card.classList.remove("ring-2", "ring-amber-400/70", "!bg-white/[0.08]");
+    }, 1500);
+  }
+
+  const inputEl = document.getElementById(`dashQuestaoTitulo_${q.id}`);
+  if (inputEl) {
+    inputEl.focus();
+  }
+}
+
+export function atualizarTituloQuestaoCms(id, value) {
+  const q = editorQuestoes.find((item) => item.id === id);
+  if (!q) return;
+  q.titulo = value || "";
+
+  const qElem = document.getElementById(`editor-qpin-${q.id}`);
+  if (qElem) {
+    qElem.title = `Questão Q${q.numero}: ${q.titulo || 'Clique para focar'} (X: ${q.x}, Y: ${q.y})`;
+    const titleSpan = qElem.querySelector(".qpin-title");
+    if (titleSpan) {
+      titleSpan.textContent = q.titulo || "Questão sem enunciado";
+    }
+  }
+}
+
+export function excluirQuestaoCms(id) {
+  const index = editorQuestoes.findIndex((item) => item.id === id);
+  if (index === -1) return;
+
+  const qElem = document.getElementById(`editor-qpin-${id}`);
+  if (qElem && viewerInstance) {
+    try { viewerInstance.removeOverlay(qElem); } catch (e) {}
+    if (qElem.parentNode) qElem.parentNode.removeChild(qElem);
+  }
+
+  editorQuestoes.splice(index, 1);
+
+  editorQuestoes.forEach((item, idx) => {
+    item.numero = idx + 1;
+  });
+
+  if (viewerInstance && viewerInstance.viewport) {
+    editorQuestoes.forEach((item) => {
+      renderizarQuestaoNoCanvas(item);
+    });
+  }
+
+  atualizarInterfaceListaQuestoes();
+  exibirToastDiscreto("Questão excluída do simulado.", "blue");
+}
+
+function atualizarInterfaceListaQuestoes() {
+  const badgeTotal = document.getElementById("dashTotalQuestoesBadge");
+  const containerLista = document.getElementById("dashListaQuestoes");
+
+  if (badgeTotal) {
+    badgeTotal.textContent = `${editorQuestoes.length} ${editorQuestoes.length === 1 ? "Questão" : "Questões"}`;
+  }
+
+  if (!containerLista) return;
+
+  if (editorQuestoes.length === 0) {
+    containerLista.innerHTML = `
+      <p class="text-neutral-500 text-xs py-6 px-4 text-center border border-dashed border-white/[0.08] rounded-xl font-mono leading-relaxed">
+        Nenhuma questão cadastrada para esta lâmina. Clique em '+ Nova Questão na Lâmina' e marque o ponto no canvas à direita.
+      </p>
+    `;
+    return;
+  }
+
+  let html = `<div class="space-y-3">`;
+  editorQuestoes.forEach((q) => {
+    html += `
+      <div id="card-questao-${q.id}" class="p-3.5 bg-white/[0.02] border border-white/[0.06] rounded-xl hover:bg-white/[0.04] transition-all space-y-2.5 group">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
+              Q${q.numero}
+            </span>
+            <span class="text-[10px] text-neutral-400 font-mono uppercase tracking-wider">Simulado de Bancada</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button 
+              type="button" 
+              onclick="window.App.focarQuestaoNoEditor('${q.id}')" 
+              class="px-2 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-amber-300 border border-white/[0.08] hover:border-amber-400/30 text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
+              title="Focar este ponto no canvas">
+              Focar
+            </button>
+            <button 
+              type="button" 
+              onclick="window.App.excluirQuestaoCms('${q.id}')" 
+              class="px-2 py-1 rounded bg-rose-500/5 hover:bg-rose-500/15 text-rose-400/80 hover:text-rose-400 border border-rose-500/20 text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
+              title="Excluir questão">
+              Excluir
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <textarea 
+            id="dashQuestaoTitulo_${q.id}" 
+            rows="2"
+            placeholder="Título / Pergunta da questão..." 
+            oninput="window.App.atualizarTituloQuestaoCms('${q.id}', this.value)"
+            class="w-full bg-neutral-950/60 border border-white/[0.08] focus:border-amber-400/40 text-xs text-white rounded-lg p-2.5 outline-none transition-colors font-sans placeholder-neutral-500 resize-y leading-relaxed">${escaparHtml(q.titulo || '')}</textarea>
+        </div>
+
+        <div class="flex items-center justify-between text-[10px] font-mono text-neutral-500 pt-0.5 border-t border-white/[0.04]">
+          <span>Coordenadas:</span>
+          <span class="text-neutral-400 font-mono">X: ${Math.round(q.x)} &bull; Y: ${Math.round(q.y)}</span>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  containerLista.innerHTML = html;
+}
+
+function escaparHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 /* =========================================================
    ========================================================= */
 
 export function encerrarPainelCms() {
+  modoCriacaoQuestao = false;
   if (typeof _unsubDashboardAcervo === "function") {
     try { _unsubDashboardAcervo(); } catch (e) {}
     _unsubDashboardAcervo = null;
@@ -730,7 +1036,8 @@ Object.assign(window.App, {
   editarLaminaCms, excluirLaminaCms, resetarFormularioDashboard,
   atualizarTopicosCms, carregarImagemNoEditor, adicionarPinoEditor,
   editarRotuloPinoCms, excluirPinoCms, vincularTextoAoPino,
-  inicializarEventosPreviewInterativo, osdEditorAction, publicarLaminaCms
+  inicializarEventosPreviewInterativo, osdEditorAction, publicarLaminaCms,
+  ativarModoNovaQuestao, atualizarTituloQuestaoCms, excluirQuestaoCms, focarQuestaoNoEditor
 });
 window.inicializarPainelCms = inicializarPainelCms;
 window.encerrarPainelCms = encerrarPainelCms;
@@ -751,3 +1058,7 @@ window.excluirPinoCms = excluirPinoCms;
 window.vincularTextoAoPino = vincularTextoAoPino;
 window.osdEditorAction = osdEditorAction;
 window.publicarLaminaCms = publicarLaminaCms;
+window.ativarModoNovaQuestao = ativarModoNovaQuestao;
+window.atualizarTituloQuestaoCms = atualizarTituloQuestaoCms;
+window.excluirQuestaoCms = excluirQuestaoCms;
+window.focarQuestaoNoEditor = focarQuestaoNoEditor;

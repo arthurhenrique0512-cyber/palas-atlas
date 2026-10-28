@@ -220,6 +220,17 @@
           </button>
         </div>
 
+        <!-- Abas de Navegação do Painel Lateral -->
+        <div class="px-7 pb-3 flex items-center gap-2 border-b border-white/[0.06] shrink-0">
+          <button id="btnTabDescricao" type="button" onclick="window.alternarAbaPainel('descricao')" class="px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-white/[0.08] text-white border border-white/[0.1] shadow-sm">
+            Descrição
+          </button>
+          <button id="btnTabQuestoes" type="button" onclick="window.alternarAbaPainel('questoes')" class="px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5">
+            <span>Questões</span>
+            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.06] text-neutral-400 font-mono">0</span>
+          </button>
+        </div>
+
         <!-- Descrição completa com hiperlinks de pinos -->
         <div
           id="slideDescriptionContainer"
@@ -229,6 +240,14 @@
           <div class="text-sm text-neutral-500 font-sans italic">
             As informações desta lâmina serão renderizadas aqui.
           </div>
+        </div>
+
+        <div
+          id="slideQuestionsContainer"
+          class="hidden px-7 pb-7 flex-1 overflow-y-auto bg-neutral-950 space-y-4"
+          style="-webkit-overflow-scrolling:touch;"
+        >
+          <!-- Questões renderizadas dinamicamente aqui -->
         </div>
 
       </div>
