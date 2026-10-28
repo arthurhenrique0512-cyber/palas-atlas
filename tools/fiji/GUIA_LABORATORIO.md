@@ -5,7 +5,40 @@
 
 ## 1. No Laboratório (No Microscópio)
 
-### A. Movimento da Varredura (Serpente Vertical)
+### A. Assistente Visual com Câmera USB e Ghosting (Onion Skin)
+Para facilitar o alinhamento de bancada sem precisar calcular overlap no olho:
+1. Conecte a Câmera USB do microscópio ao computador.
+2. Inicie o servidor local: `node tools/server.js`
+3. Abra no navegador: [http://localhost:8080/tools/fiji/assistente_captura.html](http://localhost:8080/tools/fiji/assistente_captura.html)
+4. Selecione a câmera USB no dropdown e clique em **Ligar Câmera**.
+5. Conforme você tira as fotos e avança com a **Barra de Espaço**, o assistente projeta automaticamente a faixa exata de 15% da foto anterior como um **fantasma translúcido** sobre o feed ao vivo da câmera:
+   - Ao **Descer**: Faixa inferior da foto anterior surge no topo da tela.
+   - Ao **Subir**: Faixa superior da foto anterior surge no fundo da tela.
+   - Ao **Mover para a Direita**: Faixa direita da foto anterior surge na lateral esquerda.
+6. Ajuste o charriot do microscópio até as estruturas celulares coincidirem perfeitamente com a borda tracejada em neon.
+7. Pressione **F** para congelar/inspecionar o alinhamento e **R** para ligar a mira micrométrica.
+
+### B. Recursos de Hardware e Ergonomia de Bancada (Palas Atlas)
+Para garantir ergonomia máxima durante longas sessões no microscópio:
+1. **Wake Lock API (Tela Sempre Ativa)**:
+   - Evita que a tela do notebook ou tablet escureça ou suspenda durante a varredura.
+   - Badge no cabeçalho: 🟢 **Tela Ativa** (ou ⚪ Tela: Auto ao clicar para alternar).
+   - Auto-recuperação: se você alternar de aba e voltar, o bloqueio é restaurado automaticamente.
+2. **Síntese Sonora Autônoma (Web Audio API)**:
+   - Zero dependência de arquivos externos MP3/WAV (funciona 100% offline no laboratório).
+   - **Bipe Curto Suave**: Confirmação auditiva imediata a cada foto disparada.
+   - **Tom Melódico de Transição (D5 -> A5)**: Alerta acústico claro para *"Fim de Coluna / Mover Charriot para a Direita"*.
+   - **Fanfarra Triunfante (C5 -> E5 -> G5 -> C6)**: Comemoração de varredura completa.
+   - Botão **Bipes Ativos / Mudo** no cabeçalho para silenciar quando necessário.
+3. **Persistência Anti-Pânico (`localStorage`)**:
+   - Salva em tempo real cada campo fotografado, grade $X \times Y$, amostra, objetiva e histórico.
+   - Se a bateria acabar ou a aba for fechada por acidente, ao recarregar surge o banner de restauração: *"Sessão anterior detectada: Foto X de Y na amostra Z. [Continuar Sessão] [Descartar]"*.
+4. **Gerador Dinâmico de Comandos Fiji e PowerShell**:
+   - Clique em **📋 Comandos Fiji** no cabeçalho para abrir o modal.
+   - Copie o comando pronto do PowerShell (`rename_images.ps1`) com caminho e padrão já preenchidos.
+   - Copie os parâmetros do plugin ou a macro ImageJ completa com 1 clique (`Copiado! ✅`).
+
+### C. Movimento da Varredura (Serpente Vertical)
 Você escolheu o padrão **Snake by Columns (Down & Right)**:
 ```
 (Início Topo-Esquerdo)
@@ -19,7 +52,7 @@ Você escolheu o padrão **Snake by Columns (Down & Right)**:
 (Desce Col. 1)     (Sobe Col. 2)     (Desce Col. 3)
 ```
 
-### B. Regras de Ouro para o Stitching Não Falhar
+### D. Regras de Ouro para o Stitching Não Falhar
 1. **Overlap (10% a 15%)**: 
    - Ao mover o charriot, olhe uma estrutura de referência na borda da imagem anterior e deixe-a aparecer cerca de 15% dentro do novo campo.
 2. **Travar Balanço de Branco e Exposição**:

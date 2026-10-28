@@ -3,324 +3,1518 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Assistente de Varredura — Palas Atlas</title>
+  <title>Assistente de Varredura — Palas Atlas (Copiloto de Bancada v2.0)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Scrollbars customizadas */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    
+    .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0b1120; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    .write-vertical {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.92; transform: scale(1.04); }
+    }
+    .active-cell-pulse {
+      animation: pulse-subtle 1.8s infinite ease-in-out;
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col p-4 md:p-6 selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col p-3 md:p-6 selection:bg-indigo-500 selection:text-white">
 
-  <!-- Cabeçalho -->
-  <header class="max-w-5xl mx-auto w-full flex items-center justify-between pb-4 border-b border-slate-800">
+  <!-- ======================================================================== -->
+  <!-- BANNER DE PROTOCOLO LOCAL (file://)                                      -->
+  <!-- ======================================================================== -->
+  <div id="fileProtocolWarning" class="hidden max-w-7xl mx-auto w-full mb-4 p-4 rounded-2xl bg-amber-950/70 border border-amber-600/60 text-amber-200 text-xs flex items-start gap-3 shadow-xl">
+    <span class="text-xl">⚠️</span>
+    <div class="flex-1">
+      <strong class="font-bold block text-sm text-amber-100">Atenção: Acesso via Arquivo Local (<code class="bg-amber-900/50 px-1 py-0.5 rounded">file://</code>)</strong>
+      <p class="mt-0.5 text-amber-300/90 leading-relaxed">
+        Navegadores modernos (Chrome/Edge) bloqueiam a câmera WebRTC em URLs locais. Para ligar a Câmera USB do Microscópio, execute o servidor local:
+        <code class="bg-slate-900 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold ml-1">node tools/server.js</code> 
+        e abra em 
+        <a href="http://localhost:8080/tools/fiji/assistente_captura.html" class="underline font-bold text-white hover:text-amber-300">http://localhost:8080/tools/fiji/assistente_captura.html</a>.
+      </p>
+    </div>
+    <button onclick="document.getElementById('fileProtocolWarning').remove()" class="text-amber-400 hover:text-white font-bold px-2 py-1">✕</button>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CABEÇALHO PRINCIPAL                                                      -->
+  <!-- ======================================================================== -->
+  <header class="max-w-7xl mx-auto w-full flex flex-wrap items-center justify-between pb-4 border-b border-slate-800 gap-4">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-700 to-indigo-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/25 border border-indigo-400/30">
         🔬
       </div>
       <div>
-        <h1 class="text-lg font-bold text-white">Palas Atlas <span class="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 font-mono ml-1">Copiloto de Bancada</span></h1>
-        <p class="text-xs text-slate-400">Guia passo a passo para varredura em serpente no microscópio</p>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-extrabold text-white tracking-tight">Palas Atlas</h1>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 font-mono font-semibold border border-indigo-500/30">Copiloto v2.0 • Ghosting & Grade Dinâmica</span>
+        </div>
+        <p class="text-xs text-slate-400">Varredura em serpente no microscópio óptico com Câmera USB, Onion Skin (15%) e Modo Descoberta</p>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <span class="text-xs text-slate-400 hidden sm:inline">Atalho:</span>
-      <kbd class="px-2 py-1 text-xs bg-slate-800 border border-slate-700 rounded text-slate-300 font-mono shadow-sm">Espaço</kbd>
-      <span class="text-xs text-slate-400 hidden sm:inline">ou clique para avançar</span>
+    
+    <!-- Atalhos Rápidos e Controles de Hardware -->
+    <div class="flex items-center gap-2 flex-wrap text-xs">
+      <div class="hidden xl:flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-slate-400 font-mono text-[11px]">
+        <span>Disparar:</span>
+        <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200 shadow-sm">Espaço</kbd>
+        <span class="ml-1">Concluir:</span>
+        <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200 shadow-sm">C</kbd>
+        <span class="ml-1">Congelar:</span>
+        <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200 shadow-sm">F</kbd>
+        <span class="ml-1">Mira:</span>
+        <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-200 shadow-sm">R</kbd>
+      </div>
+
+      <!-- Badge de Status da Câmera -->
+      <span id="cameraStatusBadge" class="text-xs px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 transition-all shadow-sm bg-slate-800 text-slate-400 border border-slate-700">
+        <span class="w-2 h-2 rounded-full bg-slate-500"></span> Câmera Desconectada
+      </span>
+
+      <!-- Badge de Wake Lock (Anti-Apagamento de Tela) -->
+      <button id="btnWakeLock" type="button" title="Clique para alternar o modo anti-apagamento de tela"
+              class="text-xs px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 transition-all shadow-sm bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-500">
+        <span id="wakeLockDot" class="w-2 h-2 rounded-full bg-slate-500 transition-colors"></span>
+        <span id="wakeLockText">Tela: Auto</span>
+      </button>
+
+      <!-- Interruptor de Bipes Sonoros (Web Audio API) -->
+      <button id="btnAudioToggle" type="button" title="Ativar/Desativar avisos sonoros de bancada"
+              class="text-xs px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 transition-all shadow-sm bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-500">
+        <span id="audioIcon">🔊</span>
+        <span id="audioText">Bipes Ativos</span>
+      </button>
+
+      <!-- Interruptor de Voz Sintetizada (Web Speech API) -->
+      <button id="btnVoiceToggle" type="button" title="Ativar/Desativar voz sintetizada em português [Atalho: V]"
+              class="text-xs px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 transition-all shadow-sm bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-500">
+        <span id="voiceIcon">🗣️</span>
+        <span id="voiceText">Voz Ativa</span>
+      </button>
+
+      <!-- Botão Concluir Lâmina (Header) -->
+      <button id="btnFinishSlideHeader" type="button" title="Finalizar varredura e calcular grade final para o Fiji [Atalho: C]"
+              class="text-xs px-3 py-1 rounded-full font-mono font-bold flex items-center gap-1.5 transition-all shadow-md bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40">
+        <span>🏁</span>
+        <span>Concluir Lâmina</span>
+      </button>
+
+      <!-- Botão Gaveta Fiji / PowerShell -->
+      <button id="btnOpenFijiDrawer" type="button" title="Ver comandos PowerShell e parâmetros Fiji"
+              class="text-xs px-2.5 py-1 rounded-full font-mono font-semibold flex items-center gap-1.5 transition-all shadow-sm bg-indigo-950/70 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-900/60 hover:border-indigo-400">
+        <span>📋</span>
+        <span>Fiji Scripts</span>
+      </button>
     </div>
   </header>
 
-  <!-- Conteúdo Principal -->
-  <main class="max-w-5xl mx-auto w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 items-start">
+  <!-- ======================================================================== -->
+  <!-- BANNER DE RECUPERAÇÃO ANTI-PÂNICO (localStorage)                         -->
+  <!-- ======================================================================== -->
+  <div id="recoveryBanner" class="hidden max-w-7xl mx-auto w-full my-4 bg-gradient-to-r from-amber-950/80 via-slate-900 to-amber-950/80 border border-amber-500/50 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-200">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-lg shrink-0">⚠️</div>
+      <div>
+        <div class="font-bold text-sm text-white flex items-center gap-2">
+          <span>Sessão Incompleta Detectada</span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">Anti-Pânico</span>
+        </div>
+        <div id="recoveryMessage" class="text-xs text-amber-300/90 font-mono mt-0.5">
+          Foto salva recentemente.
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+      <button id="btnRecoveryDiscard" type="button" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+        Descartar
+      </button>
+      <button id="btnRecoveryResume" type="button" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/20 transition flex items-center gap-1">
+        <span>▶️</span> Continuar Sessão
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CONTEÚDO PRINCIPAL                                                       -->
+  <!-- ======================================================================== -->
+  <main class="max-w-7xl mx-auto w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5 items-start">
     
-    <!-- Painel de Configuração e Matriz -->
-    <section class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-5">
-      <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400">Configuração da Grade</h2>
+    <!-- COLUNA ESQUERDA: CONFIGURAÇÃO, MATRIZ E GALERIA (Col-span 4) -->
+    <section class="lg:col-span-4 flex flex-col gap-5">
       
-      <div class="grid grid-cols-2 gap-3">
+      <!-- Card de Configuração da Grade e Amostra -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+        
+        <!-- Alternador de Modo: Descoberta vs Grade Fixa -->
+        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-semibold">
+          <button id="tabModeDynamic" class="flex-1 py-1.5 px-2 rounded-lg bg-indigo-600 text-white shadow-sm transition text-center flex items-center justify-center gap-1">
+            <span>✨ Modo Descoberta</span>
+            <span class="text-[9px] bg-indigo-500/40 px-1 py-0.2 rounded font-mono hidden sm:inline">Y Fixo</span>
+          </button>
+          <button id="tabModeFixed" class="flex-1 py-1.5 px-2 rounded-lg text-slate-400 hover:text-white transition text-center flex items-center justify-center gap-1">
+            <span>📐 Grade Fixa</span>
+            <span class="text-[9px] bg-slate-800 px-1 py-0.2 rounded font-mono hidden sm:inline">X × Y</span>
+          </button>
+        </div>
+
+        <!-- Identificação da Amostra -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-medium text-slate-400 mb-1">Nome da Amostra</label>
+            <input type="text" id="sampleNameInput" value="osso_maduro" placeholder="ex: figado_he" 
+                   class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-indigo-500 transition">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-400 mb-1">Objetiva</label>
+            <select id="objectiveInput"
+                    class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-indigo-500 transition">
+              <option value="4x">4x (Panorâmica)</option>
+              <option value="10x" selected>10x (Padrão)</option>
+              <option value="40x">40x (Alta Resolução)</option>
+              <option value="100x">100x (Imersão)</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Dimensões da Grade -->
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-[11px] font-medium text-slate-400 mb-1 flex items-center justify-between">
+              <span>Colunas (X)</span>
+              <span id="colStatusHint" class="text-[9px] text-indigo-400 font-mono">Auto</span>
+            </label>
+            <input type="number" id="colsInput" value="" min="1" max="25" placeholder="Auto" disabled
+                   class="w-full bg-slate-950/60 border border-slate-800 rounded-lg px-2.5 py-1.5 text-indigo-300 font-mono text-xs focus:outline-none focus:border-indigo-500 transition disabled:opacity-75 disabled:cursor-not-allowed">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-400 mb-1">Linhas (Y - Altura)</label>
+            <input type="number" id="rowsInput" value="6" min="1" max="30" 
+                   class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-indigo-500 transition">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-400 mb-1">Overlap (%)</label>
+            <input type="number" id="overlapInput" value="15" min="5" max="35" step="5"
+                   class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs focus:outline-none focus:border-indigo-500 transition">
+          </div>
+        </div>
+
+        <!-- Barra de Status Dinâmico da Grade -->
+        <div class="flex items-center justify-between text-xs text-slate-400 bg-slate-950 p-2.5 rounded-lg border border-slate-800 font-mono">
+          <span>Fotos: <strong id="totalFotosLabel" class="text-indigo-400">Dinâmico</strong></span>
+          <span id="elapsedTimer" class="text-slate-400 text-[11px]">⏱️ 00:00</span>
+          <span id="avgTimeLabel" class="text-slate-500 text-[10px]">~0s/foto</span>
+        </div>
+
+        <!-- MAPA GRÁFICO DA LÂMINA (ROLAGEM HORIZONTAL DINÂMICA) -->
         <div>
-          <label class="block text-xs font-medium text-slate-400 mb-1">Colunas (X - Horizontal)</label>
-          <input type="number" id="colsInput" value="3" min="1" max="15" 
-                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-indigo-500">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-slate-400 uppercase flex items-center gap-1.5">
+              <span>🗺️</span> Mapa da Lâmina
+            </span>
+            <div class="flex items-center gap-2">
+              <span id="mapColCounter" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">1 Coluna</span>
+              <span id="gridProgressText" class="text-xs font-mono text-indigo-400 font-semibold">Foto 1</span>
+            </div>
+          </div>
+          
+          <!-- Container de Colunas Verticais -->
+          <div id="gridContainer" class="flex gap-2 p-3 bg-slate-950 rounded-xl border border-slate-800 min-h-[220px] max-h-72 overflow-x-auto overflow-y-hidden custom-scrollbar select-none">
+            <!-- Colunas dinâmicas geradas via JS -->
+          </div>
         </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-400 mb-1">Linhas (Y - Vertical)</label>
-          <input type="number" id="rowsInput" value="4" min="1" max="25" 
-                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-indigo-500">
+
+        <!-- BOTÕES DE CONTROLE DA GRADE -->
+        <div class="grid grid-cols-3 gap-2 pt-1">
+          <button id="btnPrev" type="button" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-1 border border-slate-700">
+            <span>⬅️</span> Voltar
+          </button>
+          <button id="btnFinishSlide" type="button" class="py-2 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition flex items-center justify-center gap-1 shadow-md shadow-emerald-600/20 border border-emerald-500/40">
+            <span>🏁</span> Concluir
+          </button>
+          <button id="btnReset" type="button" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-rose-300 transition flex items-center justify-center gap-1 border border-slate-700">
+            <span>🔄</span> Reiniciar
+          </button>
         </div>
       </div>
 
-      <div class="flex items-center justify-between text-xs text-slate-400 bg-slate-800/50 p-3 rounded-lg border border-slate-800">
-        <span>Total de Fotos Estimadas:</span>
-        <span id="totalFotosLabel" class="font-bold text-indigo-400 font-mono text-sm">12 fotos</span>
+      <!-- GALERIA DE FOTOS CAPTURADAS EM SESSÃO -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+            <span>🖼️</span> Fotos Registradas (<span id="capturedCount">0</span>)
+          </h3>
+          <button id="btnDownloadAll" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 underline hidden">
+            Baixar Todas
+          </button>
+        </div>
+        <div id="galleryContainer" class="flex gap-2 overflow-x-auto pb-2 min-h-[76px] items-center text-slate-600 text-xs font-mono">
+          <span class="text-slate-500 italic text-[11px]">Nenhuma foto registrada ainda. Avance um passo para capturar.</span>
+        </div>
       </div>
 
-      <!-- Representação Gráfica da Matriz -->
-      <div class="mt-2">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-semibold text-slate-400 uppercase">Mapa da Lâmina</span>
-          <span id="gridProgressText" class="text-xs font-mono text-indigo-400">0 / 12 concluídas</span>
-        </div>
-        <div id="gridContainer" class="grid gap-1.5 p-3 bg-slate-950 rounded-xl border border-slate-800 max-h-72 overflow-auto">
-          <!-- Células geradas dinamicamente via JS -->
-        </div>
+      <!-- DICA DE OURO DE BANCADA -->
+      <div class="bg-indigo-950/30 border border-indigo-900/50 rounded-2xl p-4 text-xs text-indigo-200 leading-relaxed shadow-lg">
+        <strong class="text-indigo-300 flex items-center gap-1.5 mb-1 font-semibold">
+          <span>💡</span> Regra de Ouro do Fiji Stitching:
+        </strong>
+        No software da câmera, desative o <em>Auto-Exposure</em> e o <em>Auto-White Balance</em> após o primeiro campo. No <strong>Modo Descoberta</strong>, você só precisa contar a altura ($Y$). O assistente expande a largura dinamicamente até o tecido acabar!
       </div>
 
-      <!-- Botões de Controle -->
-      <div class="flex gap-2 pt-2">
-        <button id="btnReset" class="flex-1 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">
-          🔄 Reiniciar
-        </button>
-        <button id="btnPrev" class="py-2 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition">
-          ⬅️ Voltar
-        </button>
-      </div>
     </section>
 
-    <!-- Painel de Ação Atual e Guia Visual de Overlap -->
-    <section class="lg:col-span-7 flex flex-col gap-5">
+    <!-- COLUNA DIREITA: AÇÃO ATUAL + CÂMERA COM ONION SKIN (Col-span 8) -->
+    <section class="lg:col-span-8 flex flex-col gap-5">
       
-      <!-- Card da Ação Imediata -->
-      <div id="actionCard" class="bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-900 border-2 border-indigo-500/50 rounded-2xl p-6 shadow-2xl relative overflow-hidden cursor-pointer select-none">
-        <div class="flex items-center justify-between">
-          <span id="stepCounterBadge" class="px-3 py-1 bg-indigo-500 text-white font-mono text-xs font-bold rounded-full uppercase tracking-wider">
-            Foto 1 de 12
+      <!-- CARD DA AÇÃO IMEDIATA & DISPARO DE ALTA VISIBILIDADE -->
+      <div id="actionCard" class="bg-gradient-to-br from-indigo-950/50 via-slate-900 to-slate-900 border-2 border-indigo-500/60 rounded-2xl p-5 shadow-2xl relative overflow-hidden transition-all hover:border-indigo-400 cursor-pointer select-none">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <span id="stepCounterBadge" class="px-3 py-1 bg-indigo-600 text-white font-mono text-xs font-bold rounded-full uppercase tracking-wider shadow-sm shadow-indigo-500/40">
+            Foto 1
           </span>
-          <span class="text-xs text-slate-400 font-mono">Clique aqui ou [Espaço] após disparar</span>
+          <span class="text-xs text-indigo-300 font-mono">Pressione <kbd class="px-1.5 py-0.5 bg-slate-800 border border-indigo-500/40 rounded text-white font-bold">Espaço</kbd> ou clique para avançar</span>
         </div>
 
-        <div class="my-6 text-center">
-          <div id="directionIcon" class="text-6xl mb-2 animate-bounce">⬇️</div>
-          <h3 id="actionHeading" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Desça na Vertical
-          </h3>
-          <p id="actionSubtext" class="text-slate-300 text-sm mt-2 max-w-md mx-auto">
-            Inicie no canto superior esquerdo do tecido. Tire a foto e depois desça mantendo 15% de sobreposição.
-          </p>
+        <div class="my-4 flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+          <div class="flex items-center gap-4">
+            <div id="directionIcon" class="text-5xl sm:text-6xl animate-bounce select-none">⬇️</div>
+            <div>
+              <h3 id="actionHeading" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Desça na Vertical
+              </h3>
+              <p id="actionSubtext" class="text-slate-300 text-xs sm:text-sm mt-1 max-w-lg leading-snug">
+                Inicie no canto superior esquerdo do tecido. Tire a foto e depois desça mantendo 15% de sobreposição.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Botão Gigante de Disparo -->
+          <button id="btnTriggerCapture" type="button" class="w-full sm:w-auto px-6 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-sm tracking-wide shadow-xl shadow-indigo-500/30 border border-indigo-300/30 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+            <span>📸</span> Capturar & Avançar
+          </button>
         </div>
 
-        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-          <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+        <!-- Barra de Progresso Geral -->
+        <div class="space-y-1.5 mt-2">
+          <div class="flex justify-between text-[11px] font-mono text-slate-400">
+            <span id="coordBadge">Coluna 1 • Linha 1</span>
+            <span id="pctBadge">Varredura Dinâmica</span>
+          </div>
+          <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+            <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full w-0 transition-all duration-300"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Guia Visual do Overlap 15% (Mira de Bancada) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-            <span>🎯</span> Mira de Sobreposição (Overlap 15%)
-          </h3>
-          <span class="text-xs text-indigo-400 font-medium">Margem de Segurança Fiji</span>
-        </div>
-
-        <div class="relative w-full aspect-video bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center overflow-hidden">
+      <!-- ESTAÇÃO DE CÂMERA WEBRTC & ONION SKIN (GHOSTING) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
+        
+        <!-- Barra Superior de Controle da Câmera -->
+        <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-800/80">
           
-          <!-- Faixas de 15% de Overlap -->
-          <!-- Topo -->
-          <div class="absolute top-0 left-0 right-0 h-[15%] bg-indigo-500/15 border-b border-dashed border-indigo-400/50 flex items-center justify-center text-[10px] font-mono text-indigo-300">
-            ▲ 15% de Overlap com a foto de CIMA
-          </div>
-          <!-- Fundo -->
-          <div class="absolute bottom-0 left-0 right-0 h-[15%] bg-indigo-500/15 border-t border-dashed border-indigo-400/50 flex items-center justify-center text-[10px] font-mono text-indigo-300">
-            ▼ 15% de Overlap com a foto de BAIXO
-          </div>
-          <!-- Esquerda -->
-          <div class="absolute top-[15%] bottom-[15%] left-0 w-[15%] bg-emerald-500/15 border-r border-dashed border-emerald-400/50 flex items-center justify-center text-[9px] font-mono text-emerald-300 write-vertical">
-            ◄ 15%
-          </div>
-          <!-- Direita -->
-          <div class="absolute top-[15%] bottom-[15%] right-0 w-[15%] bg-emerald-500/15 border-l border-dashed border-emerald-400/50 flex items-center justify-center text-[9px] font-mono text-emerald-300 write-vertical">
-            15% ►
+          <!-- Seletor de Modo (Câmera ao Vivo vs Guia Sintético) -->
+          <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+            <button id="tabModeLive" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition">
+              📹 Câmera ao Vivo USB
+            </button>
+            <button id="tabModeSynthetic" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+              🎯 Mira Sintética
+            </button>
           </div>
 
-          <!-- Centro Seguro -->
-          <div class="text-center p-4">
-            <span class="text-slate-500 font-mono text-xs block mb-1">CAMPO CENTRAL (85% × 85%)</span>
-            <p class="text-xs text-slate-400 max-w-xs">
-              Ache uma estrutura marcante na borda pontilhada e faça ela reaparecer na borda oposta do próximo campo.
-            </p>
+          <!-- Seletor de Dispositivo e Botão de Ativação -->
+          <div class="flex items-center gap-2 flex-1 justify-end flex-wrap">
+            <select id="cameraSelect" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 max-w-xs transition">
+              <option value="">Carregando dispositivos USB...</option>
+            </select>
+            <button id="btnToggleCamera" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-md shadow-emerald-600/20 flex items-center gap-1.5">
+              <span>▶️</span> Ligar Câmera
+            </button>
           </div>
         </div>
+
+        <!-- VIEWPORT PRINCIPAL (Vídeo + Canvas de Ghosting Perfeitamente Sobrepostos) -->
+        <div id="cameraContainer" class="relative w-full aspect-video bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center select-none shadow-inner">
+          
+          <!-- Vídeo WebRTC ao Vivo -->
+          <video id="videoFeed" playsinline autoplay muted class="w-full h-full object-contain"></video>
+
+          <!-- Canvas Sobreposto de Alta Resolução (Ghosting 15% + Mira Reticular) -->
+          <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full object-contain pointer-events-none z-10"></canvas>
+
+          <!-- Banner Flutuante de Imagem Congelada -->
+          <div id="frozenBadge" class="hidden absolute top-3 left-3 bg-cyan-950/80 border border-cyan-500/60 text-cyan-200 px-3 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 z-20 backdrop-blur-sm shadow-lg">
+            <span class="animate-pulse">❄️</span> IMAGEM CONGELADA (INSPEÇÃO)
+          </div>
+
+          <!-- Camada do Guia Sintético (Visível quando Câmera Desligada ou no Modo Sintético) -->
+          <div id="syntheticGuideView" class="hidden absolute inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center z-5">
+            <!-- Faixas Gráficas de 15% de Overlap -->
+            <div class="absolute top-0 left-0 right-0 h-[15%] bg-indigo-500/15 border-b border-dashed border-indigo-400/50 flex items-center justify-center text-[11px] font-mono text-indigo-300">
+              ▲ 15% de Overlap com a foto de CIMA (Norte)
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-[15%] bg-indigo-500/15 border-t border-dashed border-indigo-400/50 flex items-center justify-center text-[11px] font-mono text-indigo-300">
+              ▼ 15% de Overlap com a foto de BAIXO (Sul)
+            </div>
+            <div class="absolute top-[15%] bottom-[15%] left-0 w-[15%] bg-emerald-500/15 border-r border-dashed border-emerald-400/50 flex items-center justify-center text-[10px] font-mono text-emerald-300 write-vertical">
+              ◄ 15% Overlap ESQ
+            </div>
+            <div class="absolute top-[15%] bottom-[15%] right-0 w-[15%] bg-emerald-500/15 border-l border-dashed border-emerald-400/50 flex items-center justify-center text-[10px] font-mono text-emerald-300 write-vertical">
+              15% Overlap DIR ►
+            </div>
+
+            <!-- Centro do Guia Sintético -->
+            <div class="max-w-md p-4 bg-slate-900/80 rounded-xl border border-slate-800 backdrop-blur-sm shadow-xl">
+              <span class="text-indigo-400 font-mono text-xs font-bold block mb-1">MIRA SINTÉTICA DE BANCADA (OVERLAP <span id="overlapDisplayValue">15%</span>)</span>
+              <p class="text-xs text-slate-300">
+                Conecte a câmera USB do microscópio para ativar o <strong>Ghosting ao Vivo</strong> (Onion Skin) em tempo real, ou use esta mira de 15% como referência ocular.
+              </p>
+            </div>
+          </div>
+
+          <!-- Mensagem quando Câmera Desligada -->
+          <div id="cameraOfflineMessage" class="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center z-5">
+            <div class="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-3xl mb-3 shadow-lg">
+              📷
+            </div>
+            <h4 class="text-sm font-bold text-white mb-1">Câmera USB Não Conectada</h4>
+            <p class="text-xs text-slate-400 max-w-sm mb-4 leading-relaxed">
+              Clique no botão abaixo para conectar a câmera USB do microscópio óptico e projetar o fantasma da foto anterior na borda de sobreposição.
+            </p>
+            <button id="btnStartCameraBanner" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
+              <span>▶️</span> Ligar Câmera USB
+            </button>
+          </div>
+
+        </div>
+
+        <!-- BARRA DE FERRAMENTAS DO ONION SKIN (GHOSTING & AJUSTES ÓPTICOS) -->
+        <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+          
+          <!-- Slider de Opacidade do Ghost -->
+          <div class="flex items-center gap-2.5 min-w-[200px]">
+            <span class="text-slate-400 text-xs font-medium flex items-center gap-1">
+              <span>👻</span> Fantasma:
+            </span>
+            <input type="range" id="ghostOpacityRange" min="0" max="100" value="45" 
+                   class="w-28 sm:w-36 accent-indigo-500 cursor-pointer">
+            <span id="ghostOpacityVal" class="font-mono text-xs font-bold text-indigo-400 w-10">45%</span>
+          </div>
+
+          <!-- Modo de Mesclagem do Ghost -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-400 text-xs hidden sm:inline">Modo:</span>
+            <select id="ghostBlendSelect" class="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
+              <option value="normal">Normal (Natural)</option>
+              <option value="cyan">Ciano Neon (H&E)</option>
+              <option value="difference">Diferença</option>
+            </select>
+          </div>
+
+          <!-- Botões de Ação Visual: Mira, Congelar, Espelhos -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button id="btnToggleReticle" title="Alternar Mira Reticular Central [R]" class="px-2.5 py-1 rounded-lg bg-indigo-950/60 border border-indigo-800 text-indigo-300 hover:text-white text-xs font-semibold transition flex items-center gap-1">
+              <span>🎯</span> Mira
+            </button>
+            <button id="btnToggleFreeze" title="Congelar Imagem ao Vivo [F]" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition flex items-center gap-1">
+              <span>❄️</span> Congelar
+            </button>
+            <button id="btnFlipH" title="Espelhar Horizontalmente" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition">
+              ↔️ Flip H
+            </button>
+            <button id="btnFlipV" title="Espelhar Verticalmente" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition">
+              ↕️ Flip V
+            </button>
+            <button id="btnClearGhost" title="Limpar Fantasma Atual" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-rose-300 hover:text-rose-200 text-xs font-semibold transition">
+              🗑️ Limpar
+            </button>
+          </div>
+
+        </div>
+
       </div>
 
     </section>
 
   </main>
 
+  <!-- ======================================================================== -->
+  <!-- MODAL DE CONCLUSÃO DE LÂMINA & DIAGNÓSTICO RETANGULAR                    -->
+  <!-- ======================================================================== -->
+  <div id="conclusionModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col gap-4">
+      
+      <!-- Cabeçalho do Modal -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🏁</span>
+          <div>
+            <h3 class="text-base font-bold text-white">Resumo da Varredura da Lâmina</h3>
+            <p class="text-xs text-slate-400">Diagnóstico da matriz para o Fiji Grid Stitching</p>
+          </div>
+        </div>
+        <button id="btnCloseConclusionModal" type="button" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center font-bold text-sm">✕</button>
+      </div>
+
+      <!-- Banner de Status Retangular -->
+      <div id="modalStatusBanner" class="p-4 rounded-2xl border text-xs">
+        <!-- Preenchido dinamicamente via JS -->
+      </div>
+
+      <!-- Métricas Consolidadas -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <div class="text-[10px] text-slate-500 uppercase">Fotos Disparadas</div>
+          <div id="modalTotalCaptured" class="font-bold text-indigo-400 text-sm">0</div>
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <div class="text-[10px] text-slate-500 uppercase">Grade Final X (Cols)</div>
+          <div id="modalFinalCols" class="font-bold text-white text-sm">0</div>
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <div class="text-[10px] text-slate-500 uppercase">Grade Final Y (Linhas)</div>
+          <div id="modalFinalRows" class="font-bold text-white text-sm">0</div>
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <div class="text-[10px] text-slate-500 uppercase">Matriz Completa</div>
+          <div id="modalExpectedTotal" class="font-bold text-emerald-400 text-sm">0 fotos</div>
+        </div>
+      </div>
+
+      <!-- Seção de Soluções caso a coluna seja incompleta -->
+      <div id="modalSolutionsContainer" class="hidden flex flex-col gap-2">
+        <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono">Opções para o Algoritmo do Fiji:</h4>
+        <div id="modalSolutionsList" class="flex flex-col gap-2">
+          <!-- Opções inseridas via JS -->
+        </div>
+      </div>
+
+      <!-- Ações do Modal -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800 flex-wrap gap-2">
+        <button id="btnDownloadManifest" type="button" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition flex items-center gap-1.5 border border-slate-700">
+          <span>💾</span> Baixar Manifesto JSON
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="btnDismissConclusionModal" type="button" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-semibold transition">
+            Voltar à Bancada
+          </button>
+          <button id="btnOpenFijiFromConclusion" type="button" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
+            <span>📋</span> Ver Comandos Fiji & Scripts
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- MODAL DE COMANDOS FIJI E POWERSHELL                                      -->
+  <!-- ======================================================================== -->
+  <div id="fijiModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col gap-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📋</span>
+          <div>
+            <h3 class="text-base font-bold text-white">Comandos de Pós-Processamento</h3>
+            <p class="text-xs text-slate-400">PowerShell para renomear e macro Fiji ImageJ</p>
+          </div>
+        </div>
+        <button id="btnCloseFijiModal" type="button" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center font-bold text-sm">✕</button>
+      </div>
+
+      <!-- Bloco 1: PowerShell Rename -->
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider font-mono">1. Renomeador PowerShell</span>
+          <button id="btnCopyPowerShell" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-mono text-slate-300 transition flex items-center gap-1.5">
+            <span>📋</span> Copiar Comando
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400">Ordena por milissegundos e renomeia substituindo 'x' pela ordem cronológica:</p>
+        <pre class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-xs font-mono text-indigo-200 overflow-x-auto select-all"><code id="codePowerShell">.\tools\fiji\rename_images.ps1 -Dir "C:\fotos\amostra_1" -Pattern "amostra_1_x.jpg"</code></pre>
+      </div>
+
+      <!-- Bloco 2: Parâmetros do Fiji Stitching -->
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2">
+        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono">2. Parâmetros da Caixa de Diálogo Fiji</span>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+          <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase">Grid Size X</div>
+            <div id="paramGridX" class="font-bold text-white">3 colunas</div>
+          </div>
+          <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase">Grid Size Y</div>
+            <div id="paramGridY" class="font-bold text-white">6 linhas</div>
+          </div>
+          <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase">Overlap</div>
+            <div id="paramOverlap" class="font-bold text-white">15%</div>
+          </div>
+          <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase">Padrão Arquivo</div>
+            <div id="paramPattern" class="font-bold text-indigo-300 truncate">amostra_1_{i}.jpg</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bloco 3: Macro ImageJ Completa -->
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono">3. Macro Direta ImageJ (1-Clique)</span>
+          <button id="btnCopyMacro" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-mono text-slate-300 transition flex items-center gap-1.5">
+            <span>📋</span> Copiar Macro
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400">Cole no Script Editor do Fiji (Language: ImageJ Macro) para costura e exportação direta:</p>
+        <pre class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto max-h-40 select-all"><code id="codeFijiMacro">// Carregando macro...</code></pre>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-800">
+        <button id="btnDoneModal" type="button" class="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- SCRIPTS DOS MOTORES DESACOPLADOS                                         -->
+  <!-- ======================================================================== -->
+  <script src="capture_grid_engine.js"></script>
+  <script src="microscope-camera.js"></script>
+  <script src="bench-copilot.js"></script>
+
+  <!-- ======================================================================== -->
+  <!-- SCRIPT DE COORDENAÇÃO GERAL DA BANCADA                                   -->
+  <!-- ======================================================================== -->
   <script>
-    let cols = 3;
-    let rows = 4;
-    let currentStep = 0; // 0 to (cols * rows - 1)
-    let sequence = []; // array of { col, row, action, icon, title, desc }
+    (function () {
+      // 1. Instanciação dos Módulos Especializados
+      const { CaptureGridEngine } = window.PalasGridEngine || {};
+      const { WakeLockManager, BenchAudioSynthesizer, CapturePersistence, CommandGenerator } = window.PalasBench || {};
 
-    const colsInput = document.getElementById('colsInput');
-    const rowsInput = document.getElementById('rowsInput');
-    const totalFotosLabel = document.getElementById('totalFotosLabel');
-    const gridContainer = document.getElementById('gridContainer');
-    const gridProgressText = document.getElementById('gridProgressText');
-    const actionCard = document.getElementById('actionCard');
-    const stepCounterBadge = document.getElementById('stepCounterBadge');
-    const directionIcon = document.getElementById('directionIcon');
-    const actionHeading = document.getElementById('actionHeading');
-    const actionSubtext = document.getElementById('actionSubtext');
-    const progressBar = document.getElementById('progressBar');
-    const btnReset = document.getElementById('btnReset');
-    const btnPrev = document.getElementById('btnPrev');
+      let currentMode = 'dynamic'; // 'dynamic' | 'fixed'
+      let isVoiceActive = true;
+      let isLiveMode = true;
+      let startTime = Date.now();
+      let timerInterval = null;
 
-    function generateSequence(c, r) {
-      const seq = [];
-      let stepNum = 1;
-      const total = c * r;
+      // Motor Matemático da Grade
+      const engine = new CaptureGridEngine({
+        mode: 'dynamic',
+        rowsY: 6,
+        fixedColsX: 3,
+        overlapPercent: 15,
+        photoPrefix: 'osso_maduro'
+      });
 
-      for (let col = 0; col < c; col++) {
-        const isGoingDown = (col % 2 === 0);
-        
-        for (let stepInCol = 0; stepInCol < r; stepInCol++) {
-          const row = isGoingDown ? stepInCol : (r - 1 - stepInCol);
-          const isLastInCol = (stepInCol === r - 1);
-          const isLastOverall = (stepNum === total);
+      // Módulo 1: Wake Lock API
+      const wakeLock = new WakeLockManager({
+        autoRequest: true,
+        onStateChange: (state) => updateWakeLockUI(state)
+      });
 
-          let icon = '⬇️';
-          let title = 'Desça na Vertical';
-          let desc = 'Tire a foto. Mova o charriot para baixo com 15% de sobreposição.';
+      // Módulo 2: Síntese de Áudio (Web Audio API)
+      const audioSynth = new BenchAudioSynthesizer({
+        volume: 0.22,
+        onMuteChange: (isMuted) => updateAudioUI(isMuted)
+      });
 
-          if (isLastOverall) {
-            icon = '🎉';
-            title = 'Varredura Concluída!';
-            desc = 'Última foto disparada! Salve as fotos na pasta para renomear e costurar no Fiji.';
-          } else if (isLastInCol) {
-            icon = '➡️';
-            title = 'Mova para a DIREITA';
-            desc = `Fim da Coluna ${col + 1}! Ande um campo para a direita (15% overlap) para iniciar a subida/descida.`;
-          } else if (!isGoingDown) {
-            icon = '⬆️';
-            title = 'Suba na Vertical';
-            desc = 'Tire a foto. Mova o charriot para cima com 15% de sobreposição.';
+      // Módulo 3: Persistência Anti-Pânico (localStorage)
+      const persistence = new CapturePersistence('palas_atlas_captura_state_v2');
+
+      // Referências DOM - Modos e Configuração
+      const tabModeDynamic = document.getElementById('tabModeDynamic');
+      const tabModeFixed = document.getElementById('tabModeFixed');
+      const sampleNameInput = document.getElementById('sampleNameInput');
+      const objectiveInput = document.getElementById('objectiveInput');
+      const colsInput = document.getElementById('colsInput');
+      const rowsInput = document.getElementById('rowsInput');
+      const overlapInput = document.getElementById('overlapInput');
+      const colStatusHint = document.getElementById('colStatusHint');
+      const totalFotosLabel = document.getElementById('totalFotosLabel');
+      const elapsedTimer = document.getElementById('elapsedTimer');
+      const avgTimeLabel = document.getElementById('avgTimeLabel');
+      
+      // Referências DOM - Mapa da Lâmina
+      const mapColCounter = document.getElementById('mapColCounter');
+      const gridProgressText = document.getElementById('gridProgressText');
+      const gridContainer = document.getElementById('gridContainer');
+      const btnPrev = document.getElementById('btnPrev');
+      const btnFinishSlide = document.getElementById('btnFinishSlide');
+      const btnFinishSlideHeader = document.getElementById('btnFinishSlideHeader');
+      const btnReset = document.getElementById('btnReset');
+
+      // Referências DOM - Ação Imediata
+      const actionCard = document.getElementById('actionCard');
+      const stepCounterBadge = document.getElementById('stepCounterBadge');
+      const directionIcon = document.getElementById('directionIcon');
+      const actionHeading = document.getElementById('actionHeading');
+      const actionSubtext = document.getElementById('actionSubtext');
+      const btnTriggerCapture = document.getElementById('btnTriggerCapture');
+      const coordBadge = document.getElementById('coordBadge');
+      const pctBadge = document.getElementById('pctBadge');
+      const progressBar = document.getElementById('progressBar');
+
+      // Referências DOM - Câmera & Ghosting
+      const cameraSelect = document.getElementById('cameraSelect');
+      const btnToggleCamera = document.getElementById('btnToggleCamera');
+      const btnStartCameraBanner = document.getElementById('btnStartCameraBanner');
+      const cameraStatusBadge = document.getElementById('cameraStatusBadge');
+      const videoFeed = document.getElementById('videoFeed');
+      const overlayCanvas = document.getElementById('overlayCanvas');
+      const cameraContainer = document.getElementById('cameraContainer');
+      const cameraOfflineMessage = document.getElementById('cameraOfflineMessage');
+      const syntheticGuideView = document.getElementById('syntheticGuideView');
+      const frozenBadge = document.getElementById('frozenBadge');
+      const tabModeLive = document.getElementById('tabModeLive');
+      const tabModeSynthetic = document.getElementById('tabModeSynthetic');
+      const overlapDisplayValue = document.getElementById('overlapDisplayValue');
+
+      // Referências DOM - Ghosting Toolbar
+      const ghostOpacityRange = document.getElementById('ghostOpacityRange');
+      const ghostOpacityVal = document.getElementById('ghostOpacityVal');
+      const ghostBlendSelect = document.getElementById('ghostBlendSelect');
+      const btnToggleReticle = document.getElementById('btnToggleReticle');
+      const btnToggleFreeze = document.getElementById('btnToggleFreeze');
+      const btnFlipH = document.getElementById('btnFlipH');
+      const btnFlipV = document.getElementById('btnFlipV');
+      const btnClearGhost = document.getElementById('btnClearGhost');
+      const capturedCount = document.getElementById('capturedCount');
+      const galleryContainer = document.getElementById('galleryContainer');
+      const btnDownloadAll = document.getElementById('btnDownloadAll');
+
+      // Header Badges
+      const btnWakeLock = document.getElementById('btnWakeLock');
+      const wakeLockDot = document.getElementById('wakeLockDot');
+      const wakeLockText = document.getElementById('wakeLockText');
+      const btnAudioToggle = document.getElementById('btnAudioToggle');
+      const audioIcon = document.getElementById('audioIcon');
+      const audioText = document.getElementById('audioText');
+      const btnVoiceToggle = document.getElementById('btnVoiceToggle');
+      const voiceIcon = document.getElementById('voiceIcon');
+      const voiceText = document.getElementById('voiceText');
+
+      // Banner de Recuperação
+      const recoveryBanner = document.getElementById('recoveryBanner');
+      const recoveryMessage = document.getElementById('recoveryMessage');
+      const btnRecoveryResume = document.getElementById('btnRecoveryResume');
+      const btnRecoveryDiscard = document.getElementById('btnRecoveryDiscard');
+
+      // Modal Conclusão de Lâmina
+      const conclusionModal = document.getElementById('conclusionModal');
+      const btnCloseConclusionModal = document.getElementById('btnCloseConclusionModal');
+      const btnDismissConclusionModal = document.getElementById('btnDismissConclusionModal');
+      const modalTotalCaptured = document.getElementById('modalTotalCaptured');
+      const modalFinalCols = document.getElementById('modalFinalCols');
+      const modalFinalRows = document.getElementById('modalFinalRows');
+      const modalExpectedTotal = document.getElementById('modalExpectedTotal');
+      const modalStatusBanner = document.getElementById('modalStatusBanner');
+      const modalSolutionsContainer = document.getElementById('modalSolutionsContainer');
+      const modalSolutionsList = document.getElementById('modalSolutionsList');
+      const btnOpenFijiFromConclusion = document.getElementById('btnOpenFijiFromConclusion');
+      const btnDownloadManifest = document.getElementById('btnDownloadManifest');
+
+      // Modal Fiji
+      const fijiModal = document.getElementById('fijiModal');
+      const btnOpenFijiDrawer = document.getElementById('btnOpenFijiDrawer');
+      const btnCloseFijiModal = document.getElementById('btnCloseFijiModal');
+      const btnDoneModal = document.getElementById('btnDoneModal');
+      const codePowerShell = document.getElementById('codePowerShell');
+      const codeFijiMacro = document.getElementById('codeFijiMacro');
+      const paramGridX = document.getElementById('paramGridX');
+      const paramGridY = document.getElementById('paramGridY');
+      const paramOverlap = document.getElementById('paramOverlap');
+      const paramPattern = document.getElementById('paramPattern');
+      const btnCopyPowerShell = document.getElementById('btnCopyPowerShell');
+      const btnCopyMacro = document.getElementById('btnCopyMacro');
+
+      // ==========================================
+      // 2. INICIALIZAÇÃO DA CÂMERA WEBRTC
+      // ==========================================
+      const cameraManager = new MicroscopeCameraManager({
+        videoElement: videoFeed,
+        overlayCanvas: overlayCanvas,
+        container: cameraContainer,
+        deviceSelect: cameraSelect,
+        statusBadge: cameraStatusBadge,
+        defaultOverlap: 0.15,
+        defaultOpacity: 0.45,
+        onStatusChange: ({ state, message }) => {
+          if (state === 'active') {
+            cameraOfflineMessage.classList.add('hidden');
+            btnToggleCamera.innerHTML = '<span>⏸️</span> Pausar';
+            btnToggleCamera.className = 'px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs transition flex items-center gap-1.5';
+            frozenBadge.classList.add('hidden');
+          } else if (state === 'frozen') {
+            frozenBadge.classList.remove('hidden');
+          } else {
+            frozenBadge.classList.add('hidden');
+            btnToggleCamera.innerHTML = '<span>▶️</span> Ligar Câmera';
+            btnToggleCamera.className = 'px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition flex items-center gap-1.5';
+            if (isLiveMode) {
+              cameraOfflineMessage.classList.remove('hidden');
+            }
+          }
+        },
+        onError: (err) => {
+          console.error('[AssistenteCaptura] Erro de câmera:', err);
+        },
+        onFrameCaptured: ({ stepIndex, stepNumber, canvas }) => {
+          updateGallery(stepIndex, stepNumber, canvas);
+        }
+      });
+
+      if (window.location.protocol === 'file:') {
+        const warning = document.getElementById('fileProtocolWarning');
+        if (warning) warning.classList.remove('hidden');
+      }
+
+      cameraManager.init();
+
+      // ==========================================
+      // 3. SÍNTESE DE VOZ (Web Speech API)
+      // ==========================================
+      function speakCue(text) {
+        if (!isVoiceActive || !('speechSynthesis' in window)) return;
+        try {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'pt-BR';
+          utterance.rate = 1.05;
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.warn('[Voz] Falha ao sintetizar:', e);
+        }
+      }
+
+      // ==========================================
+      // 4. ATUALIZAÇÃO DA INTERFACE & MAPA DA LÂMINA
+      // ==========================================
+      function updateUI() {
+        const step = engine.getCurrentStepInfo();
+        const matrixData = engine.getMatrix();
+        const Y = engine.rowsY;
+
+        // Atualizar textos e badges do Card de Ação
+        if (engine.mode === 'fixed') {
+          const totalExpected = engine.totalPhotosExpected;
+          stepCounterBadge.textContent = `Foto ${step.stepNum} de ${totalExpected}`;
+          const pct = Math.round(((engine.currentStep + 1) / totalExpected) * 100);
+          progressBar.style.width = `${pct}%`;
+          pctBadge.textContent = `${pct}% concluído`;
+          gridProgressText.textContent = `${engine.currentStep + 1} / ${totalExpected} fotos (${pct}%)`;
+          totalFotosLabel.textContent = `${totalExpected} fotos`;
+        } else {
+          stepCounterBadge.textContent = `Foto ${step.stepNum}`;
+          progressBar.style.width = '100%';
+          pctBadge.textContent = 'Modo Descoberta (Dinâmico)';
+          gridProgressText.textContent = `Foto ${step.stepNum} (Col ${step.colUser})`;
+          totalFotosLabel.textContent = `Dinâmico (Varredura)`;
+        }
+
+        directionIcon.textContent = step.icon;
+        actionHeading.textContent = step.title;
+        actionSubtext.textContent = step.desc;
+        coordBadge.textContent = `Coluna ${step.colUser} • Linha ${step.rowUser} de ${Y}`;
+
+        // Renderizar Mapa da Lâmina em Colunas Verticais
+        renderSlideMap(matrixData, step);
+        updateAverageTime();
+        saveCurrentState();
+      }
+
+      function renderSlideMap(matrixData, currentStepInfo) {
+        const { rows, cols, grid } = matrixData;
+        mapColCounter.textContent = `${cols} ${cols === 1 ? 'Coluna' : 'Colunas'}`;
+        gridContainer.innerHTML = '';
+
+        for (let c = 0; c < cols; c++) {
+          const isGoingDown = (c % 2 === 0);
+          const isCurrentCol = (c === currentStepInfo.col);
+
+          const colWrapper = document.createElement('div');
+          colWrapper.id = `col-wrapper-${c}`;
+          colWrapper.className = 'flex flex-col gap-1.5 shrink-0 min-w-[72px] sm:min-w-[80px]';
+
+          // Cabeçalho da Coluna com indicador direcional
+          const colHeader = document.createElement('div');
+          colHeader.className = `text-[10px] font-mono font-bold py-1 px-1.5 rounded-lg text-center border flex items-center justify-center gap-1 transition-all ${
+            isCurrentCol 
+              ? 'bg-indigo-950/80 border-indigo-500 text-indigo-300 shadow-sm shadow-indigo-500/20' 
+              : 'bg-slate-900 border-slate-800 text-slate-500'
+          }`;
+          colHeader.innerHTML = `<span>Col ${c + 1}</span> <span class="text-[11px] font-bold">${isGoingDown ? '⬇' : '⬆'}</span>`;
+          colWrapper.appendChild(colHeader);
+
+          // Células da coluna
+          const cellsWrapper = document.createElement('div');
+          cellsWrapper.className = 'flex flex-col gap-1.5';
+
+          for (let r = 0; r < rows; r++) {
+            const item = grid[r][c];
+            if (!item) continue;
+
+            const cellDiv = document.createElement('div');
+            cellDiv.id = `cell-step-${item.stepIndex}`;
+            
+            let cellStyle = 'aspect-square rounded-xl flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border cursor-pointer select-none relative ';
+            let badgeHtml = '';
+
+            if (item.isCurrent) {
+              cellStyle += 'bg-indigo-600 border-indigo-300 text-white shadow-lg shadow-indigo-600/40 ring-2 ring-indigo-400 active-cell-pulse z-10';
+              badgeHtml = `<span class="text-[9px] uppercase tracking-wider text-indigo-200">#${item.stepNum}</span><span class="text-xs">${item.icon}</span>`;
+            } else if (item.isCompleted) {
+              cellStyle += 'bg-emerald-950/70 border-emerald-600/80 text-emerald-300 hover:border-emerald-400';
+              badgeHtml = `<span class="text-[10px]">#${item.stepNum}</span><span class="text-[9px] text-emerald-400">✓</span>`;
+            } else {
+              cellStyle += 'bg-slate-900/90 border-slate-800 text-slate-600 hover:border-slate-700 hover:text-slate-400';
+              badgeHtml = `<span class="text-[10px]">#${item.stepNum}</span>`;
+            }
+
+            cellDiv.className = cellStyle;
+            cellDiv.innerHTML = badgeHtml;
+            cellDiv.onclick = (e) => {
+              e.stopPropagation();
+              engine.goToStep(item.stepIndex);
+              const cur = engine.getCurrentStepInfo();
+              cameraManager.restoreStep(cur.stepIndex, cur.action, cur.stepNum);
+              updateUI();
+              audioSynth.playShot();
+            };
+            cellsWrapper.appendChild(cellDiv);
           }
 
-          seq.push({
-            stepNum,
-            col,
-            row,
-            icon,
-            title,
-            desc
-          });
-
-          stepNum++;
+          colWrapper.appendChild(cellsWrapper);
+          gridContainer.appendChild(colWrapper);
         }
+
+        // No modo dinâmico: exibir a coluna fantasma indicando a próxima expansão
+        if (engine.mode === 'dynamic') {
+          const ghostWrapper = document.createElement('div');
+          ghostWrapper.className = 'flex flex-col gap-1.5 shrink-0 min-w-[72px] sm:min-w-[80px] opacity-40 hover:opacity-75 transition-opacity';
+          
+          const ghostHeader = document.createElement('div');
+          ghostHeader.className = 'text-[10px] font-mono py-1 px-1.5 rounded-lg text-center border border-dashed border-slate-700 text-slate-500';
+          ghostHeader.textContent = `+ Col ${cols + 1}`;
+          ghostWrapper.appendChild(ghostHeader);
+
+          const ghostCells = document.createElement('div');
+          ghostCells.className = 'flex flex-col gap-1.5';
+          for (let r = 0; r < rows; r++) {
+            const dummy = document.createElement('div');
+            dummy.className = 'aspect-square rounded-xl border border-dashed border-slate-800/80 flex items-center justify-center text-slate-700 text-[10px] font-mono';
+            dummy.textContent = '...';
+            ghostCells.appendChild(dummy);
+          }
+          ghostWrapper.appendChild(ghostCells);
+          gridContainer.appendChild(ghostWrapper);
+        }
+
+        scrollToActiveColumn(currentStepInfo.col);
       }
-      return seq;
-    }
 
-    function renderGrid() {
-      cols = parseInt(colsInput.value) || 3;
-      rows = parseInt(rowsInput.value) || 4;
-      sequence = generateSequence(cols, rows);
-
-      totalFotosLabel.textContent = `${cols * rows} fotos`;
-      gridContainer.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
-      gridContainer.innerHTML = '';
-
-      // Matriz de r x c para mapear as células na tela
-      const matrix = Array.from({ length: rows }, () => Array(cols).fill(null));
-      sequence.forEach((item, idx) => {
-        matrix[item.row][item.col] = { ...item, idx };
-      });
-
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const item = matrix[r][c];
-          const div = document.createElement('div');
-          div.id = `cell-${item.idx}`;
-          div.className = `aspect-square rounded-lg flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border ${
-            item.idx === currentStep 
-              ? 'bg-indigo-600 border-indigo-400 text-white scale-105 shadow-md shadow-indigo-500/30' 
-              : item.idx < currentStep 
-                ? 'bg-emerald-950/60 border-emerald-600 text-emerald-400' 
-                : 'bg-slate-900 border-slate-800 text-slate-500'
-          }`;
-          div.innerHTML = `<span>#${item.stepNum}</span>`;
-          div.onclick = (e) => {
-            e.stopPropagation();
-            setStep(item.idx);
-          };
-          gridContainer.appendChild(div);
+      function scrollToActiveColumn(colIdx) {
+        const activeWrapper = document.getElementById(`col-wrapper-${colIdx}`);
+        if (activeWrapper && gridContainer) {
+          const containerLeft = gridContainer.getBoundingClientRect().left;
+          const targetLeft = activeWrapper.getBoundingClientRect().left;
+          gridContainer.scrollBy({ left: targetLeft - containerLeft - 30, behavior: 'smooth' });
         }
       }
 
-      updateUI();
-    }
+      // ==========================================
+      // 5. DISPARO DE CAPTURA COM GHOSTING & ÁUDIO
+      // ==========================================
+      function captureAndAdvance() {
+        const cur = engine.getCurrentStepInfo();
+        
+        // 1. Congelar frame da câmera para projetar o fantasma (Onion Skin) no próximo passo
+        cameraManager.captureFrame(cur.stepIndex, cur.action, cur.stepNum);
 
-    function updateUI() {
-      const total = sequence.length;
-      if (currentStep >= total) currentStep = total - 1;
-      if (currentStep < 0) currentStep = 0;
+        // 2. Avançar o motor matemático
+        const nextStep = engine.next();
 
-      const current = sequence[currentStep];
-      stepCounterBadge.textContent = `Foto ${current.stepNum} de ${total}`;
-      directionIcon.textContent = current.icon;
-      actionHeading.textContent = current.title;
-      actionSubtext.textContent = current.desc;
-
-      const pct = Math.round(((currentStep + 1) / total) * 100);
-      progressBar.style.width = `${pct}%`;
-      gridProgressText.textContent = `${currentStep + 1} / ${total} fotos (${pct}%)`;
-
-      // Atualizar classes das células
-      sequence.forEach((item, idx) => {
-        const cell = document.getElementById(`cell-${idx}`);
-        if (!cell) return;
-        if (idx === currentStep) {
-          cell.className = 'aspect-square rounded-lg flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border bg-indigo-600 border-indigo-400 text-white scale-105 shadow-md shadow-indigo-500/30';
-        } else if (idx < currentStep) {
-          cell.className = 'aspect-square rounded-lg flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border bg-emerald-950/60 border-emerald-600 text-emerald-400';
+        // 3. Feedback Sonoro & Fala
+        if (nextStep.action === 'FINISH') {
+          audioSynth.playVictory();
+          speakCue('Varredura concluída');
+          openCompletionModal();
+        } else if (nextStep.isLastInCol || cur.action === 'RIGHT') {
+          audioSynth.playTurn();
+          speakCue(nextStep.audioCue);
         } else {
-          cell.className = 'aspect-square rounded-lg flex flex-col items-center justify-center font-mono text-xs font-bold transition-all border bg-slate-900 border-slate-800 text-slate-500';
+          audioSynth.playShot();
+          speakCue(nextStep.audioCue);
+        }
+
+        updateUI();
+      }
+
+      function prevStep() {
+        if (engine.currentStep > 0) {
+          const prev = engine.prev();
+          cameraManager.restoreStep(prev.stepIndex, prev.action, prev.stepNum);
+          audioSynth.playUndo();
+          speakCue(prev.audioCue);
+          updateUI();
+        }
+      }
+
+      function resetSession() {
+        if (confirm('Deseja reiniciar a varredura desta lâmina?')) {
+          engine.reset();
+          cameraManager.clearGhost();
+          startTime = Date.now();
+          audioSynth.playUndo();
+          updateUI();
+        }
+      }
+
+      // ==========================================
+      // 6. MODAL DE CONCLUSÃO DE LÂMINA
+      // ==========================================
+      function openCompletionModal() {
+        const summary = engine.getCompletionSummary();
+
+        modalTotalCaptured.textContent = summary.totalPhotosCaptured;
+        modalFinalCols.textContent = summary.gridX;
+        modalFinalRows.textContent = summary.gridY;
+        modalExpectedTotal.textContent = `${summary.expectedTotalPhotos} fotos`;
+
+        if (summary.isRectangular) {
+          modalStatusBanner.className = 'p-4 rounded-2xl border bg-emerald-950/30 border-emerald-500/40 text-emerald-200 flex items-start gap-3';
+          modalStatusBanner.innerHTML = `
+            <div class="text-2xl">🎉</div>
+            <div>
+              <h4 class="font-bold text-sm text-emerald-300">Grade 100% Retangular e Perfeita!</h4>
+              <p class="text-xs text-emerald-400/90 mt-0.5 leading-relaxed">
+                Todas as ${summary.gridX} colunas possuem exatamente ${summary.gridY} fotos (${summary.totalPhotosCaptured} fotos no total). 
+                O plugin do Fiji executará a costura sem nenhuma falha de coordenadas!
+              </p>
+            </div>
+          `;
+          modalSolutionsContainer.classList.add('hidden');
+        } else {
+          modalStatusBanner.className = 'p-4 rounded-2xl border bg-amber-950/30 border-amber-500/40 text-amber-200 flex items-start gap-3';
+          modalStatusBanner.innerHTML = `
+            <div class="text-2xl">⚠️</div>
+            <div>
+              <h4 class="font-bold text-sm text-amber-300">Última Coluna Incompleta (${summary.remainder} de ${summary.rowsY} fotos)</h4>
+              <p class="text-xs text-amber-300/90 mt-0.5 leading-relaxed">
+                A varredura parou na Coluna ${summary.totalColsTouched} com ${summary.remainder} fotos. 
+                Para o algoritmo retangular do Fiji, faltam ${summary.missingInLastCol} fotos para fechar a grade ${summary.gridX}×${summary.gridY}.
+              </p>
+            </div>
+          `;
+
+          modalSolutionsList.innerHTML = '';
+          summary.solutions.forEach((sol) => {
+            const div = document.createElement('div');
+            div.className = `p-3 rounded-xl border text-xs flex items-center justify-between gap-3 ${
+              sol.recommended 
+                ? 'bg-amber-900/30 border-amber-500/50 text-white' 
+                : 'bg-slate-900 border-slate-800 text-slate-300'
+            }`;
+            div.innerHTML = `
+              <div>
+                <div class="font-bold text-white flex items-center gap-1.5">
+                  <span>${sol.title}</span>
+                  ${sol.recommended ? '<span class="text-[9px] bg-amber-500 text-slate-950 font-bold px-1.5 rounded">RECOMENDADO</span>' : ''}
+                </div>
+                <div class="text-slate-400 text-[11px] mt-0.5 leading-snug">${sol.desc}</div>
+              </div>
+            `;
+
+            if (sol.id === 'complete_scan') {
+              const btn = document.createElement('button');
+              btn.className = 'px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs whitespace-nowrap transition';
+              btn.textContent = 'Continuar (+fotos)';
+              btn.onclick = () => {
+                conclusionModal.classList.add('hidden');
+              };
+              div.appendChild(btn);
+            } else if (sol.id === 'dummy_fill') {
+              const btn = document.createElement('button');
+              btn.className = 'px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 font-mono text-xs whitespace-nowrap border border-slate-700 transition';
+              btn.textContent = 'Copiar Dummy Script';
+              btn.onclick = () => {
+                const cmd = `1..${summary.missingInLastCol} | ForEach-Object { Copy-Item "${summary.photoPrefix}_${summary.totalPhotosCaptured}.jpg" "${summary.photoPrefix}_$(${summary.totalPhotosCaptured} + $_).jpg" }`;
+                navigator.clipboard.writeText(cmd).then(() => {
+                  btn.textContent = '✅ Copiado!';
+                  setTimeout(() => { btn.textContent = 'Copiar Dummy Script'; }, 2000);
+                });
+              };
+              div.appendChild(btn);
+            }
+            modalSolutionsList.appendChild(div);
+          });
+          modalSolutionsContainer.classList.remove('hidden');
+        }
+
+        updateFijiModal();
+        conclusionModal.classList.remove('hidden');
+      }
+
+      function downloadManifestJson() {
+        const manifest = engine.exportManifest();
+        const jsonStr = JSON.stringify(manifest, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `manifesto_${engine.photoPrefix}.json`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // ==========================================
+      // 7. MODAL DE COMANDOS FIJI & POWERSHELL
+      // ==========================================
+      function updateFijiModal() {
+        const summary = engine.getCompletionSummary();
+        const config = {
+          sampleName: engine.photoPrefix,
+          cols: summary.gridX,
+          rows: summary.gridY,
+          overlap: engine.overlapPercent,
+          objective: objectiveInput.value
+        };
+
+        const psCmd = CommandGenerator.generatePowerShell(config);
+        const fijiParams = CommandGenerator.generateFijiParameters(config);
+        const fijiMacro = CommandGenerator.generateFijiMacroSnippet(config);
+
+        codePowerShell.textContent = psCmd;
+        paramGridX.textContent = `${fijiParams.gridX} colunas`;
+        paramGridY.textContent = `${fijiParams.gridY} linhas`;
+        paramOverlap.textContent = `${fijiParams.overlap}%`;
+        paramPattern.textContent = fijiParams.filePattern;
+        codeFijiMacro.textContent = fijiMacro;
+      }
+
+      // ==========================================
+      // 8. GALERIA DE MINIATURAS
+      // ==========================================
+      function updateGallery(stepIndex, stepNumber, canvas) {
+        if (cameraManager.capturedFrames.size === 1) {
+          galleryContainer.innerHTML = '';
+          btnDownloadAll.classList.remove('hidden');
+        }
+
+        capturedCount.textContent = cameraManager.capturedFrames.size;
+
+        const thumb = document.createElement('div');
+        thumb.className = 'relative flex-shrink-0 w-16 h-12 rounded-lg border border-slate-700 overflow-hidden bg-black cursor-pointer hover:border-indigo-400 transition group';
+        thumb.title = `Foto #${stepNumber} (Clique para baixar)`;
+
+        const img = document.createElement('img');
+        img.src = canvas.toDataURL('image/jpeg', 0.6);
+        img.className = 'w-full h-full object-cover';
+
+        const tag = document.createElement('span');
+        tag.className = 'absolute bottom-0 right-0 bg-slate-900/80 text-[9px] font-mono font-bold text-white px-1 rounded-tl';
+        tag.textContent = `#${stepNumber}`;
+
+        thumb.appendChild(img);
+        thumb.appendChild(tag);
+
+        thumb.onclick = () => {
+          const cleanName = CommandGenerator.sanitizeName(engine.photoPrefix);
+          const link = document.createElement('a');
+          link.download = `${cleanName}_${stepNumber}.jpg`;
+          link.href = canvas.toDataURL('image/jpeg', 0.95);
+          link.click();
+        };
+
+        galleryContainer.appendChild(thumb);
+        galleryContainer.scrollLeft = galleryContainer.scrollWidth;
+      }
+
+      // ==========================================
+      // 9. ALTERNÂNCIA DE MODOS
+      // ==========================================
+      function setGridMode(mode) {
+        currentMode = mode;
+        engine.setMode(mode);
+
+        if (mode === 'dynamic') {
+          tabModeDynamic.className = 'flex-1 py-1.5 px-2 rounded-lg bg-indigo-600 text-white shadow-sm transition text-center flex items-center justify-center gap-1';
+          tabModeFixed.className = 'flex-1 py-1.5 px-2 rounded-lg text-slate-400 hover:text-white transition text-center flex items-center justify-center gap-1';
+          colsInput.disabled = true;
+          colsInput.value = '';
+          colsInput.placeholder = 'Auto';
+          colStatusHint.textContent = 'Auto';
+        } else {
+          tabModeFixed.className = 'flex-1 py-1.5 px-2 rounded-lg bg-indigo-600 text-white shadow-sm transition text-center flex items-center justify-center gap-1';
+          tabModeDynamic.className = 'flex-1 py-1.5 px-2 rounded-lg text-slate-400 hover:text-white transition text-center flex items-center justify-center gap-1';
+          colsInput.disabled = false;
+          colsInput.value = engine.fixedColsX || 3;
+          colStatusHint.textContent = 'Fixo';
+        }
+
+        updateUI();
+      }
+
+      function setLiveMode(live) {
+        isLiveMode = live;
+        if (live) {
+          tabModeLive.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition';
+          tabModeSynthetic.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+          syntheticGuideView.classList.add('hidden');
+          if (!cameraManager.isActive) {
+            cameraOfflineMessage.classList.remove('hidden');
+          } else {
+            cameraOfflineMessage.classList.add('hidden');
+          }
+        } else {
+          tabModeSynthetic.className = 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition';
+          tabModeLive.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+          syntheticGuideView.classList.remove('hidden');
+          cameraOfflineMessage.classList.add('hidden');
+        }
+      }
+
+      // ==========================================
+      // 10. PERSISTÊNCIA (localStorage)
+      // ==========================================
+      function saveCurrentState() {
+        persistence.save({
+          currentStep: engine.currentStep,
+          mode: engine.mode,
+          rows: engine.rowsY,
+          cols: engine.fixedColsX,
+          overlap: engine.overlapPercent,
+          sampleName: engine.photoPrefix,
+          objective: objectiveInput.value,
+          history: engine.history,
+          startTime
+        });
+      }
+
+      function checkSessionRecovery() {
+        if (persistence.hasIncompleteSession()) {
+          const saved = persistence.load();
+          const timeAgo = persistence.formatTimeAgo(saved.lastUpdated);
+
+          recoveryMessage.textContent = `Amostra '${saved.sampleName || 'amostra'}' na Foto ${saved.currentStep + 1} (${timeAgo}).`;
+          recoveryBanner.classList.remove('hidden');
+
+          btnRecoveryResume.onclick = () => {
+            if (saved.mode) setGridMode(saved.mode);
+            if (saved.rows) rowsInput.value = saved.rows;
+            if (saved.cols) colsInput.value = saved.cols;
+            if (saved.overlap) overlapInput.value = saved.overlap;
+            if (saved.sampleName) sampleNameInput.value = saved.sampleName;
+            if (saved.objective) objectiveInput.value = saved.objective;
+
+            engine.setDimensions({ rowsY: saved.rows, fixedColsX: saved.cols });
+            engine.overlapPercent = saved.overlap || 15;
+            engine.photoPrefix = saved.sampleName || 'amostra_1';
+            engine.currentStep = saved.currentStep || 0;
+            engine.history = saved.history || [];
+            startTime = saved.startTime || Date.now();
+
+            recoveryBanner.classList.add('hidden');
+            updateUI();
+            audioSynth.playShot();
+          };
+
+          btnRecoveryDiscard.onclick = () => {
+            persistence.clear();
+            recoveryBanner.classList.add('hidden');
+          };
+        }
+      }
+
+      // ==========================================
+      // 11. WAKE LOCK & ÁUDIO UI
+      // ==========================================
+      function updateWakeLockUI(state) {
+        if (!state.isSupported) {
+          wakeLockDot.className = 'w-2 h-2 rounded-full bg-amber-500';
+          wakeLockText.textContent = 'Tela: N/D';
+          btnWakeLock.title = 'Screen Wake Lock API não disponível';
+          return;
+        }
+
+        if (state.isActive) {
+          wakeLockDot.className = 'w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-emerald-500/50 pulse-ring';
+          wakeLockText.textContent = '🟢 Tela Ativa';
+          btnWakeLock.classList.add('border-emerald-500/50', 'bg-emerald-950/40', 'text-emerald-300');
+          btnWakeLock.classList.remove('border-slate-700', 'bg-slate-800', 'text-slate-300');
+        } else {
+          wakeLockDot.className = 'w-2 h-2 rounded-full bg-slate-500';
+          wakeLockText.textContent = '⚪ Tela: Auto';
+          btnWakeLock.classList.remove('border-emerald-500/50', 'bg-emerald-950/40', 'text-emerald-300');
+          btnWakeLock.classList.add('border-slate-700', 'bg-slate-800', 'text-slate-300');
+        }
+      }
+
+      function updateAudioUI(isMuted) {
+        if (isMuted) {
+          audioIcon.textContent = '🔇';
+          audioText.textContent = 'Mudo';
+          btnAudioToggle.classList.add('text-slate-500');
+        } else {
+          audioIcon.textContent = '🔊';
+          audioText.textContent = 'Bipes Ativos';
+          btnAudioToggle.classList.remove('text-slate-500');
+        }
+      }
+
+      function toggleVoice() {
+        isVoiceActive = !isVoiceActive;
+        if (isVoiceActive) {
+          voiceIcon.textContent = '🗣️';
+          voiceText.textContent = 'Voz Ativa';
+          btnVoiceToggle.classList.remove('text-slate-500');
+          speakCue('Voz ativada');
+        } else {
+          voiceIcon.textContent = '🤐';
+          voiceText.textContent = 'Voz Muda';
+          btnVoiceToggle.classList.add('text-slate-500');
+        }
+      }
+
+      // ==========================================
+      // 12. TEMPO E MÉTRICAS
+      // ==========================================
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          const diffSec = Math.floor((Date.now() - startTime) / 1000);
+          const mins = String(Math.floor(diffSec / 60)).padStart(2, '0');
+          const secs = String(diffSec % 60).padStart(2, '0');
+          elapsedTimer.textContent = `⏱️ ${mins}:${secs}`;
+        }, 1000);
+      }
+
+      function updateAverageTime() {
+        if (engine.history.length > 1) {
+          const first = engine.history[0].timestamp;
+          const last = engine.history[engine.history.length - 1].timestamp;
+          const avgSec = ((last - first) / 1000 / engine.history.length).toFixed(1);
+          avgTimeLabel.textContent = `~${avgSec}s/foto`;
+        } else {
+          avgTimeLabel.textContent = '~0s/foto';
+        }
+      }
+
+      // ==========================================
+      // 13. LISTENERS DE EVENTOS
+      // ==========================================
+      tabModeDynamic.addEventListener('click', () => setGridMode('dynamic'));
+      tabModeFixed.addEventListener('click', () => setGridMode('fixed'));
+
+      rowsInput.addEventListener('change', () => {
+        const val = Math.max(1, parseInt(rowsInput.value) || 6);
+        rowsInput.value = val;
+        engine.setDimensions({ rowsY: val });
+        updateUI();
+      });
+
+      colsInput.addEventListener('change', () => {
+        const val = Math.max(1, parseInt(colsInput.value) || 3);
+        colsInput.value = val;
+        engine.setDimensions({ fixedColsX: val });
+        updateUI();
+      });
+
+      overlapInput.addEventListener('change', () => {
+        const val = Math.max(5, parseInt(overlapInput.value) || 15);
+        overlapInput.value = val;
+        engine.overlapPercent = val;
+        cameraManager.overlapPct = val / 100;
+        if (overlapDisplayValue) overlapDisplayValue.textContent = `${val}%`;
+        updateUI();
+      });
+
+      sampleNameInput.addEventListener('input', () => {
+        const name = sampleNameInput.value.trim() || 'amostra_1';
+        engine.photoPrefix = name;
+        updateFijiModal();
+        saveCurrentState();
+      });
+
+      objectiveInput.addEventListener('change', () => {
+        updateFijiModal();
+        saveCurrentState();
+      });
+
+      // Disparos e Navegação
+      actionCard.addEventListener('click', (e) => {
+        if (e.target.closest('#btnTriggerCapture')) return;
+        captureAndAdvance();
+      });
+      btnTriggerCapture.addEventListener('click', (e) => {
+        e.stopPropagation();
+        captureAndAdvance();
+      });
+
+      btnPrev.addEventListener('click', (e) => { e.stopPropagation(); prevStep(); });
+      btnReset.addEventListener('click', (e) => { e.stopPropagation(); resetSession(); });
+      btnFinishSlide.addEventListener('click', (e) => { e.stopPropagation(); openCompletionModal(); });
+      btnFinishSlideHeader.addEventListener('click', () => openCompletionModal());
+
+      // Header Badges
+      btnWakeLock.addEventListener('click', () => wakeLock.toggle());
+      btnAudioToggle.addEventListener('click', () => audioSynth.toggleMute());
+      btnVoiceToggle.addEventListener('click', toggleVoice);
+
+      // Modais
+      btnOpenFijiDrawer.addEventListener('click', () => {
+        updateFijiModal();
+        fijiModal.classList.remove('hidden');
+      });
+      btnCloseFijiModal.addEventListener('click', () => fijiModal.classList.add('hidden'));
+      btnDoneModal.addEventListener('click', () => fijiModal.classList.add('hidden'));
+
+      btnCloseConclusionModal.addEventListener('click', () => conclusionModal.classList.add('hidden'));
+      btnDismissConclusionModal.addEventListener('click', () => conclusionModal.classList.add('hidden'));
+      btnOpenFijiFromConclusion.addEventListener('click', () => {
+        conclusionModal.classList.add('hidden');
+        updateFijiModal();
+        fijiModal.classList.remove('hidden');
+      });
+      btnDownloadManifest.addEventListener('click', downloadManifestJson);
+
+      btnCopyPowerShell.addEventListener('click', () => {
+        CommandGenerator.copyWithFeedback(codePowerShell.textContent, btnCopyPowerShell);
+      });
+      btnCopyMacro.addEventListener('click', () => {
+        CommandGenerator.copyWithFeedback(codeFijiMacro.textContent, btnCopyMacro);
+      });
+
+      // Câmera & Toolbar
+      btnToggleCamera.addEventListener('click', () => cameraManager.toggleCamera());
+      btnStartCameraBanner.addEventListener('click', () => cameraManager.startCamera());
+      cameraSelect.addEventListener('change', (e) => cameraManager.startCamera(e.target.value));
+
+      tabModeLive.addEventListener('click', () => setLiveMode(true));
+      tabModeSynthetic.addEventListener('click', () => setLiveMode(false));
+
+      ghostOpacityRange.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        ghostOpacityVal.textContent = `${val}%`;
+        cameraManager.setGhostOpacity(val / 100);
+      });
+
+      ghostBlendSelect.addEventListener('change', (e) => {
+        cameraManager.setBlendMode(e.target.value);
+      });
+
+      btnToggleReticle.addEventListener('click', () => {
+        const next = !cameraManager.showReticle;
+        cameraManager.setShowReticle(next);
+        btnToggleReticle.className = next 
+          ? 'px-2.5 py-1 rounded-lg bg-indigo-950/60 border border-indigo-800 text-indigo-300 hover:text-white text-xs font-semibold transition flex items-center gap-1'
+          : 'px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white text-xs font-semibold transition flex items-center gap-1';
+      });
+
+      btnToggleFreeze.addEventListener('click', () => {
+        const isFrozen = cameraManager.toggleFreeze();
+        btnToggleFreeze.className = isFrozen
+          ? 'px-2.5 py-1 rounded-lg bg-cyan-950/80 border border-cyan-500 text-cyan-300 font-semibold text-xs transition flex items-center gap-1'
+          : 'px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition flex items-center gap-1';
+      });
+
+      btnFlipH.addEventListener('click', () => {
+        const flipped = cameraManager.toggleFlipH();
+        btnFlipH.classList.toggle('bg-indigo-600', flipped);
+        btnFlipH.classList.toggle('text-white', flipped);
+      });
+
+      btnFlipV.addEventListener('click', () => {
+        const flipped = cameraManager.toggleFlipV();
+        btnFlipV.classList.toggle('bg-indigo-600', flipped);
+        btnFlipV.classList.toggle('text-white', flipped);
+      });
+
+      btnClearGhost.addEventListener('click', () => cameraManager.clearGhost());
+
+      btnDownloadAll.addEventListener('click', () => {
+        const cleanName = CommandGenerator.sanitizeName(engine.photoPrefix);
+        cameraManager.capturedFrames.forEach((item) => {
+          const link = document.createElement('a');
+          link.download = `${cleanName}_${item.stepNumber}.jpg`;
+          link.href = item.canvas.toDataURL('image/jpeg', 0.95);
+          link.click();
+        });
+      });
+
+      // Atalhos Ergonômicos de Bancada
+      window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+        if (e.code === 'Space' || e.code === 'Enter') {
+          e.preventDefault();
+          captureAndAdvance();
+        } else if (e.code === 'KeyC') {
+          e.preventDefault();
+          openCompletionModal();
+        } else if (e.code === 'KeyF') {
+          e.preventDefault();
+          btnToggleFreeze.click();
+        } else if (e.code === 'KeyR') {
+          e.preventDefault();
+          btnToggleReticle.click();
+        } else if (e.code === 'KeyH') {
+          e.preventDefault();
+          btnFlipH.click();
+        } else if (e.code === 'KeyV') {
+          e.preventDefault();
+          btnFlipV.click();
+        } else if (e.code === 'KeyM') {
+          e.preventDefault();
+          btnAudioToggle.click();
+        } else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
+          captureAndAdvance();
+        } else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
+          prevStep();
+        } else if (e.code === 'Escape') {
+          fijiModal.classList.add('hidden');
+          conclusionModal.classList.add('hidden');
         }
       });
-    }
 
-    function nextStep() {
-      if (currentStep < sequence.length - 1) {
-        currentStep++;
-        updateUI();
-      }
-    }
+      // Inicialização Geral
+      updateAudioUI(audioSynth.isMuted);
+      setGridMode('dynamic');
+      checkSessionRecovery();
+      startTimer();
 
-    function prevStep() {
-      if (currentStep > 0) {
-        currentStep--;
-        updateUI();
-      }
-    }
-
-    function setStep(idx) {
-      currentStep = idx;
-      updateUI();
-    }
-
-    colsInput.addEventListener('change', renderGrid);
-    rowsInput.addEventListener('change', renderGrid);
-    actionCard.addEventListener('click', nextStep);
-    btnPrev.addEventListener('click', (e) => { e.stopPropagation(); prevStep(); });
-    btnReset.addEventListener('click', (e) => { e.stopPropagation(); currentStep = 0; updateUI(); });
-
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        nextStep();
-      } else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
-        nextStep();
-      } else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
-        prevStep();
-      }
-    });
-
-    renderGrid();
+    })();
   </script>
 </body>
 </html>
