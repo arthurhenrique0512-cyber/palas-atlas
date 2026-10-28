@@ -603,6 +603,14 @@ export function vincularTextoAoPino() {
 export function inicializarEventosPreviewInterativo() {
   const editor = document.getElementById("dashEditorTexto");
   if (!editor || editor._eventosInteracaoInjetados) return;
+
+  // Intercepta colagem no editor para remover HTML poluente e spans parasitas de chats de IA
+  editor.addEventListener("paste", (evento) => {
+    evento.preventDefault();
+    const textoPuro = (evento.clipboardData || window.clipboardData).getData("text/plain");
+    document.execCommand("insertText", false, textoPuro);
+  });
+
   editor.addEventListener("mouseover", (evento) => {
     const alvo = evento.target.closest(".pin-link, [data-pin-id]");
     if (!alvo) return;
@@ -651,7 +659,8 @@ export async function publicarLaminaCms() {
   const imgUrlEl = document.getElementById("dashImgUrl");
   const imagemUrl = imgUrlEl ? imgUrlEl.value.trim() : "";
   const descEl = document.getElementById("dashEditorTexto");
-  const descricaoHTML = descEl ? descEl.innerHTML : "";
+  const rawDescHTML = descEl ? descEl.innerHTML : "";
+  const descricaoHTML = sanitizarHTMLDescricao(rawDescHTML);
   if (!nome || !imagemUrl) { alert("Os campos 'Nome da Peca / Lamina' e 'Caminho do arquivo / pasta' sao obrigatorios para gravacao."); return; }
   const pinos = editorPins.map((p) => ({ id: p.id, rotulo: p.rotulo, x: p.x, y: p.y }));
   // Req 1: Coleta maxMagnification do novo campo e converte para número
