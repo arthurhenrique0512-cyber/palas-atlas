@@ -138,8 +138,6 @@ body {
               0 10px 15px -5px rgba(0, 0, 0, 0.05) !important;
 }
 
-}
-
 /* Efeito de compressão tátil em botões ao clicar (Active State) */
 button:active {
   transform: scale(0.975);
@@ -554,4 +552,122 @@ input#global-search-input:-webkit-autofill:active {
   -webkit-text-fill-color: #ffffff !important;
   transition: background-color 5000s ease-in-out 0s;
   caret-color: #ffffff;
+}
+
+
+/* Utilitário para ocultar scrollbar em containers horizontais */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==========================================================================
+   UTILITÁRIOS TOUCH E TAMANHOS GLOBAIS
+   Garantia de que utilitários Tailwind recentes existam mesmo sem recompilar tailwind.min.css
+   ========================================================================== */
+.w-9  { width: 2.25rem !important; }
+.h-9  { height: 2.25rem !important; }
+.w-10 { width: 2.5rem !important; }
+.h-10 { height: 2.5rem !important; }
+.w-11 { width: 2.75rem !important; }
+.h-11 { height: 2.75rem !important; }
+.min-w-\[40px\] { min-width: 40px !important; }
+.min-h-\[40px\] { min-height: 40px !important; }
+.min-w-\[42px\] { min-width: 42px !important; }
+.min-h-\[38px\] { min-height: 38px !important; }
+.min-w-\[44px\] { min-width: 44px !important; }
+.min-h-\[44px\] { min-height: 44px !important; }
+
+/* ==========================================================================
+   8. RESPONSIVIDADE MOBILE & TABLET (Telas < 1024px)
+   Touch Targets ergonômicos (>= 44x44px), Safe Area Insets e Prevenção de Overflow
+   Regra de Ouro: Telas Desktop (>= 1024px) mantêm visual e comportamento intactos.
+   ========================================================================== */
+
+@media (max-width: 1023px) {
+  /* Alvos de Toque no Header e Modais */
+  #btnOpenDrawer {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  #btnVoltarGlobal {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  /* Botão fechar do menu lateral */
+  #sideDrawer button[aria-label="Fechar menu lateral"] {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Botão fechar do modal de ajuda */
+  #helpModal button[aria-label="Fechar guia de uso"] {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Botões do Leitor de Microscopia no Mobile */
+  #btnToggleSidebar,
+  #btnCloseSidebarMobile {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Side Drawer: Largura fluida amigável e espaçamento em telas menores */
+  #sideDrawer {
+    max-width: 85vw;
+  }
+
+  /* Prevenção rigorosa de vazamento horizontal */
+  #histoCatalog,
+  #histoSubCatalog {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
+/* Regra de Ouro para Desktop (>= 1024px): Preserva tamanhos originais */
+@media (min-width: 1024px) {
+  .lg\:w-10 { width: 2.5rem !important; }
+  .lg\:h-10 { height: 2.5rem !important; }
+  .lg\:w-9  { width: 2.25rem !important; }
+  .lg\:h-9  { height: 2.25rem !important; }
+  .lg\:w-6  { width: 1.5rem !important; }
+  .lg\:h-6  { height: 1.5rem !important; }
+  .lg\:min-w-0 { min-width: 0 !important; }
+  .lg\:min-h-0 { min-height: 0 !important; }
+}
+
+/* Suporte a Safe Area Inset no Side Drawer em dispositivos móveis */
+@supports (padding-top: env(safe-area-inset-top)) {
+  @media (max-width: 639px) {
+    #sideDrawer {
+      padding-top: max(1.25rem, env(safe-area-inset-top)) !important;
+      padding-bottom: max(1.25rem, env(safe-area-inset-bottom)) !important;
+      padding-left: max(1.25rem, env(safe-area-inset-left)) !important;
+      padding-right: max(1.25rem, env(safe-area-inset-right)) !important;
+    }
+  }
 }

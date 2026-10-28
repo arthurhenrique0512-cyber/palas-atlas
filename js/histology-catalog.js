@@ -75,6 +75,70 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   `;
 }
 
+
+/**
+ * Seletor Horizontal Deslizante de Disciplinas para Mobile e Tablet (md:hidden)
+ * Permite ao usuário alternar com 1 toque entre Histologia, Anatomia, Patologia, etc.
+ */
+function gerarBarraDisciplinasMobile() {
+  const lista = [
+    { id: "histologia", label: "Histologia", icon: '<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>' },
+    { id: "anatomia", label: "Anatomia", icon: '<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>' },
+    { id: "patologia", label: "Patologia", icon: '<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>' },
+    { id: "parasitologia", label: "Parasitologia", icon: '<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>' },
+    { id: "microbiologia", label: "Microbiologia", icon: '<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>' }
+  ];
+
+  const chipsHtml = lista.map((item) => {
+    const isAtivo = disciplinaAtual === item.id;
+    const classes = isAtivo
+      ? "bg-slate-900 text-white font-semibold shadow-sm border-slate-900"
+      : "bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200/80";
+    return `
+      <button
+        type="button"
+        onclick="window.App.selecionarFrente('${item.id}')"
+        class="shrink-0 flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-full text-xs transition-all border shadow-[0_1px_3px_rgba(0,0,0,0.04)] active:scale-95 cursor-pointer whitespace-nowrap ${classes}">
+        ${item.icon}
+        <span>${item.label}</span>
+      </button>
+    `;
+  }).join("");
+
+  return `
+    <div class="md:hidden w-full mb-6 pb-1 overflow-x-auto no-scrollbar flex items-center gap-2 select-none scroll-smooth">
+      ${chipsHtml}
+    </div>
+  `;
+}
+
+/**
+ * Seletor Horizontal de Tópicos do Módulo Ativo no Mobile (Nível 2)
+ */
+function gerarBarraTopicosMobile(modulo, topicoAtivoId) {
+  if (!modulo || !modulo.topicos || modulo.topicos.length <= 1) return "";
+  const chipsHtml = modulo.topicos.map((topico) => {
+    const isAtivo = topico.id === topicoAtivoId;
+    const classes = isAtivo
+      ? "bg-slate-900 text-white font-semibold shadow-sm border-slate-900"
+      : "bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200/80";
+    return `
+      <button
+        type="button"
+        onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
+        class="shrink-0 flex items-center px-4 py-2.5 min-h-[44px] rounded-full text-xs transition-all border shadow-[0_1px_3px_rgba(0,0,0,0.04)] active:scale-95 cursor-pointer whitespace-nowrap ${classes}">
+        <span>${topico.titulo}</span>
+      </button>
+    `;
+  }).join("");
+
+  return `
+    <div class="md:hidden w-full mb-5 pb-1 overflow-x-auto no-scrollbar flex items-center gap-2 select-none scroll-smooth">
+      ${chipsHtml}
+    </div>
+  `;
+}
+
 /**
  * Renderiza o Nível 1 (#histoCatalog): Sumário Limpo de Cards Visuais
  * @param {string} disciplina - Identificador da disciplina.
@@ -105,8 +169,11 @@ function renderizarCatalogoHistologia(disciplina) {
       htmlCards += `
         <div 
           onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
-          class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-lg hover:border-[#d4af37]/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex items-center min-h-[88px] group">
-          <h3 class="font-serif text-lg text-slate-800 font-semibold leading-snug group-hover:text-slate-950 transition-colors">${topico.titulo}</h3>
+          class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-lg hover:border-[#d4af37]/50 hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 cursor-pointer flex items-center justify-between min-h-[80px] sm:min-h-[88px] group">
+          <h3 class="font-serif text-base sm:text-lg text-slate-800 font-semibold leading-snug group-hover:text-slate-950 transition-colors">${topico.titulo}</h3>
+          <span class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-[#d4af37]/10 flex items-center justify-center text-slate-400 group-hover:text-[#d4af37] shrink-0 ml-3 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </span>
         </div>
       `;
       
@@ -139,11 +206,14 @@ function renderizarCatalogoHistologia(disciplina) {
   }
 
   c1.innerHTML = `
-    <div class="w-full px-6 sm:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-10">
+    <div class="w-full px-4 sm:px-6 md:px-10 pt-4 md:pt-6 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6 md:gap-10 max-w-full">
       ${gerarIndiceLateral(modulo, null, false)}
       
-      <div class="w-full">
-        <div class="mb-8 pb-5 border-b border-slate-200/70">
+      <div class="w-full min-w-0">
+        <!-- SELETOR HORIZONTAL DE DISCIPLINAS (MOBILE & TABLET: md:hidden) -->
+        ${gerarBarraDisciplinasMobile()}
+
+        <div class="mb-6 md:mb-8 pb-5 border-b border-slate-200/70">
           <!-- BREADCRUMBS -->
           <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-400 mb-2.5 flex-wrap">
             <a href="#" onclick="window.App.navegarPara('pgHome'); return false;" class="text-slate-500 hover:text-[#d4af37] hover:underline transition-colors">Início</a>
@@ -157,7 +227,7 @@ function renderizarCatalogoHistologia(disciplina) {
             </p>
           </div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           ${htmlCards}
         </div>
       </div>
@@ -222,10 +292,13 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
   // Renderização 2 Colunas Limpas (Índice + Texto) com espaçamento superior confortável
   c2.innerHTML = `
-    <div class="w-full px-6 sm:px-10 pt-6 md:pt-8 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-10">
+    <div class="w-full px-4 sm:px-6 md:px-10 pt-4 md:pt-8 pb-16 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6 md:gap-10 max-w-full">
       ${gerarIndiceLateral(modulo, topico.id, true)}
 
-      <div class="w-full">
+      <div class="w-full min-w-0">
+        <!-- SELETOR HORIZONTAL DE DISCIPLINAS & TÓPICOS (MOBILE & TABLET: md:hidden) -->
+        ${gerarBarraDisciplinasMobile()}
+        ${gerarBarraTopicosMobile(modulo, topico.id)}
       
         <!-- BREADCRUMBS -->
         <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-400 mb-2.5 flex-wrap">
@@ -242,7 +315,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
         </h1>
 
         <!-- TEXTO EXPLICATIVO (UNBOXED EDITORIAL) -->
-        <div class="text-slate-700 text-sm md:text-base leading-relaxed space-y-3 mb-6 prose-editor [&_strong]:font-semibold [&_strong]:text-slate-900 [&_b]:font-semibold [&_b]:text-slate-900">
+        <div class="text-slate-700 text-sm md:text-base leading-relaxed space-y-3 mb-6 prose-editor break-words [&_strong]:font-semibold [&_strong]:text-slate-900 [&_b]:font-semibold [&_b]:text-slate-900">
           ${formatarResumoAcademico(topico.resumo)}
         </div>
 
@@ -251,7 +324,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           <h2 class="text-xl font-serif font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">
             Lâminas de Microscopia Associadas
           </h2>
-          <div id="gridCatalogoLaminas" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div id="gridCatalogoLaminas" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <p class="text-sm text-slate-500 col-span-full">Aguardando lâminas...</p>
           </div>
         </div>
@@ -335,9 +408,9 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           }
 
           cardsLaminasHtml += `
-            <a href="microscopio.html?id=${lamina.id}" class="bg-white rounded-2xl p-5 border border-slate-200/60 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer flex flex-col justify-between">
+            <a href="microscopio.html?id=${lamina.id}" class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/60 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg active:scale-[0.98] transition-all duration-300 overflow-hidden group cursor-pointer flex flex-col justify-between">
               <!-- Thumbnail da Imagem -->
-              <div class="w-full h-48 bg-slate-100 relative overflow-hidden rounded-xl flex items-center justify-center">
+              <div class="w-full h-44 sm:h-48 bg-slate-100 relative overflow-hidden rounded-xl flex items-center justify-center">
                 <!-- Placeholder exibido quando a imagem falha (visível via CSS quando a img é ocultada) -->
                 <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden">
                   <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,13 +425,16 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onerror="var fb='${thumbSrcFallback}'; if(fb && this.src!==fb){this.src=fb;}else{this.style.display='none';var ph=this.parentElement.querySelector('.thumb-placeholder');if(ph){ph.classList.remove('hidden');ph.classList.add('flex');}}"
                 >
-                <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm font-sans">
+                <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2.5 py-1 rounded-md backdrop-blur-sm font-sans">
                   ${coloracaoNome} - 40x
                 </div>
               </div>
               <!-- Rodapé do Card -->
-              <div class="mt-4">
+              <div class="mt-4 flex items-center justify-between gap-2">
                 <h3 class="text-base font-serif font-semibold text-slate-800 group-hover:text-[#d4af37] transition-colors leading-tight">${nomeLamina}</h3>
+                <span class="shrink-0 w-8 h-8 rounded-full bg-slate-50 group-hover:bg-[#d4af37]/10 flex items-center justify-center text-slate-400 group-hover:text-[#d4af37] transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </span>
               </div>
             </a>
           `;
@@ -447,6 +523,12 @@ function voltarNivel(nivelDestino) {
     if (pgHistologia) pgHistologia.classList.remove("pt-14");
     c3.classList.remove("hidden");
   }
+}
+
+// Inicialização imediata caso o state já tenha sido definido por rotas ou main.js
+const estadoInicial = typeof getState === 'function' ? getState() : null;
+if (estadoInicial && ['anatomia', 'histologia', 'patologia', 'parasitologia', 'microbiologia'].includes(estadoInicial.frenteAtiva)) {
+  renderizarCatalogoHistologia(estadoInicial.frenteAtiva);
 }
 
 // Reativo: ao mudar a frente no state, se for do ciclo básico telescópico, atualiza o catálogo

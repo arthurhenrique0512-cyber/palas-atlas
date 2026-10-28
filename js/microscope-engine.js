@@ -48,13 +48,21 @@ function sincronizarTamanhoDoViewer() {
   } catch (e) { /* viewer em transição: ignora */ }
 }
 
+function isMobileOrLandscapeDrawer() {
+  return window.innerWidth < 1024 || window.innerHeight <= 500;
+}
+
 function aplicarEstadoSidebar(recolhida, persistir) {
-  const sidebar = document.getElementById("viewerSidebar");
-  const botao   = document.getElementById("btnToggleSidebar");
+  const sidebar  = document.getElementById("viewerSidebar");
+  const botao    = document.getElementById("btnToggleSidebar");
+  const backdrop = document.getElementById("viewerBackdrop");
   if (!sidebar) return;
+
+  const isDrawerMode = isMobileOrLandscapeDrawer();
 
   sidebar.classList.toggle("w-[85vw]", !recolhida);
   sidebar.classList.toggle("sm:w-[380px]", !recolhida);
+  sidebar.classList.toggle("max-w-[380px]", !recolhida);
   sidebar.classList.toggle("opacity-100", !recolhida);
   sidebar.classList.toggle("pointer-events-auto", !recolhida);
   sidebar.classList.toggle("w-0", recolhida);
@@ -62,6 +70,25 @@ function aplicarEstadoSidebar(recolhida, persistir) {
   sidebar.classList.toggle("pointer-events-none", recolhida);
   sidebar.setAttribute("aria-hidden", String(recolhida));
   if (recolhida) sidebar.setAttribute("inert", ""); else sidebar.removeAttribute("inert");
+
+  // Backdrop escurecido no mobile/tablet
+  if (backdrop) {
+    if (!recolhida && isDrawerMode) {
+      backdrop.classList.remove("hidden");
+      requestAnimationFrame(() => {
+        backdrop.classList.remove("opacity-0", "pointer-events-none");
+        backdrop.classList.add("opacity-100", "pointer-events-auto");
+      });
+    } else {
+      backdrop.classList.remove("opacity-100", "pointer-events-auto");
+      backdrop.classList.add("opacity-0", "pointer-events-none");
+      setTimeout(() => {
+        if (sidebar.classList.contains("w-0") || !isDrawerMode) {
+          backdrop.classList.add("hidden");
+        }
+      }, 300);
+    }
+  }
 
   if (botao) {
     botao.setAttribute("aria-expanded", String(!recolhida));
@@ -72,12 +99,18 @@ function aplicarEstadoSidebar(recolhida, persistir) {
   if (persistir) {
     try { localStorage.setItem(SIDEBAR_STORAGE_KEY, recolhida ? "1" : "0"); } catch (e) {}
   }
+
+  sincronizarTamanhoDoViewer();
 }
 
 function iniciarSidebarRetratil() {
-  const sidebar = document.getElementById("viewerSidebar");
-  const botao   = document.getElementById("btnToggleSidebar");
-  if (!sidebar || !botao) return;
+  const sidebar  = document.getElementById("viewerSidebar");
+  const botao    = document.getElementById("btnToggleSidebar");
+  const backdrop = document.getElementById("viewerBackdrop");
+  const btnClose = document.getElementById("btnCloseSidebarMobile");
+  if (!sidebar) return;
+
+  const isDrawerMode = isMobileOrLandscapeDrawer();
 
   let recolhidaInicial = false;
   try {
@@ -85,15 +118,66 @@ function iniciarSidebarRetratil() {
     if (salvo !== null) {
       recolhidaInicial = salvo === "1";
     } else {
-      recolhidaInicial = window.innerWidth < 768;
+      recolhidaInicial = isDrawerMode;
     }
   } catch (e) {
-    recolhidaInicial = window.innerWidth < 768;
+    recolhidaInicial = isDrawerMode;
   }
   aplicarEstadoSidebar(recolhidaInicial, false);
 
-  botao.addEventListener("click", () => {
-    aplicarEstadoSidebar(!sidebar.classList.contains("w-0"), true);
+  if (botao) {
+    botao.addEventListener("click", () => {
+      aplicarEstadoSidebar(!sidebar.classList.contains("w-0"), true);
+    });
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener("click", () => {
+      aplicarEstadoSidebar(true, true);
+    });
+  }
+
+  if (btnClose) {
+    btnClose.addEventListener("click", () => {
+      aplicarEstadoSidebar(true, true);
+    });
+  }
+
+  // Suporte ergonômico a swipe touch para fechar o drawer (deslizar para a direita)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  sidebar.addEventListener("touchstart", (e) => {
+    if (e.touches && e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  sidebar.addEventListener("touchend", (e) => {
+    if (e.changedTouches && e.changedTouches.length === 1) {
+      const deltaX = e.changedTouches[0].clientX - touchStartX;
+      const deltaY = e.changedTouches[0].clientY - touchStartY;
+      if (deltaX > 50 && Math.abs(deltaY) < 60) {
+        if (isMobileOrLandscapeDrawer()) {
+          aplicarEstadoSidebar(true, true);
+        }
+      }
+    }
+  }, { passive: true });
+
+  // Listener de redimensionamento para sincronizar backdrop e OpenSeadragon
+  window.addEventListener("resize", () => {
+    const isDrawer = isMobileOrLandscapeDrawer();
+    const bdrop = document.getElementById("viewerBackdrop");
+    if (!isDrawer && bdrop) {
+      bdrop.classList.add("hidden", "opacity-0", "pointer-events-none");
+      bdrop.classList.remove("opacity-100", "pointer-events-auto");
+    } else if (isDrawer && bdrop && !sidebar.classList.contains("w-0")) {
+      bdrop.classList.remove("hidden");
+      bdrop.classList.add("opacity-100", "pointer-events-auto");
+      bdrop.classList.remove("opacity-0", "pointer-events-none");
+    }
+    sincronizarTamanhoDoViewer();
   });
 
   // O palco redimensiona durante a transição CSS: mantém o OpenSeadragon ajustado quadro a quadro.
@@ -581,8 +665,8 @@ export function alternarAbaPainel(aba) {
   const abaAlvo = (aba === "questoes") ? "questoes" : "descricao";
   abaAtivaPainel = abaAlvo;
 
-  const estiloAtivo   = "px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-white/[0.08] text-white border border-white/[0.1] shadow-sm";
-  const estiloInativo = "px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] border border-transparent";
+  const estiloAtivo   = "min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-white/[0.08] text-white border border-white/[0.1] shadow-sm touch-manipulation flex items-center justify-center";
+  const estiloInativo = "min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] border border-transparent touch-manipulation flex items-center justify-center";
 
   if (abaAlvo === "descricao") {
     if (containerDesc) containerDesc.classList.remove("hidden");
@@ -895,10 +979,13 @@ function inicializarOpenSeadragon() {
   const maxZoomPixelRatioMap = { 40: 1.15, 60: 1.25, 100: 1.35 };
   const maxZoomPixelRatio = maxZoomPixelRatioMap[maxMag] || 1.15;
 
-  // Garantir dimensões explícitas no container
+  // Garantir dimensões explícitas no container e prevenção de interferência de gestos do navegador
   container.style.width = "100%";
   container.style.height = "100%";
   container.style.minHeight = "400px";
+  container.style.touchAction = "none";
+  container.style.userSelect = "none";
+  container.style.webkitUserSelect = "none";
 
   // Registra o tempo de início do carregamento da imagem
   window.__microscopeStartTime = Date.now();
@@ -952,9 +1039,22 @@ function inicializarOpenSeadragon() {
         flickEnabled:   true,
         dragToPan:      true,
         dblClickToZoom: true,
+        clickToZoom:    false,
         pinchRotate:    false
       }
     });
+
+    // Garante touch-action: none e user-select: none nos elementos canvas e container do OSD
+    if (viewer.canvas) {
+      viewer.canvas.style.touchAction = "none";
+      viewer.canvas.style.userSelect = "none";
+      viewer.canvas.style.webkitUserSelect = "none";
+    }
+    if (viewer.container) {
+      viewer.container.style.touchAction = "none";
+      viewer.container.style.userSelect = "none";
+      viewer.container.style.webkitUserSelect = "none";
+    }
   } catch (err) {
     console.error("[Palas Atlas] Erro fatal ao instanciar OpenSeadragon:", err);
     exibirErroMicroscopio("Falha na inicialização do visualizador óptico.");
@@ -1118,6 +1218,7 @@ function inicializarOpenSeadragon() {
 
   viewer.addHandler("open", updateZoomDisplay);
   viewer.addHandler("animation", updateZoomDisplay);
+  viewer.addHandler("animation-finish", updateZoomDisplay);
 
   viewer.addHandler("zoom", () => {
     if (!homeZoomRef || !viewer || !viewer.viewport) return;
@@ -1134,7 +1235,6 @@ function inicializarOpenSeadragon() {
       viewer.viewport.zoomTo(maxOSDZoom, null, true);
     }
 
-    atualizarLenteBotaoAtivo();
     updateZoomDisplay();
   });
 }
@@ -1235,9 +1335,18 @@ function atualizarLenteBotaoAtivo() {
     const magAttr = btn.getAttribute("data-mag");
     const isAtivo = magAttr ? `${magAttr}x` === objetivo : btn.textContent.trim() === objetivo;
     btn.className = isAtivo
-      ? "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens"
-      : "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
+      ? "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+      : "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   });
+
+  // Em telas compactas, rola suavemente para o botão da objetiva ativa no revólver
+  const activeBtn = document.querySelector(".lens-btn.active-lens");
+  if (activeBtn) {
+    const panel = document.getElementById("viewerLensPanel");
+    if (panel && panel.scrollWidth > panel.clientWidth) {
+      activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1249,7 +1358,7 @@ function aplicarBloqueioObjetivas(maxMag) {
     const magBotao = Number(btn.getAttribute("data-mag")) || 4;
     if (magBotao > limiteMag) {
       btn.disabled = true;
-      btn.className = "lens-btn text-neutral-600 font-medium px-2.5 py-1 rounded-lg text-xs font-mono cursor-not-allowed opacity-25";
+      btn.className = "lens-btn text-neutral-600 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono cursor-not-allowed opacity-25 min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
       btn.title = `Objetiva não disponível (Máx: ${limiteMag}x)`;
     } else {
       btn.disabled = false;
@@ -1340,6 +1449,11 @@ function focarPinoNoViewer(pinIdRaw) {
 
   pinAtivo = pinId;
 
+  // No mobile/tablet, fecha o drawer lateral para exibir o ponto focado no microscópio
+  if (isMobileOrLandscapeDrawer()) {
+    aplicarEstadoSidebar(true, false);
+  }
+
   // Auto-remove o marcador após 8s
   setTimeout(() => {
     if (pinElem && viewer) {
@@ -1367,6 +1481,11 @@ export function focarQuestaoNoViewer(questaoId) {
   // Certifica visibilidade da aba de questões e destaca card correspondente
   alternarAbaPainel("questoes");
   destacarCardQuestaoNaSidebar(idBuscado);
+
+  // No mobile/tablet, fecha o drawer lateral para exibir o ponto focado no microscópio
+  if (isMobileOrLandscapeDrawer()) {
+    aplicarEstadoSidebar(true, false);
+  }
 
   if (!viewer || !viewer.viewport || !window.OpenSeadragon) {
     console.warn("[Palas Atlas] Viewer OpenSeadragon não inicializado ao tentar focar questão.");
@@ -1440,6 +1559,9 @@ export function focarQuestaoNoViewer(questaoId) {
     e.stopPropagation();
     alternarAbaPainel("questoes");
     destacarCardQuestaoNaSidebar(idBuscado);
+    if (isMobileOrLandscapeDrawer()) {
+      aplicarEstadoSidebar(false, false);
+    }
   });
 
   viewer.addOverlay({
@@ -1514,11 +1636,19 @@ export function trocarLente(objetivaDesejada, btnElement) {
 
   document.querySelectorAll(".lens-btn").forEach(l => {
     if (l.disabled) return;
-    l.className = "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
+    l.className = "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   });
 
   if (targetBtn && !targetBtn.disabled) {
-    targetBtn.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens";
+    targetBtn.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+  }
+
+  // Em telas compactas, rola suavemente para o botão da objetiva ativada
+  if (targetBtn) {
+    const panel = document.getElementById("viewerLensPanel");
+    if (panel && panel.scrollWidth > panel.clientWidth) {
+      targetBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    }
   }
 }
 
@@ -1586,7 +1716,10 @@ Object.assign(window.App, {
   formatarMagnificacaoOtica,
   getZoom4xRef,
   calcularZoomParaMagnificacao,
-  sanitizarHTMLDescricao
+  sanitizarHTMLDescricao,
+  aplicarEstadoSidebar,
+  fecharSidebar: () => aplicarEstadoSidebar(true, true),
+  abrirSidebar:  () => aplicarEstadoSidebar(false, true)
 });
 window.osdViewerAction              = osdViewerAction;
 window.focarPinoNoViewer            = focarPinoNoViewer;
@@ -1601,7 +1734,11 @@ window.formatarMagnificacaoOtica     = formatarMagnificacaoOtica;
 window.getZoom4xRef                 = getZoom4xRef;
 window.calcularZoomParaMagnificacao = calcularZoomParaMagnificacao;
 window.sanitizarHTMLDescricao       = sanitizarHTMLDescricao;
+window.aplicarEstadoSidebar         = aplicarEstadoSidebar;
+window.fecharSidebar                = () => aplicarEstadoSidebar(true, true);
+window.abrirSidebar                 = () => aplicarEstadoSidebar(false, true);
 
 export {
-  carregarLaminaNoMicroscopio as carregarLaminaPorId
+  carregarLaminaNoMicroscopio as carregarLaminaPorId,
+  aplicarEstadoSidebar
 };

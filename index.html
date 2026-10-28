@@ -31,7 +31,7 @@
 
   <!-- Folha de Estilos Tailwind Compilada + Estilos Customizados -->
   <link rel="stylesheet" href="css/tailwind.min.css?v=1">
-  <link rel="stylesheet" href="css/styles.css?v=7">
+  <link rel="stylesheet" href="css/styles.css?v=8">
   <link rel="stylesheet" href="css/splash.css?v=1">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
@@ -135,7 +135,7 @@
       
       <!-- Lado Esquerdo: Botão Voltar + Logotipo Oficial (Top-Left) -->
       <div class="flex items-center gap-3 pointer-events-auto">
-        <button id="btnVoltarGlobal" onclick="window.App.voltarGlobal()" class="hidden p-2 text-slate-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] rounded-full transition-all text-sm font-bold items-center gap-1.5 px-3 py-2 cursor-pointer shadow-sm" aria-label="Voltar">
+        <button id="btnVoltarGlobal" onclick="window.App.voltarGlobal()" class="hidden min-h-[44px] min-w-[44px] lg:min-h-0 lg:min-w-0 p-2 text-slate-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] rounded-full transition-all text-sm font-bold items-center justify-center gap-1.5 px-3 py-2 cursor-pointer shadow-sm active:scale-95" aria-label="Voltar">
           &larr; <span class="text-xs font-sans font-normal hidden sm:inline">Voltar</span>
         </button>
 
@@ -150,7 +150,7 @@
       <!-- Lado Direito: Cápsula Flutuante Minimalista do Menu Hambúrguer -->
       <div class="pointer-events-auto flex items-center rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] p-1 sm:p-1.5 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)]">
         <!-- Botão Menu Drawer -->
-        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none" aria-label="Abrir Menu Lateral" title="Menu">
+        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="w-11 h-11 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none" aria-label="Abrir Menu Lateral" title="Menu">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
@@ -171,7 +171,7 @@
       <aside
         id="sideDrawer"
         style="z-index: 99999; position: fixed; top: 0; right: 0;"
-        class="hidden !fixed !top-0 !right-0 h-full w-[88vw] max-w-[360px] sm:w-96 bg-neutral-950/90 backdrop-blur-2xl text-white border-l border-white/[0.06] !z-[99999] transform translate-x-full transition-transform duration-300 ease-out p-6 sm:p-8 flex flex-col justify-between shadow-[0_0_60px_rgba(0,0,0,0.85)] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+        class="hidden !fixed !top-0 !right-0 h-full w-[85vw] max-w-[340px] sm:w-96 sm:max-w-none bg-neutral-950/90 backdrop-blur-2xl text-white border-l border-white/[0.06] !z-[99999] transform translate-x-full transition-transform duration-300 ease-out p-5 sm:p-8 flex flex-col justify-between shadow-[0_0_60px_rgba(0,0,0,0.85)] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
 
         <div class="space-y-7">
           <!-- Topo: Cabeçalho com Logotipo e Fechar -->
@@ -183,7 +183,7 @@
             <button
               type="button"
               onclick="window.App.fecharMenuLateral()"
-              class="w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/[0.06] rounded-full transition-all duration-200 cursor-pointer focus:outline-none"
+              class="w-11 h-11 lg:w-10 lg:h-10 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/[0.06] rounded-full transition-all duration-200 cursor-pointer focus:outline-none active:scale-95"
               aria-label="Fechar menu lateral">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -199,7 +199,7 @@
               <button
                 type="button"
                 onclick="window.App.navegarPara('pgHome'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-200 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-200 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] shrink-0"></span>
                 <span>Início</span>
               </button>
@@ -207,7 +207,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('histologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
                 <span>Histologia</span>
               </button>
@@ -215,7 +215,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('anatomia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
                 <span>Anatomia Macroscópica</span>
               </button>
@@ -223,7 +223,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('patologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
                 <span>Patologia Geral e Sistêmica</span>
               </button>
@@ -231,7 +231,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('parasitologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
                 <span>Parasitologia Médica</span>
               </button>
@@ -239,7 +239,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('microbiologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
                 <span>Microbiologia e Micologia</span>
               </button>
@@ -255,7 +255,7 @@
               <button
                 type="button"
                 onclick="window.App.fecharMenuLateral(); window.App.abrirModalAjuda();"
-                class="flex items-center gap-3 group text-neutral-200 hover:text-[#d4af37] hover:bg-white/[0.04] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-200 hover:text-[#d4af37] hover:bg-white/[0.04] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
@@ -266,7 +266,7 @@
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('histologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
@@ -286,7 +286,7 @@
               <a
                 href="sobre.html"
                 onclick="window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
                 <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -296,7 +296,7 @@
               <a
                 href="sobre.html#equipe"
                 onclick="window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
                 <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
@@ -306,7 +306,7 @@
               <button
                 type="button"
                 onclick="window.App.toggleDashboard(); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                 </svg>
@@ -998,8 +998,20 @@
 
       <!-- ── MODAL DE LOGIN DO ADMINISTRADOR ─────────────────────────────── -->
       <!-- Exibido quando o usuário não está autenticado. Sobrepõe o CMS. -->
-      <div id="dashLoginOverlay" class="absolute inset-0 z-50 bg-neutral-950/80 backdrop-blur-xl flex items-center justify-center hidden">
-        <div class="w-full max-w-sm mx-4 bg-neutral-900/60 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-8 flex flex-col gap-6">
+      <div id="dashLoginOverlay" class="absolute inset-0 z-50 bg-neutral-950/80 backdrop-blur-xl flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-sm mx-auto bg-neutral-900/60 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col gap-5 sm:gap-6 relative">
+
+          <!-- Botão Fechar Modal de Login / Voltar ao Início -->
+          <button
+            type="button"
+            onclick="window.App.navegarPara('pgHome')"
+            class="absolute top-4 right-4 w-11 h-11 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 cursor-pointer active:scale-95"
+            aria-label="Fechar e voltar ao início"
+            title="Voltar ao início">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
 
           <!-- Cabeçalho do Modal -->
           <div class="flex flex-col items-center gap-2 text-center">
@@ -1021,7 +1033,7 @@
                 type="email"
                 autocomplete="email"
                 placeholder="admin@palasatlas.com"
-                class="w-full bg-neutral-950/50 border border-white/[0.08] rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37]/40 transition-colors"
+                class="w-full bg-neutral-950/50 border border-white/[0.08] rounded-xl px-4 py-3 min-h-[44px] text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37]/40 transition-colors"
               />
             </div>
             <div>
@@ -1031,7 +1043,7 @@
                 type="password"
                 autocomplete="current-password"
                 placeholder="••••••••"
-                class="w-full bg-neutral-950/50 border border-white/[0.08] rounded-xl px-4 py-3 text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37]/40 transition-colors"
+                class="w-full bg-neutral-950/50 border border-white/[0.08] rounded-xl px-4 py-3 min-h-[44px] text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37]/40 transition-colors"
               />
             </div>
           </div>
@@ -1044,7 +1056,7 @@
             id="btnDashLogin"
             type="button"
             onclick="window.App.dashboardLogin()"
-            class="w-full bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 font-mono tracking-widest uppercase text-xs rounded-xl py-3.5 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+            class="w-full min-h-[44px] bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 font-mono tracking-widest uppercase text-xs rounded-xl py-3.5 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.99]"
           >
             <span id="dashLoginBtnText">Entrar no Painel</span>
             <span id="dashLoginSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -1582,93 +1594,93 @@
   <!-- MODAL INTERATIVO "COMO USAR O SITE" (GUIA DE USO) -->
   <div
     id="helpModal"
-    class="fixed inset-0 z-[99995] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-xl hidden transition-all duration-300">
+    class="fixed inset-0 z-[99995] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-xl hidden transition-all duration-300">
     
     <!-- Backdrop fechamento ao clicar na área escurecida -->
-    <div class="absolute inset-0 z-0" onclick="window.App.fecharModalAjuda()"></div>
+    <div class="absolute inset-0 z-0 cursor-pointer" onclick="window.App.fecharModalAjuda()"></div>
 
     <!-- Container do Modal -->
-    <div class="bg-neutral-950/95 backdrop-blur-2xl border border-white/[0.08] rounded-3xl max-w-2xl w-full p-6 sm:p-8 text-neutral-200 shadow-[0_25px_70px_rgba(0,0,0,0.85)] relative z-10 max-h-[90vh] flex flex-col">
+    <div class="bg-neutral-950/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 text-neutral-200 shadow-[0_25px_70px_rgba(0,0,0,0.85)] relative z-10 max-h-[85vh] flex flex-col overflow-hidden">
       
       <!-- Cabeçalho do Modal -->
-      <div class="flex items-start justify-between pb-5 border-b border-white/[0.06]">
+      <div class="flex items-start justify-between pb-4 sm:pb-5 border-b border-white/[0.06] shrink-0">
         <div class="space-y-1">
           <div class="inline-flex items-center gap-2 mb-1">
             <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37]"></span>
             <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/25 px-2.5 py-0.5 rounded-full">Guia de Navegação &bull; Uso Prático</span>
           </div>
-          <h3 class="text-xl sm:text-2xl font-light text-white font-serif tracking-wide">Como Usar o Palas Atlas</h3>
+          <h3 class="text-lg sm:text-2xl font-light text-white font-serif tracking-wide">Como Usar o Palas Atlas</h3>
           <p class="text-xs text-neutral-400 font-sans font-light">Orientações essenciais para explorar lâminas em alta definição e recursos interativos.</p>
         </div>
         <button
           type="button"
           onclick="window.App.fecharModalAjuda()"
-          class="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-neutral-400 hover:text-white flex items-center justify-center transition-all border border-white/[0.06] cursor-pointer shrink-0 ml-4"
+          class="w-11 h-11 lg:w-9 lg:h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-neutral-400 hover:text-white flex items-center justify-center transition-all border border-white/[0.06] cursor-pointer shrink-0 ml-2 sm:ml-4 active:scale-95"
           aria-label="Fechar guia de uso">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
 
       <!-- Conteúdo do Guia (4 Passos práticos) -->
-      <div class="py-5 space-y-3.5 max-h-[60vh] overflow-y-auto pr-1">
+      <div class="py-4 space-y-3 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
         
         <!-- Passo 1: Zoom & Pan -->
-        <div class="flex gap-4 items-start p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
+        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
           <div class="w-8 h-8 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 flex items-center justify-center font-mono font-medium text-xs shrink-0 mt-0.5">
             01
           </div>
-          <div class="space-y-1">
-            <h4 class="text-sm font-medium text-white tracking-wide flex items-center gap-2">
-              <span>Navegação Óptica & Zoom Profundo (DZI)</span>
+          <div class="space-y-1 min-w-0">
+            <h4 class="text-sm font-medium text-white tracking-wide">
+              Navegação Óptica &amp; Zoom Profundo (DZI)
             </h4>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light">
+            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light break-words">
               Utilize o <strong class="text-neutral-200 font-normal">scroll do mouse</strong> ou gestos de <strong class="text-neutral-200 font-normal">pinça no celular</strong> para transitar continuamente da visão panorâmica até o detalhamento celular em alta resolução. Clique e arraste (<em class="text-neutral-300">pan</em>) para percorrer todos os quadrantes da lâmina.
             </p>
           </div>
         </div>
 
         <!-- Passo 2: Pontos de Interesse -->
-        <div class="flex gap-4 items-start p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
+        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
           <div class="w-8 h-8 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 flex items-center justify-center font-mono font-medium text-xs shrink-0 mt-0.5">
             02
           </div>
-          <div class="space-y-1">
-            <h4 class="text-sm font-medium text-white tracking-wide flex items-center gap-2">
-              <span>Pontos de Interesse & Painel Diagnóstico</span>
+          <div class="space-y-1 min-w-0">
+            <h4 class="text-sm font-medium text-white tracking-wide">
+              Pontos de Interesse &amp; Painel Diagnóstico
             </h4>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light">
+            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light break-words">
               Clique nos <strong class="text-neutral-200 font-normal">pinos marcadores</strong> sobre a imagem histológica ou macroscópica. O painel lateral exibirá instantaneamente a nomenclatura anatômica, critérios de reconhecimento e notas de correlação clínica.
             </p>
           </div>
         </div>
 
         <!-- Passo 3: Módulos Acadêmicos -->
-        <div class="flex gap-4 items-start p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
+        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
           <div class="w-8 h-8 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 flex items-center justify-center font-mono font-medium text-xs shrink-0 mt-0.5">
             03
           </div>
-          <div class="space-y-1">
-            <h4 class="text-sm font-medium text-white tracking-wide flex items-center gap-2">
-              <span>Alternância Entre Módulos Acadêmicos</span>
+          <div class="space-y-1 min-w-0">
+            <h4 class="text-sm font-medium text-white tracking-wide">
+              Alternância Entre Módulos Acadêmicos
             </h4>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light">
+            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light break-words">
               Alterne a qualquer instante entre as disciplinas — <strong class="text-neutral-200 font-normal">Histologia</strong>, <strong class="text-neutral-200 font-normal">Anatomia</strong>, <strong class="text-neutral-200 font-normal">Patologia</strong>, <strong class="text-neutral-200 font-normal">Parasitologia</strong> e <strong class="text-neutral-200 font-normal">Microbiologia</strong> — abrindo o menu lateral ou pelos atalhos do compêndio na tela inicial.
             </p>
           </div>
         </div>
 
         <!-- Passo 4: Objetivas & Tela Cheia -->
-        <div class="flex gap-4 items-start p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
+        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
           <div class="w-8 h-8 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 flex items-center justify-center font-mono font-medium text-xs shrink-0 mt-0.5">
             04
           </div>
-          <div class="space-y-1">
-            <h4 class="text-sm font-medium text-white tracking-wide flex items-center gap-2">
-              <span>Revólver de Objetivas & Tela Cheia</span>
+          <div class="space-y-1 min-w-0">
+            <h4 class="text-sm font-medium text-white tracking-wide">
+              Revólver de Objetivas &amp; Tela Cheia
             </h4>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light">
+            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light break-words">
               No microscópio virtual, selecione aumentos padronizados (<strong class="text-neutral-200 font-normal">4x, 10x, 40x e 100x</strong>) no seletor rápido do cabeçalho. Ative o modo <strong class="text-neutral-200 font-normal">Tela Cheia</strong> para sessões imersivas de estudo ou projeções em salas de aula.
             </p>
           </div>
@@ -1677,12 +1689,12 @@
       </div>
 
       <!-- Rodapé do Modal -->
-      <div class="pt-4 border-t border-white/[0.06] flex items-center justify-between w-full mt-2">
+      <div class="pt-3 sm:pt-4 border-t border-white/[0.06] flex items-center justify-between w-full mt-1 shrink-0">
         <span class="text-[10px] font-mono text-neutral-500 uppercase tracking-widest hidden sm:inline">Palas Atlas &bull; Acervo Morfológico</span>
         <button
           type="button"
           onclick="window.App.fecharModalAjuda()"
-          class="bg-[#d4af37] hover:bg-[#e6ca65] text-neutral-950 font-medium px-6 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-200 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_25px_rgba(212,175,55,0.35)] cursor-pointer ml-auto">
+          class="bg-[#d4af37] hover:bg-[#e6ca65] text-neutral-950 font-medium px-6 py-2.5 min-h-[44px] rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-200 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_25px_rgba(212,175,55,0.35)] cursor-pointer ml-auto flex items-center justify-center active:scale-95">
           Entendi
         </button>
       </div>
@@ -1701,7 +1713,7 @@
   <!-- main.js importa dashboard-engine e microscope-engine via ES module import -->
   <!-- NÃO carregar esses arquivos duplicados aqui para evitar duas instâncias isoladas -->
   <script type="module" src="js/main.js?v=20261028_101"></script>
-  <script type="module" src="js/histology-catalog.js?v=2026.0813"></script>
+  <script type="module" src="js/histology-catalog.js?v=20261028_102"></script>
   <!-- COOKIE CONSENT BANNER -->
   <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[9999] bg-neutral-900/95 backdrop-blur-md border border-neutral-800 p-5 rounded-2xl shadow-2xl text-neutral-300 text-xs leading-relaxed hidden">
     <p>Utilizamos cookies essenciais para otimizar sua experiência de estudo no visualizador morfológico. Ao continuar navegando, você concorda com nossa Política de Privacidade.</p>
