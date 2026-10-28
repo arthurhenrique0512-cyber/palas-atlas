@@ -933,10 +933,11 @@
 
           <!-- REVOLVER DE OBJETIVAS (Canto Inferior Esquerdo) -->
           <div class="absolute bottom-4 left-4 z-20 bg-neutral-950/90 border border-neutral-800 backdrop-blur-md p-1.5 rounded-xl shadow-2xl flex items-center gap-1">
-            <button type="button" onclick="window.App.trocarLente(1, this)" class="lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-3 py-1.5 rounded-lg text-xs transition-all">4x</button>
-            <button type="button" onclick="window.App.trocarLente(2.5, this)" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">10x</button>
-            <button type="button" onclick="window.App.trocarLente(10, this)" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">40x</button>
-            <button type="button" onclick="window.App.trocarLente(25, this)" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">100x</button>
+            <button type="button" onclick="window.App.trocarLente(4, this)" data-mag="4" class="lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-3 py-1.5 rounded-lg text-xs transition-all">4x</button>
+            <button type="button" onclick="window.App.trocarLente(10, this)" data-mag="10" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">10x</button>
+            <button type="button" onclick="window.App.trocarLente(40, this)" data-mag="40" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">40x</button>
+            <button type="button" onclick="window.App.trocarLente(60, this)" data-mag="60" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">60x</button>
+            <button type="button" onclick="window.App.trocarLente(100, this)" data-mag="100" class="lens-btn text-neutral-400 hover:text-white border border-transparent px-3 py-1.5 rounded-lg text-xs transition-all">100x</button>
           </div>
 
           <!-- Dica Operacional -->
@@ -1199,14 +1200,14 @@
               </div>
 
               <div>
-                <label for="dashMaxMagnification" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Objetiva Máxima</label>
+                <label for="dashMaxMagnification" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Objetiva de Captura (Resolução)</label>
                 <select
                   id="dashMaxMagnification"
                   class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer appearance-none"
-                  title="Limite físico de aumento da digitalização desta lâmina">
-                  <option value="40" selected>40x (padrão)</option>
-                  <option value="60">60x</option>
-                  <option value="100">100x (alta resolução)</option>
+                  title="Resolução ótica nativa da câmera do microscópio na captura da lâmina">
+                  <option value="40" selected>40x (Padrão do Laboratório)</option>
+                  <option value="60">60x (Lente de Alta Abertura)</option>
+                  <option value="100">100x (Imersão em Óleo)</option>
                 </select>
               </div>
 

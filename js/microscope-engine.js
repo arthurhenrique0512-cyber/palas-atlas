@@ -25,7 +25,8 @@ let viewer       = null;
 let listaPinosAtual = [];
 let laminaAtualData = null;
 let pinAtivo     = null;
-let homeZoomRef  = null; // Zoom de referencia para mapeamento 4x/10x/40x/100x
+let homeZoomRef   = null; // Zoom de referencia para enquadramento geral (4x)
+let nativeZoomRef = null; // Zoom de referencia para resolucao nativa 1:1 da camera (maxMag)
 
 // Motor do Microscópio: Interatividade completa e ampliação profunda ativa
 const LAMINA_ESTATICA = false;
@@ -158,6 +159,7 @@ const fallbackLaminas = {
     nome: 'Osso Maduro (Lamelar) por Desgaste',
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
+    maxMagnification: 40,
     imagemUrl: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
     previewImage: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
     thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
@@ -513,9 +515,9 @@ function inicializarOpenSeadragon() {
   const pixelsPerMeter = Math.round(1e6 / mpp);
 
   // Limite de zoom máximo baseado na objetiva real da lâmina
-  const maxMag = Number(laminaAtualData.maxMagnification) || 40;
-  const maxZoomPixelRatioMap = { 40: 1.2, 60: 1.8, 100: 2.5 };
-  const maxZoomPixelRatio = maxZoomPixelRatioMap[maxMag] || 1.2;
+  const maxMag = Number(laminaAtualData.maxMagnification || laminaAtualData.maxZoomLevel || laminaAtualData.maxMag) || 40;
+  const maxZoomPixelRatioMap = { 40: 1.15, 60: 1.25, 100: 1.35 };
+  const maxZoomPixelRatio = maxZoomPixelRatioMap[maxMag] || 1.15;
 
   // Garantir dimensões explícitas no container
   container.style.width = "100%";
@@ -548,7 +550,7 @@ function inicializarOpenSeadragon() {
       showReferenceStrip:       false,
       animationTime:            0.45,
       blendTime:                0.1,
-      maxZoomPixelRatio:        Math.max(maxZoomPixelRatio, 3.5),
+      maxZoomPixelRatio:        maxZoomPixelRatio,
 
       // Motor de Ampliação e Navegação Totalmente Ativo
       mouseNavEnabled:          true,
@@ -642,21 +644,30 @@ function inicializarOpenSeadragon() {
 
     if (viewer && viewer.viewport) {
       homeZoomRef = viewer.viewport.getHomeZoom();
+      nativeZoomRef = viewer.viewport.imageToViewportZoom(1);
       
-      // Limites de ampliação configurados por lâmina (base 4x; teto estipulado 40x, 60x, 100x)
-      const minMag = Number(laminaAtualData?.minMagnification || laminaAtualData?.minZoomLevel) || 4;
+      // Limites de ampliação configurados por lâmina (teto estipulado 40x, 60x, 100x)
       const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
-      const minOSDZoom = homeZoomRef * (minMag / 4);
-      const maxOSDZoom = homeZoomRef * (maxMag / 4);
+      // Ancoragem na resolução nativa da câmera (1:1), com headroom suave de até 15%
+      const minOSDZoom = homeZoomRef;
+      const maxOSDZoom = Math.max(homeZoomRef * 1.5, nativeZoomRef * 1.15);
 
       viewer.viewport.minZoomLevel = minOSDZoom;
       viewer.viewport.maxZoomLevel = maxOSDZoom;
-      viewer.viewport.zoomTo(minOSDZoom, null, true);
+      viewer.viewport.zoomTo(homeZoomRef, null, true);
       viewer.viewport.goHome(true);
     }
 
     aplicarBloqueioObjetivas(maxMag);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialMag = Number(urlParams.get("mag"));
+    if (initialMag) {
+      setTimeout(() => {
+        trocarLente(initialMag);
+      }, 120);
+    }
 
     setTimeout(() => {
       const navParent = document.querySelector(".openseadragon-navigator");
@@ -713,6 +724,7 @@ function inicializarOpenSeadragon() {
     if (display) {
       display.textContent = formatarMagnificacaoOtica(mag);
     }
+    atualizarLenteBotaoAtivo();
   };
 
   viewer.addHandler("open", updateZoomDisplay);
@@ -720,12 +732,11 @@ function inicializarOpenSeadragon() {
 
   viewer.addHandler("zoom", () => {
     if (!homeZoomRef || !viewer || !viewer.viewport) return;
-    const minMag = Number(laminaAtualData?.minMagnification || laminaAtualData?.minZoomLevel) || 4;
-    const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
-    const minOSDZoom = homeZoomRef * (minMag / 4);
-    const maxOSDZoom = homeZoomRef * (maxMag / 4);
+    const nativeZoom = nativeZoomRef || viewer.viewport.imageToViewportZoom(1);
+    const minOSDZoom = homeZoomRef;
+    const maxOSDZoom = Math.max(homeZoomRef * 1.5, nativeZoom * 1.15);
 
-    // Clamping estrito impedindo ultrapassar o teto ou desaproximar além da visão mínima (4x)
+    // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além do enquadramento inicial
     const current = viewer.viewport.getZoom();
     if (current < minOSDZoom) {
       viewer.viewport.zoomTo(minOSDZoom, null, true);
@@ -743,7 +754,7 @@ function inicializarOpenSeadragon() {
 // ---------------------------------------------------------------------------
 /**
  * Converte o zoom interno do OpenSeadragon (viewer.viewport.getZoom(true))
- * para o equivalente de ampliação ótica real (escala base 4x).
+ * para o equivalente de ampliação ótica real baseado na resolução nativa da câmera.
  *
  * @param {number} [osdZoom] - Zoom interno OSD opcional
  * @returns {number} Magnificação ótica numérica (ex: 4.0, 10.0, 40.0)
@@ -751,17 +762,24 @@ function inicializarOpenSeadragon() {
 export function calcularMagnificacaoOtica(osdZoom) {
   if (!viewer || !viewer.viewport) return 4;
   const baseHome = homeZoomRef || viewer.viewport.getHomeZoom();
+  const nativeZoom = nativeZoomRef || viewer.viewport.imageToViewportZoom(1);
   if (!baseHome || baseHome <= 0) return 4;
 
   const currentZoom = typeof osdZoom === "number" ? osdZoom : viewer.viewport.getZoom(true);
-  const minMag = Number(laminaAtualData?.minMagnification || laminaAtualData?.minZoomLevel) || 4;
   const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
-  // Escala proporcional à lente base (4x): (zoomAtual / homeZoom) * 4
-  const magRaw = (currentZoom / baseHome) * 4;
+  // No enquadramento geral inicial (home), a visão panorâmica representa 4x
+  if (currentZoom <= baseHome * 1.02) {
+    return 4;
+  }
 
-  // Clamping rigoroso entre a visão mínima (4x) e o teto da lâmina (maxMag)
-  return Math.max(minMag, Math.min(maxMag, magRaw));
+  // Interpolação ótica proporcional entre a visão panorâmica (4x no homeZoom)
+  // e a resolução nativa da objetiva de captura (maxMag no nativeZoom)
+  const ratio = (currentZoom - baseHome) / Math.max(0.0001, (nativeZoom - baseHome));
+  const magRaw = 4 + ratio * (maxMag - 4);
+
+  // Clamping rigoroso entre 4x e o teto físico da lâmina (maxMag)
+  return Math.max(4, Math.min(maxMag, magRaw));
 }
 
 /**
@@ -786,19 +804,26 @@ export function formatarMagnificacaoOtica(mag) {
 function atualizarLenteBotaoAtivo() {
   if (!viewer || !viewer.viewport || !homeZoomRef) return;
   const mag = calcularMagnificacaoOtica();
+  const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
   // Mapeamento proporcional para os botões de objetiva: 4x, 10x, 40x, 60x, 100x
   let objetivo = "4x";
-  if      (mag >= 75) objetivo = "100x";
-  else if (mag >= 48) objetivo = "60x";
-  else if (mag >= 18) objetivo = "40x";
-  else if (mag >= 6.5) objetivo = "10x";
+  if (maxMag >= 100 && mag >= 80) {
+    objetivo = "100x";
+  } else if (maxMag >= 60 && mag >= 50) {
+    objetivo = "60x";
+  } else if (mag >= (maxMag <= 40 ? 25 : 30)) {
+    objetivo = "40x";
+  } else if (mag >= 6.5) {
+    objetivo = "10x";
+  }
 
   document.querySelectorAll(".lens-btn").forEach(btn => {
     // Pula botões bloqueados (disabled) para não sobrescrever classes
     if (btn.disabled) return;
 
-    const isAtivo = btn.textContent.trim() === objetivo;
+    const magAttr = btn.getAttribute("data-mag");
+    const isAtivo = magAttr ? `${magAttr}x` === objetivo : btn.textContent.trim() === objetivo;
     btn.className = isAtivo
       ? "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens"
       : "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
@@ -938,20 +963,32 @@ export function osdViewerAction(acao) {
 export function trocarLente(objetivaDesejada, btnElement) {
   if (!viewer || !viewer.viewport || !homeZoomRef) return;
 
-  const minMag = Number(laminaAtualData?.minMagnification || laminaAtualData?.minZoomLevel) || 4;
   const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
   const magDesejada = Number(objetivaDesejada) || 4;
-  const magClamped = Math.max(minMag, Math.min(maxMag, magDesejada));
+  const magClamped = Math.max(4, Math.min(maxMag, magDesejada));
+  const nativeZoom = nativeZoomRef || viewer.viewport.imageToViewportZoom(1);
 
-  const targetZoom = homeZoomRef * (magClamped / 4);
+  let targetZoom = homeZoomRef;
+  if (magClamped <= 4) {
+    targetZoom = homeZoomRef;
+  } else if (magClamped >= maxMag) {
+    targetZoom = nativeZoom;
+  } else {
+    const ratio = (magClamped - 4) / (maxMag - 4);
+    targetZoom = homeZoomRef + ratio * (nativeZoom - homeZoomRef);
+  }
+
   viewer.viewport.zoomTo(targetZoom, null, false);
 
-  if (btnElement) {
-    document.querySelectorAll(".lens-btn").forEach(l => {
-      if (l.disabled) return;
-      l.className = "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
-    });
-    btnElement.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens";
+  const targetBtn = btnElement || document.querySelector(`.lens-btn[data-mag="${magClamped}"]`) || Array.from(document.querySelectorAll(".lens-btn")).find(b => b.textContent.trim() === `${magClamped}x`);
+
+  document.querySelectorAll(".lens-btn").forEach(l => {
+    if (l.disabled) return;
+    l.className = "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
+  });
+
+  if (targetBtn && !targetBtn.disabled) {
+    targetBtn.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens";
   }
 }
 
