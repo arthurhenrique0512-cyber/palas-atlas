@@ -695,8 +695,8 @@ function inicializarOpenSeadragon() {
       const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
       const zoom4x = getZoom4xRef();
-      const minOSDZoom = zoom4x * 0.8;
-      const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.35;
+      const minOSDZoom = zoom4x;
+      const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.05;
 
       viewer.viewport.minZoomLevel = minOSDZoom;
       viewer.viewport.maxZoomLevel = maxOSDZoom;
@@ -792,8 +792,8 @@ function inicializarOpenSeadragon() {
     if (!homeZoomRef || !viewer || !viewer.viewport) return;
     const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
     const zoom4x = getZoom4xRef();
-    const minOSDZoom = zoom4x * 0.8;
-    const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.35;
+    const minOSDZoom = zoom4x;
+    const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.05;
 
     // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x)
     const current = viewer.viewport.getZoom();
