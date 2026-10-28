@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste de Recorte Máximo — Estúdio de Microscopia Palas</title>
+  <meta name="description" content="Visualizador de teste com campo retangular máximo do Osso Maduro Desgaste.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans:  ['Inter',         'system-ui', 'sans-serif'],
+            serif: ['Merriweather',  'serif'],
+            mono:  ['JetBrains Mono','monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- Web Component da Marca e Configurações -->
+  <script src="js/brand-logo.js?v=2"></script>
+  <script src="js/settings-panel.js"></script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .prose-atlas h3       { color:#e5e5e5; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
+    .prose-atlas p        { color:#d4d4d4; line-height:1.8; margin-bottom:1rem; }
+    .prose-atlas strong   { color:#fff; font-weight:600; }
+    ::-webkit-scrollbar       { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #404040; }
+  </style>
+</head>
+
+<body class="bg-neutral-950 w-full h-screen overflow-hidden flex flex-col font-sans text-slate-200 selection:bg-neutral-800 selection:text-white">
+
+  <!-- CABEÇALHO DO TESTE -->
+  <header class="shrink-0 w-full bg-neutral-950 px-5 py-2.5 flex items-center justify-between border-b border-white/[0.08] z-50 relative">
+
+    <!-- Esquerda: Voltar + Identificador -->
+    <div class="flex items-center gap-3 min-w-0 z-10">
+      <button
+        type="button"
+        onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
+        class="flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-white transition-all duration-200 cursor-pointer shrink-0"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Voltar
+      </button>
+      <span class="text-neutral-700 select-none hidden sm:block">|</span>
+      <span class="text-xs text-amber-400 font-mono tracking-wide px-2 py-0.5 rounded bg-amber-400/10 border border-amber-400/20">
+        MODO TESTE: Recorte Retangular Máximo
+      </span>
+    </div>
+
+    <!-- Centro: Seletor de Comparação (Recorte vs Original) -->
+    <div class="flex items-center gap-1 bg-neutral-900 border border-white/[0.08] p-1 rounded-xl z-10 shadow-lg">
+      <button id="btnModoCrop" type="button" onclick="alternarVersao('crop')" class="px-3 py-1 rounded-lg text-xs font-semibold transition-all bg-[#c8ad5f] text-neutral-950 shadow">
+        ✂️ Recorte Máximo (30.3 MP)
+      </button>
+      <button id="btnModoOriginal" type="button" onclick="alternarVersao('original')" class="px-3 py-1 rounded-lg text-xs font-semibold transition-all text-neutral-400 hover:text-white">
+        🗺️ Mosaico Bruto (53.1 MP)
+      </button>
+    </div>
+
+    <!-- Direita: Ações rápidas -->
+    <div class="flex items-center gap-3 shrink-0 z-10">
+      <button
+        type="button"
+        onclick="if(viewer){ viewer.viewport.goHome(); }"
+        class="text-[11px] font-mono text-slate-400 hover:text-white transition-all px-2 py-1 rounded bg-neutral-900 border border-neutral-800"
+        title="Enquadramento 1:1"
+      >1:1</button>
+    </div>
+
+  </header>
+
+  <!-- WORKSPACE -->
+  <div class="flex flex-1 overflow-hidden relative">
+
+    <!-- Canvas OpenSeadragon -->
+    <main class="relative flex-1 min-w-0 h-full bg-neutral-950 overflow-hidden flex items-center justify-center">
+      <div id="osd-viewer" class="w-full h-full bg-neutral-950 relative overflow-hidden"></div>
+
+      <!-- REVÓLVER DE OBJETIVAS -->
+      <div class="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 p-1.5 rounded-2xl bg-neutral-900/90 backdrop-blur-md border border-white/[0.08] shadow-2xl text-xs font-mono select-none">
+        <button type="button" onclick="setMagnification(4)"   class="px-2.5 py-1 rounded-lg bg-[#c8ad5f] text-neutral-950 font-bold" id="lens-4">4x</button>
+        <button type="button" onclick="setMagnification(10)"  class="px-2.5 py-1 rounded-lg text-neutral-400 hover:text-white" id="lens-10">10x</button>
+        <button type="button" onclick="setMagnification(40)"  class="px-2.5 py-1 rounded-lg text-neutral-400 hover:text-white" id="lens-40">40x</button>
+        <button type="button" onclick="setMagnification(100)" class="px-2.5 py-1 rounded-lg text-neutral-400 hover:text-white" id="lens-100">100x</button>
+        <div class="w-px h-4 bg-white/[0.08] my-auto"></div>
+        <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-neutral-950/70 border border-white/[0.06]">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#c8ad5f] animate-pulse"></span>
+          <span class="text-[#c8ad5f] font-bold text-xs" id="zoomIndicator">4.0x</span>
+        </div>
+      </div>
+
+      <!-- Badge de Dimensões em tempo real -->
+      <div id="badgeDimensao" class="absolute top-4 left-4 z-20 px-3 py-1.5 rounded-xl bg-neutral-900/80 backdrop-blur-md border border-white/[0.08] text-[11px] font-mono text-neutral-300 shadow-xl">
+        📐 Resolução: 6.120 × 4.944 px (30.26 MP) &bull; Sem bordas pretas
+      </div>
+    </main>
+
+    <!-- Barra Lateral Histológica -->
+    <aside class="w-[360px] h-full bg-neutral-950 border-l border-white/[0.08] flex flex-col p-6 overflow-y-auto">
+      <div class="pb-4 border-b border-neutral-800">
+        <span class="text-[10px] font-mono uppercase tracking-widest text-[#c8ad5f]">Histologia Humana</span>
+        <h2 class="text-lg font-serif font-bold text-white mt-1">Osso Maduro por Desgaste</h2>
+        <p class="text-xs font-mono text-neutral-400 mt-1">Corte Transversal &bull; Sem Coloração</p>
+      </div>
+
+      <div class="mt-4 prose-atlas text-xs leading-relaxed space-y-3">
+        <p>Esta lâmina teste foi recortada matematicamente no <strong>Retângulo Inscrito Máximo (Zero Bordas)</strong> a partir da varredura de 54 campos costurada no Fiji.</p>
+        
+        <div class="p-3 bg-neutral-900/60 rounded-xl border border-white/[0.06] space-y-1.5 font-mono text-[11px]">
+          <div class="text-neutral-400 font-semibold uppercase tracking-wider text-[10px]">Parâmetros do Recorte:</div>
+          <div>&bull; <span class="text-white font-bold">X</span>: 608 px &bull; <span class="text-white font-bold">Y</span>: 588 px</div>
+          <div>&bull; <span class="text-white font-bold">Largura</span>: 6.120 px</div>
+          <div>&bull; <span class="text-white font-bold">Altura</span>: 4.944 px</div>
+          <div>&bull; <span class="text-emerald-400 font-bold">Bordas Pretas</span>: 0% (Eliminadas)</div>
+          <div>&bull; <span class="text-amber-400 font-bold">Aproveitamento</span>: 30,26 Megapixels</div>
+        </div>
+
+        <p class="pt-2"><strong>Estruturas Morfológicas Preservadas:</strong></p>
+        <ul class="list-disc pl-4 space-y-1 text-neutral-300">
+          <li><strong>Sistemas de Havers (Ósteons)</strong> completos com lamelas concêntricas.</li>
+          <li><strong>Canais de Havers</strong> centrais em todos os sistemas.</li>
+          <li><strong>Lacunas de osteócitos</strong> e rede de canalículos radiados.</li>
+          <li><strong>Canais de Volkmann</strong> perfurantes.</li>
+          <li><strong>Superfície perióstica</strong> e lamelas circunferenciais externas.</li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+
+  <script>
+    let viewer = null;
+    let currentDzi = 'assets/histologia/osso_maduro_desgaste_ct_crop_teste.dzi';
+
+    function initViewer(dziPath) {
+      if (viewer) {
+        viewer.destroy();
+      }
+
+      viewer = OpenSeadragon({
+        id: "osd-viewer",
+        prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+        tileSources: dziPath,
+        showNavigationControl: false,
+        animationTime: 0.4,
+        blendTime: 0.1,
+        constrainDuringPan: true,
+        maxZoomPixelRatio: 2.5,
+        visibilityRatio: 1.0,
+        defaultZoomLevel: 0
+      });
+
+      viewer.addHandler('zoom', function(e) {
+        const mag = Math.max(4, Math.round(e.zoom * 40) / 10);
+        document.getElementById('zoomIndicator').textContent = mag.toFixed(1) + 'x';
+      });
+    }
+
+    function alternarVersao(tipo) {
+      const btnCrop = document.getElementById('btnModoCrop');
+      const btnOrig = document.getElementById('btnModoOriginal');
+      const badge = document.getElementById('badgeDimensao');
+
+      if (tipo === 'crop') {
+        btnCrop.className = "px-3 py-1 rounded-lg text-xs font-semibold transition-all bg-[#c8ad5f] text-neutral-950 shadow";
+        btnOrig.className = "px-3 py-1 rounded-lg text-xs font-semibold transition-all text-neutral-400 hover:text-white";
+        badge.innerHTML = "📐 Resolução: 6.120 × 4.944 px (30.26 MP) &bull; Sem bordas pretas";
+        currentDzi = 'assets/histologia/osso_maduro_desgaste_ct_crop_teste.dzi';
+      } else {
+        btnOrig.className = "px-3 py-1 rounded-lg text-xs font-semibold transition-all bg-[#c8ad5f] text-neutral-950 shadow";
+        btnCrop.className = "px-3 py-1 rounded-lg text-xs font-semibold transition-all text-neutral-400 hover:text-white";
+        badge.innerHTML = "📐 Resolução: 7.338 × 7.240 px (53.1 MP) &bull; Mosaico bruto com degraus da varredura";
+        currentDzi = 'assets/histologia/osso_maduro_desgaste_ct.dzi';
+      }
+
+      initViewer(currentDzi);
+    }
+
+    function setMagnification(mag) {
+      if (!viewer) return;
+      const zoomMap = { 4: 0.9, 10: 2.5, 40: 8.0, 100: 18.0 };
+      const targetZoom = zoomMap[mag] || 1;
+      viewer.viewport.zoomTo(targetZoom, null, false);
+
+      [4, 10, 40, 100].forEach(m => {
+        const el = document.getElementById('lens-' + m);
+        if (el) {
+          if (m === mag) {
+            el.className = "px-2.5 py-1 rounded-lg bg-[#c8ad5f] text-neutral-950 font-bold";
+          } else {
+            el.className = "px-2.5 py-1 rounded-lg text-neutral-400 hover:text-white";
+          }
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initViewer(currentDzi);
+    });
+  </script>
+</body>
+</html>
