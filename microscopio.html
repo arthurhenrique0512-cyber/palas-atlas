@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Estúdio de Microscopia Virtual — Palas Atlas</title>
   <meta name="description" content="Visualizador de microscopia digital do Palas Atlas — análise morfológica interativa com marcadores anatômicos.">
 
@@ -31,6 +31,22 @@
     /* Touch & Gesture Engine Optimization */
     html, body {
       overscroll-behavior: none !important;
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      height: 100dvh !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      -webkit-text-size-adjust: 100% !important;
+    }
+
+    #viewerLensPanel {
+      position: absolute !important;
+      bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+      left: max(14px, env(safe-area-inset-left, 14px)) !important;
+      z-index: 36 !important;
     }
 
     #osd-viewer,
@@ -117,6 +133,10 @@
       }
       #viewerBackdrop {
         display: none !important;
+      }
+      #viewerLensPanel {
+        bottom: 20px !important;
+        left: 20px !important;
       }
     }
 
@@ -231,7 +251,7 @@
       <!-- REVÓLVER DE OBJETIVAS + CONTROLES DE ZOOM DINÂMICOS -->
       <div
         id="viewerLensPanel"
-        class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-20 flex items-center gap-1 sm:gap-1.5 lg:gap-2 p-1 sm:p-1.5 lg:p-1.5 rounded-2xl bg-neutral-900/85 backdrop-blur-md border border-white/[0.08] shadow-2xl text-xs font-mono select-none max-w-[calc(100vw-16px)] sm:max-w-[calc(100vw-24px)] overflow-x-auto no-scrollbar scroll-smooth"
+        class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-36 flex items-center gap-1 sm:gap-1.5 lg:gap-2 p-1 sm:p-1.5 lg:p-1.5 rounded-2xl bg-neutral-900/90 backdrop-blur-md border border-white/[0.12] shadow-2xl text-xs font-mono select-none max-w-[calc(100%-16px)] sm:max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
       >
         <!-- Valores nominais das objetivas -->
         <button
@@ -390,7 +410,7 @@
   </div><!-- /workspace -->
 
   <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261028_touch2"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261028_touch4"></script>
 
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>

@@ -112,16 +112,15 @@ function iniciarSidebarRetratil() {
 
   const isDrawerMode = isMobileOrLandscapeDrawer();
 
-  let recolhidaInicial = false;
-  try {
-    const salvo = localStorage.getItem(SIDEBAR_STORAGE_KEY);
-    if (salvo !== null) {
-      recolhidaInicial = salvo === "1";
-    } else {
-      recolhidaInicial = isDrawerMode;
-    }
-  } catch (e) {
-    recolhidaInicial = isDrawerMode;
+  // No modo drawer (celular e tablet), sempre inicia recolhido para exibir o microscópio limpo
+  let recolhidaInicial = isDrawerMode;
+  if (!isDrawerMode) {
+    try {
+      const salvo = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+      if (salvo !== null) {
+        recolhidaInicial = salvo === "1";
+      }
+    } catch (e) {}
   }
   aplicarEstadoSidebar(recolhidaInicial, false);
 
@@ -1134,8 +1133,8 @@ function inicializarOpenSeadragon() {
 
       const urlParams = new URLSearchParams(window.location.search);
       const initialMagParam = urlParams.get("mag");
-      // Padrão de abertura do laboratório: abre diretamente na resolução de captura (40x), permitindo override via ?mag=
-      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : (maxMag >= 40 ? 40 : maxMag);
+      // Padrão de abertura morfológica: visão panorâmica (4x) para enquadramento inicial da lâmina inteira
+      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : 4;
       const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
 
       const imgBounds = viewer.world.getItemAt(0)?.getBounds();
@@ -1339,12 +1338,13 @@ function atualizarLenteBotaoAtivo() {
       : "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   });
 
-  // Em telas compactas, rola suavemente para o botão da objetiva ativa no revólver
+  // Em telas compactas, centraliza suavemente o botão da objetiva ativa no revólver sem rolar a janela
   const activeBtn = document.querySelector(".lens-btn.active-lens");
   if (activeBtn) {
     const panel = document.getElementById("viewerLensPanel");
     if (panel && panel.scrollWidth > panel.clientWidth) {
-      activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+      const scrollPos = activeBtn.offsetLeft - panel.offsetLeft - (panel.clientWidth / 2) + (activeBtn.clientWidth / 2);
+      panel.scrollTo({ left: Math.max(0, scrollPos), behavior: "smooth" });
     }
   }
 }
@@ -1643,11 +1643,12 @@ export function trocarLente(objetivaDesejada, btnElement) {
     targetBtn.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   }
 
-  // Em telas compactas, rola suavemente para o botão da objetiva ativada
+  // Em telas compactas, centraliza suavemente o botão da objetiva ativada no revólver sem rolar a janela
   if (targetBtn) {
     const panel = document.getElementById("viewerLensPanel");
     if (panel && panel.scrollWidth > panel.clientWidth) {
-      targetBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+      const scrollPos = targetBtn.offsetLeft - panel.offsetLeft - (panel.clientWidth / 2) + (targetBtn.clientWidth / 2);
+      panel.scrollTo({ left: Math.max(0, scrollPos), behavior: "smooth" });
     }
   }
 }
