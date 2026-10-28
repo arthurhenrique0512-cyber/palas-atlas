@@ -160,6 +160,8 @@ const fallbackLaminas = {
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
     maxMagnification: 40,
+    mpp: 0.25,
+    defaultCenter: { x: 0.65, y: 0.525 },
     imagemUrl: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
     previewImage: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
     thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
@@ -598,12 +600,12 @@ function inicializarOpenSeadragon() {
       // Motor de Ampliação e Navegação Totalmente Ativo
       mouseNavEnabled:          true,
 
-      // Pan livre com limites suaves
+      // Pan livre e navegacao sem travas, permitindo visao distante com espacos em preto
       panHorizontal:            true,
       panVertical:              true,
       constrainDuringPan:       true,
-      visibilityRatio:          0.75,
-      minZoomImageRatio:        0.8,
+      visibilityRatio:          0.2,
+      minZoomImageRatio:        0.1,
 
       // Gestos de Mouse (Desktop)
       gestureSettingsMouse: {
@@ -692,29 +694,38 @@ function inicializarOpenSeadragon() {
       // Limites de ampliação configurados por lâmina (teto estipulado 40x, 60x, 100x)
       const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
-      // Ancoragem na resolução nativa da câmera (1:1), com headroom suave de até 15%
-      const minOSDZoom = homeZoomRef;
-      const maxOSDZoom = Math.max(homeZoomRef * 1.5, nativeZoomRef * 1.15);
+      const zoom4x = getZoom4xRef();
+      const minOSDZoom = zoom4x * 0.8;
+      const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.35;
 
       viewer.viewport.minZoomLevel = minOSDZoom;
       viewer.viewport.maxZoomLevel = maxOSDZoom;
-      viewer.viewport.goHome(true);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialMagParam = urlParams.get("mag");
+      // Padrão de abertura do laboratório: abre diretamente na resolução de captura (40x), permitindo override via ?mag=
+      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : (maxMag >= 40 ? 40 : maxMag);
+      const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
+
+      const imgBounds = viewer.world.getItemAt(0)?.getBounds();
+      const centerPoint = imgBounds ? imgBounds.getCenter() : viewer.viewport.getCenter();
+
+      // Ponto focal inicial da lâmina (se especificado) ou ponto morfológico de interesse
+      let initialPoint = centerPoint;
+      if (targetInitialMag > 4 && laminaAtualData?.defaultCenter) {
+        initialPoint = new window.OpenSeadragon.Point(
+          laminaAtualData.defaultCenter.x,
+          laminaAtualData.defaultCenter.y
+        );
+      }
+
+      viewer.viewport.zoomTo(targetInitialZoom, initialPoint, true);
+      viewer.viewport.panTo(initialPoint, true);
     }
 
     aplicarBloqueioObjetivas(maxMag);
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialMagParam = urlParams.get("mag");
-    // Padrão de abertura do laboratório: abre diretamente na resolução de captura (40x), permitindo override via ?mag=
-    const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : (maxMag >= 40 ? 40 : maxMag);
-
-    if (targetInitialMag && targetInitialMag > 4) {
-      setTimeout(() => {
-        trocarLente(targetInitialMag);
-      }, 50);
-    } else {
-      atualizarLenteBotaoAtivo();
-    }
+    atualizarLenteBotaoAtivo();
+    updateZoomDisplay();
 
     setTimeout(() => {
       const navParent = document.querySelector(".openseadragon-navigator");
@@ -779,11 +790,12 @@ function inicializarOpenSeadragon() {
 
   viewer.addHandler("zoom", () => {
     if (!homeZoomRef || !viewer || !viewer.viewport) return;
-    const nativeZoom = nativeZoomRef || viewer.viewport.imageToViewportZoom(1);
-    const minOSDZoom = homeZoomRef;
-    const maxOSDZoom = Math.max(homeZoomRef * 1.5, nativeZoom * 1.15);
+    const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
+    const zoom4x = getZoom4xRef();
+    const minOSDZoom = zoom4x * 0.8;
+    const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.35;
 
-    // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além do enquadramento inicial
+    // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x)
     const current = viewer.viewport.getZoom();
     if (current < minOSDZoom) {
       viewer.viewport.zoomTo(minOSDZoom, null, true);
@@ -800,33 +812,53 @@ function inicializarOpenSeadragon() {
 // 5.5 Cálculo Dinâmico de Magnificação Ótica Real & Formatação Legível
 // ---------------------------------------------------------------------------
 /**
+ * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
+ * Na objetiva de 4x, o campo de visão ótico real é amplo (~5.5 mm), fazendo com que
+ * a amostra histológica (com cerca de 1.5 mm) ocupe aproximadamente 28% da tela,
+ * deixando margens pretas ao redor ("espaços em preto" característicos da visão macroscópica).
+ */
+export function getZoom4xRef() {
+  if (!viewer || !viewer.viewport) return 1.0;
+  const baseHome = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
+  return baseHome * 0.28;
+}
+
+/**
+ * Converte um valor nominal de ampliação ótica (ex: 4, 10, 40, 60, 100)
+ * para o nível de zoom correspondente no OpenSeadragon.
+ */
+export function calcularZoomParaMagnificacao(mag) {
+  const z4 = getZoom4xRef();
+  const m = Number(mag) || 4;
+  return z4 * (m / 4);
+}
+
+/**
  * Converte o zoom interno do OpenSeadragon (viewer.viewport.getZoom(true))
- * para o equivalente de ampliação ótica real baseado na resolução nativa da câmera.
+ * para o equivalente de ampliação ótica real baseado na escala física das objetivas.
  *
  * @param {number} [osdZoom] - Zoom interno OSD opcional
  * @returns {number} Magnificação ótica numérica (ex: 4.0, 10.0, 40.0)
  */
 export function calcularMagnificacaoOtica(osdZoom) {
   if (!viewer || !viewer.viewport) return 4;
-  const baseHome = homeZoomRef || viewer.viewport.getHomeZoom();
-  const nativeZoom = nativeZoomRef || viewer.viewport.imageToViewportZoom(1);
-  if (!baseHome || baseHome <= 0) return 4;
+  const z4 = getZoom4xRef();
+  if (!z4 || z4 <= 0) return 4;
 
   const currentZoom = typeof osdZoom === "number" ? osdZoom : viewer.viewport.getZoom(true);
   const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
-  // No enquadramento geral inicial (home), a visão panorâmica representa 4x
-  if (currentZoom <= baseHome * 1.02) {
-    return 4;
-  }
+  // Relação ótica linear direta: Magnificação = 4 * (zoomAtual / zoom4x)
+  const magRaw = 4 * (currentZoom / z4);
 
-  // Interpolação ótica proporcional entre a visão panorâmica (4x no homeZoom)
-  // e a resolução nativa da objetiva de captura (maxMag no nativeZoom)
-  const ratio = (currentZoom - baseHome) / Math.max(0.0001, (nativeZoom - baseHome));
-  const magRaw = 4 + ratio * (maxMag - 4);
+  // Snap suave para valores nominais se muito próximo (dentro de margem imperceptível)
+  if (Math.abs(magRaw - 4) < 0.2) return 4;
+  if (Math.abs(magRaw - 10) < 0.3) return 10;
+  if (Math.abs(magRaw - 40) < 0.8) return 40;
+  if (Math.abs(magRaw - 60) < 1.0) return 60;
+  if (Math.abs(magRaw - 100) < 1.5) return 100;
 
-  // Clamping rigoroso entre 4x e o teto físico da lâmina (maxMag)
-  return Math.max(4, Math.min(maxMag, magRaw));
+  return Math.max(4, Math.min(maxMag, Math.round(magRaw * 10) / 10));
 }
 
 /**
@@ -846,7 +878,7 @@ export function formatarMagnificacaoOtica(mag) {
 }
 
 // ---------------------------------------------------------------------------
-// 6. Atualiza destaque do botao de lente conforme zoom atual (item 4)
+// 6. Atualiza destaque do botão de lente conforme zoom atual
 // ---------------------------------------------------------------------------
 function atualizarLenteBotaoAtivo() {
   if (!viewer || !viewer.viewport || !homeZoomRef) return;
@@ -861,7 +893,7 @@ function atualizarLenteBotaoAtivo() {
     objetivo = "60x";
   } else if (mag >= (maxMag <= 40 ? 25 : 30)) {
     objetivo = "40x";
-  } else if (mag >= 6.5) {
+  } else if (mag >= 7) {
     objetivo = "10x";
   }
 
@@ -997,15 +1029,14 @@ export function osdViewerAction(acao) {
   if      (acaoNorm === "zoomin")  alterarZoom(1.35);
   else if (acaoNorm === "zoomout") alterarZoom(0.75);
   else if (acaoNorm === "reset" || acaoNorm === "home") {
-    viewer.viewport.goHome();
-    atualizarLenteBotaoAtivo();
+    trocarLente(4);
   }
   else if (acaoNorm === "center")   viewer.viewport.panTo(viewer.viewport.getCenter());
   else if (acaoNorm === "fullpage") viewer.setFullPage(!viewer.isFullPage());
 }
 
 // ---------------------------------------------------------------------------
-// 9.5 Trocar Lente Objetiva — zoom baseado no homeZoomRef como 4x
+// 9.5 Trocar Lente Objetiva — zoom baseado no modelo ótico proporcional
 // ---------------------------------------------------------------------------
 export function trocarLente(objetivaDesejada, btnElement) {
   if (!viewer || !viewer.viewport || !homeZoomRef) return;
@@ -1013,19 +1044,18 @@ export function trocarLente(objetivaDesejada, btnElement) {
   const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
   const magDesejada = Number(objetivaDesejada) || 4;
   const magClamped = Math.max(4, Math.min(maxMag, magDesejada));
-  const nativeZoom = nativeZoomRef || viewer.viewport.imageToViewportZoom(1);
 
-  let targetZoom = homeZoomRef;
+  const targetZoom = calcularZoomParaMagnificacao(magClamped);
+
   if (magClamped <= 4) {
-    targetZoom = homeZoomRef;
-  } else if (magClamped >= maxMag) {
-    targetZoom = nativeZoom;
+    // Ao voltar para 4x (visao panoramica com margens pretas), centraliza a lamina
+    const imgBounds = viewer.world.getItemAt(0)?.getBounds();
+    const centerPoint = imgBounds ? imgBounds.getCenter() : viewer.viewport.getCenter();
+    viewer.viewport.zoomTo(targetZoom, null, false);
+    viewer.viewport.panTo(centerPoint, false);
   } else {
-    const ratio = (magClamped - 4) / (maxMag - 4);
-    targetZoom = homeZoomRef + ratio * (nativeZoom - homeZoomRef);
+    viewer.viewport.zoomTo(targetZoom, null, false);
   }
-
-  viewer.viewport.zoomTo(targetZoom, null, false);
 
   const targetBtn = btnElement || document.querySelector(`.lens-btn[data-mag="${magClamped}"]`) || Array.from(document.querySelectorAll(".lens-btn")).find(b => b.textContent.trim() === `${magClamped}x`);
 
@@ -1094,6 +1124,8 @@ Object.assign(window.App, {
   alterarZoom,
   calcularMagnificacaoOtica,
   formatarMagnificacaoOtica,
+  getZoom4xRef,
+  calcularZoomParaMagnificacao,
   sanitizarHTMLDescricao
 });
 window.osdViewerAction          = osdViewerAction;
@@ -1102,4 +1134,6 @@ window.trocarLente              = trocarLente;
 window.alterarZoom              = alterarZoom;
 window.calcularMagnificacaoOtica = calcularMagnificacaoOtica;
 window.formatarMagnificacaoOtica = formatarMagnificacaoOtica;
+window.getZoom4xRef             = getZoom4xRef;
+window.calcularZoomParaMagnificacao = calcularZoomParaMagnificacao;
 window.sanitizarHTMLDescricao   = sanitizarHTMLDescricao;
