@@ -698,18 +698,22 @@ function inicializarOpenSeadragon() {
 
       viewer.viewport.minZoomLevel = minOSDZoom;
       viewer.viewport.maxZoomLevel = maxOSDZoom;
-      viewer.viewport.zoomTo(homeZoomRef, null, true);
       viewer.viewport.goHome(true);
     }
 
     aplicarBloqueioObjetivas(maxMag);
 
     const urlParams = new URLSearchParams(window.location.search);
-    const initialMag = Number(urlParams.get("mag"));
-    if (initialMag) {
+    const initialMagParam = urlParams.get("mag");
+    // Padrão de abertura do laboratório: abre diretamente na resolução de captura (40x), permitindo override via ?mag=
+    const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : (maxMag >= 40 ? 40 : maxMag);
+
+    if (targetInitialMag && targetInitialMag > 4) {
       setTimeout(() => {
-        trocarLente(initialMag);
-      }, 120);
+        trocarLente(targetInitialMag);
+      }, 50);
+    } else {
+      atualizarLenteBotaoAtivo();
     }
 
     setTimeout(() => {
