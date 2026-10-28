@@ -153,17 +153,57 @@
 
   <script>
     let viewer = null;
-    let currentDzi = 'assets/histologia/osso_maduro_desgaste_ct_crop_teste.dzi';
+    let versaoAtual = 'crop';
 
-    function initViewer(dziPath) {
+    const TILE_SOURCES = {
+      crop: {
+        dzi: 'assets/histologia/osso_maduro_desgaste_ct_crop_teste.dzi',
+        inline: {
+          Image: {
+            xmlns: "http://schemas.microsoft.com/deepzoom/2008",
+            Url: "assets/histologia/osso_maduro_desgaste_ct_crop_teste_files/",
+            Format: "jpg",
+            Overlap: 0,
+            TileSize: 256,
+            Size: {
+              Width: 6120,
+              Height: 4944
+            }
+          }
+        }
+      },
+      original: {
+        dzi: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
+        inline: {
+          Image: {
+            xmlns: "http://schemas.microsoft.com/deepzoom/2008",
+            Url: "assets/histologia/osso_maduro_desgaste_ct_files/",
+            Format: "jpg",
+            Overlap: 0,
+            TileSize: 256,
+            Size: {
+              Width: 7338,
+              Height: 7240
+            }
+          }
+        }
+      }
+    };
+
+    function initViewer(tipo) {
       if (viewer) {
         viewer.destroy();
+        viewer = null;
       }
+
+      // Se executado via file:// (sem servidor HTTP), usa o objeto inline para evitar bloqueio de CORS do fetch XML
+      const isFileProtocol = window.location.protocol === 'file:';
+      const sourceConfig = isFileProtocol ? TILE_SOURCES[tipo].inline : TILE_SOURCES[tipo].dzi;
 
       viewer = OpenSeadragon({
         id: "osd-viewer",
         prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
-        tileSources: dziPath,
+        tileSources: sourceConfig,
         showNavigationControl: false,
         animationTime: 0.4,
         blendTime: 0.1,
@@ -173,13 +213,38 @@
         defaultZoomLevel: 0
       });
 
+      viewer.addHandler('open-failed', function(e) {
+        console.error("OpenSeadragon open-failed:", e);
+        const container = document.getElementById('osd-viewer');
+        if (container) {
+          container.innerHTML = `
+            <div class="h-full flex flex-col items-center justify-center p-6 text-center text-neutral-300">
+              <div class="p-4 rounded-2xl bg-neutral-900 border border-amber-500/30 max-w-md shadow-2xl">
+                <div class="text-amber-400 font-bold mb-2">⚠️ Bloqueio de Segurança Local (CORS)</div>
+                <p class="text-xs text-neutral-400 mb-4 leading-relaxed">
+                  O navegador impede o carregamento de pirâmides de imagens via protocolo <code>file:///</code> direto.
+                </p>
+                <div class="p-3 bg-neutral-950 rounded-xl border border-white/[0.08] text-xs font-mono mb-4 text-[#c8ad5f]">
+                  http://localhost:8080/microscopio_teste.html
+                </div>
+                <a href="http://localhost:8080/microscopio_teste.html" class="inline-block px-4 py-2 bg-[#c8ad5f] text-neutral-950 font-bold text-xs rounded-xl hover:bg-[#d8bd6f] transition-all">
+                  Abrir pelo Servidor Local (Porta 8080)
+                </a>
+              </div>
+            </div>
+          `;
+        }
+      });
+
       viewer.addHandler('zoom', function(e) {
         const mag = Math.max(4, Math.round(e.zoom * 40) / 10);
-        document.getElementById('zoomIndicator').textContent = mag.toFixed(1) + 'x';
+        const el = document.getElementById('zoomIndicator');
+        if (el) el.textContent = mag.toFixed(1) + 'x';
       });
     }
 
     function alternarVersao(tipo) {
+      versaoAtual = tipo;
       const btnCrop = document.getElementById('btnModoCrop');
       const btnOrig = document.getElementById('btnModoOriginal');
       const badge = document.getElementById('badgeDimensao');
@@ -188,19 +253,17 @@
         btnCrop.className = "px-3 py-1 rounded-lg text-xs font-semibold transition-all bg-[#c8ad5f] text-neutral-950 shadow";
         btnOrig.className = "px-3 py-1 rounded-lg text-xs font-semibold transition-all text-neutral-400 hover:text-white";
         badge.innerHTML = "📐 Resolução: 6.120 × 4.944 px (30.26 MP) &bull; Sem bordas pretas";
-        currentDzi = 'assets/histologia/osso_maduro_desgaste_ct_crop_teste.dzi';
       } else {
         btnOrig.className = "px-3 py-1 rounded-lg text-xs font-semibold transition-all bg-[#c8ad5f] text-neutral-950 shadow";
         btnCrop.className = "px-3 py-1 rounded-lg text-xs font-semibold transition-all text-neutral-400 hover:text-white";
         badge.innerHTML = "📐 Resolução: 7.338 × 7.240 px (53.1 MP) &bull; Mosaico bruto com degraus da varredura";
-        currentDzi = 'assets/histologia/osso_maduro_desgaste_ct.dzi';
       }
 
-      initViewer(currentDzi);
+      initViewer(tipo);
     }
 
     function setMagnification(mag) {
-      if (!viewer) return;
+      if (!viewer || !viewer.viewport) return;
       const zoomMap = { 4: 0.9, 10: 2.5, 40: 8.0, 100: 18.0 };
       const targetZoom = zoomMap[mag] || 1;
       viewer.viewport.zoomTo(targetZoom, null, false);
@@ -218,7 +281,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      initViewer(currentDzi);
+      initViewer('crop');
     });
   </script>
 </body>
