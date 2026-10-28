@@ -4,8 +4,12 @@
  * Módulo WebRTC de Alta Resolução e Alinhamento Óptico com Margem de Overlap
  * ============================================================================
  * Desenvolvido para microscopia óptica de alta precisão (Palas Atlas / Fiji Stitching).
- * Suporta câmeras USB microscópicas (UVC), webcams, congelamento de inspeção,
- * espelhamento óptico (prismas), retículo micrométrico e ghosting direcional de 15%.
+ * Suporta câmeras USB microscópicas (UVC), simulador óptico H&E em tempo real,
+ * congelamento de inspeção, espelhamento óptico (prismas), retículo micrométrico
+ * e recorte de 15% em canvas offscreen dedicado (Onion Skin).
+ *
+ * NOTA ARQUITETURAL:
+ * Todo o feedback sonoro é centralizado no BenchAudioSynthesizer (bench-copilot.js).
  */
 
 class MicroscopeCameraManager {
@@ -16,7 +20,7 @@ class MicroscopeCameraManager {
     this.container = options.container || document.getElementById('cameraContainer');
     this.deviceSelect = options.deviceSelect || document.getElementById('cameraSelect');
     this.statusBadge = options.statusBadge || document.getElementById('cameraStatusBadge');
-    
+
     // Callbacks de evento
     this.onStatusChange = options.onStatusChange || null;
     this.onError = options.onError || null;
@@ -28,7 +32,12 @@ class MicroscopeCameraManager {
     this.selectedDeviceId = null;
     this.isActive = false;
     this.isFrozen = false;
-    this.frozenFrameCanvas = null;
+    this._stoppingIntentionally = false;
+
+    // Simulador de Stream Virtual (para bancada sem hardware / testes DevTools)
+    this._simCanvas = null;
+    this._simAnimId = null;
+    this._simStepHint = { col: 0, row: 0, stepNum: 1 };
 
     // Configurações Ópticas e Visuais
     this.isFlippedH = false;
@@ -38,26 +47,35 @@ class MicroscopeCameraManager {
     this.ghostBlendMode = 'normal'; // 'normal', 'cyan', 'difference'
     this.showReticle = true;
 
-    // Histórico de Captura e Fantasma
-    this.lastCapturedFrame = null; // HTMLCanvasElement com frame de alta resolução
-    this.capturedFrames = new Map(); // stepIndex -> { canvas, timestamp, direction }
-    this.currentDirection = 'DOWN'; // 'DOWN', 'UP', 'RIGHT', 'LEFT', 'DONE', null
+    // Histórico de Captura e Fantasma com limite de cache em RAM
+    this.maxCachedCanvases = options.maxCachedCanvases || 8;
+    this.lastCapturedFrame = null; // HTMLCanvasElement do último frame capturado
+    this.capturedFrames = new Map(); // stepIndex -> { canvas, jpegUrl, thumbUrl, timestamp, direction, stepNumber }
+    this.currentDirection = 'START'; // 'START', 'DOWN', 'UP', 'RIGHT', 'LEFT', 'FINISH', 'DONE'
     this.previousStepNumber = null;
 
-    // Audio Context para som de obturador sintetizado (zero assets externos)
-    this.audioCtx = null;
+    // Canvas Offscreen dedicado exclusivamente à fatia de 15% do Onion Skin
+    this.offscreenStripCanvas = document.createElement('canvas');
+    this.offscreenStripCtx = this.offscreenStripCanvas.getContext('2d');
+    this.lastSliceMetrics = null;
 
-    // Inicialização de Canvas em memória
-    this.captureCanvas = document.createElement('canvas');
-    this.captureCtx = this.captureCanvas.getContext('2d');
+    // Canvas Offscreen reutilizável para geração de miniaturas da galeria
+    this._thumbCanvas = document.createElement('canvas');
+    this._thumbCanvas.width = 320;
+    this._thumbCanvas.height = 180;
+    this._thumbCtx = this._thumbCanvas.getContext('2d');
+
+    this._boundResize = () => {
+      if (this.isActive) this.syncCanvasResolution();
+    };
   }
 
   /**
    * Verifica se o navegador suporta WebRTC e se está em contexto seguro (HTTPS ou localhost)
    */
   checkEnvironment() {
-    const isSecure = window.isSecureContext || 
-      window.location.hostname === 'localhost' || 
+    const isSecure = window.isSecureContext ||
+      window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1';
 
     const hasMediaDevices = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -84,29 +102,26 @@ class MicroscopeCameraManager {
     }
 
     if (env.isLocalFile) {
-      console.warn('[MicroscopeCamera] Atenção: Arquivo aberto via file://. Acesso à câmera pode ser bloqueado pelo Chrome.');
+      console.warn('[MicroscopeCamera] Arquivo aberto via file://. Acesso à câmera pode ser bloqueado pelo navegador.');
     }
 
     await this.enumerateDevices();
 
-    // Ouvinte para quando o usuário plugar/desplugar a câmera USB do microscópio
     if (navigator.mediaDevices.ondevicechange !== undefined) {
       navigator.mediaDevices.ondevicechange = async () => {
-        console.log('[MicroscopeCamera] Dispositivo USB alterado ou conectado.');
         await this.enumerateDevices();
       };
     }
 
-    // Configurar redimensionamento responsivo do overlay
-    window.addEventListener('resize', () => {
-      if (this.isActive) this.syncCanvasResolution();
-    });
+    window.removeEventListener('resize', this._boundResize);
+    window.addEventListener('resize', this._boundResize, { passive: true });
 
+    this.syncCanvasResolution();
     return true;
   }
 
   /**
-   * Enumera as câmeras de vídeo conectadas
+   * Enumera as câmeras de vídeo conectadas e adiciona o Simulador Óptico H&E
    */
   async enumerateDevices() {
     try {
@@ -114,25 +129,16 @@ class MicroscopeCameraManager {
       this.devices = allDevices.filter(d => d.kind === 'videoinput');
 
       if (this.deviceSelect) {
+        const previousSelection = this.selectedDeviceId || this.deviceSelect.value;
         this.deviceSelect.innerHTML = '';
-        
-        if (this.devices.length === 0) {
-          const opt = document.createElement('option');
-          opt.value = '';
-          opt.textContent = 'Nenhuma câmera detectada (conecte o USB)';
-          this.deviceSelect.appendChild(opt);
-          return;
-        }
 
-        // Tentar identificar câmera externa/microscópio prioritariamente
         let preferredIndex = 0;
         this.devices.forEach((device, index) => {
           const opt = document.createElement('option');
-          opt.value = device.deviceId;
-          const label = device.label || `Câmera ${index + 1} (${device.deviceId.slice(0, 8)}...)`;
+          opt.value = device.deviceId || `hw-cam-${index}`;
+          const label = device.label || `Câmera USB ${index + 1}`;
           opt.textContent = label;
 
-          // Se tiver "USB", "Microscope", "UVC", "Endoscope" ou "External", prioriza
           const lower = label.toLowerCase();
           if (lower.includes('usb') || lower.includes('microscope') || lower.includes('uvc') || lower.includes('camera 2')) {
             preferredIndex = index;
@@ -141,81 +147,114 @@ class MicroscopeCameraManager {
           this.deviceSelect.appendChild(opt);
         });
 
-        if (!this.selectedDeviceId && this.devices[preferredIndex]) {
+        // Opção de Simulador Óptico H&E 1080p para validação e treino sem hardware
+        const simOpt = document.createElement('option');
+        simOpt.value = 'virtual-he-1080p';
+        simOpt.textContent = '🧪 Simulador Óptico H&E (1920×1080 @ 30fps)';
+        this.deviceSelect.appendChild(simOpt);
+
+        if (previousSelection && Array.from(this.deviceSelect.options).some(o => o.value === previousSelection)) {
+          this.selectedDeviceId = previousSelection;
+          this.deviceSelect.value = previousSelection;
+        } else if (this.devices.length > 0 && this.devices[preferredIndex].deviceId) {
           this.selectedDeviceId = this.devices[preferredIndex].deviceId;
           this.deviceSelect.value = this.selectedDeviceId;
+        } else if (this.devices.length === 0) {
+          this.selectedDeviceId = 'virtual-he-1080p';
+          this.deviceSelect.value = 'virtual-he-1080p';
         }
       }
     } catch (err) {
-      console.warn('[MicroscopeCamera] Erro ao listar dispositivos antes da permissão:', err);
+      console.warn('[MicroscopeCamera] Erro ao listar dispositivos:', err);
     }
   }
 
   /**
-   * Inicia o fluxo de vídeo WebRTC com resolução Full HD ideal (1920x1080)
+   * Inicia um stream sintético contínuo em 1920x1080 para testes de bancada / DevTools
+   */
+  _startVirtualStream() {
+    this._stopVirtualStream();
+    const canvas = document.createElement('canvas');
+    canvas.width = 1920;
+    canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+    this._simCanvas = canvas;
+
+    // Desenha um frame estático de alta definição e atualiza suavemente a 15fps para baixo uso de CPU
+    let tick = 0;
+    const baseFrame = this.generateSyntheticMicroscopyFrame(this._simStepHint.stepNum || 1);
+
+    const renderTick = () => {
+      if (!this._simCanvas) return;
+      tick++;
+      ctx.drawImage(baseFrame, 0, 0);
+      // Indicador discreto de stream ativo
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
+      ctx.fillRect(60, 48, 620, 54);
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(60, 48, 620, 54);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 22px "JetBrains Mono", monospace';
+      ctx.fillText(`STREAM ÓPTICO H&E 1080p • CAMPO #${this._simStepHint.stepNum || 1}`, 80, 82);
+
+      this._simAnimId = requestAnimationFrame(renderTick);
+    };
+    renderTick();
+
+    return canvas.captureStream(30);
+  }
+
+  _stopVirtualStream() {
+    if (this._simAnimId) {
+      cancelAnimationFrame(this._simAnimId);
+      this._simAnimId = null;
+    }
+    this._simCanvas = null;
+  }
+
+  /**
+   * Atualiza dica de posição para que o simulador óptico acompanhe o campo atual
+   */
+  setSimulationStepHint({ col = 0, row = 0, stepNum = 1 } = {}) {
+    this._simStepHint = { col, row, stepNum };
+  }
+
+  /**
+   * Inicia o fluxo de vídeo WebRTC com negociação ideal Full HD (1920x1080)
    */
   async startCamera(deviceId = null) {
-    if (deviceId) {
+    if (deviceId !== null && deviceId !== undefined) {
       this.selectedDeviceId = deviceId;
     } else if (this.deviceSelect && this.deviceSelect.value) {
       this.selectedDeviceId = this.deviceSelect.value;
     }
 
     this.stopCamera();
-
-    const videoConstraints = {
-      width: { ideal: 1920, min: 1280 },
-      height: { ideal: 1080, min: 720 },
-      frameRate: { ideal: 30, min: 15 }
-    };
-
-    if (this.selectedDeviceId) {
-      videoConstraints.deviceId = { exact: this.selectedDeviceId };
-    }
-
+    this._stoppingIntentionally = false;
     this.updateStatus('connecting', 'Conectando câmera...');
 
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: videoConstraints,
-        audio: false
-      });
-
-      this.videoElement.srcObject = this.stream;
-      this.videoElement.play();
-      this.isActive = true;
-      this.isFrozen = false;
-
-      // Aguardar o vídeo carregar dimensões nativas
-      await new Promise(resolve => {
-        this.videoElement.onloadedmetadata = () => {
-          this.syncCanvasResolution();
-          resolve();
+      if (this.selectedDeviceId === 'virtual-he-1080p') {
+        this.stream = this._startVirtualStream();
+      } else {
+        const videoConstraints = {
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          frameRate: { ideal: 30 }
         };
-      });
 
-      const track = this.stream.getVideoTracks()[0];
-      const settings = track.getSettings ? track.getSettings() : {};
-      const width = settings.width || this.videoElement.videoWidth || 1920;
-      const height = settings.height || this.videoElement.videoHeight || 1080;
-      const fps = Math.round(settings.frameRate || 30);
+        if (this.selectedDeviceId && !this.selectedDeviceId.startsWith('hw-cam-')) {
+          videoConstraints.deviceId = { exact: this.selectedDeviceId };
+        }
 
-      this.updateStatus('active', `Ao Vivo: ${width}x${height} @ ${fps}fps`);
-
-      // Após permissão, os rótulos de hardware são liberados; atualiza dropdown
-      await this.enumerateDevices();
-      if (this.deviceSelect && track.label) {
-        // Encontrar e marcar a câmera correta
-        Array.from(this.deviceSelect.options).forEach(opt => {
-          if (opt.value === track.getSettings().deviceId) {
-            opt.selected = true;
-          }
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: videoConstraints,
+          audio: false
         });
       }
 
-      this.renderOverlay();
-      return true;
-
+      return await this._attachStream(this.stream);
     } catch (err) {
       console.error('[MicroscopeCamera] Falha ao iniciar câmera:', err);
       this.handleCameraError(err);
@@ -223,25 +262,85 @@ class MicroscopeCameraManager {
     }
   }
 
+  async _attachStream(stream) {
+    this.videoElement.srcObject = stream;
+    try {
+      await this.videoElement.play();
+    } catch (e) {}
+
+    this.isActive = true;
+    this.isFrozen = false;
+
+    if (this.videoElement.readyState < 1) {
+      await new Promise((resolve) => {
+        const onLoaded = () => {
+          this.videoElement.removeEventListener('loadedmetadata', onLoaded);
+          resolve();
+        };
+        this.videoElement.addEventListener('loadedmetadata', onLoaded, { once: true });
+        setTimeout(resolve, 800);
+      });
+    }
+
+    this.syncCanvasResolution();
+
+    const track = stream.getVideoTracks()[0];
+    const settings = (track && typeof track.getSettings === 'function') ? track.getSettings() : {};
+    const width = settings.width || this.videoElement.videoWidth || 1920;
+    const height = settings.height || this.videoElement.videoHeight || 1080;
+    const fps = Math.round(settings.frameRate || 30);
+
+    // Monitoramento de desconexão abrupta do cabo USB / encerramento da trilha
+    if (track) {
+      const handleTrackEnded = () => {
+        if (this._stoppingIntentionally || !this.isActive) return;
+        console.warn('[MicroscopeCamera] Stream de vídeo encerrado inesperadamente (cabo USB desconectado).');
+        this._cleanupActiveStream();
+        this.updateStatus('error', 'Câmera Desconectada');
+        this.notifyError({
+          name: 'StreamDisconnectedError',
+          message: 'A conexão com a câmera USB foi interrompida. Verifique o cabo USB e reconecte.'
+        });
+      };
+      track.addEventListener('ended', handleTrackEnded, { once: true });
+      track.onended = handleTrackEnded;
+    }
+
+    const modeTag = this.selectedDeviceId === 'virtual-he-1080p' ? 'Simulador' : 'Ao Vivo';
+    this.updateStatus('active', `${modeTag}: ${width}×${height} @ ${fps}fps`);
+
+    await this.enumerateDevices();
+    if (this.deviceSelect) {
+      if (this.selectedDeviceId === 'virtual-he-1080p') {
+        this.deviceSelect.value = 'virtual-he-1080p';
+      } else if (settings.deviceId) {
+        this.selectedDeviceId = settings.deviceId;
+        this.deviceSelect.value = settings.deviceId;
+      }
+    }
+
+    this.renderOverlay();
+    return true;
+  }
+
   /**
    * Tratamento amigável e técnico dos erros do getUserMedia
    */
   handleCameraError(err) {
-    this.stopCamera();
+    if (err.name === 'OverconstrainedError') {
+      this.fallbackCamera();
+      return;
+    }
+
+    this._cleanupActiveStream();
     let userMsg = '';
-    let category = 'error';
 
     if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-      userMsg = 'Permissão negada. Clique no ícone de CADEADO na barra de endereços do navegador e permita o uso da Câmera.';
+      userMsg = 'Permissão negada. Permita o uso da câmera na barra de endereços do navegador.';
     } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-      userMsg = 'Câmera não encontrada. Verifique se o cabo USB da câmera do microscópio está bem conectado.';
+      userMsg = 'Câmera USB não encontrada. Verifique a conexão USB ou selecione o Simulador Óptico H&E.';
     } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-      userMsg = 'Câmera em uso. Feche outros aplicativos de microscopia (AmScope, ToupLite, OBS, Zoom) que possam estar com a câmera aberta.';
-    } else if (err.name === 'OverconstrainedError') {
-      userMsg = 'A câmera não suporta resolução Full HD. Tentando modo de compatibilidade automático...';
-      // Tentativa de fallback sem restrição de resolução
-      setTimeout(() => this.fallbackCamera(), 500);
-      return;
+      userMsg = 'Câmera ocupada por outro software (AmScope, ToupView, OBS). Feche-o e tente novamente.';
     } else {
       userMsg = `Erro na câmera (${err.name}): ${err.message || 'Falha de comunicação de hardware.'}`;
     }
@@ -256,26 +355,21 @@ class MicroscopeCameraManager {
   async fallbackCamera() {
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      this.videoElement.srcObject = this.stream;
-      this.videoElement.play();
-      this.isActive = true;
-      this.isFrozen = false;
-      this.videoElement.onloadedmetadata = () => {
-        this.syncCanvasResolution();
-        this.renderOverlay();
-      };
-      this.updateStatus('active', 'Ao Vivo (Modo Compatibilidade)');
+      await this._attachStream(this.stream);
     } catch (err) {
-      this.handleCameraError(err);
+      this._cleanupActiveStream();
+      this.updateStatus('error', 'Câmera Desconectada / Erro');
+      this.notifyError({ name: err.name, message: err.message || 'Falha no modo de compatibilidade.', raw: err });
     }
   }
 
-  /**
-   * Encerra o fluxo de vídeo da câmera
-   */
-  stopCamera() {
+  _cleanupActiveStream() {
+    this._stopVirtualStream();
     if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
+      this.stream.getTracks().forEach(track => {
+        track.onended = null;
+        try { track.stop(); } catch (e) {}
+      });
       this.stream = null;
     }
     if (this.videoElement) {
@@ -283,7 +377,14 @@ class MicroscopeCameraManager {
     }
     this.isActive = false;
     this.isFrozen = false;
-    this.frozenFrameCanvas = null;
+  }
+
+  /**
+   * Encerra o fluxo de vídeo da câmera
+   */
+  stopCamera() {
+    this._stoppingIntentionally = true;
+    this._cleanupActiveStream();
     this.updateStatus('stopped', 'Câmera Pausada');
     this.renderOverlay();
   }
@@ -294,8 +395,9 @@ class MicroscopeCameraManager {
   async toggleCamera() {
     if (this.isActive) {
       this.stopCamera();
+      return false;
     } else {
-      await this.startCamera();
+      return await this.startCamera();
     }
   }
 
@@ -306,24 +408,12 @@ class MicroscopeCameraManager {
     if (!this.isActive) return false;
 
     if (!this.isFrozen) {
-      // Congelar: captura o frame atual e desenha no canvas
-      const w = this.videoElement.videoWidth || 1920;
-      const h = this.videoElement.videoHeight || 1080;
-      
-      this.frozenFrameCanvas = document.createElement('canvas');
-      this.frozenFrameCanvas.width = w;
-      this.frozenFrameCanvas.height = h;
-      const ctx = this.frozenFrameCanvas.getContext('2d');
-      ctx.drawImage(this.videoElement, 0, 0, w, h);
-
       this.videoElement.pause();
       this.isFrozen = true;
-      this.updateStatus('frozen', '❄️ Imagem Congelada (Alinhamento)');
+      this.updateStatus('frozen', 'Imagem Congelada (Inspeção)');
     } else {
-      // Descongelar
-      this.videoElement.play();
+      this.videoElement.play().catch(() => {});
       this.isFrozen = false;
-      this.frozenFrameCanvas = null;
       this.updateStatus('active', 'Ao Vivo');
     }
 
@@ -352,9 +442,7 @@ class MicroscopeCameraManager {
   applyTransform() {
     const scaleX = this.isFlippedH ? -1 : 1;
     const scaleY = this.isFlippedV ? -1 : 1;
-    const transformStr = `scale(${scaleX}, ${scaleY})`;
-    this.videoElement.style.transform = transformStr;
-    // O canvas de overlay não é espelhado por CSS, pois o retículo e badges devem permanecer legíveis!
+    this.videoElement.style.transform = `scale(${scaleX}, ${scaleY})`;
     this.renderOverlay();
   }
 
@@ -372,7 +460,6 @@ class MicroscopeCameraManager {
       this.overlayCanvas.height = h;
     }
 
-    // Ajustar o container de vídeo para a proporção exata da câmera sem distorção
     if (this.container && w > 0 && h > 0) {
       this.container.style.aspectRatio = `${w} / ${h}`;
     }
@@ -381,10 +468,11 @@ class MicroscopeCameraManager {
   }
 
   /**
-   * Define o percentual de sobreposição (overlap)
+   * Define o percentual de sobreposição (overlap) e recalcula a fatia offscreen
    */
   setOverlap(percent) {
     this.overlapPct = Math.max(0.05, Math.min(0.40, percent));
+    this._updateOffscreenGhostStrip();
     this.renderOverlay();
   }
 
@@ -413,65 +501,109 @@ class MicroscopeCameraManager {
   }
 
   /**
-   * Dispara o som de clique de obturador mecânico sintético via Web Audio
-   */
-  playShutterSound() {
-    try {
-      if (!this.audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioContextClass) this.audioCtx = new AudioContextClass();
-      }
-      if (this.audioCtx && this.audioCtx.state === 'suspended') {
-        this.audioCtx.resume();
-      }
-      if (!this.audioCtx) return;
-
-      const now = this.audioCtx.currentTime;
-      const osc = this.audioCtx.createOscillator();
-      const gain = this.audioCtx.createGain();
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(800, now);
-      osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
-
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-
-      osc.connect(gain);
-      gain.connect(this.audioCtx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.08);
-    } catch (e) {
-      // Ignora silenciosamente se o áudio estiver bloqueado
-    }
-  }
-
-  /**
-   * Flash visual na tela para indicar disparo de foto
+   * Flash visual discreto na tela para indicar disparo de foto
    */
   triggerVisualFlash() {
     if (!this.container) return;
     const flashDiv = document.createElement('div');
-    flashDiv.className = 'absolute inset-0 bg-white pointer-events-none transition-opacity duration-200 z-50';
-    flashDiv.style.opacity = '0.7';
+    flashDiv.className = 'absolute inset-0 bg-white pointer-events-none transition-opacity duration-150 z-50';
+    flashDiv.style.opacity = '0.55';
     this.container.appendChild(flashDiv);
     requestAnimationFrame(() => {
       flashDiv.style.opacity = '0';
-      setTimeout(() => flashDiv.remove(), 250);
+      setTimeout(() => flashDiv.remove(), 180);
     });
   }
 
   /**
+   * Recorta apenas a faixa de 15% relevante do último frame para o canvas offscreen dedicado
+   */
+  _updateOffscreenGhostStrip() {
+    const src = this.lastCapturedFrame;
+    const dir = this.currentDirection;
+    if (!src || !dir || dir === 'START' || dir === 'FINISH' || dir === 'DONE') {
+      this.lastSliceMetrics = null;
+      return;
+    }
+
+    const P = this.overlapPct;
+    const srcW = src.width || 1920;
+    const srcH = src.height || 1080;
+
+    let sx = 0, sy = 0, sw = srcW, sh = srcH;
+
+    if (dir === 'DOWN') {
+      // Charriot desceu: a borda INFERIOR (15%) da foto anterior sobrepõe o TOPO (15%) do campo atual
+      sx = 0;
+      sy = Math.round(srcH * (1 - P));
+      sw = srcW;
+      sh = Math.max(1, srcH - sy);
+    } else if (dir === 'UP') {
+      // Charriot subiu: a borda SUPERIOR (15%) da foto anterior sobrepõe a BASE (15%) do campo atual
+      sx = 0;
+      sy = 0;
+      sw = srcW;
+      sh = Math.max(1, Math.round(srcH * P));
+    } else if (dir === 'RIGHT') {
+      // Charriot moveu à direita: a borda DIREITA (15%) da foto anterior sobrepõe a ESQUERDA (15%) do campo atual
+      sx = Math.round(srcW * (1 - P));
+      sy = 0;
+      sw = Math.max(1, srcW - sx);
+      sh = srcH;
+    } else if (dir === 'LEFT') {
+      sx = 0;
+      sy = 0;
+      sw = Math.max(1, Math.round(srcW * P));
+      sh = srcH;
+    } else {
+      this.lastSliceMetrics = null;
+      return;
+    }
+
+    this.offscreenStripCanvas.width = sw;
+    this.offscreenStripCanvas.height = sh;
+    this.offscreenStripCtx.clearRect(0, 0, sw, sh);
+    this.offscreenStripCtx.drawImage(src, sx, sy, sw, sh, 0, 0, sw, sh);
+
+    this.lastSliceMetrics = {
+      direction: dir,
+      overlapPct: P,
+      sourceWidth: srcW,
+      sourceHeight: srcH,
+      sx,
+      sy,
+      sw,
+      sh
+    };
+  }
+
+  /**
+   * Limita o número de elementos HTMLCanvasElement mantidos em memória RAM
+   */
+  _pruneCanvasCache() {
+    if (this.capturedFrames.size <= this.maxCachedCanvases) return;
+    const keys = Array.from(this.capturedFrames.keys()).sort((a, b) => a - b);
+    const excess = keys.length - this.maxCachedCanvases;
+    for (let i = 0; i < excess; i++) {
+      const entry = this.capturedFrames.get(keys[i]);
+      if (entry && entry.canvas && entry.canvas !== this.lastCapturedFrame) {
+        entry.canvas.width = 0;
+        entry.canvas.height = 0;
+        entry.canvas = null;
+      }
+    }
+  }
+
+  /**
    * CAPTURA DE FOTO E ARMAZENAMENTO PARA O ONION SKIN
-   * @param {number} stepIndex - Índice do passo recém-concluído (0, 1, 2...)
-   * @param {string} nextDirection - Próximo movimento ('DOWN', 'UP', 'RIGHT', 'LEFT', 'DONE')
-   * @param {number} stepNumber - Número legível da foto (ex: 1, 2, 3...)
+   * @param {number} stepIndex - Índice do passo recém-capturado (0, 1, 2...)
+   * @param {string} nextDirection - Movimento para o próximo campo ('DOWN', 'UP', 'RIGHT', 'LEFT', 'FINISH')
+   * @param {number} stepNumber - Número legível da foto (1, 2, 3...)
    */
   captureFrame(stepIndex, nextDirection = 'DOWN', stepNumber = 1) {
     let sourceCanvas = null;
 
-    if (this.isActive && this.videoElement.videoWidth > 0) {
+    if (this.isActive && this.videoElement && this.videoElement.videoWidth > 0) {
       const w = this.videoElement.videoWidth;
       const h = this.videoElement.videoHeight;
 
@@ -480,7 +612,6 @@ class MicroscopeCameraManager {
       snap.height = h;
       const sCtx = snap.getContext('2d');
 
-      // Se houver espelhamento óptico ativo, aplica na captura para bater com a tela
       sCtx.save();
       if (this.isFlippedH || this.isFlippedV) {
         sCtx.translate(this.isFlippedH ? w : 0, this.isFlippedV ? h : 0);
@@ -491,27 +622,31 @@ class MicroscopeCameraManager {
 
       sourceCanvas = snap;
     } else {
-      // Fallback: Gera um padrão sintético texturizado de microscopia para testes
       sourceCanvas = this.generateSyntheticMicroscopyFrame(stepNumber);
     }
+
+    // Gera miniatura leve e JPEG de exportação
+    this._thumbCtx.clearRect(0, 0, 320, 180);
+    this._thumbCtx.drawImage(sourceCanvas, 0, 0, 320, 180);
+    const thumbUrl = this._thumbCanvas.toDataURL('image/jpeg', 0.7);
+    const jpegUrl = sourceCanvas.toDataURL('image/jpeg', 0.92);
 
     this.lastCapturedFrame = sourceCanvas;
     this.currentDirection = nextDirection;
     this.previousStepNumber = stepNumber;
 
-    // Salva no histórico de frames
     this.capturedFrames.set(stepIndex, {
       canvas: sourceCanvas,
+      jpegUrl,
+      thumbUrl,
       stepNumber,
       direction: nextDirection,
       timestamp: new Date().toISOString()
     });
 
-    // Efeitos de feedback
-    this.playShutterSound();
+    this._pruneCanvasCache();
+    this._updateOffscreenGhostStrip();
     this.triggerVisualFlash();
-
-    // Renderizar o novo ghosting para o próximo passo
     this.renderOverlay();
 
     if (this.onFrameCaptured) {
@@ -519,7 +654,9 @@ class MicroscopeCameraManager {
         stepIndex,
         stepNumber,
         nextDirection,
-        canvas: sourceCanvas
+        canvas: sourceCanvas,
+        thumbUrl,
+        jpegUrl
       });
     }
 
@@ -527,32 +664,117 @@ class MicroscopeCameraManager {
   }
 
   /**
-   * Restaura o ghosting de um passo anterior quando o usuário clica em "Voltar"
+   * Restaura o ghosting de um passo quando o usuário clica em "Voltar" ou navega pelo mapa.
+   * @param {number} currentStepIndex - Índice do passo atual no visor (o fantasma vem de currentStepIndex - 1)
+   * @param {string} entryDirection - Direção do movimento que levou de (currentStepIndex - 1) até (currentStepIndex)
    */
-  restoreStep(stepIndex, nextDirection = 'DOWN', prevStepNumber = null) {
-    const prevItem = this.capturedFrames.get(stepIndex - 1);
+  restoreStep(currentStepIndex, entryDirection = 'DOWN') {
+    if (currentStepIndex <= 0 || entryDirection === 'START') {
+      this.lastCapturedFrame = null;
+      this.previousStepNumber = null;
+      this.currentDirection = 'START';
+      this._updateOffscreenGhostStrip();
+      this.renderOverlay();
+      return;
+    }
+
+    const prevItem = this.capturedFrames.get(currentStepIndex - 1);
+    this.currentDirection = entryDirection;
+
     if (prevItem) {
-      this.lastCapturedFrame = prevItem.canvas;
       this.previousStepNumber = prevItem.stepNumber;
+      if (prevItem.canvas) {
+        this.lastCapturedFrame = prevItem.canvas;
+        this._updateOffscreenGhostStrip();
+        this.renderOverlay();
+      } else if (prevItem.jpegUrl) {
+        const img = new Image();
+        img.onload = () => {
+          const restored = document.createElement('canvas');
+          restored.width = img.naturalWidth || 1920;
+          restored.height = img.naturalHeight || 1080;
+          restored.getContext('2d').drawImage(img, 0, 0);
+          prevItem.canvas = restored;
+          this.lastCapturedFrame = restored;
+          this._updateOffscreenGhostStrip();
+          this.renderOverlay();
+        };
+        img.src = prevItem.jpegUrl;
+      }
     } else {
       this.lastCapturedFrame = null;
       this.previousStepNumber = null;
+      this._updateOffscreenGhostStrip();
+      this.renderOverlay();
     }
-    this.currentDirection = nextDirection;
-    this.renderOverlay();
   }
 
   /**
-   * Limpa o fantasma atual
+   * Limpa o fantasma atual do visor
    */
   clearGhost() {
     this.lastCapturedFrame = null;
     this.previousStepNumber = null;
+    this.lastSliceMetrics = null;
+    this.offscreenStripCanvas.width = 0;
+    this.offscreenStripCanvas.height = 0;
     this.renderOverlay();
   }
 
   /**
-   * RENDERIZADOR PRINCIPAL DO OVERLAY (Ghosting + Linhas de 15% + Mira Reticular)
+   * Limpa todo o histórico de frames capturados e libera memória RAM
+   */
+  clearHistory() {
+    this.capturedFrames.forEach((entry) => {
+      if (entry && entry.canvas) {
+        entry.canvas.width = 0;
+        entry.canvas.height = 0;
+        entry.canvas = null;
+      }
+    });
+    this.capturedFrames.clear();
+    this.currentDirection = 'START';
+    this.clearGhost();
+  }
+
+  /**
+   * Retorna telemetria e diagnóstico geométrico do Onion Skin para inspeção / DevTools
+   */
+  getGhostDiagnostics() {
+    const W = this.overlayCanvas ? this.overlayCanvas.width : 1920;
+    const H = this.overlayCanvas ? this.overlayCanvas.height : 1080;
+    const P = this.overlapPct;
+    const dir = this.currentDirection;
+
+    let projection = null;
+    if (dir === 'DOWN') {
+      projection = { edge: 'TOP', dx: 0, dy: 0, dw: W, dh: Math.round(H * P) };
+    } else if (dir === 'UP') {
+      projection = { edge: 'BOTTOM', dx: 0, dy: Math.round(H * (1 - P)), dw: W, dh: Math.round(H * P) };
+    } else if (dir === 'RIGHT') {
+      projection = { edge: 'LEFT', dx: 0, dy: 0, dw: Math.round(W * P), dh: H };
+    } else if (dir === 'LEFT') {
+      projection = { edge: 'RIGHT', dx: Math.round(W * (1 - P)), dy: 0, dw: Math.round(W * P), dh: H };
+    }
+
+    return {
+      hasGhostFrame: !!this.lastCapturedFrame,
+      previousStepNumber: this.previousStepNumber,
+      currentDirection: dir,
+      overlapPct: P,
+      ghostOpacity: this.ghostOpacity,
+      offscreenStripSize: {
+        width: this.offscreenStripCanvas.width,
+        height: this.offscreenStripCanvas.height
+      },
+      sourceSlice: this.lastSliceMetrics,
+      targetProjection: projection,
+      cachedFramesCount: this.capturedFrames.size
+    };
+  }
+
+  /**
+   * RENDERIZADOR PRINCIPAL DO OVERLAY (Ghosting Offscreen 15% + Mira Reticular)
    */
   renderOverlay() {
     if (!this.overlayCanvas) return;
@@ -560,204 +782,155 @@ class MicroscopeCameraManager {
     const w = this.overlayCanvas.width;
     const h = this.overlayCanvas.height;
 
-    // 1. Limpa o canvas
     ctx.clearRect(0, 0, w, h);
-
     if (w === 0 || h === 0) return;
 
-    // 2. Desenhar Onion Skin (Ghosting) se houver foto anterior
-    if (this.lastCapturedFrame && this.ghostOpacity > 0 && this.currentDirection !== 'DONE') {
+    const isDone = (this.currentDirection === 'DONE' || this.currentDirection === 'FINISH');
+
+    if (this.lastCapturedFrame && this.ghostOpacity > 0 && !isDone && this.currentDirection !== 'START') {
       this.drawGhostingSlice(ctx, w, h);
     }
 
-    // 3. Desenhar Mira Central Reticular (se ativada)
     if (this.showReticle) {
       this.drawMicroscopyReticle(ctx, w, h);
     }
 
-    // 4. Se a varredura estiver concluída, exibe banner festivo
-    if (this.currentDirection === 'DONE') {
+    if (isDone) {
       this.drawDoneBanner(ctx, w, h);
     }
   }
 
   /**
-   * Desenha a faixa de 15% de Overlap de acordo com a direção do movimento
+   * Projeta a fatia de 15% pré-recortada no offscreenStripCanvas sobre a borda correspondente
    */
   drawGhostingSlice(ctx, W, H) {
-    const P = this.overlapPct; // Ex: 0.15
-    const src = this.lastCapturedFrame;
-    const srcW = src.width;
-    const srcH = src.height;
+    if (!this.lastSliceMetrics || this.offscreenStripCanvas.width === 0) {
+      this._updateOffscreenGhostStrip();
+    }
+    if (!this.lastSliceMetrics || this.offscreenStripCanvas.width === 0) return;
 
-    let sx = 0, sy = 0, sw = srcW, sh = srcH;
+    const P = this.overlapPct;
     let dx = 0, dy = 0, dw = W, dh = H;
     let lineStart = { x: 0, y: 0 };
     let lineEnd = { x: 0, y: 0 };
     let badgeText = '';
     let badgePos = { x: 0, y: 0 };
 
-    /**
-     * MECÂNICA ÓPTICA DA VARREDURA EM SERPENTE:
-     * - Se o próximo movimento é DESCER (DOWN):
-     *   O novo campo ao vivo está ABAIXO do campo anterior.
-     *   Portanto, a faixa INFERIOR de 15% da foto anterior
-     *   se sobrepõe com a faixa SUPERIOR de 15% do campo atual.
-     * 
-     * - Se o próximo movimento é SUBIR (UP):
-     *   O novo campo ao vivo está ACIMA do campo anterior.
-     *   Portanto, a faixa SUPERIOR de 15% da foto anterior
-     *   se sobrepõe com a faixa INFERIOR de 15% do campo atual.
-     * 
-     * - Se o próximo movimento é DIREITA (RIGHT):
-     *   O novo campo ao vivo está À DIREITA do campo anterior.
-     *   Portanto, a faixa DIREITA de 15% da foto anterior
-     *   se sobrepõe com a faixa ESQUERDA de 15% do campo atual.
-     */
     if (this.currentDirection === 'DOWN') {
-      // Recorta faixa inferior de 15% da anterior
-      sx = 0;
-      sy = srcH * (1 - P);
-      sw = srcW;
-      sh = srcH * P;
-
-      // Desenha no topo de 15% do canvas ao vivo
       dx = 0;
       dy = 0;
       dw = W;
-      dh = H * P;
+      dh = Math.round(H * P);
 
-      lineStart = { x: 0, y: H * P };
-      lineEnd = { x: W, y: H * P };
+      lineStart = { x: 0, y: dh };
+      lineEnd = { x: W, y: dh };
       badgeText = `▲ FOTO #${this.previousStepNumber || ''} ANTERIOR — OVERLAP ${Math.round(P * 100)}% (TOPO)`;
-      badgePos = { x: W / 2, y: (H * P) / 2 };
+      badgePos = { x: W / 2, y: dh / 2 };
 
     } else if (this.currentDirection === 'UP') {
-      // Recorta faixa superior de 15% da anterior
-      sx = 0;
-      sy = 0;
-      sw = srcW;
-      sh = srcH * P;
-
-      // Desenha no fundo de 15% do canvas ao vivo
+      dh = Math.round(H * P);
       dx = 0;
-      dy = H * (1 - P);
+      dy = H - dh;
       dw = W;
-      dh = H * P;
 
-      lineStart = { x: 0, y: H * (1 - P) };
-      lineEnd = { x: W, y: H * (1 - P) };
-      badgeText = `▼ FOTO #${this.previousStepNumber || ''} ANTERIOR — OVERLAP ${Math.round(P * 100)}% (FUNDO)`;
-      badgePos = { x: W / 2, y: H - (H * P) / 2 };
+      lineStart = { x: 0, y: dy };
+      lineEnd = { x: W, y: dy };
+      badgeText = `▼ FOTO #${this.previousStepNumber || ''} ANTERIOR — OVERLAP ${Math.round(P * 100)}% (BASE)`;
+      badgePos = { x: W / 2, y: dy + dh / 2 };
 
     } else if (this.currentDirection === 'RIGHT') {
-      // Recorta faixa direita de 15% da anterior
-      sx = srcW * (1 - P);
-      sy = 0;
-      sw = srcW * P;
-      sh = srcH;
-
-      // Desenha na borda esquerda de 15% do canvas ao vivo
       dx = 0;
       dy = 0;
-      dw = W * P;
+      dw = Math.round(W * P);
       dh = H;
 
-      lineStart = { x: W * P, y: 0 };
-      lineEnd = { x: W * P, y: H };
-      badgeText = `◄ FOTO #${this.previousStepNumber || ''} ANTERIOR — OVERLAP ${Math.round(P * 100)}% (ESQ)`;
-      badgePos = { x: (W * P) / 2, y: H / 2 };
+      lineStart = { x: dw, y: 0 };
+      lineEnd = { x: dw, y: H };
+      badgeText = `◄ FOTO #${this.previousStepNumber || ''} (${Math.round(P * 100)}% ESQ)`;
+      badgePos = { x: dw / 2, y: H / 2 };
 
     } else if (this.currentDirection === 'LEFT') {
-      // Recorta faixa esquerda de 15%
-      sx = 0;
-      sy = 0;
-      sw = srcW * P;
-      sh = srcH;
-
-      // Desenha na borda direita de 15%
-      dx = W * (1 - P);
+      dw = Math.round(W * P);
+      dx = W - dw;
       dy = 0;
-      dw = W * P;
       dh = H;
 
-      lineStart = { x: W * (1 - P), y: 0 };
-      lineEnd = { x: W * (1 - P), y: H };
-      badgeText = `FOTO #${this.previousStepNumber || ''} ANTERIOR — OVERLAP ${Math.round(P * 100)}% (DIR) ►`;
-      badgePos = { x: W - (W * P) / 2, y: H / 2 };
+      lineStart = { x: dx, y: 0 };
+      lineEnd = { x: dx, y: H };
+      badgeText = `FOTO #${this.previousStepNumber || ''} (${Math.round(P * 100)}% DIR) ►`;
+      badgePos = { x: dx + dw / 2, y: H / 2 };
+    } else {
+      return;
     }
 
-    // Desenho do Ghost com efeito de transparência
     ctx.save();
     ctx.globalAlpha = this.ghostOpacity;
 
     if (this.ghostBlendMode === 'cyan') {
-      // Modo Ciano: Realce óptico com contraste para cortes histológicos (H&E)
-      ctx.drawImage(src, sx, sy, sw, sh, dx, dy, dw, dh);
+      ctx.drawImage(this.offscreenStripCanvas, 0, 0, this.offscreenStripCanvas.width, this.offscreenStripCanvas.height, dx, dy, dw, dh);
       ctx.globalCompositeOperation = 'source-atop';
       ctx.fillStyle = 'rgba(6, 182, 212, 0.45)';
       ctx.fillRect(dx, dy, dw, dh);
     } else if (this.ghostBlendMode === 'difference') {
-      // Modo Diferença: Estruturas alinhadas tendem a se anular/destacar
       ctx.globalCompositeOperation = 'difference';
-      ctx.drawImage(src, sx, sy, sw, sh, dx, dy, dw, dh);
+      ctx.drawImage(this.offscreenStripCanvas, 0, 0, this.offscreenStripCanvas.width, this.offscreenStripCanvas.height, dx, dy, dw, dh);
     } else {
-      // Modo Normal com Alpha
       ctx.globalCompositeOperation = 'source-over';
-      ctx.drawImage(src, sx, sy, sw, sh, dx, dy, dw, dh);
+      ctx.drawImage(this.offscreenStripCanvas, 0, 0, this.offscreenStripCanvas.width, this.offscreenStripCanvas.height, dx, dy, dw, dh);
     }
     ctx.restore();
 
-    // Linha divisória pontilhada com brilho neon
+    // Linha divisória pontilhada de alinhamento óptico
     ctx.save();
     ctx.beginPath();
     ctx.setLineDash([10, 8]);
-    ctx.lineWidth = Math.max(2, Math.round(W * 0.0015));
-    ctx.strokeStyle = '#f59e0b'; // Âmbar / Neon
-    ctx.shadowColor = '#d97706';
-    ctx.shadowBlur = 8;
+    ctx.lineWidth = Math.max(2, Math.round(W * 0.0016));
+    ctx.strokeStyle = '#f59e0b';
     ctx.moveTo(lineStart.x, lineStart.y);
     ctx.lineTo(lineEnd.x, lineEnd.y);
     ctx.stroke();
     ctx.restore();
 
-    // Badge explicativo sobreposto na faixa
     this.drawOverlapBadge(ctx, badgeText, badgePos.x, badgePos.y, W, H);
   }
 
   /**
-   * Desenha um badge translúcido de identificação da faixa de overlap
+   * Desenha um badge de alto contraste identificando a faixa de overlap
    */
   drawOverlapBadge(ctx, text, x, y, W, H) {
     ctx.save();
-    const fontSize = Math.max(11, Math.round(H * 0.022));
-    ctx.font = `bold ${fontSize}px 'JetBrains Mono', monospace`;
+    const fontSize = Math.max(11, Math.round(H * 0.02));
+    ctx.font = `bold ${fontSize}px "JetBrains Mono", Consolas, monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     const textMetrics = ctx.measureText(text);
-    const paddingX = 14;
-    const paddingY = 8;
+    const paddingX = 12;
+    const paddingY = 6;
     const boxW = textMetrics.width + paddingX * 2;
     const boxH = fontSize + paddingY * 2;
 
-    // Fundo do Pill escuro com borda âmbar
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-    ctx.strokeStyle = 'rgba(245, 158, 11, 0.9)';
+    const clampedX = Math.max(boxW / 2 + 8, Math.min(W - boxW / 2 - 8, x));
+    const clampedY = Math.max(boxH / 2 + 8, Math.min(H - boxH / 2 - 8, y));
+
+    ctx.fillStyle = 'rgba(9, 13, 22, 0.9)';
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.95)';
     ctx.lineWidth = 1.5;
 
-    const rx = x - boxW / 2;
-    const ry = y - boxH / 2;
-    const radius = 6;
+    const rx = clampedX - boxW / 2;
+    const ry = clampedY - boxH / 2;
 
     ctx.beginPath();
-    ctx.roundRect(rx, ry, boxW, boxH, radius);
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(rx, ry, boxW, boxH, 6);
+    } else {
+      ctx.rect(rx, ry, boxW, boxH);
+    }
     ctx.fill();
     ctx.stroke();
 
-    // Texto com contraste
     ctx.fillStyle = '#fde68a';
-    ctx.fillText(text, x, y);
+    ctx.fillText(text, clampedX, clampedY);
     ctx.restore();
   }
 
@@ -770,42 +943,34 @@ class MicroscopeCameraManager {
     const cy = H / 2;
     const scale = Math.min(W, H);
 
-    ctx.strokeStyle = 'rgba(99, 102, 241, 0.55)'; // Indigo translúcido
+    ctx.strokeStyle = 'rgba(99, 102, 241, 0.55)';
     ctx.lineWidth = 1.2;
 
-    // 1. Círculo Central Pequeno (Foco Primário)
     ctx.beginPath();
     ctx.arc(cx, cy, scale * 0.04, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 2. Círculo Médio
     ctx.beginPath();
     ctx.arc(cx, cy, scale * 0.15, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 3. Cruz Reticular com Marcadores Micrométricos (Ticks)
     const armLength = scale * 0.25;
     ctx.beginPath();
-    // Eixo Horizontal
     ctx.moveTo(cx - armLength, cy);
     ctx.lineTo(cx + armLength, cy);
-    // Eixo Vertical
     ctx.moveTo(cx, cy - armLength);
     ctx.lineTo(cx, cy + armLength);
     ctx.stroke();
 
-    // Ticks micrométricos a cada 2% da tela
     const tickStep = scale * 0.025;
     const tickSize = 4;
     ctx.beginPath();
     for (let i = 1; i <= 8; i++) {
       const d = i * tickStep;
-      // Horizontais
       ctx.moveTo(cx + d, cy - tickSize);
       ctx.lineTo(cx + d, cy + tickSize);
       ctx.moveTo(cx - d, cy - tickSize);
       ctx.lineTo(cx - d, cy + tickSize);
-      // Verticais
       ctx.moveTo(cx - tickSize, cy + d);
       ctx.lineTo(cx + tickSize, cy + d);
       ctx.moveTo(cx - tickSize, cy - d);
@@ -813,7 +978,6 @@ class MicroscopeCameraManager {
     }
     ctx.stroke();
 
-    // Ponto central diminuto
     ctx.fillStyle = '#818cf8';
     ctx.beginPath();
     ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
@@ -823,28 +987,28 @@ class MicroscopeCameraManager {
   }
 
   /**
-   * Banner de comemoração ao término da lâmina
+   * Banner ao término da lâmina no modo fixo
    */
   drawDoneBanner(ctx, W, H) {
     ctx.save();
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+    ctx.fillStyle = 'rgba(9, 13, 22, 0.82)';
     ctx.fillRect(0, 0, W, H);
 
-    const fontSize = Math.max(18, Math.round(H * 0.05));
-    ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+    const fontSize = Math.max(18, Math.round(H * 0.045));
+    ctx.font = `bold ${fontSize}px Inter, system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#34d399';
-    ctx.fillText('🎉 Varredura Completa!', W / 2, H / 2 - 20);
+    ctx.fillText('🎉 Varredura Concluída!', W / 2, H / 2 - 18);
 
-    ctx.font = `500 ${Math.round(fontSize * 0.6)}px Inter, sans-serif`;
+    ctx.font = `500 ${Math.round(fontSize * 0.58)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = '#cbd5e1';
-    ctx.fillText('Todas as fotos do grid foram capturadas.', W / 2, H / 2 + 25);
+    ctx.fillText('Todos os campos da grade foram registrados.', W / 2, H / 2 + 24);
     ctx.restore();
   }
 
   /**
-   * Gera uma imagem sintética com aspecto histológico (H&E) caso nenhuma câmera esteja plugada
+   * Gera uma imagem sintética com aspecto histológico (H&E) determinístico por campo
    */
   generateSyntheticMicroscopyFrame(stepNumber) {
     const canvas = document.createElement('canvas');
@@ -852,7 +1016,6 @@ class MicroscopeCameraManager {
     canvas.height = 1080;
     const ctx = canvas.getContext('2d');
 
-    // Fundo rosa suave (típico de estroma/citoplasma histológico)
     const grad = ctx.createLinearGradient(0, 0, 1920, 1080);
     grad.addColorStop(0, '#fce7f3');
     grad.addColorStop(0.5, '#fbcfe8');
@@ -860,14 +1023,13 @@ class MicroscopeCameraManager {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 1920, 1080);
 
-    // Núcleos celulares em roxo/azul hematoxilina aleatórios
     const rng = (seed) => {
-      let x = Math.sin(seed++) * 10000;
+      const x = Math.sin(seed) * 10000;
       return x - Math.floor(x);
     };
 
-    let seed = stepNumber * 777;
-    for (let i = 0; i < 90; i++) {
+    let seed = (stepNumber || 1) * 777;
+    for (let i = 0; i < 85; i++) {
       const cx = rng(seed++) * 1920;
       const cy = rng(seed++) * 1080;
       const r = 8 + rng(seed++) * 16;
@@ -877,10 +1039,9 @@ class MicroscopeCameraManager {
       ctx.fill();
     }
 
-    // Carimbo de identificação
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
-    ctx.font = 'bold 36px monospace';
-    ctx.fillText(`SIMULAÇÃO HISTOLÓGICA — CAMPO #${stepNumber}`, 80, 120);
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+    ctx.font = 'bold 34px "JetBrains Mono", Consolas, monospace';
+    ctx.fillText(`SIMULAÇÃO HISTOLÓGICA H&E — CAMPO #${stepNumber}`, 80, 120);
 
     return canvas;
   }
@@ -890,22 +1051,22 @@ class MicroscopeCameraManager {
    */
   updateStatus(state, message) {
     if (this.statusBadge) {
-      this.statusBadge.className = 'text-xs px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 transition-all shadow-sm ';
+      let base = 'text-xs px-2.5 py-1 rounded-full font-mono flex items-center gap-1.5 transition-all ';
       if (state === 'active') {
-        this.statusBadge.className += 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
-        this.statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ${message}`;
+        this.statusBadge.className = base + 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/50';
+        this.statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> <span>${message}</span>`;
       } else if (state === 'connecting') {
-        this.statusBadge.className += 'bg-amber-500/20 text-amber-400 border border-amber-500/40';
-        this.statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> ${message}`;
+        this.statusBadge.className = base + 'bg-amber-950/80 text-amber-300 border border-amber-500/50';
+        this.statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> <span>${message}</span>`;
       } else if (state === 'frozen') {
-        this.statusBadge.className += 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
-        this.statusBadge.innerHTML = `<span>❄️</span> ${message}`;
+        this.statusBadge.className = base + 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/50';
+        this.statusBadge.innerHTML = `<span>❄️</span> <span>${message}</span>`;
       } else if (state === 'error') {
-        this.statusBadge.className += 'bg-rose-500/20 text-rose-400 border border-rose-500/40';
-        this.statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> ${message}`;
+        this.statusBadge.className = base + 'bg-rose-950/80 text-rose-300 border border-rose-500/50';
+        this.statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> <span>${message}</span>`;
       } else {
-        this.statusBadge.className += 'bg-slate-800 text-slate-400 border border-slate-700';
-        this.statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500"></span> ${message}`;
+        this.statusBadge.className = base + 'bg-slate-900 text-slate-400 border border-slate-700';
+        this.statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500"></span> <span>${message}</span>`;
       }
     }
 
@@ -921,7 +1082,7 @@ class MicroscopeCameraManager {
     if (this.onError) {
       this.onError(errObj);
     } else {
-      alert(`[Aviso da Câmera] ${errObj.message}`);
+      console.warn('[MicroscopeCamera]', errObj.message);
     }
   }
 
@@ -938,7 +1099,6 @@ class MicroscopeCameraManager {
   }
 }
 
-// Exporta globalmente para compatibilidade total em navegador e módulos
 if (typeof window !== 'undefined') {
   window.MicroscopeCameraManager = MicroscopeCameraManager;
 }

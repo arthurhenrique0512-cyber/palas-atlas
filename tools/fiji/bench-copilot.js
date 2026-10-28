@@ -2,10 +2,10 @@
  * Palas Atlas - Bench Copilot & Hardware Integration Engine
  * ==============================================================================
  * Módulos de Engenharia e Ergonomia de Bancada para Microscopia:
- * 1. WakeLockManager: Anti-bloqueio de tela contínuo com recuperação por visibilidade
- * 2. BenchAudioSynthesizer: Síntese de áudio autônoma via Web Audio API (Zero arquivos externos)
+ * 1. WakeLockManager: Anti-bloqueio de tela contínuo com recuperação por visibilidade e gesto
+ * 2. BenchAudioSynthesizer: Síntese de áudio centralizada via Web Audio API (Zero arquivos externos)
  * 3. CapturePersistence: Persistência anti-pânico contínua e recuperação via localStorage
- * 4. CommandGenerator: Gerador dinâmico de comandos PowerShell e macros Fiji (ImageJ)
+ * 4. CommandGenerator: Gerador unificado de comandos PowerShell, Node e macros Fiji (ImageJ)
  * ==============================================================================
  */
 
@@ -23,46 +23,54 @@
       this.autoRequest = options.autoRequest !== false;
       this.onStateChange = typeof options.onStateChange === 'function' ? options.onStateChange : () => {};
       this._userWantsActive = this.autoRequest;
+      this._gestureBound = false;
 
       this._initVisibilityListener();
 
       if (this.autoRequest && this.isSupported) {
-        // Tenta ativar na inicialização ou no primeiro gesto
-        this.request().catch(() => {
-          // Navegadores modernos podem requerer interação do usuário primeiro
-          this._bindFirstGestureActivation();
+        // request() retorna Promise<boolean>; se bloqueado sem gesto inicial, agenda ativação no 1º gesto
+        this.request({ silentOnGestureBlock: true }).then((ok) => {
+          if (!ok) {
+            this._bindFirstGestureActivation();
+          }
         });
+      } else if (!this.isSupported) {
+        this._notify('unsupported', 'A Screen Wake Lock API não é suportada neste navegador.');
       }
     }
 
     _bindFirstGestureActivation() {
+      if (this._gestureBound) return;
+      this._gestureBound = true;
+
       const activateOnGesture = async () => {
-        if (this._userWantsActive && !this.isActive) {
-          await this.request();
-        }
+        this._gestureBound = false;
         window.removeEventListener('click', activateOnGesture);
         window.removeEventListener('keydown', activateOnGesture);
         window.removeEventListener('touchstart', activateOnGesture);
+
+        if (this._userWantsActive && !this.isActive) {
+          await this.request();
+        }
       };
 
-      window.addEventListener('click', activateOnGesture, { once: true });
-      window.addEventListener('keydown', activateOnGesture, { once: true });
-      window.addEventListener('touchstart', activateOnGesture, { once: true });
+      window.addEventListener('click', activateOnGesture, { once: true, passive: true });
+      window.addEventListener('keydown', activateOnGesture, { once: true, passive: true });
+      window.addEventListener('touchstart', activateOnGesture, { once: true, passive: true });
     }
 
     _initVisibilityListener() {
       document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible' && this._userWantsActive && !this.isActive) {
-          try {
-            await this.request();
-          } catch (e) {
-            console.warn('[WakeLock] Falha na auto-recuperação pós-visibilidade:', e);
+          const ok = await this.request({ silentOnGestureBlock: true });
+          if (!ok) {
+            this._bindFirstGestureActivation();
           }
         }
       });
     }
 
-    async request() {
+    async request(opts = {}) {
       if (!this.isSupported) {
         this._notify('unsupported', 'A Screen Wake Lock API não é suportada neste navegador.');
         return false;
@@ -70,26 +78,37 @@
 
       try {
         if (this.sentinel !== null) {
-          await this.release();
+          try {
+            await this.sentinel.release();
+          } catch (e) {}
+          this.sentinel = null;
         }
 
-        this.sentinel = await navigator.wakeLock.request('screen');
+        const sentinel = await navigator.wakeLock.request('screen');
+        this.sentinel = sentinel;
         this.isActive = true;
         this._userWantsActive = true;
 
-        this.sentinel.addEventListener('release', () => {
-          // Só marca inativo se não for um ciclo planejado de re-solicitação
-          this.isActive = false;
-          this.sentinel = null;
-          this._notify('inactive', 'Bloqueio de tela liberado.');
-        });
+        if (typeof sentinel.addEventListener === 'function') {
+          sentinel.addEventListener('release', () => {
+            if (this.sentinel === sentinel) {
+              this.isActive = false;
+              this.sentinel = null;
+              this._notify('inactive', 'Bloqueio de tela liberado.');
+            }
+          });
+        }
 
-        this._notify('active', 'Tela mantida sempre ativa com sucesso.');
+        this._notify('active', 'Tela mantida sempre ativa.');
         return true;
       } catch (err) {
         this.isActive = false;
         this.sentinel = null;
-        this._notify('error', `Não foi possível manter a tela ativa: ${err.message || err}`);
+        if (opts.silentOnGestureBlock) {
+          this._notify('pending', 'Aguardando interação para travar tela ativa.');
+        } else {
+          this._notify('error', `Não foi possível manter a tela ativa: ${err.message || err}`);
+        }
         return false;
       }
     }
@@ -97,10 +116,11 @@
     async release() {
       this._userWantsActive = false;
       if (this.sentinel) {
-        try {
-          await this.sentinel.release();
-        } catch (e) {}
+        const current = this.sentinel;
         this.sentinel = null;
+        try {
+          await current.release();
+        } catch (e) {}
       }
       this.isActive = false;
       this._notify('inactive', 'Modo de tela ativa desativado.');
@@ -118,7 +138,7 @@
 
     _notify(status, message = '') {
       this.onStateChange({
-        status, // 'active' | 'inactive' | 'unsupported' | 'error'
+        status, // 'active' | 'inactive' | 'pending' | 'unsupported' | 'error'
         isActive: this.isActive,
         isSupported: this.isSupported,
         message
@@ -128,42 +148,58 @@
 
 
   // ============================================================================
-  // 2. BENCH AUDIO SYNTHESIZER (Síntese Sonora Web Audio API)
+  // 2. BENCH AUDIO SYNTHESIZER (Síntese Sonora Centralizada Web Audio API)
   // ============================================================================
   class BenchAudioSynthesizer {
     constructor(options = {}) {
       this.ctx = null;
-      this.isMuted = (localStorage.getItem('palas_bench_audio_muted') === 'true');
-      this.volume = typeof options.volume === 'number' ? options.volume : 0.22;
+      this.isMuted = false;
+      try {
+        this.isMuted = (localStorage.getItem('palas_bench_audio_muted') === 'true');
+      } catch (e) {}
+      this.volume = typeof options.volume === 'number' ? options.volume : 0.24;
       this.onMuteChange = typeof options.onMuteChange === 'function' ? options.onMuteChange : () => {};
 
-      // Inicialização lazy ao primeiro gesto
       this._bindGestureUnlock();
     }
 
     _bindGestureUnlock() {
       const unlockAudio = () => {
-        this._ensureContext();
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
         window.removeEventListener('click', unlockAudio);
         window.removeEventListener('keydown', unlockAudio);
         window.removeEventListener('touchstart', unlockAudio);
       };
-      window.addEventListener('click', unlockAudio, { once: true });
-      window.addEventListener('keydown', unlockAudio, { once: true });
-      window.addEventListener('touchstart', unlockAudio, { once: true });
+      window.addEventListener('click', unlockAudio, { once: true, passive: true });
+      window.addEventListener('keydown', unlockAudio, { once: true, passive: true });
+      window.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
     }
 
-    _ensureContext() {
-      if (!this.ctx) {
-        const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtxClass) {
+    /**
+     * Garante que o AudioContext exista e esteja em estado 'running' antes de agendar osciladores,
+     * respeitando a política de Autoplay do Chrome sem gerar avisos no console.
+     */
+    async _withRunningContext(callback) {
+      if (this.isMuted) return false;
+      try {
+        if (!this.ctx) {
+          const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtxClass) return false;
           this.ctx = new AudioCtxClass();
         }
+        if (this.ctx.state === 'suspended') {
+          await this.ctx.resume();
+        }
+        if (this.ctx.state === 'running') {
+          callback(this.ctx, this.ctx.currentTime);
+          return true;
+        }
+      } catch (e) {
+        // Silencia bloqueios de autoplay quando chamado fora de gesto de usuário
       }
-      if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume().catch(() => {});
-      }
-      return this.ctx;
+      return false;
     }
 
     toggleMute() {
@@ -188,31 +224,48 @@
     }
 
     /**
-     * Bipe curto e nítido de disparo comum (880Hz -> 1100Hz)
-     * Resposta acústica percussiva e agradável para confirmar o clique no microscópio.
+     * Disparo de captura (Obturador óptico + confirmação aguda limpa: 880Hz -> 1180Hz)
      */
     playShot() {
-      if (this.isMuted) return;
-      const ctx = this._ensureContext();
-      if (!ctx) return;
+      return this._withRunningContext((ctx, now) => {
+        // Camada 1: Transiente mecânico curto de obturador
+        const clickOsc = ctx.createOscillator();
+        const clickGain = ctx.createGain();
+        clickOsc.type = 'triangle';
+        clickOsc.frequency.setValueAtTime(720, now);
+        clickOsc.frequency.exponentialRampToValueAtTime(140, now + 0.045);
 
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+        clickGain.gain.setValueAtTime(this.volume * 0.8, now);
+        clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, now);
-      osc.frequency.exponentialRampToValueAtTime(1150, now + 0.07);
+        clickOsc.connect(clickGain);
+        clickGain.connect(ctx.destination);
+        clickOsc.start(now);
+        clickOsc.stop(now + 0.05);
 
-      gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(this.volume, now + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+        // Camada 2: Bipe tonal de confirmação
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now + 0.015);
+        osc.frequency.exponentialRampToValueAtTime(1180, now + 0.085);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.001, now + 0.015);
+        gain.gain.linearRampToValueAtTime(this.volume, now + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.105);
 
-      osc.start(now);
-      osc.stop(now + 0.095);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + 0.015);
+        osc.stop(now + 0.11);
+      });
+    }
+
+    /**
+     * Alias semântico para compatibilidade com chamadas de obturador
+     */
+    playShutter() {
+      return this.playShot();
     }
 
     /**
@@ -220,101 +273,111 @@
      * Acorde de duas notas ascendentes em quinta perfeita (D5 587Hz -> A5 880Hz).
      */
     playTurn() {
-      if (this.isMuted) return;
-      const ctx = this._ensureContext();
-      if (!ctx) return;
+      return this._withRunningContext((ctx, now) => {
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(587.33, now);
+        gain1.gain.setValueAtTime(0.001, now);
+        gain1.gain.linearRampToValueAtTime(this.volume * 1.1, now + 0.01);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.13);
 
-      const now = ctx.currentTime;
-
-      // Nota 1: D5 (587.33 Hz) com onda triangular para riqueza harmônica
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.type = 'triangle';
-      osc1.frequency.setValueAtTime(587.33, now);
-      gain1.gain.setValueAtTime(0.001, now);
-      gain1.gain.linearRampToValueAtTime(this.volume * 1.1, now + 0.01);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.13);
-
-      // Nota 2: A5 (880.00 Hz) ascendente
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(880.00, now + 0.09);
-      gain2.gain.setValueAtTime(0.001, now + 0.09);
-      gain2.gain.linearRampToValueAtTime(this.volume * 1.25, now + 0.10);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-      osc2.start(now + 0.09);
-      osc2.stop(now + 0.33);
-    }
-
-    /**
-     * Fanfarra curta e triunfante de vitória para "Varredura Concluída!"
-     * Arpejo de 4 notas ascendentes (C5 -> E5 -> G5 -> C6).
-     */
-    playVictory() {
-      if (this.isMuted) return;
-      const ctx = this._ensureContext();
-      if (!ctx) return;
-
-      const baseTime = ctx.currentTime;
-      const arpeggio = [
-        { freq: 523.25, offset: 0.00, dur: 0.13, type: 'triangle' }, // C5
-        { freq: 659.25, offset: 0.11, dur: 0.13, type: 'triangle' }, // E5
-        { freq: 783.99, offset: 0.22, dur: 0.16, type: 'sine' },     // G5
-        { freq: 1046.50, offset: 0.35, dur: 0.65, type: 'sine' }    // C6
-      ];
-
-      arpeggio.forEach((note) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        const noteStart = baseTime + note.offset;
-
-        osc.type = note.type;
-        osc.frequency.setValueAtTime(note.freq, noteStart);
-
-        gain.gain.setValueAtTime(0.001, noteStart);
-        gain.gain.linearRampToValueAtTime(this.volume * 1.35, noteStart + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + note.dur);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(noteStart);
-        osc.stop(noteStart + note.dur + 0.05);
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880.00, now + 0.09);
+        gain2.gain.setValueAtTime(0.001, now + 0.09);
+        gain2.gain.linearRampToValueAtTime(this.volume * 1.25, now + 0.10);
+        gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.09);
+        osc2.stop(now + 0.33);
       });
     }
 
     /**
-     * Som de retorno / voltar passo (440Hz -> 280Hz)
+     * Fanfarra curta e triunfante para "Varredura Concluída!"
+     * Arpejo de 4 notas ascendentes (C5 -> E5 -> G5 -> C6).
+     */
+    playVictory() {
+      return this._withRunningContext((ctx, baseTime) => {
+        const arpeggio = [
+          { freq: 523.25, offset: 0.00, dur: 0.13, type: 'triangle' }, // C5
+          { freq: 659.25, offset: 0.11, dur: 0.13, type: 'triangle' }, // E5
+          { freq: 783.99, offset: 0.22, dur: 0.16, type: 'sine' },     // G5
+          { freq: 1046.50, offset: 0.35, dur: 0.55, type: 'sine' }     // C6
+        ];
+
+        arpeggio.forEach((note) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const noteStart = baseTime + note.offset;
+
+          osc.type = note.type;
+          osc.frequency.setValueAtTime(note.freq, noteStart);
+
+          gain.gain.setValueAtTime(0.001, noteStart);
+          gain.gain.linearRampToValueAtTime(this.volume * 1.3, noteStart + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + note.dur);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(noteStart);
+          osc.stop(noteStart + note.dur + 0.04);
+        });
+      });
+    }
+
+    /**
+     * Som de retorno / voltar passo (440Hz -> 260Hz)
      */
     playUndo() {
-      if (this.isMuted) return;
-      const ctx = this._ensureContext();
-      if (!ctx) return;
+      return this._withRunningContext((ctx, now) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(260, now + 0.1);
 
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.exponentialRampToValueAtTime(260, now + 0.1);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(this.volume * 0.65, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
 
-      gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(this.volume * 0.7, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.11);
+      });
+    }
 
-      osc.start(now);
-      osc.stop(now + 0.11);
+    /**
+     * Alerta grave duplo para desconexão de câmera USB ou falha de hardware
+     */
+    playAlert() {
+      return this._withRunningContext((ctx, now) => {
+        [0, 0.14].forEach((offset, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const start = now + offset;
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(idx === 0 ? 320 : 240, start);
+          gain.gain.setValueAtTime(0.001, start);
+          gain.gain.linearRampToValueAtTime(this.volume * 0.9, start + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.11);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(start);
+          osc.stop(start + 0.12);
+        });
+      });
     }
   }
 
@@ -333,12 +396,14 @@
         const payload = {
           version: 2,
           currentStep: state.currentStep || 0,
+          maxStepReached: state.maxStepReached || state.currentStep || 0,
+          isFinished: !!state.isFinished,
           cols: state.cols || 3,
-          rows: state.rows || 4,
-          sampleName: state.sampleName || 'amostra_1',
+          rows: state.rows || 6,
+          sampleName: state.sampleName || 'osso_maduro',
           objective: state.objective || '10x',
           overlap: state.overlap || 15,
-          mode: state.mode || 'snake_columns',
+          mode: state.mode || 'dynamic',
           history: Array.isArray(state.history) ? state.history : [],
           startTime: state.startTime || Date.now(),
           lastUpdated: Date.now()
@@ -377,14 +442,20 @@
     hasIncompleteSession() {
       const data = this.load();
       if (!data) return false;
-      const total = (data.cols || 3) * (data.rows || 4);
-      // Incompleta se começou (step > 0) e não passou do total final
-      return (typeof data.currentStep === 'number' && data.currentStep > 0 && data.currentStep < total);
+      if (data.isFinished) return false;
+      if (typeof data.currentStep !== 'number' || data.currentStep <= 0) return false;
+
+      if (data.mode === 'fixed') {
+        const total = (data.cols || 3) * (data.rows || 6);
+        return data.currentStep < total;
+      }
+      // No modo dinâmico, qualquer sessão iniciada (currentStep > 0) e não marcada como concluída é recuperável
+      return true;
     }
 
     formatTimeAgo(timestamp) {
       if (!timestamp) return 'recentemente';
-      const diffSec = Math.floor((Date.now() - timestamp) / 1000);
+      const diffSec = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
       if (diffSec < 60) return `há ${diffSec}s`;
       const diffMin = Math.floor(diffSec / 60);
       if (diffMin < 60) return `há ${diffMin} min`;
@@ -396,7 +467,7 @@
 
 
   // ============================================================================
-  // 4. COMMAND GENERATOR (PowerShell & Fiji ImageJ Automation)
+  // 4. COMMAND GENERATOR (Unificação PowerShell, Node & Fiji ImageJ)
   // ============================================================================
   class CommandGenerator {
     static sanitizeName(name) {
@@ -404,23 +475,40 @@
       return name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_');
     }
 
-    static generatePowerShell(config) {
-      const sample = this.sanitizeName(config.sampleName);
+    static generatePowerShell(config = {}) {
+      const sample = this.sanitizeName(config.sampleName || config.photoPrefix);
       const pattern = `${sample}_x.jpg`;
       return `.\\tools\\fiji\\rename_images.ps1 -Dir "C:\\fotos\\${sample}" -Pattern "${pattern}"`;
     }
 
-    static generatePowerShellOneLiner(config) {
-      const sample = this.sanitizeName(config.sampleName);
+    static generatePowerShellOneLiner(config = {}) {
+      const sample = this.sanitizeName(config.sampleName || config.photoPrefix);
       const pattern = `${sample}_x.jpg`;
       return `powershell -ExecutionPolicy Bypass -File .\\tools\\fiji\\rename_images.ps1 -Dir "C:\\fotos\\${sample}" -Pattern "${pattern}"`;
     }
 
-    static generateFijiParameters(config) {
-      const sample = this.sanitizeName(config.sampleName);
-      const cols = parseInt(config.cols) || 3;
-      const rows = parseInt(config.rows) || 4;
-      const overlap = parseInt(config.overlap) || 15;
+    static generateNodeRename(config = {}) {
+      const sample = this.sanitizeName(config.sampleName || config.photoPrefix);
+      const pattern = `${sample}_x.jpg`;
+      return `node tools/fiji/rename_images.js --dir "C:\\fotos\\${sample}" --pattern "${pattern}"`;
+    }
+
+    /**
+     * Gera script PowerShell para preencher arquivos faltantes (Dummy Fill)
+     * quando uma varredura é interrompida antes de fechar a última coluna.
+     */
+    static generateDummyFillPowerShell(config = {}) {
+      const sample = this.sanitizeName(config.sampleName || config.photoPrefix);
+      const captured = Math.max(1, parseInt(config.totalPhotosCaptured, 10) || 1);
+      const missing = Math.max(1, parseInt(config.missingInLastCol, 10) || 1);
+      return `1..${missing} | ForEach-Object { Copy-Item "${sample}_${captured}.jpg" "${sample}_$(${captured} + $_).jpg" }`;
+    }
+
+    static generateFijiParameters(config = {}) {
+      const sample = this.sanitizeName(config.sampleName || config.photoPrefix);
+      const cols = Math.max(1, parseInt(config.cols || config.gridX, 10) || 1);
+      const rows = Math.max(1, parseInt(config.rows || config.gridY, 10) || 6);
+      const overlap = Math.max(5, Math.min(40, parseInt(config.overlap || config.overlapPercent, 10) || 15));
       const filePattern = `${sample}_{i}.jpg`;
       const directory = `C:/fotos/${sample}/`;
 
@@ -437,12 +525,13 @@
       };
     }
 
-    static generateFijiMacroSnippet(config) {
+    static generateFijiMacroSnippet(config = {}) {
       const p = this.generateFijiParameters(config);
+      const objective = config.objective || '10x';
 
       return `// ==============================================================================
 // Palas Atlas - Macro de Costura (Stitching) no Fiji (ImageJ)
-// Amostra: ${p.sample} (${config.objective || '10x'}) | Grade: ${p.gridX} colunas x ${p.gridY} linhas (${p.totalPhotos} fotos)
+// Amostra: ${p.sample} (${objective}) | Grade: ${p.gridX} colunas x ${p.gridY} linhas (${p.totalPhotos} fotos)
 // ==============================================================================
 
 dirStr = "${p.directory}";
@@ -479,10 +568,10 @@ rename("Palas_${p.sample}_Costurada");
 outTif = dirStr + "lamina_${p.sample}_costurada.tif";
 print("Salvando TIF final em: " + outTif);
 saveAs("Tiff", outTif);
-print("✅ Lâmina costurada com sucesso! Pronto para converter para DZI.");`;
+print("✅ Lâmina costurada com sucesso! Pronta para converter para DZI.");`;
     }
 
-    static async copyWithFeedback(text, buttonEl, defaultLabel = 'Copiar') {
+    static async copyWithFeedback(text, buttonEl) {
       let copied = false;
       if (navigator.clipboard && window.isSecureContext) {
         try {
@@ -517,7 +606,7 @@ print("✅ Lâmina costurada com sucesso! Pronto para converter para DZI.");`;
           buttonEl.innerHTML = origContent;
           buttonEl.classList.remove('border-emerald-500', 'bg-emerald-950/60');
           buttonEl.classList.add('border-slate-700', 'bg-slate-800');
-        }, 2200);
+        }, 2000);
       }
 
       return copied;
@@ -525,12 +614,17 @@ print("✅ Lâmina costurada com sucesso! Pronto para converter para DZI.");`;
   }
 
 
-  // Exporta para escopo global ou módulos
-  global.PalasBench = {
+  // Exporta para escopo global ou módulos CommonJS
+  const exported = {
     WakeLockManager,
     BenchAudioSynthesizer,
     CapturePersistence,
     CommandGenerator
   };
+
+  global.PalasBench = exported;
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = exported;
+  }
 
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
