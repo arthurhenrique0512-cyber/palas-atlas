@@ -152,6 +152,26 @@ const fallbackLaminas = {
     descricaoHTML: '<p>Corte longitudinal de músculo estriado esquelético. Fibras musculares multinucleadas com núcleos periféricos achatados e estriações transversais de actina e miosina.</p>',
     pinos: []
   },
+  'osso_maduro_desgaste_ct': {
+    id: 'osso_maduro_desgaste_ct',
+    aliases: ['osso-maduro', 'osso_maduro', 'osso-maduro-desgaste', 'osso-desgaste', 'osso_compacto_dzi', 'osso-compacto'],
+    nome: 'Osso Maduro (Lamelar) por Desgaste',
+    disciplina: 'histologia',
+    coloracao: 'Desgaste • 40x',
+    imagemUrl: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
+    previewImage: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
+    thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
+    dziUrl: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
+    descricaoHTML: `
+      <div class="prose-atlas">
+        <h3>Tecido Ósseo Maduro — Corte Transversal por Desgaste</h3>
+        <p>Esta preparação histológica por desgaste exibe a arquitetura do <strong>tecido ósseo compacto maduro (lamelar)</strong>, preservando a matriz mineralizada rica em hidroxiapatita sem coloração química. A unidade estrutural predominante é o <strong>Sistema de Havers (ósteon)</strong>, caracterizado por cilindros concêntricos paralelos ao eixo longitudinal da diáfise. No centro de cada sistema localiza-se o <strong>canal de Havers</strong>, por onde trafegavam vasos sanguíneos e nervos in vivo.</p>
+        <p>Circundando os canais dispõem-se as <strong>lamelas concêntricas</strong>, formadas por fibras colágenas mineralizadas. Entre e no interior das lamelas evidenciam-se as <strong>lacunas dos osteócitos</strong>, que alojavam as células maduras. Emergindo radialmente das lacunas, uma intrincada rede de <strong>canalículos</strong> anastomosa-se em toda a matriz, permitindo a difusão de nutrientes e comunicação celular via junções comunicantes.</p>
+        <p>Nos espaços entre ósteons adjacentes encontram-se as <strong>lamelas intersticiais</strong>, remanescentes de sistemas de Havers reabsorvidos durante a remodelação óssea. Canais transversais ou oblíquos (<strong>canais de Volkmann</strong>) comunicam os canais de Havers entre si, com a cavidade medular e com a superfície perióstica externa, delineada pelas lamelas circunferenciais.</p>
+      </div>
+    `,
+    pinos: []
+  },
   'osso_compacto_dzi': {
     id: 'osso_compacto_dzi',
     aliases: ['osso-compacto', 'osso-compacto-he', 'osso_compacto'],
