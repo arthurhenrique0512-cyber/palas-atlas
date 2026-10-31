@@ -67,9 +67,9 @@ export const fallbackLaminas: Record<string, Lamina> = {
     mpp: 0.25,
     default_center: { x: 0.65, y: 0.525 },
     status: 'ativa',
-    dzi_url: '/assets/histologia/osso_maduro_desgaste_ct.dzi',
-    preview_image: '/assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
-    thumbnail_url: '/assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
+    dzi_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/osso_maduro_desgaste_ct.dzi',
+    preview_image: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/osso_maduro_desgaste_ct-preview.jpg',
+    thumbnail_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/osso_maduro_desgaste_ct-preview.jpg',
     descricao_html: `
       <div class="prose-atlas space-y-4 text-neutral-300 text-sm leading-relaxed">
         <h3 class="text-base font-bold text-neutral-100">Tecido Ósseo Maduro — Corte Transversal por Desgaste</h3>
@@ -92,9 +92,9 @@ export const fallbackLaminas: Record<string, Lamina> = {
     mpp: 0.25,
     default_center: { x: 0.5, y: 0.5 },
     status: 'ativa',
-    dzi_url: '/assets/histologia/medula-espinal-he.png',
-    preview_image: '/assets/histologia/medula-espinal-he.png',
-    thumbnail_url: '/assets/histologia/medula-espinal-he.png',
+    dzi_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/medula-espinal-he.png',
+    preview_image: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/medula-espinal-he.png',
+    thumbnail_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/medula-espinal-he.png',
     descricao_html: '<p class="text-neutral-300 text-sm leading-relaxed">Corte transversal de medula espinal exibindo substância cinzenta central em forma de "H" com motoneurônios no corno anterior e substância branca periférica contendo tratos mielinizados.</p>',
     pinos: []
   },
@@ -110,9 +110,9 @@ export const fallbackLaminas: Record<string, Lamina> = {
     mpp: 0.25,
     default_center: { x: 0.5, y: 0.5 },
     status: 'ativa',
-    dzi_url: '/assets/histologia/medula-espinal-he.png',
-    preview_image: '/assets/histologia/medula-espinal-he.png',
-    thumbnail_url: '/assets/histologia/medula-espinal-he.png',
+    dzi_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/medula-espinal-he.png',
+    preview_image: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/medula-espinal-he.png',
+    thumbnail_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/medula-espinal-he.png',
     descricao_html: '<p class="text-neutral-300 text-sm leading-relaxed">Corte transversal de medula espinal exibindo substância cinzenta central em forma de "H" com motoneurônios no corno anterior e substância branca periférica contendo tratos mielinizados.</p>',
     pinos: []
   },
@@ -128,9 +128,9 @@ export const fallbackLaminas: Record<string, Lamina> = {
     mpp: 0.25,
     default_center: { x: 0.5, y: 0.5 },
     status: 'ativa',
-    dzi_url: '/assets/histologia/epitelio-simples-escamoso.dzi',
-    preview_image: '/assets/histologia/epitelio-simples-escamoso-preview.jpg',
-    thumbnail_url: '/assets/histologia/epitelio-simples-escamoso-preview.jpg',
+    dzi_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/epitelio-simples-escamoso.dzi',
+    preview_image: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/epitelio-simples-escamoso-preview.jpg',
+    thumbnail_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/epitelio-simples-escamoso-preview.jpg',
     descricao_html: '<p class="text-neutral-300 text-sm leading-relaxed">Camada única de células epiteliais pavimentosas (achatadas) com núcleos elípticos proeminentes, adaptadas para transporte passivo e difusão de solutos.</p>',
     pinos: []
   },
@@ -146,9 +146,9 @@ export const fallbackLaminas: Record<string, Lamina> = {
     mpp: 0.25,
     default_center: { x: 0.5, y: 0.5 },
     status: 'ativa',
-    dzi_url: '/assets/histologia/muscular-esqueletico-he.jpg',
-    preview_image: '/assets/histologia/muscular-esqueletico-he.jpg',
-    thumbnail_url: '/assets/histologia/muscular-esqueletico-he.jpg',
+    dzi_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/muscular-esqueletico-he.jpg',
+    preview_image: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/muscular-esqueletico-he.jpg',
+    thumbnail_url: 'https://omdgpncqtswnqpphfovo.supabase.co/storage/v1/object/public/laminas-dzi/muscular-esqueletico-he.jpg',
     descricao_html: '<p class="text-neutral-300 text-sm leading-relaxed">Corte longitudinal de músculo estriado esquelético. Fibras musculares multinucleadas com núcleos periféricos achatados e estriações transversais de actina e miosina.</p>',
     pinos: []
   }

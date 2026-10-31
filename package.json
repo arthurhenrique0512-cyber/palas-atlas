@@ -14,6 +14,7 @@
     "slide:upload": "node scripts/upload_dzi_to_supabase.js"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.16.5",
     "@types/dompurify": "^3.0.5",
     "@types/node": "^26.6.6",
     "@types/openseadragon": "^5.0.2",
