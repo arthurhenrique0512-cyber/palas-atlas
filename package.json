@@ -4,10 +4,36 @@
   "private": true,
   "description": "Palas Atlas - Plataforma Morfológica de Alta Fidelidade",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
     "build:css": "tailwindcss -i css/input.css -o css/tailwind.min.css --minify",
     "watch:css": "tailwindcss -i css/input.css -o css/tailwind.min.css --watch"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.17"
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^26.6.6",
+    "@types/openseadragon": "^5.0.2",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.6.2",
+    "pg": "^8.23.1",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.109.0",
+    "clsx": "^2.1.1",
+    "dompurify": "^3.4.17",
+    "lucide-react": "^1.65.0",
+    "next": "^16.4.3",
+    "openseadragon": "^6.1.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwind-merge": "^3.7.0"
   }
 }
