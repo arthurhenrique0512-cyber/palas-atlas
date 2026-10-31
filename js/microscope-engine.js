@@ -23,6 +23,9 @@ import { db } from "./firebase-config.js";
 // ---------------------------------------------------------------------------
 let viewer       = null;
 let listaPinosAtual = [];
+let listaQuestoesAtual = [];
+let questaoAtivaId = null;
+let overlayQuestaoAtiva = null;
 let laminaAtualData = null;
 let pinAtivo     = null;
 let homeZoomRef   = null; // Zoom de referencia para enquadramento geral (4x)
@@ -45,13 +48,21 @@ function sincronizarTamanhoDoViewer() {
   } catch (e) { /* viewer em transição: ignora */ }
 }
 
+function isMobileOrLandscapeDrawer() {
+  return window.innerWidth < 1024 || window.innerHeight <= 500;
+}
+
 function aplicarEstadoSidebar(recolhida, persistir) {
-  const sidebar = document.getElementById("viewerSidebar");
-  const botao   = document.getElementById("btnToggleSidebar");
+  const sidebar  = document.getElementById("viewerSidebar");
+  const botao    = document.getElementById("btnToggleSidebar");
+  const backdrop = document.getElementById("viewerBackdrop");
   if (!sidebar) return;
+
+  const isDrawerMode = isMobileOrLandscapeDrawer();
 
   sidebar.classList.toggle("w-[85vw]", !recolhida);
   sidebar.classList.toggle("sm:w-[380px]", !recolhida);
+  sidebar.classList.toggle("max-w-[380px]", !recolhida);
   sidebar.classList.toggle("opacity-100", !recolhida);
   sidebar.classList.toggle("pointer-events-auto", !recolhida);
   sidebar.classList.toggle("w-0", recolhida);
@@ -59,6 +70,25 @@ function aplicarEstadoSidebar(recolhida, persistir) {
   sidebar.classList.toggle("pointer-events-none", recolhida);
   sidebar.setAttribute("aria-hidden", String(recolhida));
   if (recolhida) sidebar.setAttribute("inert", ""); else sidebar.removeAttribute("inert");
+
+  // Backdrop escurecido no mobile/tablet
+  if (backdrop) {
+    if (!recolhida && isDrawerMode) {
+      backdrop.classList.remove("hidden");
+      requestAnimationFrame(() => {
+        backdrop.classList.remove("opacity-0", "pointer-events-none");
+        backdrop.classList.add("opacity-100", "pointer-events-auto");
+      });
+    } else {
+      backdrop.classList.remove("opacity-100", "pointer-events-auto");
+      backdrop.classList.add("opacity-0", "pointer-events-none");
+      setTimeout(() => {
+        if (sidebar.classList.contains("w-0") || !isDrawerMode) {
+          backdrop.classList.add("hidden");
+        }
+      }, 300);
+    }
+  }
 
   if (botao) {
     botao.setAttribute("aria-expanded", String(!recolhida));
@@ -69,28 +99,84 @@ function aplicarEstadoSidebar(recolhida, persistir) {
   if (persistir) {
     try { localStorage.setItem(SIDEBAR_STORAGE_KEY, recolhida ? "1" : "0"); } catch (e) {}
   }
+
+  sincronizarTamanhoDoViewer();
 }
 
 function iniciarSidebarRetratil() {
-  const sidebar = document.getElementById("viewerSidebar");
-  const botao   = document.getElementById("btnToggleSidebar");
-  if (!sidebar || !botao) return;
+  const sidebar  = document.getElementById("viewerSidebar");
+  const botao    = document.getElementById("btnToggleSidebar");
+  const backdrop = document.getElementById("viewerBackdrop");
+  const btnClose = document.getElementById("btnCloseSidebarMobile");
+  if (!sidebar) return;
 
-  let recolhidaInicial = false;
-  try {
-    const salvo = localStorage.getItem(SIDEBAR_STORAGE_KEY);
-    if (salvo !== null) {
-      recolhidaInicial = salvo === "1";
-    } else {
-      recolhidaInicial = window.innerWidth < 768;
-    }
-  } catch (e) {
-    recolhidaInicial = window.innerWidth < 768;
+  const isDrawerMode = isMobileOrLandscapeDrawer();
+
+  // No modo drawer (celular e tablet), sempre inicia recolhido para exibir o microscópio limpo
+  let recolhidaInicial = isDrawerMode;
+  if (!isDrawerMode) {
+    try {
+      const salvo = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+      if (salvo !== null) {
+        recolhidaInicial = salvo === "1";
+      }
+    } catch (e) {}
   }
   aplicarEstadoSidebar(recolhidaInicial, false);
 
-  botao.addEventListener("click", () => {
-    aplicarEstadoSidebar(!sidebar.classList.contains("w-0"), true);
+  if (botao) {
+    botao.addEventListener("click", () => {
+      aplicarEstadoSidebar(!sidebar.classList.contains("w-0"), true);
+    });
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener("click", () => {
+      aplicarEstadoSidebar(true, true);
+    });
+  }
+
+  if (btnClose) {
+    btnClose.addEventListener("click", () => {
+      aplicarEstadoSidebar(true, true);
+    });
+  }
+
+  // Suporte ergonômico a swipe touch para fechar o drawer (deslizar para a direita)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  sidebar.addEventListener("touchstart", (e) => {
+    if (e.touches && e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  sidebar.addEventListener("touchend", (e) => {
+    if (e.changedTouches && e.changedTouches.length === 1) {
+      const deltaX = e.changedTouches[0].clientX - touchStartX;
+      const deltaY = e.changedTouches[0].clientY - touchStartY;
+      if (deltaX > 50 && Math.abs(deltaY) < 60) {
+        if (isMobileOrLandscapeDrawer()) {
+          aplicarEstadoSidebar(true, true);
+        }
+      }
+    }
+  }, { passive: true });
+
+  // Listener de redimensionamento para sincronizar backdrop e OpenSeadragon
+  window.addEventListener("resize", () => {
+    const isDrawer = isMobileOrLandscapeDrawer();
+    const bdrop = document.getElementById("viewerBackdrop");
+    if (!isDrawer && bdrop) {
+      bdrop.classList.add("hidden", "opacity-0", "pointer-events-none");
+      bdrop.classList.remove("opacity-100", "pointer-events-auto");
+    } else if (isDrawer && bdrop && !sidebar.classList.contains("w-0")) {
+      bdrop.classList.remove("hidden");
+      bdrop.classList.add("opacity-100", "pointer-events-auto");
+      bdrop.classList.remove("opacity-0", "pointer-events-none");
+    }
+    sincronizarTamanhoDoViewer();
   });
 
   // O palco redimensiona durante a transição CSS: mantém o OpenSeadragon ajustado quadro a quadro.
@@ -174,7 +260,27 @@ const fallbackLaminas = {
         <p>Nos espaços entre ósteons adjacentes encontram-se as <strong>lamelas intersticiais</strong>, remanescentes de sistemas de Havers reabsorvidos durante a remodelação óssea. Canais transversais ou oblíquos (<strong>canais de Volkmann</strong>) comunicam os canais de Havers entre si, com a cavidade medular e com a superfície perióstica externa, delineada pelas lamelas circunferenciais.</p>
       </div>
     `,
-    pinos: []
+    pinos: [],
+    questoes: [
+      {
+        id: "q-havers-1",
+        numero: 1,
+        titulo: "Identificação do Sistema de Havers (Ósteon)",
+        enunciado: "Examine o campo microscópico focalizado e identifique o canal vascular central (Canal de Havers) e as lamelas ósseas concêntricas dispostas ao redor.",
+        x: 0.65,
+        y: 0.525,
+        zoom: 2.2
+      },
+      {
+        id: "q-osteocitos-2",
+        numero: 2,
+        titulo: "Lacunas de Osteócitos e Rede Canalicular",
+        enunciado: "Observe as cavidades fusiformes escuras (lacunas) entre as lamelas e descreva como os canalículos radiados viabilizam a comunicação e nutrição osteocitária na matriz mineralizada.",
+        x: 0.685,
+        y: 0.515,
+        zoom: 3.5
+      }
+    ]
   },
   'osso_compacto_dzi': {
     id: 'osso_compacto_dzi',
@@ -227,6 +333,7 @@ function iniciarMicroscopio() {
   const laminaId  = urlParams.get("id") || urlParams.get("laminaId");
 
   if (dziParam) {
+    const isOsso = String(dziParam).toLowerCase().includes("osso");
     laminaAtualData = {
       id: "local-dzi",
       nome: urlParams.get("nome") || "Osso Maduro (Desgaste - Corte Transversal)",
@@ -248,11 +355,15 @@ function iniciarMicroscopio() {
           </ul>
         </div>
       `,
-      pinos: []
+      pinos: [],
+      questoes: isOsso ? (fallbackLaminas['osso_maduro_desgaste_ct']?.questoes || []) : []
     };
     listaPinosAtual = [];
+    listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
     renderizarMetadadosDaLamina();
     renderizarDescricaoETextos();
+    renderizarQuestoesNaSidebar(listaQuestoesAtual);
+    atualizarBadgeContadorQuestoes();
     inicializarOpenSeadragon();
   } else if (laminaId) {
     carregarLaminaNoMicroscopio(laminaId);
@@ -291,8 +402,11 @@ async function carregarLaminaNoMicroscopio(laminaId) {
   if (fallback) {
     laminaAtualData = { ...fallback };
     listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
+    listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
     renderizarMetadadosDaLamina();
     renderizarDescricaoETextos();
+    renderizarQuestoesNaSidebar(listaQuestoesAtual);
+    atualizarBadgeContadorQuestoes();
     inicializarOpenSeadragon();
 
     // Sincroniza em background: textos e pinos editados no CMS (Firestore)
@@ -325,6 +439,12 @@ async function carregarLaminaNoMicroscopio(laminaId) {
           if (Array.isArray(dados.pinos)) {
             laminaAtualData.pinos = dados.pinos;
             listaPinosAtual = dados.pinos;
+          }
+          if (Array.isArray(dados.questoes)) {
+            laminaAtualData.questoes = dados.questoes;
+            listaQuestoesAtual = dados.questoes;
+            renderizarQuestoesNaSidebar(listaQuestoesAtual);
+            atualizarBadgeContadorQuestoes();
           }
           if (dados.maxMagnification) {
             laminaAtualData.maxMagnification = Number(dados.maxMagnification) || 40;
@@ -359,8 +479,11 @@ async function carregarLaminaNoMicroscopio(laminaId) {
           laminaAtualData.imagemUrl = img.replace(/^\/+/, '');
         }
         listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
+        listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
         renderizarMetadadosDaLamina();
         renderizarDescricaoETextos();
+        renderizarQuestoesNaSidebar(listaQuestoesAtual);
+        atualizarBadgeContadorQuestoes();
         inicializarOpenSeadragon();
         return;
       }
@@ -377,8 +500,11 @@ async function carregarLaminaNoMicroscopio(laminaId) {
   if (fallbackSecundario) {
     laminaAtualData = { ...fallbackSecundario };
     listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
+    listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
     renderizarMetadadosDaLamina();
     renderizarDescricaoETextos();
+    renderizarQuestoesNaSidebar(listaQuestoesAtual);
+    atualizarBadgeContadorQuestoes();
     inicializarOpenSeadragon();
     return;
   }
@@ -518,6 +644,294 @@ function renderizarDescricaoETextos() {
 }
 
 // ---------------------------------------------------------------------------
+// 4.5 Abas do Painel Lateral e Questões Práticas de Bancada
+// ---------------------------------------------------------------------------
+let abaAtivaPainel = "descricao";
+const debounceTimersRespostas = {};
+
+/**
+ * Alterna a visualização entre a aba de Descrição Morfológica e a aba de Questões de Bancada.
+ * Atualiza classes dos botões (ativo vs inativo) e a visibilidade dos containers.
+ *
+ * @param {'descricao' | 'questoes'} aba
+ */
+export function alternarAbaPainel(aba) {
+  const containerDesc  = document.getElementById("slideDescriptionContainer");
+  const containerQuest = document.getElementById("slideQuestionsContainer");
+  const btnDesc        = document.getElementById("btnTabDescricao");
+  const btnQuest       = document.getElementById("btnTabQuestoes");
+
+  const abaAlvo = (aba === "questoes") ? "questoes" : "descricao";
+  abaAtivaPainel = abaAlvo;
+
+  const estiloAtivo   = "min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-white/[0.08] text-white border border-white/[0.1] shadow-sm touch-manipulation flex items-center justify-center";
+  const estiloInativo = "min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] border border-transparent touch-manipulation flex items-center justify-center";
+
+  if (abaAlvo === "descricao") {
+    if (containerDesc) containerDesc.classList.remove("hidden");
+    if (containerQuest) containerQuest.classList.add("hidden");
+
+    if (btnDesc)  btnDesc.className = estiloAtivo;
+    if (btnQuest) btnQuest.className = `${estiloInativo} flex items-center gap-1.5`;
+  } else {
+    if (containerDesc) containerDesc.classList.add("hidden");
+    if (containerQuest) containerQuest.classList.remove("hidden");
+
+    if (btnDesc)  btnDesc.className = estiloInativo;
+    if (btnQuest) btnQuest.className = `${estiloAtivo} flex items-center gap-1.5`;
+  }
+}
+
+/**
+ * Atualiza o badge contador da aba de questões.
+ * Destaque sutil com cor ouro-champanhe se houver questões, ou neutro/apagado se 0.
+ */
+function atualizarBadgeContadorQuestoes() {
+  const badge = document.getElementById("badgeContadorQuestoes");
+  if (!badge) return;
+
+  const total = Array.isArray(listaQuestoesAtual) ? listaQuestoesAtual.length : 0;
+  badge.textContent = String(total);
+
+  if (total > 0) {
+    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-[#c8ad5f]/20 text-[#c8ad5f] border border-[#c8ad5f]/30 font-mono font-medium";
+  } else {
+    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.06] text-neutral-400 font-mono border border-transparent";
+  }
+}
+
+/**
+ * Escapa strings para inserção segura no DOM.
+ */
+function escaparHTML(texto) {
+  if (texto === null || texto === undefined) return "";
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
+ * Persiste a anotação/resposta diagnóstica do estudante com debounce no localStorage.
+ * Chave de armazenamento: palasAtlas.respostas.${laminaId}.${questaoId}
+ */
+function salvarRespostaEstudante(laminaId, questaoId, texto) {
+  const idSeguro = String(questaoId);
+  const statusEl = document.getElementById(`statusSalvo-${idSeguro}`);
+  if (statusEl) {
+    statusEl.textContent = "Salvando...";
+    statusEl.classList.remove("text-neutral-500");
+    statusEl.classList.add("text-[#c8ad5f]");
+  }
+
+  clearTimeout(debounceTimersRespostas[idSeguro]);
+  debounceTimersRespostas[idSeguro] = setTimeout(() => {
+    try {
+      const chave = `palasAtlas.respostas.${laminaId}.${idSeguro}`;
+      localStorage.setItem(chave, texto);
+      if (statusEl) {
+        statusEl.textContent = "Salvo localmente";
+        statusEl.classList.remove("text-[#c8ad5f]");
+        statusEl.classList.add("text-neutral-500");
+      }
+    } catch (e) {
+      console.warn("[Palas Atlas] Erro ao persistir resposta no localStorage:", e);
+    }
+  }, 400);
+}
+
+/**
+ * Persistência imediata da anotação ao perder foco (evento blur).
+ */
+function salvarRespostaImediato(laminaId, questaoId, texto) {
+  const idSeguro = String(questaoId);
+  clearTimeout(debounceTimersRespostas[idSeguro]);
+  try {
+    const chave = `palasAtlas.respostas.${laminaId}.${idSeguro}`;
+    localStorage.setItem(chave, texto);
+    const statusEl = document.getElementById(`statusSalvo-${idSeguro}`);
+    if (statusEl) {
+      statusEl.textContent = "Salvo localmente";
+      statusEl.classList.remove("text-[#c8ad5f]");
+      statusEl.classList.add("text-neutral-500");
+    }
+  } catch (e) {
+    console.warn("[Palas Atlas] Erro ao persistir resposta imediata no localStorage:", e);
+  }
+}
+
+/**
+ * Renderiza a lista de questões na aba do painel lateral.
+ * Atende estritamente à diretriz de ausência de gabarito/correção automática:
+ * o estudante possui um campo de anotação limpo e persistente. O professor discute
+ * os diagnósticos e estruturas em sala de aula.
+ *
+ * @param {Array} questoes - Array de objetos de questão
+ */
+export function renderizarQuestoesNaSidebar(questoes) {
+  const container = document.getElementById("slideQuestionsContainer");
+  if (!container) {
+    console.warn("[Palas Atlas] Container #slideQuestionsContainer não encontrado no DOM.");
+    return;
+  }
+
+  const laminaId = laminaAtualData?.id || "default";
+
+  if (!Array.isArray(questoes) || questoes.length === 0) {
+    container.innerHTML = `
+      <div class="py-12 px-2 text-center space-y-3">
+        <div class="w-10 h-10 mx-auto rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-neutral-500">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.5L18 8.5V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <p class="text-xs text-neutral-400 font-sans leading-relaxed max-w-xs mx-auto">
+          Nenhuma questão de bancada cadastrada para esta lâmina pelo professor.
+        </p>
+        <span class="inline-block text-[10px] font-mono text-neutral-500 tracking-wider uppercase">
+          Atividades Práticas de Laboratório
+        </span>
+      </div>
+    `;
+    return;
+  }
+
+  const cardsHtml = questoes.map((q, index) => {
+    const qId = q.id ? String(q.id) : `q_${index + 1}`;
+    q.id = qId;
+    const numeroQ = q.numero !== undefined && q.numero !== null ? q.numero : (index + 1);
+    const tituloQ = q.titulo || q.pergunta || (q.enunciado ? (q.enunciado.length > 70 ? q.enunciado.slice(0, 67) + '...' : q.enunciado) : `Questão ${numeroQ}`);
+    const enunciadoQ = q.enunciado && q.enunciado !== tituloQ ? q.enunciado : "";
+
+    const chaveStorage = `palasAtlas.respostas.${laminaId}.${qId}`;
+    let respostaSalva = "";
+    try {
+      respostaSalva = localStorage.getItem(chaveStorage) || "";
+    } catch (e) {
+      console.warn("[Palas Atlas] Falha ao recuperar resposta salva:", e);
+    }
+
+    const temCoordenadas = (Number(q.x) > 0 || Number(q.y) > 0);
+
+    return `
+      <div
+        id="card-questao-${qId}"
+        data-questao-id="${qId}"
+        class="card-questao rounded-xl border border-white/[0.06] bg-neutral-900/40 p-4 transition-all duration-200 hover:border-white/[0.12] space-y-3"
+      >
+        <!-- Cabeçalho Clicável da Questão -->
+        <button
+          type="button"
+          onclick="window.focarQuestaoNoViewer('${qId}')"
+          class="w-full text-left flex items-start justify-between gap-3 group cursor-pointer focus:outline-none"
+          title="Focar localização da questão no microscópio"
+        >
+          <div class="flex items-start gap-2.5 min-w-0">
+            <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-[#c8ad5f]/15 text-[#c8ad5f] border border-[#c8ad5f]/30 shrink-0 mt-0.5">
+              Q${numeroQ}
+            </span>
+            <div class="min-w-0">
+              <h4 class="text-xs font-semibold text-neutral-200 tracking-wide font-sans group-hover:text-[#c8ad5f] transition-colors leading-snug">
+                ${escaparHTML(tituloQ)}
+              </h4>
+            </div>
+          </div>
+          ${temCoordenadas ? `
+            <div class="flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-neutral-400 group-hover:text-[#c8ad5f] shrink-0 transition-colors pt-0.5">
+              <span>Focar</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </div>
+          ` : ''}
+        </button>
+
+        <!-- Enunciado e Orientação Diagnóstica -->
+        ${enunciadoQ ? `
+          <div class="text-xs text-neutral-300 font-sans leading-relaxed border-l-2 border-white/[0.08] ml-1 pl-2.5">
+            ${escaparHTML(enunciadoQ)}
+          </div>
+        ` : ''}
+
+        <!-- Área de Anotação / Resposta do Estudante (sem gabarito) -->
+        <div class="space-y-1.5 pt-1">
+          <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">
+            <span class="text-neutral-400">Resposta / Diagnóstico</span>
+            <span id="statusSalvo-${qId}" class="text-neutral-500 transition-colors">
+              ${respostaSalva ? "Salvo localmente" : ""}
+            </span>
+          </div>
+          <textarea
+            id="resposta-${qId}"
+            data-questao-id="${qId}"
+            rows="3"
+            placeholder="Sua anotação / resposta diagnóstica..."
+            style="resize:vertical; min-height:72px;"
+            class="w-full bg-neutral-950/80 border border-white/[0.08] focus:border-[#c8ad5f]/60 focus:ring-1 focus:ring-[#c8ad5f]/40 rounded-lg p-2.5 text-xs text-neutral-200 placeholder-neutral-500 font-sans leading-relaxed outline-none transition-all"
+          >${escaparHTML(respostaSalva)}</textarea>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML = `
+    <div class="space-y-3 pt-1">
+      <div class="flex items-center justify-between px-0.5 pb-1">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+          Caderno de Bancada
+        </span>
+        <span class="text-[10px] font-mono text-neutral-500">
+          ${questoes.length} ${questoes.length === 1 ? 'questão' : 'questões'}
+        </span>
+      </div>
+      ${cardsHtml}
+    </div>
+  `;
+
+  // Anexa listeners de input e blur usando delegação de eventos estável
+  if (!container.__eventosRespostasVinculados) {
+    container.__eventosRespostasVinculados = true;
+    container.addEventListener("input", (evento) => {
+      const textarea = evento.target.closest("textarea[data-questao-id]");
+      if (!textarea) return;
+      const qId = textarea.getAttribute("data-questao-id");
+      const lId = laminaAtualData?.id || "default";
+      salvarRespostaEstudante(lId, qId, textarea.value);
+    });
+    container.addEventListener("blur", (evento) => {
+      const textarea = evento.target.closest("textarea[data-questao-id]");
+      if (!textarea) return;
+      const qId = textarea.getAttribute("data-questao-id");
+      const lId = laminaAtualData?.id || "default";
+      salvarRespostaImediato(lId, qId, textarea.value);
+    }, true);
+  }
+}
+
+/**
+ * Aplica destaque visual ao card da questão ativa na barra lateral.
+ *
+ * @param {string} qId - ID da questão
+ */
+function destacarCardQuestaoNaSidebar(qId) {
+  const idBuscado = String(qId);
+  document.querySelectorAll(".card-questao").forEach((card) => {
+    const cardQId = card.getAttribute("data-questao-id");
+    const isAtivo = String(cardQId) === idBuscado;
+    if (isAtivo) {
+      card.classList.add("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
+      card.classList.remove("border-white/[0.06]", "bg-neutral-900/40");
+      card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+      card.classList.remove("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
+      card.classList.add("border-white/[0.06]", "bg-neutral-900/40");
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
 // 5. Inicializa o OpenSeadragon com constraints de trava e escalas corretas
 // ---------------------------------------------------------------------------
 function inicializarOpenSeadragon() {
@@ -564,10 +978,13 @@ function inicializarOpenSeadragon() {
   const maxZoomPixelRatioMap = { 40: 1.15, 60: 1.25, 100: 1.35 };
   const maxZoomPixelRatio = maxZoomPixelRatioMap[maxMag] || 1.15;
 
-  // Garantir dimensões explícitas no container
+  // Garantir dimensões explícitas no container e prevenção de interferência de gestos do navegador
   container.style.width = "100%";
   container.style.height = "100%";
   container.style.minHeight = "400px";
+  container.style.touchAction = "none";
+  container.style.userSelect = "none";
+  container.style.webkitUserSelect = "none";
 
   // Registra o tempo de início do carregamento da imagem
   window.__microscopeStartTime = Date.now();
@@ -621,9 +1038,22 @@ function inicializarOpenSeadragon() {
         flickEnabled:   true,
         dragToPan:      true,
         dblClickToZoom: true,
+        clickToZoom:    false,
         pinchRotate:    false
       }
     });
+
+    // Garante touch-action: none e user-select: none nos elementos canvas e container do OSD
+    if (viewer.canvas) {
+      viewer.canvas.style.touchAction = "none";
+      viewer.canvas.style.userSelect = "none";
+      viewer.canvas.style.webkitUserSelect = "none";
+    }
+    if (viewer.container) {
+      viewer.container.style.touchAction = "none";
+      viewer.container.style.userSelect = "none";
+      viewer.container.style.webkitUserSelect = "none";
+    }
   } catch (err) {
     console.error("[Palas Atlas] Erro fatal ao instanciar OpenSeadragon:", err);
     exibirErroMicroscopio("Falha na inicialização do visualizador óptico.");
@@ -703,8 +1133,8 @@ function inicializarOpenSeadragon() {
 
       const urlParams = new URLSearchParams(window.location.search);
       const initialMagParam = urlParams.get("mag");
-      // Padrão de abertura do laboratório: abre diretamente na resolução de captura (40x), permitindo override via ?mag=
-      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : (maxMag >= 40 ? 40 : maxMag);
+      // Padrão de abertura morfológica: visão panorâmica (4x) para enquadramento inicial da lâmina inteira
+      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : 4;
       const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
 
       const imgBounds = viewer.world.getItemAt(0)?.getBounds();
@@ -787,6 +1217,7 @@ function inicializarOpenSeadragon() {
 
   viewer.addHandler("open", updateZoomDisplay);
   viewer.addHandler("animation", updateZoomDisplay);
+  viewer.addHandler("animation-finish", updateZoomDisplay);
 
   viewer.addHandler("zoom", () => {
     if (!homeZoomRef || !viewer || !viewer.viewport) return;
@@ -803,7 +1234,6 @@ function inicializarOpenSeadragon() {
       viewer.viewport.zoomTo(maxOSDZoom, null, true);
     }
 
-    atualizarLenteBotaoAtivo();
     updateZoomDisplay();
   });
 }
@@ -904,9 +1334,19 @@ function atualizarLenteBotaoAtivo() {
     const magAttr = btn.getAttribute("data-mag");
     const isAtivo = magAttr ? `${magAttr}x` === objetivo : btn.textContent.trim() === objetivo;
     btn.className = isAtivo
-      ? "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens"
-      : "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
+      ? "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+      : "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   });
+
+  // Em telas compactas, centraliza suavemente o botão da objetiva ativa no revólver sem rolar a janela
+  const activeBtn = document.querySelector(".lens-btn.active-lens");
+  if (activeBtn) {
+    const panel = document.getElementById("viewerLensPanel");
+    if (panel && panel.scrollWidth > panel.clientWidth) {
+      const scrollPos = activeBtn.offsetLeft - panel.offsetLeft - (panel.clientWidth / 2) + (activeBtn.clientWidth / 2);
+      panel.scrollTo({ left: Math.max(0, scrollPos), behavior: "smooth" });
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -918,7 +1358,7 @@ function aplicarBloqueioObjetivas(maxMag) {
     const magBotao = Number(btn.getAttribute("data-mag")) || 4;
     if (magBotao > limiteMag) {
       btn.disabled = true;
-      btn.className = "lens-btn text-neutral-600 font-medium px-2.5 py-1 rounded-lg text-xs font-mono cursor-not-allowed opacity-25";
+      btn.className = "lens-btn text-neutral-600 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono cursor-not-allowed opacity-25 min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
       btn.title = `Objetiva não disponível (Máx: ${limiteMag}x)`;
     } else {
       btn.disabled = false;
@@ -967,6 +1407,13 @@ function focarPinoNoViewer(pinIdRaw) {
     if (anterior) { try { viewer.removeOverlay(anterior); } catch (e) {} }
   }
 
+  // Remove pin de questão ativa se houver
+  if (overlayQuestaoAtiva) {
+    try { viewer.removeOverlay(overlayQuestaoAtiva); } catch (e) {}
+    overlayQuestaoAtiva = null;
+    questaoAtivaId = null;
+  }
+
   // Cria elemento do pino neon pulsante em ouro-champanhe
   const pinId   = String(pino.id);
   const pinElem = document.createElement("div");
@@ -1002,6 +1449,11 @@ function focarPinoNoViewer(pinIdRaw) {
 
   pinAtivo = pinId;
 
+  // No mobile/tablet, fecha o drawer lateral para exibir o ponto focado no microscópio
+  if (isMobileOrLandscapeDrawer()) {
+    aplicarEstadoSidebar(true, false);
+  }
+
   // Auto-remove o marcador após 8s
   setTimeout(() => {
     if (pinElem && viewer) {
@@ -1009,6 +1461,129 @@ function focarPinoNoViewer(pinIdRaw) {
       if (pinAtivo === pinId) pinAtivo = null;
     }
   }, 8000);
+}
+
+/**
+ * Localiza e foca uma questão prática de bancada no visualizador OpenSeadragon.
+ * Realiza a conversão precisa de coordenadas, insere um overlay pulsante
+ * em ouro-champanhe / ciano e navega com transição suave (pan & zoom).
+ *
+ * @param {string|number} questaoId
+ */
+export function focarQuestaoNoViewer(questaoId) {
+  const idBuscado = String(questaoId);
+  const q = listaQuestoesAtual.find(item => String(item.id) === idBuscado);
+  if (!q) {
+    console.warn("[Palas Atlas] Questão não encontrada para ID:", questaoId);
+    return;
+  }
+
+  // Certifica visibilidade da aba de questões e destaca card correspondente
+  alternarAbaPainel("questoes");
+  destacarCardQuestaoNaSidebar(idBuscado);
+
+  // No mobile/tablet, fecha o drawer lateral para exibir o ponto focado no microscópio
+  if (isMobileOrLandscapeDrawer()) {
+    aplicarEstadoSidebar(true, false);
+  }
+
+  if (!viewer || !viewer.viewport || !window.OpenSeadragon) {
+    console.warn("[Palas Atlas] Viewer OpenSeadragon não inicializado ao tentar focar questão.");
+    return;
+  }
+
+  const temX = q.x !== undefined && q.x !== null && !isNaN(Number(q.x));
+  const temY = q.y !== undefined && q.y !== null && !isNaN(Number(q.y));
+  if (!temX && !temY) {
+    return;
+  }
+
+  let posX = Number(q.x) || 0;
+  let posY = Number(q.y) || 0;
+
+  // Se coordenadas estiverem normalizadas (0 a 1), converte para pixels originais da imagem
+  if (posX > 0 && posX <= 1 && viewer.world && viewer.world.getItemAt(0)) {
+    const item = viewer.world.getItemAt(0);
+    const size = item.getContentSize();
+    if (size && size.x > 1) {
+      posX *= size.x;
+      posY *= size.y;
+    }
+  }
+
+  // Converte coordenadas usando OpenSeadragon
+  const pontoViewport = viewer.viewport.imageToViewportCoordinates(
+    new window.OpenSeadragon.Point(posX, posY)
+  );
+
+  // Remove overlay de questão ativa anterior
+  if (overlayQuestaoAtiva) {
+    try {
+      viewer.removeOverlay(overlayQuestaoAtiva);
+    } catch (e) {}
+    overlayQuestaoAtiva = null;
+  }
+  if (questaoAtivaId) {
+    const elemAnterior = document.getElementById(`viewer-qpin-${questaoAtivaId}`);
+    if (elemAnterior) {
+      try { viewer.removeOverlay(elemAnterior); } catch (e) {}
+    }
+  }
+
+  // Remove pino comum de estrutura ativo se houver
+  if (pinAtivo) {
+    const anteriorPin = document.getElementById(`viewer-pin-${pinAtivo}`);
+    if (anteriorPin) {
+      try { viewer.removeOverlay(anteriorPin); } catch (e) {}
+      pinAtivo = null;
+    }
+  }
+
+  const numeroQ = q.numero !== undefined && q.numero !== null ? q.numero : (listaQuestoesAtual.indexOf(q) + 1);
+
+  // Cria elemento do pino pulsante com outer glowing ring em ouro-champanhe/ciano e inner badge
+  const pinElem = document.createElement("div");
+  pinElem.id = `viewer-qpin-${q.id}`;
+  pinElem.className = "viewer-qpin cursor-pointer";
+  pinElem.style.cssText = "position:relative; display:flex; align-items:center; justify-content:center; width:46px; height:46px; z-index:45; pointer-events:auto;";
+  pinElem.title = `Questão Q${numeroQ}: ${q.titulo || "Ponto de Investigação"}`;
+
+  pinElem.innerHTML = `
+    <div class="animate-ping" style="position:absolute; width:100%; height:100%; border-radius:9999px; background:radial-gradient(circle, rgba(200,173,95,0.4) 0%, rgba(6,182,212,0.25) 70%, transparent 100%); border:1.5px solid rgba(200,173,95,0.7);"></div>
+    <div style="position:relative; min-width:32px; height:32px; padding:0 6px; background:#0a0a0a; border-radius:9999px; border:1.5px solid #c8ad5f; box-shadow:0 0 0 2px rgba(6,182,212,0.35), 0 0 16px rgba(200,173,95,0.5), 0 4px 14px rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; gap:2px;">
+      <span style="font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:800; color:#ffffff; letter-spacing:-0.02em;">Q${numeroQ}</span>
+    </div>
+  `;
+
+  pinElem.addEventListener("click", (e) => {
+    e.stopPropagation();
+    alternarAbaPainel("questoes");
+    destacarCardQuestaoNaSidebar(idBuscado);
+    if (isMobileOrLandscapeDrawer()) {
+      aplicarEstadoSidebar(false, false);
+    }
+  });
+
+  viewer.addOverlay({
+    element: pinElem,
+    location: pontoViewport,
+    placement: window.OpenSeadragon.Placement.CENTER
+  });
+
+  overlayQuestaoAtiva = pinElem;
+  questaoAtivaId = idBuscado;
+
+  // Pan & Zoom suave para a localização
+  let targetZoom = (q.zoom && Number(q.zoom) > 0)
+    ? Number(q.zoom)
+    : Math.max(viewer.viewport.getZoom(), (homeZoomRef || 1) * 3.5);
+
+  if (viewer.viewport.maxZoomLevel) {
+    targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
+  }
+
+  viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
+  viewer.viewport.panTo(pontoViewport, false);
 }
 
 // ---------------------------------------------------------------------------
@@ -1061,11 +1636,20 @@ export function trocarLente(objetivaDesejada, btnElement) {
 
   document.querySelectorAll(".lens-btn").forEach(l => {
     if (l.disabled) return;
-    l.className = "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer";
+    l.className = "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   });
 
   if (targetBtn && !targetBtn.disabled) {
-    targetBtn.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens";
+    targetBtn.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+  }
+
+  // Em telas compactas, centraliza suavemente o botão da objetiva ativada no revólver sem rolar a janela
+  if (targetBtn) {
+    const panel = document.getElementById("viewerLensPanel");
+    if (panel && panel.scrollWidth > panel.clientWidth) {
+      const scrollPos = targetBtn.offsetLeft - panel.offsetLeft - (panel.clientWidth / 2) + (targetBtn.clientWidth / 2);
+      panel.scrollTo({ left: Math.max(0, scrollPos), behavior: "smooth" });
+    }
   }
 }
 
@@ -1085,6 +1669,9 @@ function exibirErroMicroscopio(msg) {
   if (tituloEl) tituloEl.textContent = "Lâmina Indisponível";
   const descEl = document.getElementById("slideDescriptionContainer");
   if (descEl) descEl.innerHTML = `<p class="text-neutral-500 italic text-sm font-sans">Não foi possível recuperar os dados morfológicos desta peça.</p>`;
+  listaQuestoesAtual = [];
+  atualizarBadgeContadorQuestoes();
+  renderizarQuestoesNaSidebar([]);
 
   const container = document.getElementById("osd-viewer");
   if (!container) return;
@@ -1120,20 +1707,39 @@ window.App = window.App || {};
 Object.assign(window.App, {
   osdViewerAction,
   focarPinoNoViewer,
+  focarQuestaoNoViewer,
+  alternarAbaPainel,
+  renderizarQuestoesNaSidebar,
+  carregarLaminaPorId: carregarLaminaNoMicroscopio,
   trocarLente,
   alterarZoom,
   calcularMagnificacaoOtica,
   formatarMagnificacaoOtica,
   getZoom4xRef,
   calcularZoomParaMagnificacao,
-  sanitizarHTMLDescricao
+  sanitizarHTMLDescricao,
+  aplicarEstadoSidebar,
+  fecharSidebar: () => aplicarEstadoSidebar(true, true),
+  abrirSidebar:  () => aplicarEstadoSidebar(false, true)
 });
-window.osdViewerAction          = osdViewerAction;
-window.focarPinoNoViewer        = focarPinoNoViewer;
-window.trocarLente              = trocarLente;
-window.alterarZoom              = alterarZoom;
-window.calcularMagnificacaoOtica = calcularMagnificacaoOtica;
-window.formatarMagnificacaoOtica = formatarMagnificacaoOtica;
-window.getZoom4xRef             = getZoom4xRef;
+window.osdViewerAction              = osdViewerAction;
+window.focarPinoNoViewer            = focarPinoNoViewer;
+window.focarQuestaoNoViewer         = focarQuestaoNoViewer;
+window.alternarAbaPainel            = alternarAbaPainel;
+window.renderizarQuestoesNaSidebar  = renderizarQuestoesNaSidebar;
+window.carregarLaminaPorId          = carregarLaminaNoMicroscopio;
+window.trocarLente                  = trocarLente;
+window.alterarZoom                  = alterarZoom;
+window.calcularMagnificacaoOtica     = calcularMagnificacaoOtica;
+window.formatarMagnificacaoOtica     = formatarMagnificacaoOtica;
+window.getZoom4xRef                 = getZoom4xRef;
 window.calcularZoomParaMagnificacao = calcularZoomParaMagnificacao;
-window.sanitizarHTMLDescricao   = sanitizarHTMLDescricao;
+window.sanitizarHTMLDescricao       = sanitizarHTMLDescricao;
+window.aplicarEstadoSidebar         = aplicarEstadoSidebar;
+window.fecharSidebar                = () => aplicarEstadoSidebar(true, true);
+window.abrirSidebar                 = () => aplicarEstadoSidebar(false, true);
+
+export {
+  carregarLaminaNoMicroscopio as carregarLaminaPorId,
+  aplicarEstadoSidebar
+};

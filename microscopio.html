@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Estúdio de Microscopia Virtual — Palas Atlas</title>
   <meta name="description" content="Visualizador de microscopia digital do Palas Atlas — análise morfológica interativa com marcadores anatômicos.">
 
@@ -13,6 +13,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
 
   <link rel="stylesheet" href="css/tailwind.min.css?v=1">
+  <link rel="stylesheet" href="css/styles.css?v=8">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -26,6 +27,47 @@
   <link rel="stylesheet" href="css/splash.css?v=1">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
+
+    /* Touch & Gesture Engine Optimization */
+    html, body {
+      overscroll-behavior: none !important;
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      height: 100dvh !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      -webkit-text-size-adjust: 100% !important;
+    }
+
+    #viewerLensPanel {
+      position: absolute !important;
+      bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+      left: max(14px, env(safe-area-inset-left, 14px)) !important;
+      z-index: 36 !important;
+    }
+
+    #osd-viewer,
+    #osd-viewer canvas,
+    .openseadragon-container,
+    .openseadragon-canvas {
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-touch-callout: none !important;
+      overscroll-behavior: none !important;
+    }
+
+    #viewerStage {
+      overscroll-behavior: none !important;
+      touch-action: none;
+    }
+
+    /* Scrollbar minimalista e utilitário no-scrollbar */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     /* Prose do texto descritivo lateral (off-white + detalhes em ouro-champanhe) */
     .prose-atlas {
@@ -43,11 +85,14 @@
       text-underline-offset: 3px;
       font-weight: 500;
       cursor: pointer;
-      padding: 0 2px;
-      transition: color .15s;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color .15s, background-color .15s;
       white-space: normal;
+      touch-action: manipulation;
     }
     .prose-atlas .pin-link:hover { color: #e0c97f; }
+    .prose-atlas .pin-link:active { background-color: rgba(200, 173, 95, 0.15); }
 
     /* Botão de recolher painel: preenchimento do painel indica estado aberto */
     .viewer-sidebar-toggle .sidebar-icon-fill { opacity: .35; transition: opacity .3s ease; }
@@ -55,6 +100,45 @@
 
     /* Logo do cabeçalho: ATLAS em ouro-champanhe discreto */
     header brand-logo span.font-normal { color: #c8ad5f !important; }
+
+    /* Drawer Slide-over para qualquer tela < 1024px OU altura de celular em paisagem (<= 500px) */
+    @media (max-width: 1023px), (max-height: 500px) {
+      #viewerSidebar {
+        position: absolute !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: 100% !important;
+        z-index: 40 !important;
+        box-shadow: -10px 0 35px rgba(0, 0, 0, 0.8) !important;
+        background-color: rgba(10, 10, 10, 0.95) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+      }
+      .openseadragon-navigator {
+        width: 80px !important;
+        height: 60px !important;
+        bottom: 8px !important;
+        right: 8px !important;
+      }
+    }
+
+    /* Somente no Desktop grande (>= 1024px E altura > 500px): layout lado a lado */
+    @media (min-width: 1024px) and (min-height: 501px) {
+      #viewerSidebar {
+        position: relative !important;
+        box-shadow: none !important;
+        background-color: #0a0a0a !important;
+        backdrop-filter: none !important;
+      }
+      #viewerBackdrop {
+        display: none !important;
+      }
+      #viewerLensPanel {
+        bottom: 20px !important;
+        left: 20px !important;
+      }
+    }
 
     /* Scrollbar minimalista */
     ::-webkit-scrollbar       { width: 5px; }
@@ -70,23 +154,24 @@
        BARRA SUPERIOR DO LEITOR (item 1)
        bg-neutral-950 | borda inferior | Studio Dark
        ════════════════════════════════════════════════════════════════════ -->
-  <header class="shrink-0 w-full bg-neutral-950 px-5 py-3 flex items-center justify-between z-50 relative">
+  <header class="shrink-0 w-full bg-neutral-950 px-3 sm:px-5 py-2 sm:py-3 flex items-center justify-between z-50 relative border-b border-white/[0.06]">
 
     <!-- Esquerda: Voltar + Breadcrumb -->
-    <div class="flex items-center gap-3 min-w-0 z-10">
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0 z-10">
       <button
         type="button"
         onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
-        class="flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-white transition-all duration-200 cursor-pointer shrink-0"
+        class="h-11 px-2 -ml-2 flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-white active:text-[#c8ad5f] transition-all duration-200 cursor-pointer shrink-0 touch-manipulation"
         aria-label="Voltar para Tecido"
       >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
-        Voltar para Tecido
+        <span class="hidden sm:inline">Voltar para Tecido</span>
+        <span class="inline sm:hidden">Voltar</span>
       </button>
       <span class="text-neutral-700 select-none hidden sm:block">|</span>
-      <span id="viewerBreadcrumb" class="text-xs text-neutral-500 font-sans tracking-wide truncate max-w-[160px] md:max-w-xs hidden"></span>
+      <span id="viewerBreadcrumb" class="text-xs text-neutral-500 font-sans tracking-wide truncate max-w-[120px] sm:max-w-[160px] md:max-w-xs hidden"></span>
     </div>
 
     <!-- Centro: Logo PALAS ATLAS (centralizado absolutamente para não ser deslocado pelas laterais) -->
@@ -99,13 +184,13 @@
       <button
         id="btnToggleSidebar"
         type="button"
-        class="viewer-sidebar-toggle text-neutral-400 hover:text-[#c8ad5f] transition-colors duration-200 cursor-pointer"
+        class="viewer-sidebar-toggle w-11 h-11 flex items-center justify-center rounded-lg text-neutral-400 hover:text-[#c8ad5f] active:bg-white/[0.06] transition-colors duration-200 cursor-pointer touch-manipulation"
         aria-label="Recolher painel de informações"
         aria-controls="viewerSidebar"
         aria-expanded="true"
         title="Recolher painel"
       >
-        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="w-5 h-5 lg:w-[18px] lg:h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4.5" width="18" height="15" rx="2.5"></rect>
           <path d="M15 4.5v15"></path>
           <rect class="sidebar-icon-fill" x="15" y="4.5" width="6" height="15" rx="2" fill="currentColor" stroke="none"></rect>
@@ -164,27 +249,73 @@
       ></div>
 
       <!-- REVÓLVER DE OBJETIVAS + CONTROLES DE ZOOM DINÂMICOS -->
-      <div id="viewerLensPanel" class="absolute bottom-3 sm:bottom-5 left-3 sm:left-5 z-20 flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-neutral-900/80 backdrop-blur-md border border-white/[0.08] shadow-2xl text-xs font-mono select-none max-w-[calc(100vw-24px)] overflow-x-auto">
+      <div
+        id="viewerLensPanel"
+        class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-36 flex items-center gap-1 sm:gap-1.5 lg:gap-2 p-1 sm:p-1.5 lg:p-1.5 rounded-2xl bg-neutral-900/90 backdrop-blur-md border border-white/[0.12] shadow-2xl text-xs font-mono select-none max-w-[calc(100%-16px)] sm:max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
+      >
         <!-- Valores nominais das objetivas -->
-        <button type="button" onclick="window.trocarLente(4, this)"    class="lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 py-1 rounded-lg text-xs transition-all active-lens cursor-pointer" data-mag="4">4x</button>
-        <button type="button" onclick="window.trocarLente(10, this)"   class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="10">10x</button>
-        <button type="button" onclick="window.trocarLente(40, this)"   class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="40">40x</button>
-        <button type="button" onclick="window.trocarLente(60, this)"   class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="60">60x</button>
-        <button type="button" onclick="window.trocarLente(100, this)"  class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] font-medium px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer" data-mag="100">100x</button>
+        <button
+          type="button"
+          onclick="window.trocarLente(4, this)"
+          class="lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          data-mag="4"
+        >4x</button>
+        <button
+          type="button"
+          onclick="window.trocarLente(10, this)"
+          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          data-mag="10"
+        >10x</button>
+        <button
+          type="button"
+          onclick="window.trocarLente(40, this)"
+          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          data-mag="40"
+        >40x</button>
+        <button
+          type="button"
+          onclick="window.trocarLente(60, this)"
+          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          data-mag="60"
+        >60x</button>
+        <button
+          type="button"
+          onclick="window.trocarLente(100, this)"
+          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          data-mag="100"
+        >100x</button>
         
         <!-- Divisor sutil -->
-        <div class="w-px h-4 bg-white/[0.08]"></div>
+        <div class="w-px h-5 lg:h-4 bg-white/[0.08] shrink-0"></div>
 
         <!-- Controles manuais de Zoom (+ / - / Home) -->
-        <button type="button" onclick="window.alterarZoom(1.35)" class="w-6 h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-all text-xs font-bold cursor-pointer" title="Aproximar (+)">+</button>
-        <button type="button" onclick="window.alterarZoom(0.75)" class="w-6 h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-all text-xs font-bold cursor-pointer" title="Afastar (&minus;)">&minus;</button>
-        <button type="button" onclick="window.osdViewerAction('home')" class="px-2 py-0.5 flex items-center justify-center rounded-lg text-neutral-400 hover:text-[#c8ad5f] hover:bg-white/[0.06] transition-all text-[10px] tracking-wider uppercase font-medium cursor-pointer" title="Enquadramento geral">1:1</button>
+        <button
+          type="button"
+          onclick="window.alterarZoom(1.35)"
+          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-6 lg:h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
+          title="Aproximar (+)"
+          aria-label="Aproximar zoom"
+        >+</button>
+        <button
+          type="button"
+          onclick="window.alterarZoom(0.75)"
+          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-6 lg:h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
+          title="Afastar (&minus;)"
+          aria-label="Afastar zoom"
+        >&minus;</button>
+        <button
+          type="button"
+          onclick="window.osdViewerAction('home')"
+          class="min-h-[38px] sm:min-h-[40px] lg:min-h-0 px-2.5 sm:px-3 lg:px-2 py-1 lg:py-0.5 flex items-center justify-center rounded-lg text-neutral-400 hover:text-[#c8ad5f] hover:bg-white/[0.06] active:bg-white/10 transition-all text-xs lg:text-[10px] tracking-wider uppercase font-medium cursor-pointer touch-manipulation shrink-0"
+          title="Enquadramento geral"
+          aria-label="Enquadramento geral 1 para 1"
+        >1:1</button>
 
         <!-- Divisor sutil -->
-        <div class="w-px h-4 bg-white/[0.08]"></div>
+        <div class="w-px h-5 lg:h-4 bg-white/[0.08] shrink-0"></div>
 
         <!-- Display do Zoom Dinâmico em Tempo Real -->
-        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-950/70 border border-white/[0.06]">
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 lg:py-1 rounded-lg bg-neutral-950/70 border border-white/[0.06] shrink-0 min-h-[38px] sm:min-h-[40px] lg:min-h-0">
           <span class="w-1.5 h-1.5 rounded-full bg-[#c8ad5f] animate-pulse"></span>
           <span class="text-[#c8ad5f] font-bold text-xs" id="zoomIndicatorDisplay">4.0x</span>
         </div>
@@ -197,38 +328,80 @@
 
     </main>
 
+    <!-- Backdrop escurecido para mobile/tablet (fecha a barra lateral ao tocar fora) -->
+    <div
+      id="viewerBackdrop"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[35] hidden opacity-0 transition-opacity duration-300 lg:hidden pointer-events-none"
+      aria-hidden="true"
+    ></div>
+
     <!-- Direita — Painel de Informações (retrátil) -->
-    <aside id="viewerSidebar"
-      class="h-full bg-neutral-950/95 md:bg-neutral-950 backdrop-blur-md md:backdrop-blur-none border-l border-white/[0.08] text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 md:relative w-[85vw] sm:w-[380px] opacity-100 transition-[width,opacity] duration-500 ease-in-out shadow-2xl md:shadow-none"
+    <aside
+      id="viewerSidebar"
+      class="h-full bg-neutral-950/95 lg:bg-neutral-950 backdrop-blur-md lg:backdrop-blur-none border-l border-white/[0.08] text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
       aria-hidden="false"
     >
-      <div class="w-[85vw] sm:w-[380px] h-full flex flex-col">
+      <div class="w-[85vw] sm:w-[380px] max-w-[380px] h-full flex flex-col">
 
         <!-- Cabeçalho do Painel: Título e Coloração -->
-        <div class="px-7 pt-7 pb-5 shrink-0 flex items-start justify-between gap-3">
-          <div>
-            <h2 id="slideTitle" class="text-xl font-serif font-bold text-neutral-100 leading-tight tracking-tight">
+        <div class="px-5 sm:px-7 pt-5 sm:pt-7 pb-4 sm:pb-5 shrink-0 flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-bold text-neutral-100 leading-tight tracking-tight truncate sm:whitespace-normal">
               Carregando lâmina...
             </h2>
-            <p id="slideColoracao" class="mt-2 text-[11px] font-mono tracking-wide text-[#c8ad5f]/80">
+            <p id="slideColoracao" class="mt-1.5 sm:mt-2 text-[11px] font-mono tracking-wide text-[#c8ad5f]/80">
               Hematoxilina e Eosina (H&amp;E)
             </p>
             <span id="slideDisciplina" class="hidden">—</span>
           </div>
-          <button type="button" onclick="document.getElementById('btnToggleSidebar').click()" class="md:hidden p-1.5 text-neutral-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors shrink-0" aria-label="Fechar painel">
+          <button
+            type="button"
+            id="btnCloseSidebarMobile"
+            class="lg:hidden w-11 h-11 flex items-center justify-center text-neutral-400 hover:text-white active:bg-white/10 rounded-xl transition-colors shrink-0 touch-manipulation cursor-pointer -mr-2 -mt-1"
+            aria-label="Fechar painel"
+          >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Abas de Navegação do Painel Lateral -->
+        <div class="px-5 sm:px-7 pb-3 flex items-center gap-2 border-b border-white/[0.06] shrink-0">
+          <button
+            id="btnTabDescricao"
+            type="button"
+            onclick="window.alternarAbaPainel('descricao')"
+            class="min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-white/[0.08] text-white border border-white/[0.1] shadow-sm touch-manipulation flex items-center justify-center"
+          >
+            Descrição
+          </button>
+          <button
+            id="btnTabQuestoes"
+            type="button"
+            onclick="window.alternarAbaPainel('questoes')"
+            class="min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5 touch-manipulation justify-center"
+          >
+            <span>Questões</span>
+            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.06] text-neutral-400 font-mono">0</span>
           </button>
         </div>
 
         <!-- Descrição completa com hiperlinks de pinos -->
         <div
           id="slideDescriptionContainer"
-          class="px-7 pb-7 flex-1 overflow-y-auto bg-neutral-950"
+          class="px-5 sm:px-7 pb-7 flex-1 overflow-y-auto bg-neutral-950"
           style="-webkit-overflow-scrolling:touch;"
         >
           <div class="text-sm text-neutral-500 font-sans italic">
             As informações desta lâmina serão renderizadas aqui.
           </div>
+        </div>
+
+        <div
+          id="slideQuestionsContainer"
+          class="hidden px-5 sm:px-7 pb-7 flex-1 overflow-y-auto bg-neutral-950 space-y-4"
+          style="-webkit-overflow-scrolling:touch;"
+        >
+          <!-- Questões renderizadas dinamicamente aqui -->
         </div>
 
       </div>
@@ -237,7 +410,7 @@
   </div><!-- /workspace -->
 
   <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261028_104"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261028_touch4"></script>
 
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>
