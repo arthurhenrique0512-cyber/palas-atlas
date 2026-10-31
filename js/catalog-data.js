@@ -48,6 +48,32 @@ export const catalogData = {
                 explicacao: "A camada parietal da Cápsula de Bowman é constituída por epitélio plano (escamoso) simples que reveste exteriormente o corpúsculo renal e delimita o espaço cápsula onde o filtrado é capturado."
               }
             ]
+          },
+          {
+            id: "pele_espessa",
+            nome: "Pele Espessa (Epiderme e Derme) HE",
+            coloracao: "Hematoxilina e Eosina (H&E) • 40x",
+            disciplina: "histologia",
+            topico: "epitelial",
+            maxMagnification: 40,
+            dziUrl: "assets/histologia/pele_espessa.dzi",
+            imageUrl: "assets/histologia/pele_espessa.dzi",
+            caminhoImagemBase: "assets/histologia/pele_espessa-preview.jpg",
+            questoes: [
+              {
+                x: 50,
+                y: 30,
+                enunciado: "Identifique o estrato epidérmico logo abaixo da camada córnea caracterizado pela presença de queratinócitos repletos de grânulos basofílicos densos.",
+                alternativas: [
+                  "Camada Granulosa (grânulos de querato-hialina)",
+                  "Camada Basal (melanócitos)",
+                  "Camada Espinhosa (desmossomos)",
+                  "Derme Papilar (tecido conjuntivo frouxo)"
+                ],
+                alternativaCorreta: 0,
+                explicacao: "A camada granulosa da epiderme da pele espessa exibe queratinócitos com abundantes grânulos basofílicos de querato-hialina, responsáveis pela maturação e formação da queratina córnea."
+              }
+            ]
           }
         ]
       },

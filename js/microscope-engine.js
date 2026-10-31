@@ -320,6 +320,54 @@ const fallbackLaminas = {
     dziUrl: 'assets/histologia/lamina-real1.dzi',
     descricaoHTML: '<p>Lâmina completa digitalizada em altíssima resolução com pirâmide de Deep Zoom (DZI) para exploração microscópica multiescala.</p>',
     pinos: []
+  },
+  'pele_espessa': {
+    id: 'pele_espessa',
+    aliases: ['pele-espessa', 'pele_espessa_he', 'pele-espessa-he', 'pele', 'epiderme-derme', 'pele-grossa'],
+    nome: 'Pele Espessa (Epiderme e Derme)',
+    disciplina: 'histologia',
+    topico: 'epitelial',
+    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
+    maxMagnification: 40,
+    mpp: 0.25,
+    imagemUrl: 'assets/histologia/pele_espessa.dzi',
+    previewImage: 'assets/histologia/pele_espessa-preview.jpg',
+    thumbnailUrl: 'assets/histologia/pele_espessa-preview.jpg',
+    dziUrl: 'assets/histologia/pele_espessa.dzi',
+    descricaoHTML: `
+      <div class="prose-atlas">
+        <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
+        <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
+        <p><strong>Estratificação Epidérmica (da profundidade para a superfície):</strong></p>
+        <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
+          <li><strong>Camada Basal (Germinativa):</strong> Fileira única de células cúbicas a prismáticas com alta atividade mitótica sobre a lâmina basal.</li>
+          <li><strong>Camada Espinhosa:</strong> Múltiplas camadas de queratinócitos poliédricos unidos por densos desmossomos ("espinhos").</li>
+          <li><strong>Camada Granulosa:</strong> Células achatadas com volumosos grânulos basofílicos de querato-hialina no citoplasma.</li>
+          <li><strong>Camada Lúcida:</strong> Fita homogênea, clara e eosinofílica refringente, característica exclusiva da pele espessa.</li>
+          <li><strong>Camada Córnea:</strong> Camada superficial densa de escamas anucleadas de queratina pura (barreira impermeável).</li>
+        </ul>
+        <p>Na interface dermo-epidérmica observam-se as <strong>papilas dérmicas</strong> que se interdigitam com as cristas epidérmicas, garantindo forte adesão mecânica e nutrição vascular ao epitélio.</p>
+      </div>
+    `,
+    pinos: [],
+    questoes: [
+      {
+        id: "q-pele-1",
+        numero: 1,
+        titulo: "Estratificação da Epiderme",
+        enunciado: "Observe a espessura da camada córnea e identifique os grânulos basofílicos citoplasmáticos característicos da camada subjacente imediata.",
+        x: 0.5,
+        y: 0.3,
+        alternativas: [
+          "Camada Granulosa (grânulos de querato-hialina)",
+          "Camada Basal (melanossomos)",
+          "Camada Espinhosa (grânulos de glicogênio)",
+          "Derme Reticular (fibras elásticas)"
+        ],
+        alternativaCorreta: 0,
+        explicacao: "A camada granulosa situa-se logo abaixo do estrato lúcido/córneo e caracteriza-se por queratinócitos preenchidos por grânulos basofílicos de querato-hialina, precursores da filagrina e da queratinização madura."
+      }
+    ]
   }
 };
 
@@ -334,29 +382,33 @@ function iniciarMicroscopio() {
 
   if (dziParam) {
     const isOsso = String(dziParam).toLowerCase().includes("osso");
+    const isPele = String(dziParam).toLowerCase().includes("pele");
+    const maxMagParam = Number(urlParams.get("maxMag") || urlParams.get("maxMagnification")) || 40;
+
+    let defaultNome = "Preparação Histológica Digital";
+    let defaultColor = "Hematoxilina e Eosina (H&E)";
+    let defaultDesc = `<p>Preparação histológica digitalizada sob objetiva de ${maxMagParam}x.</p>`;
+
+    if (isPele) {
+      defaultNome = "Pele Espessa (Epiderme e Derme)";
+      defaultColor = "Hematoxilina e Eosina (H&E) • 40x";
+      defaultDesc = fallbackLaminas['pele_espessa']?.descricaoHTML || defaultDesc;
+    } else if (isOsso) {
+      defaultNome = "Osso Maduro (Lamelar) por Desgaste";
+      defaultColor = "Corte por Desgaste (Sem Coloração) • 40x";
+      defaultDesc = fallbackLaminas['osso_maduro_desgaste_ct']?.descricaoHTML || defaultDesc;
+    }
+
     laminaAtualData = {
       id: "local-dzi",
-      nome: urlParams.get("nome") || "Osso Maduro (Desgaste - Corte Transversal)",
+      nome: urlParams.get("nome") || defaultNome,
       disciplina: urlParams.get("disciplina") || "histologia",
-      coloracao: urlParams.get("coloracao") || "Corte por Desgaste (Sem Coloracao)",
+      coloracao: urlParams.get("coloracao") || defaultColor,
+      maxMagnification: maxMagParam,
       imagemUrl: dziParam,
-      descricaoHTML: `
-        <div class="prose-atlas">
-          <h3>Tecido Osseo Maduro — Corte por Desgaste</h3>
-          <p>Preparacao histologica de osso compacto maduro obtida pela tecnica de desgaste fisico. Por nao utilizar descalcificacao nem corantes histologicos, a matriz ossea mineralizada (hidroxiapatita) e preservada intacta, permitindo a observacao direta dos canais vasculares e do sistema canalicular preenchido por ar ou residuos refrateis.</p>
-          <p><strong>Estruturas Morfologicas Visiveis:</strong></p>
-          <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
-            <li><strong>Sistemas de Havers (Osteons):</strong> Unidades cilindricas formadas por lamelas concentricas de matriz mineralizada dispostas em torno de um canal central.</li>
-            <li><strong>Canais de Havers:</strong> Tuneis longitudinais centrais que alojavam vasos sanguineos e nervos in vivo.</li>
-            <li><strong>Lacunas de Osteocitos:</strong> Pequenas cavidades lenticulares onde residiam os corpos celulares dos osteocitos.</li>
-            <li><strong>Canaliculos Osseos:</strong> Delicadas ramificacoes radiadas que interconectam as lacunas entre si e com os canais vasculares para nutricao celular.</li>
-            <li><strong>Lamelas Intersticiais:</strong> Remanescentes angulares de osteons antigos degradados pelo remodelamento osseo continuo.</li>
-            <li><strong>Canais de Volkmann:</strong> Canais perfurantes transversais/obliquos que conectam canais de Havers adjacentes e o periosteo.</li>
-          </ul>
-        </div>
-      `,
+      descricaoHTML: defaultDesc,
       pinos: [],
-      questoes: isOsso ? (fallbackLaminas['osso_maduro_desgaste_ct']?.questoes || []) : []
+      questoes: isPele ? (fallbackLaminas['pele_espessa']?.questoes || []) : isOsso ? (fallbackLaminas['osso_maduro_desgaste_ct']?.questoes || []) : []
     };
     listaPinosAtual = [];
     listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
@@ -1125,7 +1177,7 @@ function inicializarOpenSeadragon() {
       const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
       const zoom4x = getZoom4xRef();
-      const minOSDZoom = zoom4x;
+      const minOSDZoom = Math.min(zoom4x, homeZoomRef * 0.95);
       const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.05;
 
       viewer.viewport.minZoomLevel = minOSDZoom;
@@ -1223,10 +1275,10 @@ function inicializarOpenSeadragon() {
     if (!homeZoomRef || !viewer || !viewer.viewport) return;
     const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
     const zoom4x = getZoom4xRef();
-    const minOSDZoom = zoom4x;
+    const minOSDZoom = Math.min(zoom4x, homeZoomRef * 0.95);
     const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.05;
 
-    // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x)
+    // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x/home)
     const current = viewer.viewport.getZoom();
     if (current < minOSDZoom) {
       viewer.viewport.zoomTo(minOSDZoom, null, true);
@@ -1242,25 +1294,46 @@ function inicializarOpenSeadragon() {
 // 5.5 Cálculo Dinâmico de Magnificação Ótica Real & Formatação Legível
 // ---------------------------------------------------------------------------
 /**
- * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
- * Na objetiva de 4x, o campo de visão ótico real é amplo (~5.5 mm), fazendo com que
- * a amostra histológica (com cerca de 1.5 mm) ocupe aproximadamente 28% da tela,
- * deixando margens pretas ao redor ("espaços em preto" característicos da visão macroscópica).
+ * Retorna o zoom nativo 1:1 da câmera (nativeZoomRef).
+ * Em microscopia digital, a resolução nativa da captura (1 imagem pixel = 1 CSS pixel)
+ * corresponde à objetiva física com a qual a lâmina foi digitalizada (maxMag, ex: 40x).
  */
-export function getZoom4xRef() {
-  if (!viewer || !viewer.viewport) return 1.0;
-  const baseHome = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
-  return baseHome * 0.28;
+export function getNativeZoomRef() {
+  if (nativeZoomRef && nativeZoomRef > 0) return nativeZoomRef;
+  if (viewer && viewer.viewport) {
+    try {
+      const z = viewer.viewport.imageToViewportZoom(1);
+      if (z && z > 0) {
+        nativeZoomRef = z;
+        return z;
+      }
+    } catch (e) {}
+  }
+  const baseHome = homeZoomRef || (viewer && viewer.viewport ? viewer.viewport.getHomeZoom() : 1.0) || 1.0;
+  return baseHome * 10;
 }
 
 /**
  * Converte um valor nominal de ampliação ótica (ex: 4, 10, 40, 60, 100)
- * para o nível de zoom correspondente no OpenSeadragon.
+ * para o nível de zoom correspondente no OpenSeadragon de forma dinâmica para QUALQUER lâmina.
+ * A escala é baseada na objetiva de captura da lâmina (maxMag):
+ * - Na objetiva de captura (ex: 40x), o zoom corresponde à resolução nativa 1:1 da câmera (nativeZoom).
+ * - Em 4x, o zoom é proporcionalmente 4 / maxMag (ex: 10% da resolução nativa para lâminas de 40x).
+ * - Em 10x, o zoom é proporcionalmente 10 / maxMag (ex: 25% da resolução nativa).
  */
 export function calcularZoomParaMagnificacao(mag) {
-  const z4 = getZoom4xRef();
+  if (!viewer || !viewer.viewport) return 1.0;
+  const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
+  const native = getNativeZoomRef();
   const m = Number(mag) || 4;
-  return z4 * (m / 4);
+  return native * (m / maxMag);
+}
+
+/**
+ * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
+ */
+export function getZoom4xRef() {
+  return calcularZoomParaMagnificacao(4);
 }
 
 /**
@@ -1272,18 +1345,18 @@ export function calcularZoomParaMagnificacao(mag) {
  */
 export function calcularMagnificacaoOtica(osdZoom) {
   if (!viewer || !viewer.viewport) return 4;
-  const z4 = getZoom4xRef();
-  if (!z4 || z4 <= 0) return 4;
+  const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
+  const native = getNativeZoomRef();
+  if (!native || native <= 0) return 4;
 
   const currentZoom = typeof osdZoom === "number" ? osdZoom : viewer.viewport.getZoom(true);
-  const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
-  // Relação ótica linear direta: Magnificação = 4 * (zoomAtual / zoom4x)
-  const magRaw = 4 * (currentZoom / z4);
+  // Relação óptica linear física: Magnificação = maxMag * (currentZoom / nativeZoom)
+  const magRaw = maxMag * (currentZoom / native);
 
   // Snap suave para valores nominais se muito próximo (dentro de margem imperceptível)
-  if (Math.abs(magRaw - 4) < 0.2) return 4;
-  if (Math.abs(magRaw - 10) < 0.3) return 10;
+  if (Math.abs(magRaw - 4) < 0.25) return 4;
+  if (Math.abs(magRaw - 10) < 0.4) return 10;
   if (Math.abs(magRaw - 40) < 0.8) return 40;
   if (Math.abs(magRaw - 60) < 1.0) return 60;
   if (Math.abs(magRaw - 100) < 1.5) return 100;
