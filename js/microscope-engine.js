@@ -204,16 +204,161 @@ const fallbackLaminas = {
   },
   'a3oRvXvJpMKAtU2RE85q': {
     id: 'a3oRvXvJpMKAtU2RE85q',
-    aliases: ['lamina-real1', 'lamina-real-1', 'matriz', 'teste'],
-    nome: 'Preparação Histológica Digital Matriz',
+    aliases: ['lamina-real1', 'lamina-real-1', 'pele_espessa', 'pele-espessa', 'pele', 'matriz', 'teste'],
+    nome: 'Pele Espessa (Epiderme e Derme)',
     disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E)',
+    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
+    maxMagnification: 40,
+    mpp: 0.25,
+    defaultCenter: { x: 0.5, y: 0.70 },
     imagemUrl: 'assets/histologia/lamina-real1.dzi',
     previewImage: 'assets/histologia/lamina-real1-preview.jpg',
     thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
     dziUrl: 'assets/histologia/lamina-real1.dzi',
-    descricaoHTML: '<p>Lâmina completa digitalizada em altíssima resolução com pirâmide de Deep Zoom (DZI) para exploração microscópica multiescala.</p>',
-    pinos: []
+    descricaoHTML: `
+      <div class="prose-atlas">
+        <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
+        <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
+        <p><strong>Estratificação Epidérmica (da profundidade para a superfície):</strong></p>
+        <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
+          <li><strong>Camada Basal (Germinativa):</strong> Fileira única de células cúbicas a prismáticas com alta atividade mitótica sobre a lâmina basal.</li>
+          <li><strong>Camada Espinhosa:</strong> Múltiplas camadas de queratinócitos poliédricos unidos por densos desmossomos.</li>
+          <li><strong>Camada Granulosa:</strong> Células achatadas com volumosos grânulos basofílicos de querato-hialina no citoplasma.</li>
+          <li><strong>Camada Lúcida:</strong> Fita homogênea, clara e eosinofílica refringente, característica exclusiva da pele espessa.</li>
+          <li><strong>Camada Córnea:</strong> Camada superficial densa de escamas anucleadas de queratina pura (barreira impermeável).</li>
+        </ul>
+        <p>Na derme subjacente evidenciam-se a <strong>derme papilar</strong> (tecido conjuntivo frouxo rico em capilares) e a <strong>derme reticular</strong> (tecido conjuntivo denso não modelado).</p>
+      </div>
+    `,
+    pinos: [
+      {
+        id: "pin_1793069948222_573",
+        rotulo: "Hemácia / Vaso Sanguíneo",
+        x: 1702.79,
+        y: 6851.49,
+        zoom: 3.5
+      },
+      {
+        id: "pin_1787596855230_238",
+        rotulo: "Queratina / Estrato Córneo",
+        x: 1091.31,
+        y: 5586.05,
+        zoom: 2.8
+      },
+      {
+        id: "pin_1793136232358_898",
+        rotulo: "Interface Dermo-Epidérmica",
+        x: 1631.39,
+        y: 6802.9,
+        zoom: 3.2
+      },
+      {
+        id: "pin_1793136245811_274",
+        rotulo: "Papila Dérmica Vascularizada",
+        x: 1682.44,
+        y: 6869.79,
+        zoom: 3.5
+      }
+    ],
+    questoes: [
+      {
+        id: "q-pele-1",
+        numero: 1,
+        titulo: "Identificação da Camada Granulosa",
+        enunciado: "Examine a epiderme e identifique a camada imediatamente abaixo do estrato córneo que contém volumosos grânulos basofílicos de querato-hialina.",
+        x: 1631.39,
+        y: 6802.9,
+        zoom: 3.0
+      },
+      {
+        id: "q-pele-2",
+        numero: 2,
+        titulo: "Papilas Dérmicas e Nutrição Epidérmica",
+        enunciado: "Localize a transição entre o epitélio avascular e o tecido conjuntivo da derme. Como as papilas dérmicas aumentam a adesão e a nutrição do epitélio?",
+        x: 1702.79,
+        y: 6851.49,
+        zoom: 3.2
+      }
+    ]
+  },
+  'pele_espessa': {
+    id: 'pele_espessa',
+    aliases: ['a3oRvXvJpMKAtU2RE85q', 'lamina-real1', 'lamina-real-1', 'pele-espessa', 'pele'],
+    nome: 'Pele Espessa (Epiderme e Derme)',
+    disciplina: 'histologia',
+    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
+    maxMagnification: 40,
+    mpp: 0.25,
+    defaultCenter: { x: 0.5, y: 0.70 },
+    imagemUrl: 'assets/histologia/lamina-real1.dzi',
+    previewImage: 'assets/histologia/lamina-real1-preview.jpg',
+    thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
+    dziUrl: 'assets/histologia/lamina-real1.dzi',
+    descricaoHTML: `
+      <div class="prose-atlas">
+        <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
+        <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
+        <p><strong>Estratificação Epidérmica (da profundidade para a superfície):</strong></p>
+        <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
+          <li><strong>Camada Basal (Germinativa):</strong> Fileira única de células cúbicas a prismáticas com alta atividade mitótica sobre a lâmina basal.</li>
+          <li><strong>Camada Espinhosa:</strong> Múltiplas camadas de queratinócitos poliédricos unidos por densos desmossomos.</li>
+          <li><strong>Camada Granulosa:</strong> Células achatadas com volumosos grânulos basofílicos de querato-hialina no citoplasma.</li>
+          <li><strong>Camada Lúcida:</strong> Fita homogênea, clara e eosinofílica refringente, característica exclusiva da pele espessa.</li>
+          <li><strong>Camada Córnea:</strong> Camada superficial densa de escamas anucleadas de queratina pura (barreira impermeável).</li>
+        </ul>
+        <p>Na derme subjacente evidenciam-se a <strong>derme papilar</strong> (tecido conjuntivo frouxo rico em capilares) e a <strong>derme reticular</strong> (tecido conjuntivo denso não modelado).</p>
+      </div>
+    `,
+    pinos: [
+      {
+        id: "pin_1793069948222_573",
+        rotulo: "Hemácia / Vaso Sanguíneo",
+        x: 1702.79,
+        y: 6851.49,
+        zoom: 3.5
+      },
+      {
+        id: "pin_1787596855230_238",
+        rotulo: "Queratina / Estrato Córneo",
+        x: 1091.31,
+        y: 5586.05,
+        zoom: 2.8
+      },
+      {
+        id: "pin_1793136232358_898",
+        rotulo: "Interface Dermo-Epidérmica",
+        x: 1631.39,
+        y: 6802.9,
+        zoom: 3.2
+      },
+      {
+        id: "pin_1793136245811_274",
+        rotulo: "Papila Dérmica Vascularizada",
+        x: 1682.44,
+        y: 6869.79,
+        zoom: 3.5
+      }
+    ],
+    questoes: [
+      {
+        id: "q-pele-1",
+        numero: 1,
+        titulo: "Identificação da Camada Granulosa",
+        enunciado: "Examine a epiderme e identifique a camada imediatamente abaixo do estrato córneo que contém volumosos grânulos basofílicos de querato-hialina.",
+        x: 1631.39,
+        y: 6802.9,
+        zoom: 3.0
+      },
+      {
+        id: "q-pele-2",
+        numero: 2,
+        titulo: "Papilas Dérmicas e Nutrição Epidérmica",
+        enunciado: "Localize a transição entre o epitélio avascular e o tecido conjuntivo da derme. Como as papilas dérmicas aumentam a adesão e a nutrição do epitélio?",
+        x: 1702.79,
+        y: 6851.49,
+        zoom: 3.2
+      }
+    ]
   },
   'medula-espinal-he': {
     id: 'medula-espinal-he',
@@ -310,16 +455,40 @@ const fallbackLaminas = {
   },
   'lamina-real1': {
     id: 'lamina-real1',
-    aliases: ['a3oRvXvJpMKAtU2RE85q', 'lamina-real-1', 'matriz'],
-    nome: 'Preparação Histológica Digital Matriz',
+    aliases: ['a3oRvXvJpMKAtU2RE85q', 'lamina-real-1', 'pele_espessa', 'pele-espessa', 'pele'],
+    nome: 'Pele Espessa (Epiderme e Derme)',
     disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E)',
+    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
+    maxMagnification: 40,
+    mpp: 0.25,
+    defaultCenter: { x: 0.5, y: 0.70 },
     imagemUrl: 'assets/histologia/lamina-real1.dzi',
     previewImage: 'assets/histologia/lamina-real1-preview.jpg',
     thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
     dziUrl: 'assets/histologia/lamina-real1.dzi',
-    descricaoHTML: '<p>Lâmina completa digitalizada em altíssima resolução com pirâmide de Deep Zoom (DZI) para exploração microscópica multiescala.</p>',
-    pinos: []
+    descricaoHTML: `
+      <div class="prose-atlas">
+        <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
+        <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
+        <p><strong>Estratificação Epidérmica:</strong> Camadas Basal, Espinhosa, Granulosa (grânulos de querato-hialina), Lúcida e Córnea (queratina pura).</p>
+      </div>
+    `,
+    pinos: [
+      {
+        id: "pin_1793069948222_573",
+        rotulo: "Hemácia / Vaso Sanguíneo",
+        x: 1702.79,
+        y: 6851.49,
+        zoom: 3.5
+      },
+      {
+        id: "pin_1787596855230_238",
+        rotulo: "Queratina / Estrato Córneo",
+        x: 1091.31,
+        y: 5586.05,
+        zoom: 2.8
+      }
+    ]
   }
 };
 
@@ -493,7 +662,8 @@ async function carregarLaminaNoMicroscopio(laminaId) {
             atualizarBadgeContadorQuestoes();
           }
           if (dados.maxMagnification) {
-            laminaAtualData.maxMagnification = Number(dados.maxMagnification) || 40;
+            const isPele = (dados.nome && dados.nome.toLowerCase().includes("pele")) || idBuscado === "a3oRvXvJpMKAtU2RE85q" || idBuscado === "pele_espessa";
+            laminaAtualData.maxMagnification = isPele ? 40 : (Number(dados.maxMagnification) || 40);
             aplicarBloqueioObjetivas(laminaAtualData.maxMagnification);
           }
 
@@ -1168,37 +1338,39 @@ function inicializarOpenSeadragon() {
       
       const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
       const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
+      const nativeZoom = getNativeZoomRef();
 
       // Análise Óptica Automática e Rigorosa da Pirâmide DZI
-      const analiseDzi = analisarProporcoesOpticasDzi(item, maxMag);
+      analisarProporcoesOpticasDzi(item, maxMag);
 
-      const zoom4x = analiseDzi ? analiseDzi.zoomLevels["4x"] : getZoom4xRef();
-      const minOSDZoom = analiseDzi ? analiseDzi.minOSDZoom : Math.min(zoom4x, homeZoomRef * 0.92);
-      const maxOSDZoom = analiseDzi ? analiseDzi.maxOSDZoom : calcularZoomParaMagnificacao(maxMag) * 1.15;
+      // Limites físicos de zoom:
+      // Mínimo: 90% do enquadramento panorâmico (lâmina inteira visível sem margens pretas excessivas)
+      // Máximo: resolução nativa 1:1 da câmera com headroom digital de 35%
+      const minOSDZoom = homeZoomRef * 0.90;
+      const maxOSDZoom = Math.max(homeZoomRef * 1.5, nativeZoom * 1.35);
 
       viewer.viewport.minZoomLevel = minOSDZoom;
       viewer.viewport.maxZoomLevel = maxOSDZoom;
 
       const urlParams = new URLSearchParams(window.location.search);
       const initialMagParam = urlParams.get("mag");
-      // Padrão de abertura morfológica: visão panorâmica (4x) para enquadramento inicial da lâmina inteira
       const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : 4;
-      const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
 
-      const imgBounds = item?.getBounds() || viewer.viewport.getHomeBounds();
-      const centerPoint = imgBounds ? imgBounds.getCenter() : viewer.viewport.getCenter();
-
-      // Ponto focal inicial da lâmina (se especificado) ou ponto morfológico de interesse
-      let initialPoint = centerPoint;
-      if (targetInitialMag > 4 && laminaAtualData?.defaultCenter) {
-        initialPoint = new window.OpenSeadragon.Point(
-          laminaAtualData.defaultCenter.x,
-          laminaAtualData.defaultCenter.y
-        );
+      if (targetInitialMag > 4) {
+        const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
+        let initialPoint = viewer.viewport.getCenter();
+        if (laminaAtualData?.defaultCenter) {
+          initialPoint = new window.OpenSeadragon.Point(
+            laminaAtualData.defaultCenter.x,
+            laminaAtualData.defaultCenter.y
+          );
+        }
+        viewer.viewport.zoomTo(targetInitialZoom, initialPoint, true);
+        viewer.viewport.panTo(initialPoint, true);
+      } else {
+        // Enquadramento morfológico padrão: visão panorâmica (4x) completa e sem corte
+        viewer.viewport.goHome(true);
       }
-
-      viewer.viewport.zoomTo(targetInitialZoom, initialPoint, true);
-      viewer.viewport.panTo(initialPoint, true);
     }
 
     aplicarBloqueioObjetivas(maxMag);
@@ -1270,9 +1442,9 @@ function inicializarOpenSeadragon() {
   viewer.addHandler("zoom", () => {
     if (!homeZoomRef || !viewer || !viewer.viewport) return;
     const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
-    const zoom4x = getZoom4xRef();
-    const minOSDZoom = Math.min(zoom4x, homeZoomRef * 0.92);
-    const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.15;
+    const nativeZoom = getNativeZoomRef();
+    const minOSDZoom = homeZoomRef * 0.90;
+    const maxOSDZoom = Math.max(homeZoomRef * 1.5, nativeZoom * 1.35);
 
     // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x/home)
     const current = viewer.viewport.getZoom();
@@ -1313,14 +1485,18 @@ export function analisarProporcoesOpticasDzi(tiledImage, maxMagNominal) {
     imgWidth = item.source.dimensions.x;
     imgHeight = item.source.dimensions.y;
     tileSize = item.source.tileSize || 256;
+  } else if (item && typeof item.getContentSize === "function") {
+    const cs = item.getContentSize();
+    imgWidth = cs.x;
+    imgHeight = cs.y;
   }
 
   const nativeZoom = getNativeZoomRef();
-  const z4x   = nativeZoom * (4 / maxMag);
-  const z10x  = nativeZoom * (10 / maxMag);
-  const z40x  = nativeZoom * (40 / maxMag);
-  const z60x  = nativeZoom * (60 / maxMag);
-  const z100x = nativeZoom * (100 / maxMag);
+  const z4x   = homeZoom;
+  const z10x  = calcularZoomParaMagnificacao(10);
+  const z40x  = calcularZoomParaMagnificacao(40);
+  const z60x  = calcularZoomParaMagnificacao(60);
+  const z100x = calcularZoomParaMagnificacao(100);
 
   const proporcoes = {
     imgWidth,
@@ -1340,8 +1516,8 @@ export function analisarProporcoesOpticasDzi(tiledImage, maxMagNominal) {
       "60x": z60x,
       "100x": z100x
     },
-    minOSDZoom: Math.min(z4x, homeZoom * 0.92),
-    maxOSDZoom: (maxMag >= 100 ? z100x : maxMag >= 60 ? z60x : z40x) * 1.15
+    minOSDZoom: homeZoom * 0.90,
+    maxOSDZoom: Math.max(homeZoom * 1.5, nativeZoom * 1.35)
   };
 
   if (imgWidth > 0) {
@@ -1349,9 +1525,9 @@ export function analisarProporcoesOpticasDzi(tiledImage, maxMagNominal) {
       `%c[Palas Atlas • Calibração Óptica DZI]%c ${laminaAtualData?.nome || 'Lâmina'}\n` +
       `• Resolução DZI: ${imgWidth} × ${imgHeight} px (${proporcoes.megapixels} MP, Proporção: ${proporcoes.aspectRatio})\n` +
       `• Objetiva de Captura: ${maxMag}x (100% resolução nativa 1:1 = zoom ${nativeZoom.toFixed(3)})\n` +
-      `• Objetiva 4x:  zoom ${z4x.toFixed(3)}  (10.0% da resolução celular)\n` +
-      `• Objetiva 10x: zoom ${z10x.toFixed(3)} (25.0% da resolução celular)\n` +
-      `• Objetiva 40x: zoom ${z40x.toFixed(3)} (100% resolução 1:1)`,
+      `• Visão Panorâmica 4x: zoom ${z4x.toFixed(3)} (Enquadramento geral)\n` +
+      `• Objetiva 10x: zoom ${z10x.toFixed(3)}\n` +
+      `• Objetiva 40x: zoom ${z40x.toFixed(3)} (1:1 resolução física nativa)`,
       "color: #c8ad5f; font-weight: bold;",
       "color: #94a3b8;"
     );
@@ -1387,47 +1563,64 @@ export function getNativeZoomRef() {
  * Converte um valor nominal de ampliação ótica (ex: 4, 10, 40, 60, 100)
  * para o nível de zoom correspondente no OpenSeadragon de forma dinâmica para QUALQUER lâmina.
  * A escala é baseada na objetiva de captura da lâmina (maxMag):
- * - Na objetiva de captura (ex: 40x), o zoom corresponde à resolução nativa 1:1 da câmera (nativeZoom).
- * - Em 4x, o zoom é proporcionalmente 4 / maxMag (ex: 10% da resolução nativa para lâminas de 40x).
- * - Em 10x, o zoom é proporcionalmente 10 / maxMag (ex: 25% da resolução nativa).
- * - Em 40x, o zoom é exatamente 100% da resolução nativa 1:1 do sensor óptico.
+ * - Na objetiva de captura (ex: 40x), o zoom corresponde com rigor à resolução nativa 1:1 da câmera (nativeZoom).
+ * - Em 4x, o zoom é o enquadramento completo e limpo da lâmina no campo visual (homeZoom).
+ * - Em 10x, o zoom é interpolado geometricamente entre 4x e 40x.
  */
 export function calcularZoomParaMagnificacao(mag) {
   if (!viewer || !viewer.viewport) return 1.0;
+  const home = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
   const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
   const native = getNativeZoomRef();
   const m = Number(mag) || 4;
-  return native * (m / maxMag);
+
+  if (m <= 4) {
+    return home;
+  }
+  if (m >= maxMag) {
+    return native;
+  }
+
+  // Interpolação óptica geométrica natural:
+  const R = Math.max(1.05, native / Math.max(0.001, home));
+  const ratio = Math.log(m / 4) / Math.max(0.001, Math.log(maxMag / 4));
+  return home * Math.pow(R, ratio);
 }
 
 /**
  * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
  */
 export function getZoom4xRef() {
-  return calcularZoomParaMagnificacao(4);
+  return homeZoomRef || (viewer && viewer.viewport ? viewer.viewport.getHomeZoom() : 1.0) || 1.0;
 }
 
 /**
  * Converte o zoom interno do OpenSeadragon (viewer.viewport.getZoom(true))
  * para o equivalente de ampliação ótica real baseado na escala física das objetivas.
  *
- * Relação óptica linear física:
- *   Magnificação = maxMag * (currentZoom / nativeZoom)
- * Quando currentZoom == nativeZoom, a magnificação é EXATAMENTE maxMag (ex: 40x).
- *
  * @param {number} [osdZoom] - Zoom interno OSD opcional
  * @returns {number} Magnificação ótica numérica (ex: 4.0, 10.0, 40.0)
  */
 export function calcularMagnificacaoOtica(osdZoom) {
   if (!viewer || !viewer.viewport) return 4;
+  const home = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
   const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
   const native = getNativeZoomRef();
-  if (!native || native <= 0) return 4;
+  if (!home || home <= 0 || !native || native <= 0) return 4;
 
   const currentZoom = typeof osdZoom === "number" ? osdZoom : viewer.viewport.getZoom(true);
 
-  // Relação óptica linear física: Magnificação = maxMag * (currentZoom / nativeZoom)
-  const magRaw = maxMag * (currentZoom / native);
+  if (currentZoom <= home * 1.02) {
+    return 4;
+  }
+  if (currentZoom >= native * 0.98) {
+    return maxMag;
+  }
+
+  // Interpolação óptica contínua e suave
+  const R = Math.max(1.05, native / Math.max(0.001, home));
+  const ratio = Math.log(Math.max(0.0001, currentZoom / home)) / Math.max(0.001, Math.log(R));
+  const magRaw = 4 * Math.pow(maxMag / 4, ratio);
 
   // Snap suave para valores nominais se muito próximo (dentro de margem imperceptível)
   if (Math.abs(magRaw - 4) < 0.25) return 4;
@@ -1436,7 +1629,7 @@ export function calcularMagnificacaoOtica(osdZoom) {
   if (Math.abs(magRaw - 60) < 1.0) return 60;
   if (Math.abs(magRaw - 100) < 1.5) return 100;
 
-  return Math.max(1, Math.min(maxMag * 1.25, Math.round(magRaw * 10) / 10));
+  return Math.max(4, Math.min(maxMag * 1.25, Math.round(magRaw * 10) / 10));
 }
 
 /**
@@ -1771,11 +1964,8 @@ export function trocarLente(objetivaDesejada, btnElement) {
   const targetZoom = calcularZoomParaMagnificacao(magClamped);
 
   if (magClamped <= 4) {
-    // Ao voltar para 4x (visao panoramica com margens pretas), centraliza a lamina
-    const imgBounds = viewer.world.getItemAt(0)?.getBounds();
-    const centerPoint = imgBounds ? imgBounds.getCenter() : viewer.viewport.getCenter();
-    viewer.viewport.zoomTo(targetZoom, null, false);
-    viewer.viewport.panTo(centerPoint, false);
+    // Ao voltar para 4x (visão panorâmica completa), recentraliza a lâmina inteira
+    viewer.viewport.goHome(false);
   } else {
     viewer.viewport.zoomTo(targetZoom, null, false);
   }
