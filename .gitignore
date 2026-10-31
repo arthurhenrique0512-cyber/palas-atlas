@@ -1,24 +1,16 @@
-# Dependencies
+.DS_Store
+**/.DS_Store
 node_modules/
 .npm/
 
-# Next.js Build Output
-.next/
-out/
-dist/
-
-# Environment Variables
-.env*.local
-.env.local
-
-# OS Metadata
-.DS_Store
-**/.DS_Store
-Thumbs.db
-
-# Temporary & Log files
+# Temporary files
 tmp/
 *.tmp
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+
+# Local binaries / apps
+app/
+
+# OS metadata
+Thumbs.db
+.env*.local
+.env.local
