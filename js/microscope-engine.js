@@ -1344,33 +1344,34 @@ function inicializarOpenSeadragon() {
       analisarProporcoesOpticasDzi(item, maxMag);
 
       // Limites físicos de zoom:
-      // Mínimo: 90% do enquadramento panorâmico (lâmina inteira visível sem margens pretas excessivas)
-      // Máximo: resolução nativa 1:1 da câmera com headroom digital de 35%
-      const minOSDZoom = homeZoomRef * 0.90;
-      const maxOSDZoom = Math.max(homeZoomRef * 1.5, nativeZoom * 1.35);
+      // Mínimo: 90% do enquadramento panorâmico (4x) permitindo margens pretas confortáveis
+      // Máximo: 125% do teto da lâmina (40x, 60x ou 100x)
+      const zoom4x = getZoom4xRef();
+      const minOSDZoom = zoom4x * 0.90;
+      const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.25;
 
       viewer.viewport.minZoomLevel = minOSDZoom;
       viewer.viewport.maxZoomLevel = maxOSDZoom;
 
       const urlParams = new URLSearchParams(window.location.search);
       const initialMagParam = urlParams.get("mag");
-      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : 4;
+      // Padrão de abertura do laboratório: abre diretamente na resolução de captura (40x), permitindo override via ?mag=
+      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : (maxMag >= 40 ? 40 : maxMag);
+      const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
 
-      if (targetInitialMag > 4) {
-        const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
-        let initialPoint = viewer.viewport.getCenter();
-        if (laminaAtualData?.defaultCenter) {
-          initialPoint = new window.OpenSeadragon.Point(
-            laminaAtualData.defaultCenter.x,
-            laminaAtualData.defaultCenter.y
-          );
-        }
-        viewer.viewport.zoomTo(targetInitialZoom, initialPoint, true);
-        viewer.viewport.panTo(initialPoint, true);
-      } else {
-        // Enquadramento morfológico padrão: visão panorâmica (4x) completa e sem corte
-        viewer.viewport.goHome(true);
+      const imgBounds = viewer.world.getItemAt(0)?.getBounds();
+      const centerPoint = imgBounds ? imgBounds.getCenter() : viewer.viewport.getCenter();
+
+      // Ponto focal inicial da lâmina (se especificado) ou ponto morfológico de interesse
+      let initialPoint = centerPoint;
+      if (targetInitialMag > 4 && laminaAtualData?.defaultCenter) {
+        initialPoint = new window.OpenSeadragon.Point(
+          laminaAtualData.defaultCenter.x,
+          laminaAtualData.defaultCenter.y
+        );
       }
+      viewer.viewport.zoomTo(targetInitialZoom, initialPoint, true);
+      viewer.viewport.panTo(initialPoint, true);
     }
 
     aplicarBloqueioObjetivas(maxMag);
@@ -1442,11 +1443,11 @@ function inicializarOpenSeadragon() {
   viewer.addHandler("zoom", () => {
     if (!homeZoomRef || !viewer || !viewer.viewport) return;
     const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
-    const nativeZoom = getNativeZoomRef();
-    const minOSDZoom = homeZoomRef * 0.90;
-    const maxOSDZoom = Math.max(homeZoomRef * 1.5, nativeZoom * 1.35);
+    const zoom4x = getZoom4xRef();
+    const minOSDZoom = zoom4x * 0.90;
+    const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.25;
 
-    // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x/home)
+    // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x)
     const current = viewer.viewport.getZoom();
     if (current < minOSDZoom) {
       viewer.viewport.zoomTo(minOSDZoom, null, true);
@@ -1492,7 +1493,7 @@ export function analisarProporcoesOpticasDzi(tiledImage, maxMagNominal) {
   }
 
   const nativeZoom = getNativeZoomRef();
-  const z4x   = homeZoom;
+  const z4x   = calcularZoomParaMagnificacao(4);
   const z10x  = calcularZoomParaMagnificacao(10);
   const z40x  = calcularZoomParaMagnificacao(40);
   const z60x  = calcularZoomParaMagnificacao(60);
@@ -1516,18 +1517,18 @@ export function analisarProporcoesOpticasDzi(tiledImage, maxMagNominal) {
       "60x": z60x,
       "100x": z100x
     },
-    minOSDZoom: homeZoom * 0.90,
-    maxOSDZoom: Math.max(homeZoom * 1.5, nativeZoom * 1.35)
+    minOSDZoom: z4x * 0.90,
+    maxOSDZoom: calcularZoomParaMagnificacao(maxMag) * 1.25
   };
 
   if (imgWidth > 0) {
     console.info(
       `%c[Palas Atlas • Calibração Óptica DZI]%c ${laminaAtualData?.nome || 'Lâmina'}\n` +
       `• Resolução DZI: ${imgWidth} × ${imgHeight} px (${proporcoes.megapixels} MP, Proporção: ${proporcoes.aspectRatio})\n` +
-      `• Objetiva de Captura: ${maxMag}x (100% resolução nativa 1:1 = zoom ${nativeZoom.toFixed(3)})\n` +
-      `• Visão Panorâmica 4x: zoom ${z4x.toFixed(3)} (Enquadramento geral)\n` +
+      `• Objetiva Máxima: ${maxMag}x (100% resolução nativa 1:1 = zoom ${nativeZoom.toFixed(3)})\n` +
+      `• Visão Panorâmica 4x: zoom ${z4x.toFixed(3)} (Margens pretas calibradas)\n` +
       `• Objetiva 10x: zoom ${z10x.toFixed(3)}\n` +
-      `• Objetiva 40x: zoom ${z40x.toFixed(3)} (1:1 resolução física nativa)`,
+      `• Objetiva 40x: zoom ${z40x.toFixed(3)}`,
       "color: #c8ad5f; font-weight: bold;",
       "color: #94a3b8;"
     );
@@ -1560,38 +1561,30 @@ export function getNativeZoomRef() {
 }
 
 /**
- * Converte um valor nominal de ampliação ótica (ex: 4, 10, 40, 60, 100)
- * para o nível de zoom correspondente no OpenSeadragon de forma dinâmica para QUALQUER lâmina.
- * A escala é baseada na objetiva de captura da lâmina (maxMag):
- * - Na objetiva de captura (ex: 40x), o zoom corresponde com rigor à resolução nativa 1:1 da câmera (nativeZoom).
- * - Em 4x, o zoom é o enquadramento completo e limpo da lâmina no campo visual (homeZoom).
- * - Em 10x, o zoom é interpolado geometricamente entre 4x e 40x.
+ * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
+ * Na objetiva de 4x, o campo de visão ótico real é amplo (~5.5 mm), fazendo com que
+ * a amostra histológica ocupe aproximadamente 28% da tela,
+ * deixando margens pretas ao redor ("espaços em preto" característicos da visão macroscópica).
  */
-export function calcularZoomParaMagnificacao(mag) {
+export function getZoom4xRef() {
   if (!viewer || !viewer.viewport) return 1.0;
-  const home = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
-  const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
-  const native = getNativeZoomRef();
-  const m = Number(mag) || 4;
-
-  if (m <= 4) {
-    return home;
-  }
-  if (m >= maxMag) {
-    return native;
-  }
-
-  // Interpolação óptica geométrica natural:
-  const R = Math.max(1.05, native / Math.max(0.001, home));
-  const ratio = Math.log(m / 4) / Math.max(0.001, Math.log(maxMag / 4));
-  return home * Math.pow(R, ratio);
+  const baseHome = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
+  return baseHome * 0.28;
 }
 
 /**
- * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
+ * Converte um valor nominal de ampliação ótica (ex: 4, 10, 40, 60, 100)
+ * para o nível de zoom correspondente no OpenSeadragon.
+ * A relação ótica é estritamente linear:
+ * - 10x = 2.5 * 4x
+ * - 40x = 10 * 4x
+ * - 60x = 15 * 4x
+ * - 100x = 25 * 4x
  */
-export function getZoom4xRef() {
-  return homeZoomRef || (viewer && viewer.viewport ? viewer.viewport.getHomeZoom() : 1.0) || 1.0;
+export function calcularZoomParaMagnificacao(mag) {
+  const z4 = getZoom4xRef();
+  const m = Number(mag) || 4;
+  return z4 * (m / 4);
 }
 
 /**
@@ -1603,31 +1596,21 @@ export function getZoom4xRef() {
  */
 export function calcularMagnificacaoOtica(osdZoom) {
   if (!viewer || !viewer.viewport) return 4;
-  const home = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
-  const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
-  const native = getNativeZoomRef();
-  if (!home || home <= 0 || !native || native <= 0) return 4;
+  const z4 = getZoom4xRef();
+  if (!z4 || z4 <= 0) return 4;
 
   const currentZoom = typeof osdZoom === "number" ? osdZoom : viewer.viewport.getZoom(true);
+  const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
-  if (currentZoom <= home * 1.02) {
-    return 4;
-  }
-  if (currentZoom >= native * 0.98) {
-    return maxMag;
-  }
-
-  // Interpolação óptica contínua e suave
-  const R = Math.max(1.05, native / Math.max(0.001, home));
-  const ratio = Math.log(Math.max(0.0001, currentZoom / home)) / Math.max(0.001, Math.log(R));
-  const magRaw = 4 * Math.pow(maxMag / 4, ratio);
+  // Relação ótica linear direta: Magnificação = 4 * (zoomAtual / zoom4x)
+  const magRaw = 4 * (currentZoom / z4);
 
   // Snap suave para valores nominais se muito próximo (dentro de margem imperceptível)
-  if (Math.abs(magRaw - 4) < 0.25) return 4;
-  if (Math.abs(magRaw - 10) < 0.4) return 10;
-  if (Math.abs(magRaw - 40) < 0.8) return 40;
-  if (Math.abs(magRaw - 60) < 1.0) return 60;
-  if (Math.abs(magRaw - 100) < 1.5) return 100;
+  if (Math.abs(magRaw - 4) < 0.35) return 4;
+  if (Math.abs(magRaw - 10) < 0.8) return 10;
+  if (Math.abs(magRaw - 40) < 2.5) return 40;
+  if (Math.abs(magRaw - 60) < 3.0) return 60;
+  if (Math.abs(magRaw - 100) < 4.5) return 100;
 
   return Math.max(4, Math.min(maxMag * 1.25, Math.round(magRaw * 10) / 10));
 }
@@ -1964,8 +1947,11 @@ export function trocarLente(objetivaDesejada, btnElement) {
   const targetZoom = calcularZoomParaMagnificacao(magClamped);
 
   if (magClamped <= 4) {
-    // Ao voltar para 4x (visão panorâmica completa), recentraliza a lâmina inteira
-    viewer.viewport.goHome(false);
+    // Ao voltar para 4x (visao panoramica com margens pretas), centraliza a lamina
+    const imgBounds = viewer.world.getItemAt(0)?.getBounds();
+    const centerPoint = imgBounds ? imgBounds.getCenter() : viewer.viewport.getCenter();
+    viewer.viewport.zoomTo(targetZoom, null, false);
+    viewer.viewport.panTo(centerPoint, false);
   } else {
     viewer.viewport.zoomTo(targetZoom, null, false);
   }
