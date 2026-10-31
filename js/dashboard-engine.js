@@ -279,9 +279,11 @@ export async function editarLaminaCms(id) {
   if (topicoSelect && lamina.topico) topicoSelect.value = lamina.topico;
   if (coloracaoSelect && lamina.coloracao) coloracaoSelect.value = lamina.coloracao;
   if (statusSelect) statusSelect.value = lamina.status || "inativa";
-  // Req 1: Carrega maxMagnification ao editar
+  // Req 1: Carrega maxMagnification e zoom4xRatio ao editar
   const maxMagSelect = document.getElementById("dashMaxMagnification");
   if (maxMagSelect) maxMagSelect.value = String(lamina.maxMagnification || 40);
+  const ratioInput = document.getElementById("dashZoom4xRatio");
+  if (ratioInput) ratioInput.value = Number(lamina.zoom4xRatio || 0.28).toFixed(2);
   const urlImagem = lamina.imagemUrl || lamina.dziUrl || lamina.imageUrl || lamina.caminhoImagemBase || "";
   if (imgUrlInput) imgUrlInput.value = urlImagem;
   if (editorTexto) editorTexto.innerHTML = lamina.descricaoHTML || lamina.descricao || "";
@@ -559,20 +561,26 @@ export function atualizarCardAnaliseOpticaCms(item, maxMagNominal) {
 
   const mp = ((w * h) / 1e6).toFixed(1);
   const ratio = (w / h).toFixed(2);
-  const p4 = ((4 / maxMag) * 100).toFixed(0);
-  const p10 = ((10 / maxMag) * 100).toFixed(0);
+  const isVertical = h > w * 1.8;
 
   const dimEl = document.getElementById("dashDziDimensions");
   const mpEl = document.getElementById("dashDziMegapixels");
-  const z4El = document.getElementById("dashDziZoom4x");
-  const z40El = document.getElementById("dashDziZoom40x");
+  const geomEl = document.getElementById("dashDziGeometria");
+  const tetoEl = document.getElementById("dashDziTeto");
   const badgeEl = document.getElementById("dashDziBadgeMag");
+  const ratioInput = document.getElementById("dashZoom4xRatio");
 
-  if (dimEl) dimEl.textContent = `${w} × ${h} (${ratio}:1)`;
+  if (dimEl) dimEl.textContent = `${w} × ${h}`;
   if (mpEl) mpEl.textContent = `${mp} Megapixels`;
-  if (z4El) z4El.textContent = `${p4}% da resolução`;
-  if (z40El) z40El.textContent = `100% (1:1 Nativo • ${maxMag}x)`;
+  if (geomEl) geomEl.textContent = `${ratio}:1 (${isVertical ? "Faixa Vertical" : "Mosaico Amplo"})`;
+  if (tetoEl) tetoEl.textContent = `${maxMag}x (Rígido)`;
   if (badgeEl) badgeEl.textContent = `Captura: ${maxMag}x`;
+
+  // Se for nova lâmina ou campo vazio, sugere automaticamente o ratio baseado na geometria física
+  if (ratioInput && (!laminaEmEdicaoId || !ratioInput.value)) {
+    const recommended = isVertical ? 0.65 : 0.28;
+    ratioInput.value = recommended.toFixed(2);
+  }
 
   card.classList.remove("hidden");
 }
@@ -788,9 +796,11 @@ export async function publicarLaminaCms() {
     x: q.x,
     y: q.y
   }));
-  // Req 1: Coleta maxMagnification do novo campo e converte para número
+  // Coleta maxMagnification e zoom4xRatio individual da lâmina
   const maxMagEl = document.getElementById("dashMaxMagnification");
   const maxMagnification = maxMagEl ? Number(maxMagEl.value) || 40 : 40;
+  const ratioEl = document.getElementById("dashZoom4xRatio");
+  const zoom4xRatio = ratioEl ? parseFloat(ratioEl.value) || 0.28 : 0.28;
   const laminaData = {
     nome,
     disciplina,
@@ -802,6 +812,7 @@ export async function publicarLaminaCms() {
     pinos,
     questoes,
     maxMagnification,
+    zoom4xRatio,
     dataModificacao: new Date().toISOString()
   };
   const statusBox = document.getElementById("dashCmsStatus");

@@ -56,6 +56,8 @@ export const catalogData = {
             disciplina: "histologia",
             topico: "epitelial",
             maxMagnification: 40,
+            zoom4xRatio: 0.65,
+            defaultCenter: { x: 0.5, y: 0.70 },
             dziUrl: "assets/histologia/lamina-real1.dzi",
             imageUrl: "assets/histologia/lamina-real1.dzi",
             caminhoImagemBase: "assets/histologia/lamina-real1-preview.jpg",
@@ -96,7 +98,23 @@ export const catalogData = {
       {
         id: "osseo",
         titulo: "Tecido Ósseo Compacto e Esponjoso",
-        resumo: "Tecido conjuntivo rígido e mineralizado, composto por matriz orgânica (predomínio de colágeno tipo I) impregnada por matriz inorgânica (cristais de hidroxiapatita). Suas células incluem osteoblastos (síntese do osteoide), osteócitos (manutenção da matriz em lacunas comunicadas por canalículos) e osteoclastos (células multinucleadas responsáveis pela reabsorção óssea). Apresenta-se como Óssea Compacto (organizado em Sistemas de Havers ou Ósteons, com lamelas concêntricas ao redor de canais vasculares) e Óssea Esponjoso (rede tridimensional de trabéculas ósseas que delimitam cavidades preenchidas por medula óssea)."
+        resumo: "Tecido conjuntivo rígido e mineralizado, composto por matriz orgânica (predomínio de colágeno tipo I) impregnada por matriz inorgânica (cristais de hidroxiapatita). Suas células incluem osteoblastos (síntese do osteoide), osteócitos (manutenção da matriz em lacunas comunicadas por canalículos) e osteoclastos (células multinucleadas responsáveis pela reabsorção óssea). Apresenta-se como Óssea Compacto (organizado em Sistemas de Havers ou Ósteons, com lamelas concêntricas ao redor de canais vasculares) e Óssea Esponjoso (rede tridimensional de trabéculas ósseas que delimitam cavidades preenchidas por medula óssea).",
+        laminasEstaticas: [
+          {
+            id: "96ZYqoM2SV8p4fB2QgeM",
+            nome: "Osso Maduro (Lamelar) por Desgaste",
+            coloracao: "Desgaste • 40x",
+            disciplina: "histologia",
+            topico: "osseo",
+            maxMagnification: 40,
+            zoom4xRatio: 0.28,
+            defaultCenter: { x: 0.65, y: 0.525 },
+            dziUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
+            imageUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
+            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg",
+            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg"
+          }
+        ]
       },
       {
         id: "nervoso",

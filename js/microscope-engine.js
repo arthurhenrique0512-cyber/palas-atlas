@@ -209,6 +209,7 @@ const fallbackLaminas = {
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
     maxMagnification: 40,
+    zoom4xRatio: 0.65,
     mpp: 0.25,
     defaultCenter: { x: 0.5, y: 0.70 },
     imagemUrl: 'assets/histologia/lamina-real1.dzi',
@@ -288,6 +289,7 @@ const fallbackLaminas = {
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
     maxMagnification: 40,
+    zoom4xRatio: 0.65,
     mpp: 0.25,
     defaultCenter: { x: 0.5, y: 0.70 },
     imagemUrl: 'assets/histologia/lamina-real1.dzi',
@@ -391,6 +393,7 @@ const fallbackLaminas = {
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
     maxMagnification: 40,
+    zoom4xRatio: 0.28,
     mpp: 0.25,
     defaultCenter: { x: 0.65, y: 0.525 },
     imagemUrl: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
@@ -460,6 +463,7 @@ const fallbackLaminas = {
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
     maxMagnification: 40,
+    zoom4xRatio: 0.65,
     mpp: 0.25,
     defaultCenter: { x: 0.5, y: 0.70 },
     imagemUrl: 'assets/histologia/lamina-real1.dzi',
@@ -491,6 +495,8 @@ const fallbackLaminas = {
     ]
   }
 };
+
+fallbackLaminas['96ZYqoM2SV8p4fB2QgeM'] = fallbackLaminas['osso_maduro_desgaste_ct'];
 
 // ---------------------------------------------------------------------------
 // 1. Disparo automatico ao carregar a pagina
@@ -616,6 +622,7 @@ async function carregarLaminaNoMicroscopio(laminaId) {
 
   if (fallback) {
     laminaAtualData = { ...fallback };
+    window.laminaAtualData = laminaAtualData;
     listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
     listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
     renderizarMetadadosDaLamina();
@@ -1258,6 +1265,7 @@ function inicializarOpenSeadragon() {
         pinchRotate:    false
       }
     });
+    window.viewer = viewer;
 
     // Garante touch-action: none e user-select: none nos elementos canvas e container do OSD
     if (viewer.canvas) {
@@ -1345,10 +1353,10 @@ function inicializarOpenSeadragon() {
 
       // Limites físicos de zoom:
       // Mínimo: 90% do enquadramento panorâmico (4x) permitindo margens pretas confortáveis
-      // Máximo: 125% do teto da lâmina (40x, 60x ou 100x)
+      // Máximo: Travamento absoluto no teto da lâmina (40x, 60x ou 100x) — impede ultrapassar para 50x
       const zoom4x = getZoom4xRef();
       const minOSDZoom = zoom4x * 0.90;
-      const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.25;
+      const maxOSDZoom = calcularZoomParaMagnificacao(maxMag);
 
       viewer.viewport.minZoomLevel = minOSDZoom;
       viewer.viewport.maxZoomLevel = maxOSDZoom;
@@ -1445,7 +1453,7 @@ function inicializarOpenSeadragon() {
     const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
     const zoom4x = getZoom4xRef();
     const minOSDZoom = zoom4x * 0.90;
-    const maxOSDZoom = calcularZoomParaMagnificacao(maxMag) * 1.25;
+    const maxOSDZoom = calcularZoomParaMagnificacao(maxMag);
 
     // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x)
     const current = viewer.viewport.getZoom();
@@ -1518,7 +1526,7 @@ export function analisarProporcoesOpticasDzi(tiledImage, maxMagNominal) {
       "100x": z100x
     },
     minOSDZoom: z4x * 0.90,
-    maxOSDZoom: calcularZoomParaMagnificacao(maxMag) * 1.25
+    maxOSDZoom: calcularZoomParaMagnificacao(maxMag)
   };
 
   if (imgWidth > 0) {
@@ -1562,14 +1570,35 @@ export function getNativeZoomRef() {
 
 /**
  * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
- * Na objetiva de 4x, o campo de visão ótico real é amplo (~5.5 mm), fazendo com que
- * a amostra histológica ocupe aproximadamente 28% da tela,
- * deixando margens pretas ao redor ("espaços em preto" característicos da visão macroscópica).
+ * Cada lâmina possui seu próprio parâmetro de proporção (zoom4xRatio) calibrado
+ * e travado para respeitar a sua morfologia e proporção de tela:
+ * - Osso Maduro (mosaico horizontal 1.24:1): zoom4xRatio = 0.28 (28% do homeZoom, margens pretas)
+ * - Pele Espessa (faixa vertical 0.27:1): zoom4xRatio = 0.65 (65% do homeZoom)
  */
 export function getZoom4xRef() {
   if (!viewer || !viewer.viewport) return 1.0;
   const baseHome = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
-  return baseHome * 0.28;
+
+  // 1. Lê o parâmetro individual gravado e travado para a lâmina atual:
+  let ratio = Number(laminaAtualData?.zoom4xRatio || laminaAtualData?.optica?.zoom4xRatio);
+
+  // 2. Se a lâmina não possuir parâmetro cadastrado, analisa a proporção geométrica da imagem:
+  if (!ratio || isNaN(ratio) || ratio <= 0) {
+    const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+    let w = 0, h = 0;
+    if (item && item.source && item.source.dimensions) {
+      w = item.source.dimensions.x;
+      h = item.source.dimensions.y;
+    } else if (item && typeof item.getContentSize === "function") {
+      const cs = item.getContentSize();
+      w = cs.x;
+      h = cs.y;
+    }
+    // Faixa vertical longa (como pele espessa, h > 1.8 * w): 0.65; mosaico horizontal: 0.28
+    ratio = (h > w * 1.8) ? 0.65 : 0.28;
+  }
+
+  return baseHome * ratio;
 }
 
 /**
@@ -1601,6 +1630,12 @@ export function calcularMagnificacaoOtica(osdZoom) {
 
   const currentZoom = typeof osdZoom === "number" ? osdZoom : viewer.viewport.getZoom(true);
   const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
+  const maxOSDZoom = calcularZoomParaMagnificacao(maxMag);
+
+  // Travamento rígido: se o zoom estiver no teto físico da lâmina, exibe rigorosamente maxMag (ex: 40x)
+  if (currentZoom >= maxOSDZoom * 0.985) {
+    return maxMag;
+  }
 
   // Relação ótica linear direta: Magnificação = 4 * (zoomAtual / zoom4x)
   const magRaw = 4 * (currentZoom / z4);
@@ -1612,7 +1647,8 @@ export function calcularMagnificacaoOtica(osdZoom) {
   if (Math.abs(magRaw - 60) < 3.0) return 60;
   if (Math.abs(magRaw - 100) < 4.5) return 100;
 
-  return Math.max(4, Math.min(maxMag * 1.25, Math.round(magRaw * 10) / 10));
+  // O valor exibido NUNCA ultrapassa maxMag (impede exibição de 50x quando maxMag for 40x)
+  return Math.max(4, Math.min(maxMag, Math.round(magRaw * 10) / 10));
 }
 
 /**
@@ -2064,6 +2100,8 @@ window.sanitizarHTMLDescricao       = sanitizarHTMLDescricao;
 window.aplicarEstadoSidebar         = aplicarEstadoSidebar;
 window.fecharSidebar                = () => aplicarEstadoSidebar(true, true);
 window.abrirSidebar                 = () => aplicarEstadoSidebar(false, true);
+window.getViewer                    = () => viewer;
+window.getLaminaAtualData           = () => laminaAtualData;
 
 export {
   carregarLaminaNoMicroscopio as carregarLaminaPorId,
