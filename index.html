@@ -1152,6 +1152,26 @@
               <span>Carregar no Canvas</span>
               <span class="group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
             </button>
+
+            <!-- PAINEL DE CALIBRAÇÃO ÓPTICA AUTOMÁTICA DZI -->
+            <div id="dashDziOpticalCard" class="hidden p-3.5 bg-neutral-950/80 border border-[#d4af37]/30 rounded-xl text-xs font-mono space-y-2">
+              <div class="flex items-center justify-between text-[#d4af37] font-semibold text-[11px]">
+                <span class="flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Calibração Óptica DZI Detectada</span>
+                </span>
+                <span id="dashDziBadgeMag" class="px-2 py-0.5 bg-[#d4af37]/10 border border-[#d4af37]/30 rounded text-[10px]">Captura: 40x</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-[10px] text-neutral-400">
+                <div>Dimensões: <span id="dashDziDimensions" class="text-white font-medium">-</span></div>
+                <div>Resolução: <span id="dashDziMegapixels" class="text-white font-medium">-</span></div>
+                <div>Panorâmica 4x: <span id="dashDziZoom4x" class="text-white font-medium">-</span></div>
+                <div>Celular 40x: <span id="dashDziZoom40x" class="text-[#d4af37] font-bold">100% (1:1)</span></div>
+              </div>
+              <p class="text-[9px] text-neutral-500 italic leading-tight pt-1 border-t border-white/[0.06]">
+                Proporções calculadas automaticamente com base no arquivo DZI. As objetivas 4x e 10x escalam proporcionalmente à resolução nativa da objetiva de captura informada.
+              </p>
+            </div>
           </div>
 
           <!-- BLOCO B: METADADOS CLÍNICOS E ACADÊMICOS -->

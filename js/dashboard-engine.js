@@ -481,6 +481,21 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
     alert(`O sistema nao localizou o arquivo "${url}". Verifique se o arquivo existe no servidor.`);
   });
   viewerInstance.addHandler("open", () => {
+    // Calibração e Análise Óptica Automática do DZI no CMS
+    const item = viewerInstance.world && viewerInstance.world.getItemCount() > 0 ? viewerInstance.world.getItemAt(0) : null;
+    const maxMagEl = document.getElementById("dashMaxMagnification");
+    const maxMag = maxMagEl ? Number(maxMagEl.value) || 40 : 40;
+    atualizarCardAnaliseOpticaCms(item, maxMag);
+
+    if (maxMagEl && !maxMagEl.__boundDziChange) {
+      maxMagEl.__boundDziChange = true;
+      maxMagEl.addEventListener("change", () => {
+        if (viewerInstance && viewerInstance.world && viewerInstance.world.getItemCount() > 0) {
+          atualizarCardAnaliseOpticaCms(viewerInstance.world.getItemAt(0), maxMagEl.value);
+        }
+      });
+    }
+
     if (isAutoLoad && url.includes("muscular-esqueletico-he") && editorPins.length === 0 && !laminaEmEdicaoId) {
       adicionarPinoEditor(550, 280, "Estriacoes HE", "pin_demo");
     }
@@ -517,6 +532,49 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
       adicionarPinoEditor(imagePoint.x, imagePoint.y);
     }
   });
+}
+
+/**
+ * Atualiza o card de calibração óptica automática do DZI no CMS.
+ * Extrai largura, altura e megapixels nativos do DZI e calcula
+ * as proporções exatas de cada lente objetiva em relação à resolução de captura.
+ */
+export function atualizarCardAnaliseOpticaCms(item, maxMagNominal) {
+  const card = document.getElementById("dashDziOpticalCard");
+  if (!card) return;
+
+  const maxMag = Number(maxMagNominal) || 40;
+  let w = 0, h = 0, tileSize = 256;
+
+  if (item && item.source && item.source.dimensions) {
+    w = item.source.dimensions.x;
+    h = item.source.dimensions.y;
+    tileSize = item.source.tileSize || 256;
+  }
+
+  if (w <= 0 || h <= 0) {
+    card.classList.add("hidden");
+    return;
+  }
+
+  const mp = ((w * h) / 1e6).toFixed(1);
+  const ratio = (w / h).toFixed(2);
+  const p4 = ((4 / maxMag) * 100).toFixed(0);
+  const p10 = ((10 / maxMag) * 100).toFixed(0);
+
+  const dimEl = document.getElementById("dashDziDimensions");
+  const mpEl = document.getElementById("dashDziMegapixels");
+  const z4El = document.getElementById("dashDziZoom4x");
+  const z40El = document.getElementById("dashDziZoom40x");
+  const badgeEl = document.getElementById("dashDziBadgeMag");
+
+  if (dimEl) dimEl.textContent = `${w} × ${h} (${ratio}:1)`;
+  if (mpEl) mpEl.textContent = `${mp} Megapixels`;
+  if (z4El) z4El.textContent = `${p4}% da resolução`;
+  if (z40El) z40El.textContent = `100% (1:1 Nativo • ${maxMag}x)`;
+  if (badgeEl) badgeEl.textContent = `Captura: ${maxMag}x`;
+
+  card.classList.remove("hidden");
 }
 
 export function adicionarPinoEditor(x, y, customLabel, customId) {
@@ -1037,7 +1095,8 @@ Object.assign(window.App, {
   atualizarTopicosCms, carregarImagemNoEditor, adicionarPinoEditor,
   editarRotuloPinoCms, excluirPinoCms, vincularTextoAoPino,
   inicializarEventosPreviewInterativo, osdEditorAction, publicarLaminaCms,
-  ativarModoNovaQuestao, atualizarTituloQuestaoCms, excluirQuestaoCms, focarQuestaoNoEditor
+  ativarModoNovaQuestao, atualizarTituloQuestaoCms, excluirQuestaoCms, focarQuestaoNoEditor,
+  atualizarCardAnaliseOpticaCms
 });
 window.inicializarPainelCms = inicializarPainelCms;
 window.encerrarPainelCms = encerrarPainelCms;
@@ -1062,3 +1121,4 @@ window.ativarModoNovaQuestao = ativarModoNovaQuestao;
 window.atualizarTituloQuestaoCms = atualizarTituloQuestaoCms;
 window.excluirQuestaoCms = excluirQuestaoCms;
 window.focarQuestaoNoEditor = focarQuestaoNoEditor;
+window.atualizarCardAnaliseOpticaCms = atualizarCardAnaliseOpticaCms;
