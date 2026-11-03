@@ -1595,24 +1595,10 @@ function focarPinoNoViewer(pinIdRaw) {
     questaoAtivaId = null;
   }
 
-  // Cria elemento do pino neon pulsante em ouro-champanhe
-  const pinId   = String(pino.id);
-  const pinElem = document.createElement("div");
-  pinElem.id    = `viewer-pin-${pinId}`;
-  pinElem.style.cssText = "pointer-events:none; position:relative; display:flex; align-items:center; justify-content:center; width:36px; height:36px; z-index:40;";
-  pinElem.innerHTML = `
-    <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(200,173,95,0.45);border-radius:50%;"></div>
-    <div style="position:relative;width:14px;height:14px;background:#c8ad5f;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(200,173,95,0.45),0 4px 16px rgba(0,0,0,0.8);"></div>
-  `;
+  const pinId = String(pino.id);
+  let overlayElem = null;
 
-  // Adiciona overlay ancorado no ponto exato da imagem
-  viewer.addOverlay({
-    element:   pinElem,
-    location:  pontoViewport,
-    placement: window.OpenSeadragon.Placement.CENTER
-  });
-
-  // Zoom no ponto de interesse: amplia para visualização celular detalhada (~3.5x do home zoom ou valor configurado no pino)
+  // Zoom no ponto de interesse
   const homeZoom = homeZoomRef || viewer.viewport.getHomeZoom();
   let targetZoom = homeZoom * 3.5;
   if (pino.zoom && Number(pino.zoom) > 0) {
@@ -1620,13 +1606,106 @@ function focarPinoNoViewer(pinIdRaw) {
   } else {
     targetZoom = Math.max(viewer.viewport.getZoom(), homeZoom * 3.2);
   }
-  if (viewer.viewport.maxZoomLevel) {
-    targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
-  }
 
-  // Aproximação suave e centralização no pino
-  viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
-  viewer.viewport.panTo(pontoViewport, false);
+  // 1. ANOTAÇÃO TIPO CÍRCULO (Delimitação Estrutural Escalável no Zoom)
+  if (pino.type === "circle") {
+    const r = Number(pino.radius) || 250;
+    const imgRect = new window.OpenSeadragon.Rect(pino.x - r, pino.y - r, 2 * r, 2 * r);
+    const vpRect = viewer.viewport.imageToViewportRectangle(imgRect);
+
+    overlayElem = document.createElement("div");
+    overlayElem.id = `viewer-pin-${pinId}`;
+    overlayElem.style.cssText = "pointer-events:none; position:relative; width:100%; height:100%; z-index:40;";
+    overlayElem.innerHTML = `
+      <div class="animate-pulse" style="position:absolute; inset:0; border-radius:50%; border:2.5px solid #c8ad5f; box-shadow:0 0 25px rgba(200,173,95,0.7), inset 0 0 20px rgba(200,173,95,0.25); background:rgba(200,173,95,0.12);"></div>
+      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.85); color:#c8ad5f; border:1px solid rgba(200,173,95,0.5); font-family:monospace; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.8); white-space:nowrap;">
+        ${pino.rotulo || ''}
+      </div>
+    `;
+
+    viewer.addOverlay({
+      element: overlayElem,
+      location: vpRect
+    });
+
+    targetZoom = homeZoom * Math.min(5.5, Math.max(2.2, 1400 / (r * 2)));
+    if (viewer.viewport.maxZoomLevel) targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
+
+    viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
+    viewer.viewport.panTo(pontoViewport, false);
+
+  // 2. ANOTAÇÃO TIPO SETA DIRECIONAL (Vetor com Alvo e Haste)
+  } else if (pino.type === "arrow") {
+    const x1 = Number(pino.x) || 0;
+    const y1 = Number(pino.y) || 0;
+    const x2 = Number(pino.endX != null ? pino.endX : (pino.end_x != null ? pino.end_x : x1 + 100));
+    const y2 = Number(pino.endY != null ? pino.endY : (pino.end_y != null ? pino.end_y : y1 + 100));
+
+    const pad = Math.max(30, Math.hypot(x2 - x1, y2 - y1) * 0.08);
+    const minX = Math.min(x1, x2) - pad;
+    const minY = Math.min(y1, y2) - pad;
+    const maxX = Math.max(x1, x2) + pad;
+    const maxY = Math.max(y1, y2) + pad;
+    const w = Math.max(1, maxX - minX);
+    const h = Math.max(1, maxY - minY);
+    const imgRect = new window.OpenSeadragon.Rect(minX, minY, w, h);
+    const vpRect = viewer.viewport.imageToViewportRectangle(imgRect);
+
+    const svgX1 = x1 - minX;
+    const svgY1 = y1 - minY;
+    const svgX2 = x2 - minX;
+    const svgY2 = y2 - minY;
+    const markerId = `viewer-marker-arrow-${pinId}`;
+
+    overlayElem = document.createElement("div");
+    overlayElem.id = `viewer-pin-${pinId}`;
+    overlayElem.style.cssText = "pointer-events:none; position:relative; width:100%; height:100%; z-index:40;";
+    overlayElem.innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" class="w-full h-full overflow-visible" style="filter:drop-shadow(0 0 10px rgba(200,173,95,0.8));">
+        <defs>
+          <marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#c8ad5f" />
+          </marker>
+        </defs>
+        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#c8ad5f" stroke-width="4" stroke-linecap="round" marker-end="url(#${markerId})" />
+        <circle cx="${svgX1}" cy="${svgY1}" r="6" fill="#c8ad5f" stroke="#ffffff" stroke-width="2" />
+        <circle cx="${svgX2}" cy="${svgY2}" r="5" fill="#ffffff" class="animate-ping" />
+      </svg>
+      <div style="position:absolute; left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform:translate(-50%, -130%); background:rgba(0,0,0,0.85); color:#c8ad5f; border:1px solid rgba(200,173,95,0.5); font-family:monospace; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.8);">
+        ${pino.rotulo || ''}
+      </div>
+    `;
+
+    viewer.addOverlay({
+      element: overlayElem,
+      location: vpRect
+    });
+
+    const pontoAlvoViewport = viewer.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(x2, y2));
+    if (viewer.viewport.maxZoomLevel) targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
+    viewer.viewport.zoomTo(targetZoom, pontoAlvoViewport, false);
+    viewer.viewport.panTo(pontoAlvoViewport, false);
+
+  // 3. ANOTAÇÃO TIPO PIN CLÁSSICO (Ponto Ancorado com Brilho Neon)
+  } else {
+    overlayElem = document.createElement("div");
+    overlayElem.id = `viewer-pin-${pinId}`;
+    overlayElem.style.cssText = "pointer-events:none; position:relative; display:flex; align-items:center; justify-content:center; width:36px; height:36px; z-index:40;";
+    overlayElem.innerHTML = `
+      <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(200,173,95,0.45);border-radius:50%;"></div>
+      <div style="position:relative;width:14px;height:14px;background:#c8ad5f;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(200,173,95,0.45),0 4px 16px rgba(0,0,0,0.8);"></div>
+    `;
+
+    viewer.addOverlay({
+      element: overlayElem,
+      location: pontoViewport,
+      placement: window.OpenSeadragon.Placement.CENTER
+    });
+
+    if (viewer.viewport.maxZoomLevel) targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
+    viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
+    viewer.viewport.panTo(pontoViewport, false);
+  }
 
   pinAtivo = pinId;
 
@@ -1637,8 +1716,8 @@ function focarPinoNoViewer(pinIdRaw) {
 
   // Auto-remove o marcador após 8s
   setTimeout(() => {
-    if (pinElem && viewer) {
-      try { viewer.removeOverlay(pinElem); } catch (e) {}
+    if (overlayElem && viewer) {
+      try { viewer.removeOverlay(overlayElem); } catch (e) {}
       if (pinAtivo === pinId) pinAtivo = null;
     }
   }, 8000);

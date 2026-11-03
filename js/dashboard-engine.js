@@ -24,6 +24,10 @@ let modoCriacaoQuestao = false;
 let viewerInstance = null;
 let laminaEmEdicaoId = null;
 let acervoFirestoreCache = [];
+let acervoAssetsCache = [];
+let modoAnotacaoAtual = "pin"; // 'pin' | 'circle' | 'arrow'
+let raioCirculoAtual = 250;
+let setaPontoOrigem = null;
 let filtroStatusAtual = "todos";
 let _unsubDashboardAcervo = null;
 
@@ -135,7 +139,204 @@ export function filtroAcervoCms(filtro) {
   if (btnTodos) btnTodos.className = filtroStatusAtual === "todos" ? clsAtivo : clsInativo;
   if (btnAtivas) btnAtivas.className = filtroStatusAtual === "ativa" ? clsAtivo : clsInativo;
   if (btnInativas) btnInativas.className = filtroStatusAtual === "inativa" ? clsAtivo : clsInativo;
-  renderizarTabelaAcervo();
+}
+
+/* ============================================================================
+ * SELETOR DINÂMICO DE ASSETS (LÂMINAS DZI E IMAGENS)
+ * ============================================================================ */
+
+export async function carregarListaDeAssets(forcar = false) {
+  const seletor = document.getElementById("dashAssetSelector");
+  const badgeInfo = document.getElementById("dashAssetInfoBadge");
+  if (!seletor) return;
+
+  if (acervoAssetsCache.length > 0 && !forcar) {
+    popularSeletorAssets(acervoAssetsCache);
+    return;
+  }
+
+  seletor.innerHTML = `<option value="">Carregando acervo de lâminas...</option>`;
+  try {
+    let res = await fetch("/api/assets");
+    if (!res.ok) {
+      res = await fetch("assets/histologia/manifest.json");
+    }
+    const data = await res.json();
+    const assets = Array.isArray(data.assets) ? data.assets : [];
+    acervoAssetsCache = assets;
+    popularSeletorAssets(assets);
+    if (badgeInfo) {
+      badgeInfo.textContent = `${assets.length} lâminas disponíveis no acervo local`;
+    }
+  } catch (err) {
+    console.warn("[Palas Atlas CMS] Falha ao carregar lista dinâmica de assets:", err);
+    seletor.innerHTML = `
+      <option value="">(Selecione ou digite o caminho)</option>
+      <option value="assets/histologia/osso_maduro_desgaste_ct.dzi">Osso Maduro Desgaste (DZI)</option>
+      <option value="assets/histologia/epitelio-simples-escamoso.dzi">Epitélio Simples Escamoso (DZI)</option>
+      <option value="assets/histologia/lamina-real1.dzi">Lâmina Real 1 (DZI)</option>
+      <option value="assets/histologia/osso_compacto_dzi.dzi">Osso Compacto (DZI)</option>
+      <option value="assets/histologia/muscular-esqueletico-he.jpg">Músculo Esquelético HE (Estático)</option>
+      <option value="assets/histologia/medula-espinal-he.png">Medula Espinal HE (Estático)</option>
+    `;
+    if (badgeInfo) {
+      badgeInfo.textContent = "Modo de contingência ativo";
+    }
+  }
+}
+
+function popularSeletorAssets(assets) {
+  const seletor = document.getElementById("dashAssetSelector");
+  if (!seletor) return;
+
+  const inputUrl = document.getElementById("dashImgUrl");
+  const urlAtual = inputUrl ? inputUrl.value.trim() : "";
+
+  let html = `<option value="">-- Selecione uma lâmina do acervo --</option>`;
+
+  const dzis = assets.filter(a => a.tipo === "dzi");
+  const statics = assets.filter(a => a.tipo !== "dzi");
+
+  if (dzis.length > 0) {
+    html += `<optgroup label="Lâminas Piramidais (Deep Zoom DZI)">`;
+    dzis.forEach(a => {
+      const selected = (urlAtual && (urlAtual === a.caminho || urlAtual.includes(a.id))) ? "selected" : "";
+      const dims = a.largura > 0 ? ` [${a.largura}×${a.altura}]` : "";
+      html += `<option value="${a.caminho}" data-tipo="dzi" data-nome="${a.nome}" ${selected}>${a.nome}${dims}</option>`;
+    });
+    html += `</optgroup>`;
+  }
+
+  if (statics.length > 0) {
+    html += `<optgroup label="Imagens Estáticas (Alta Definição)">`;
+    statics.forEach(a => {
+      const selected = (urlAtual && (urlAtual === a.caminho || urlAtual.includes(a.id))) ? "selected" : "";
+      html += `<option value="${a.caminho}" data-tipo="static" data-nome="${a.nome}" ${selected}>${a.nome}</option>`;
+    });
+    html += `</optgroup>`;
+  }
+
+  seletor.innerHTML = html;
+}
+
+export function onAssetSelecionado(caminho) {
+  if (!caminho) return;
+  const inputUrl = document.getElementById("dashImgUrl");
+  const badgeInfo = document.getElementById("dashAssetInfoBadge");
+  const nomeInput = document.getElementById("dashNomeLamina");
+  
+  if (inputUrl) inputUrl.value = caminho;
+
+  const asset = acervoAssetsCache.find(a => a.caminho === caminho || a.url === caminho);
+  const isDzi = caminho.endsWith(".dzi") || (asset && asset.tipo === "dzi");
+
+  // Ajusta automaticamente o radio de tipo
+  const radioDzi = document.querySelector('input[name="dashImgType"][value="dzi"]');
+  const radioStatic = document.querySelector('input[name="dashImgType"][value="static"]');
+  if (isDzi && radioDzi) radioDzi.checked = true;
+  else if (!isDzi && radioStatic) radioStatic.checked = true;
+
+  if (asset) {
+    if (badgeInfo) {
+      const dims = asset.largura > 0 ? ` (${asset.largura}×${asset.altura} px)` : "";
+      badgeInfo.textContent = `${asset.formato}${dims}`;
+    }
+    // Sugere o nome formatado caso seja nova lâmina ou nome padrão
+    if (nomeInput && (!laminaEmEdicaoId || !nomeInput.value || nomeInput.value.includes("Músculo Estriado Esquelético"))) {
+      nomeInput.value = asset.nome;
+    }
+  }
+
+  carregarImagemNoEditor(caminho, isDzi, false);
+  exibirToastDiscreto(`Lâmina "${asset ? asset.nome : caminho}" carregada no canvas`, "emerald");
+}
+
+export function alternarModoCaminhoManual() {
+  const containerManual = document.getElementById("containerManualPath");
+  const containerSelect = document.getElementById("containerAssetSelector");
+  const btnToggle = document.getElementById("btnToggleModoCaminho");
+  if (!containerManual || !containerSelect) return;
+
+  const estaManual = !containerManual.classList.contains("hidden");
+  if (estaManual) {
+    containerManual.classList.add("hidden");
+    containerSelect.classList.remove("hidden");
+    if (btnToggle) btnToggle.textContent = "Digitar URL manual";
+  } else {
+    containerManual.classList.remove("hidden");
+    containerSelect.classList.add("hidden");
+    if (btnToggle) btnToggle.textContent = "Selecionar da lista";
+    const inputUrl = document.getElementById("dashImgUrl");
+    if (inputUrl) inputUrl.focus();
+  }
+}
+
+/* ============================================================================
+ * MODOS DE ANOTAÇÃO E MARCAÇÃO (PONTO, CÍRCULO, SETA)
+ * ============================================================================ */
+
+export function definirModoAnotacao(modo) {
+  if (!["pin", "circle", "arrow"].includes(modo)) return;
+  modoAnotacaoAtual = modo;
+  setaPontoOrigem = null;
+
+  // Atualiza botões da barra lateral
+  const btnPin = document.getElementById("dashBtnModoPin");
+  const btnCircle = document.getElementById("dashBtnModoCircle");
+  const btnArrow = document.getElementById("dashBtnModoArrow");
+
+  const btnAtivoCls = "py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer";
+  const btnInativoCls = "py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer";
+
+  if (btnPin) btnPin.className = modo === "pin" ? btnAtivoCls : btnInativoCls;
+  if (btnCircle) btnCircle.className = modo === "circle" ? btnAtivoCls : btnInativoCls;
+  if (btnArrow) btnArrow.className = modo === "arrow" ? btnAtivoCls : btnInativoCls;
+
+  // Atualiza botões rápidos sobre o canvas
+  const quickPin = document.getElementById("dashQuickBtnPin");
+  const quickCircle = document.getElementById("dashQuickBtnCircle");
+  const quickArrow = document.getElementById("dashQuickBtnArrow");
+
+  const quickAtivoCls = "px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer";
+  const quickInativoCls = "px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer";
+
+  if (quickPin) quickPin.className = modo === "pin" ? quickAtivoCls : quickInativoCls;
+  if (quickCircle) quickCircle.className = modo === "circle" ? quickAtivoCls : quickInativoCls;
+  if (quickArrow) quickArrow.className = modo === "arrow" ? quickAtivoCls : quickInativoCls;
+
+  // Painéis contextuais
+  const configCirculo = document.getElementById("dashConfigCirculo");
+  const configSeta = document.getElementById("dashConfigSeta");
+  const arrowStatusText = document.getElementById("dashArrowStatusText");
+
+  if (configCirculo) {
+    if (modo === "circle") configCirculo.classList.remove("hidden");
+    else configCirculo.classList.add("hidden");
+  }
+
+  if (configSeta) {
+    if (modo === "arrow") {
+      configSeta.classList.remove("hidden");
+      if (arrowStatusText) {
+        arrowStatusText.textContent = "Clique 1: Ponto de início da haste. Clique 2: Ponta da seta sobre a estrutura celular.";
+      }
+    } else {
+      configSeta.classList.add("hidden");
+    }
+  }
+
+  const rotulos = {
+    pin: "Ponto Clássico",
+    circle: `Círculo Delimitador (${raioCirculoAtual}px)`,
+    arrow: "Seta Direcional (2 cliques)"
+  };
+  exibirToastDiscreto(`Ferramenta: ${rotulos[modo]}`, "amber");
+}
+
+export function onAtualizarRaioCirculo(val) {
+  raioCirculoAtual = Number(val) || 250;
+  const label = document.getElementById("dashCircleRadiusLabel");
+  if (label) label.textContent = `${raioCirculoAtual} px`;
 }
 
 export function inicializarPainelCms() {
@@ -145,6 +346,7 @@ export function inicializarPainelCms() {
   atualizarInterfaceListaQuestoes();
   atualizarEstadoBotaoModoQuestao();
   inicializarEventosPreviewInterativo();
+  carregarListaDeAssets();
   setTimeout(() => {
     if (!viewerInstance && document.getElementById("osd-editor-viewer") && !laminaEmEdicaoId) {
       carregarImagemNoEditor("/assets/histologia/muscular-esqueletico-he.jpg", false, true);
@@ -286,6 +488,10 @@ export async function editarLaminaCms(id) {
   if (ratioInput) ratioInput.value = Number(lamina.zoom4xRatio || 0.28).toFixed(2);
   const urlImagem = lamina.imagemUrl || lamina.dziUrl || lamina.imageUrl || lamina.caminhoImagemBase || "";
   if (imgUrlInput) imgUrlInput.value = urlImagem;
+  const assetSelect = document.getElementById("dashAssetSelector");
+  if (assetSelect) {
+    assetSelect.value = urlImagem;
+  }
   if (editorTexto) editorTexto.innerHTML = lamina.descricaoHTML || lamina.descricao || "";
   const isDzi = urlImagem.endsWith(".dzi") || urlImagem.includes(".dzi?");
   carregarImagemNoEditor(urlImagem, isDzi, false);
@@ -295,7 +501,19 @@ export async function editarLaminaCms(id) {
     const pinosOrigem = (lamina.pinos || []);
     if (pinosOrigem.length > 0) {
       pinosOrigem.forEach((pin, i) => {
-        const pinoData = { id: pin.id || `pin_${Date.now()}_${i}`, rotulo: pin.rotulo || pin.nome || `${i + 1}`, x: pin.x || 0, y: pin.y || 0 };
+        const pinoData = {
+          id: pin.id || `pin_${Date.now()}_${i}`,
+          rotulo: pin.rotulo || pin.nome || `${i + 1}`,
+          type: pin.type || "pin",
+          x: Number(pin.x) || 0,
+          y: Number(pin.y) || 0,
+          radius: pin.radius ? Number(pin.radius) : (pin.type === "circle" ? 250 : null),
+          endX: (pin.endX != null ? pin.endX : pin.end_x) ? Number(pin.endX ?? pin.end_x) : null,
+          endY: (pin.endY != null ? pin.endY : pin.end_y) ? Number(pin.endY ?? pin.end_y) : null,
+          angle: pin.angle ? Number(pin.angle) : null,
+          stroke_color: pin.stroke_color || "#d4af37",
+          fill_color: pin.fill_color || null
+        };
         editorPins.push(pinoData);
         renderizarPinoNoCanvas(pinoData);
       });
@@ -381,6 +599,9 @@ export function resetarFormularioDashboard() {
   atualizarInterfaceListaPinos();
   atualizarDropdownPinosVinculacao();
   atualizarInterfaceListaQuestoes();
+  definirModoAnotacao("pin");
+  const assetSelect = document.getElementById("dashAssetSelector");
+  if (assetSelect) assetSelect.value = "/assets/histologia/muscular-esqueletico-he.jpg";
   if (viewerInstance && typeof viewerInstance.clearOverlays === "function") viewerInstance.clearOverlays();
   carregarImagemNoEditor("/assets/histologia/muscular-esqueletico-he.jpg", false, true);
   exibirToastDiscreto("Formulario redefinido para o modo de novo cadastro.", "emerald");
@@ -530,8 +751,45 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
         }
       }, 50);
       exibirToastDiscreto(`Questão Q${novaQuestao.numero} adicionada. Digite o enunciado.`, "emerald");
+      return;
+    }
+
+    if (modoAnotacaoAtual === "circle") {
+      adicionarPinoEditor(imagePoint.x, imagePoint.y, null, null, "circle", { radius: raioCirculoAtual });
+      exibirToastDiscreto(`Círculo adicionado com raio de ${raioCirculoAtual}px`, "emerald");
+    } else if (modoAnotacaoAtual === "arrow") {
+      if (!setaPontoOrigem) {
+        setaPontoOrigem = { x: Math.round(imagePoint.x * 100) / 100, y: Math.round(imagePoint.y * 100) / 100 };
+        const arrowStatus = document.getElementById("dashArrowStatusText");
+        if (arrowStatus) {
+          arrowStatus.innerHTML = `<span class="text-amber-300 font-bold">Origem marcada (X:${Math.round(setaPontoOrigem.x)}, Y:${Math.round(setaPontoOrigem.y)}).</span> Agora clique na ponta do alvo / célula.`;
+        }
+        exibirToastDiscreto("Início da haste fixado. Clique no alvo celular.", "amber");
+      } else {
+        const x1 = setaPontoOrigem.x;
+        const y1 = setaPontoOrigem.y;
+        const x2 = Math.round(imagePoint.x * 100) / 100;
+        const y2 = Math.round(imagePoint.y * 100) / 100;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const angulo = Math.round(Math.atan2(dy, dx) * (180 / Math.PI) * 10) / 10;
+
+        adicionarPinoEditor(x1, y1, null, null, "arrow", {
+          endX: x2,
+          endY: y2,
+          angle: angulo,
+          stroke_color: "#d4af37"
+        });
+
+        setaPontoOrigem = null;
+        const arrowStatus = document.getElementById("dashArrowStatusText");
+        if (arrowStatus) {
+          arrowStatus.textContent = "Clique 1: Ponto de início da haste. Clique 2: Ponta da seta sobre a estrutura celular.";
+        }
+        exibirToastDiscreto("Seta direcional cadastrada com sucesso!", "emerald");
+      }
     } else {
-      adicionarPinoEditor(imagePoint.x, imagePoint.y);
+      adicionarPinoEditor(imagePoint.x, imagePoint.y, null, null, "pin");
     }
   });
 }
@@ -585,12 +843,24 @@ export function atualizarCardAnaliseOpticaCms(item, maxMagNominal) {
   card.classList.remove("hidden");
 }
 
-export function adicionarPinoEditor(x, y, customLabel, customId) {
+export function adicionarPinoEditor(x, y, customLabel, customId, tipo = "pin", geomData = null) {
   if (!viewerInstance || !viewerInstance.viewport) return;
   const pinId = customId || `pin_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   const numeroSequencial = editorPins.length + 1;
   const rotulo = customLabel || `P${numeroSequencial}`;
-  const pinoData = { id: pinId, rotulo: rotulo, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 };
+  const pinoData = {
+    id: pinId,
+    rotulo: rotulo,
+    type: tipo || "pin",
+    x: Math.round(x * 100) / 100,
+    y: Math.round(y * 100) / 100,
+    radius: tipo === "circle" ? (Number(geomData?.radius) || raioCirculoAtual || 250) : null,
+    endX: tipo === "arrow" ? (geomData?.endX != null ? Math.round(geomData.endX * 100) / 100 : null) : null,
+    endY: tipo === "arrow" ? (geomData?.endY != null ? Math.round(geomData.endY * 100) / 100 : null) : null,
+    angle: tipo === "arrow" ? (geomData?.angle ?? null) : null,
+    stroke_color: geomData?.stroke_color || "#d4af37",
+    fill_color: geomData?.fill_color || null
+  };
   editorPins.push(pinoData);
   renderizarPinoNoCanvas(pinoData);
   atualizarInterfaceListaPinos();
@@ -599,21 +869,114 @@ export function adicionarPinoEditor(x, y, customLabel, customId) {
 
 function renderizarPinoNoCanvas(pinoData) {
   if (!viewerInstance || !viewerInstance.viewport || !window.OpenSeadragon) return;
+
+  // 1. ANOTAÇÃO TIPO CÍRCULO (Delimitação Geométrica Escalável com Zoom)
+  if (pinoData.type === "circle") {
+    const r = Number(pinoData.radius) || 250;
+    const imgRect = new window.OpenSeadragon.Rect(pinoData.x - r, pinoData.y - r, 2 * r, 2 * r);
+    const vpRect = viewerInstance.viewport.imageToViewportRectangle(imgRect);
+
+    const circleElem = document.createElement("div");
+    circleElem.id = `editor-pin-${pinoData.id}`;
+    circleElem.className = "editor-pin-circle group relative flex items-center justify-center cursor-pointer select-none";
+    circleElem.style.cssText = "width:100%; height:100%; pointer-events:auto; z-index:30;";
+    circleElem.innerHTML = `
+      <div class="circle-ring w-full h-full rounded-full border-2 border-[#d4af37] bg-[#d4af37]/10 hover:bg-[#d4af37]/25 hover:border-amber-300 transition-all shadow-[0_0_15px_rgba(212,175,55,0.4)] flex items-center justify-center relative">
+        <span class="pin-badge text-[10px] font-mono font-bold text-[#d4af37] bg-black/80 px-2 py-0.5 rounded-full border border-[#d4af37]/50 shadow-md pointer-events-none">${pinoData.rotulo}</span>
+      </div>
+      <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/95 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl z-50">
+        ${pinoData.rotulo} &bull; Círculo (R: ${Math.round(r)}px)
+      </div>
+    `;
+
+    new window.OpenSeadragon.MouseTracker({
+      element: circleElem,
+      clickHandler: (e) => {
+        e.originalEvent.stopPropagation();
+        e.originalEvent.preventDefault();
+        const point = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(pinoData.x, pinoData.y));
+        viewerInstance.viewport.panTo(point);
+        destacarPinoTemporariamente(pinoData.id);
+      }
+    });
+
+    viewerInstance.addOverlay({ element: circleElem, location: vpRect });
+    return;
+  }
+
+  // 2. ANOTAÇÃO TIPO SETA (Vetor Direcional com Ponta e Haste Escaláveis)
+  if (pinoData.type === "arrow") {
+    const x1 = pinoData.x;
+    const y1 = pinoData.y;
+    const x2 = pinoData.endX != null ? pinoData.endX : x1 + 100;
+    const y2 = pinoData.endY != null ? pinoData.endY : y1 + 100;
+
+    const pad = Math.max(30, Math.hypot(x2 - x1, y2 - y1) * 0.08);
+    const minX = Math.min(x1, x2) - pad;
+    const minY = Math.min(y1, y2) - pad;
+    const maxX = Math.max(x1, x2) + pad;
+    const maxY = Math.max(y1, y2) + pad;
+    const w = Math.max(1, maxX - minX);
+    const h = Math.max(1, maxY - minY);
+
+    const imgRect = new window.OpenSeadragon.Rect(minX, minY, w, h);
+    const vpRect = viewerInstance.viewport.imageToViewportRectangle(imgRect);
+
+    const svgX1 = x1 - minX;
+    const svgY1 = y1 - minY;
+    const svgX2 = x2 - minX;
+    const svgY2 = y2 - minY;
+    const markerId = `editor-marker-arrow-${pinoData.id}`;
+
+    const arrowElem = document.createElement("div");
+    arrowElem.id = `editor-pin-${pinoData.id}`;
+    arrowElem.className = "editor-pin-arrow group relative cursor-pointer select-none";
+    arrowElem.style.cssText = "width:100%; height:100%; pointer-events:auto; z-index:30;";
+    arrowElem.innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" class="w-full h-full overflow-visible" style="filter: drop-shadow(0 0 6px rgba(212,175,55,0.6));">
+        <defs>
+          <marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#d4af37" />
+          </marker>
+        </defs>
+        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#d4af37" stroke-width="4" stroke-linecap="round" marker-end="url(#${markerId})" />
+        <circle cx="${svgX1}" cy="${svgY1}" r="5" fill="#d4af37" stroke="#ffffff" stroke-width="1.5" />
+      </svg>
+      <div class="pin-badge absolute bg-neutral-950/90 text-[#d4af37] border border-[#d4af37]/40 text-[10px] font-mono px-1.5 py-0.5 rounded shadow pointer-events-none" style="left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform: translate(-50%, -120%);">
+        ${pinoData.rotulo}
+      </div>
+      <div class="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/95 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl z-50" style="left:${(svgX2 / w) * 100}%; top:${(svgY2 / h) * 100}%; transform: translate(-50%, -130%);">
+        ${pinoData.rotulo} &bull; Seta (Alvo: ${Math.round(x2)}, ${Math.round(y2)})
+      </div>
+    `;
+
+    new window.OpenSeadragon.MouseTracker({
+      element: arrowElem,
+      clickHandler: (e) => {
+        e.originalEvent.stopPropagation();
+        e.originalEvent.preventDefault();
+        const targetPoint = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(x2, y2));
+        viewerInstance.viewport.panTo(targetPoint);
+        destacarPinoTemporariamente(pinoData.id);
+      }
+    });
+
+    viewerInstance.addOverlay({ element: arrowElem, location: vpRect });
+    return;
+  }
+
+  // 3. ANOTAÇÃO TIPO PIN CLÁSSICO (Ponto Ancorado Fixo com Glow)
   const pinElem = document.createElement("div");
   pinElem.id = `editor-pin-${pinoData.id}`;
-  
-  // Container principal do pino com classe "group" para exibir o tooltip no hover
   pinElem.className = "editor-pin group relative flex items-center justify-center cursor-pointer z-30 transition-transform duration-200 hover:scale-125";
   pinElem.title = `Pino ${pinoData.rotulo} (X: ${pinoData.x}, Y: ${pinoData.y})`;
-  
-  // HTML do Pino (Ponto luminoso + Tooltip flutuante)
   pinElem.innerHTML = `
     <div class="w-4 h-4 bg-[#d4af37] border-2 border-white rounded-full shadow-[0_0_15px_rgba(212,175,55,0.6)] animate-pulse"></div>
-    <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/90 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl">
+    <div class="pin-badge absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/90 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl">
       ${pinoData.rotulo}
     </div>
   `;
-  
+
   new window.OpenSeadragon.MouseTracker({
     element: pinElem,
     clickHandler: (e) => {
@@ -624,6 +987,7 @@ function renderizarPinoNoCanvas(pinoData) {
       destacarPinoTemporariamente(pinoData.id);
     }
   });
+
   const location = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(pinoData.x, pinoData.y));
   viewerInstance.addOverlay({ element: pinElem, location: location, placement: window.OpenSeadragon.Placement.CENTER });
 }
@@ -631,33 +995,60 @@ function renderizarPinoNoCanvas(pinoData) {
 function destacarPinoTemporariamente(pinId) {
   const pinElem = document.getElementById(`editor-pin-${pinId}`);
   if (!pinElem) return;
-  const point = pinElem.querySelector("div");
-  if (!point) return;
-  
-  point.classList.add("!bg-amber-400", "ring-4", "ring-amber-500/50", "scale-150");
-  setTimeout(() => {
-    if (point) point.classList.remove("!bg-amber-400", "ring-4", "ring-amber-500/50", "scale-150");
-  }, 1600);
+
+  const ring = pinElem.querySelector(".circle-ring");
+  const svg = pinElem.querySelector("svg");
+  const point = pinElem.querySelector("div > div, .animate-pulse");
+
+  if (ring) {
+    ring.classList.add("!border-amber-300", "ring-4", "ring-amber-500/50", "scale-105");
+    setTimeout(() => { if (ring) ring.classList.remove("!border-amber-300", "ring-4", "ring-amber-500/50", "scale-105"); }, 1600);
+  } else if (svg) {
+    svg.style.filter = "drop-shadow(0 0 16px rgba(245,158,11,1))";
+    setTimeout(() => { if (svg) svg.style.filter = "drop-shadow(0 0 6px rgba(212,175,55,0.6))"; }, 1600);
+  } else if (point) {
+    point.classList.add("!bg-amber-400", "ring-4", "ring-amber-500/50", "scale-150");
+    setTimeout(() => { if (point) point.classList.remove("!bg-amber-400", "ring-4", "ring-amber-500/50", "scale-150"); }, 1600);
+  }
 }
 
 function atualizarInterfaceListaPinos() {
   const containerLista = document.getElementById("dashListaPinos");
   const contadorBadge = document.getElementById("dashTotalPinosBadge");
-  if (contadorBadge) contadorBadge.textContent = `${editorPins.length} ${editorPins.length === 1 ? "Pino" : "Pinos"}`;
+  if (contadorBadge) contadorBadge.textContent = `${editorPins.length} ${editorPins.length === 1 ? "Marcação" : "Marcações"}`;
   if (!containerLista) return;
   if (editorPins.length === 0) {
-    containerLista.innerHTML = `<p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl font-mono">Nenhum pino marcado na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações de diagnóstico.</p>`;
+    containerLista.innerHTML = `<p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl font-mono">Nenhuma marcação na imagem. Selecione Ponto, Círculo ou Seta e clique no canvas para adicionar.</p>`;
     return;
   }
   let html = `<div class="space-y-2">`;
   editorPins.forEach((p) => {
+    let icone = "📍";
+    let tipoTexto = "Ponto";
+    let detalhesGeom = `X: ${Math.round(p.x)} &bull; Y: ${Math.round(p.y)}`;
+    
+    if (p.type === "circle") {
+      icone = "⭕";
+      tipoTexto = `Círculo (R: ${Math.round(p.radius || 250)}px)`;
+      detalhesGeom = `Centro: (${Math.round(p.x)}, ${Math.round(p.y)})`;
+    } else if (p.type === "arrow") {
+      icone = "↗️";
+      tipoTexto = "Seta Direcional";
+      detalhesGeom = `De (${Math.round(p.x)}, ${Math.round(p.y)}) &rarr; (${Math.round(p.endX || p.x)}, ${Math.round(p.endY || p.y)})`;
+    }
+
     html += `
       <div class="p-3 flex items-center justify-between bg-white/[0.02] border border-white/[0.06] rounded-xl hover:bg-white/[0.04] transition-colors">
         <div class="flex items-center gap-3">
-          <div class="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[#d4af37] font-mono text-[10px] font-bold flex items-center justify-center shadow-sm shrink-0">${p.rotulo}</div>
+          <div class="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[#d4af37] font-mono text-[10px] font-bold flex items-center justify-center shadow-sm shrink-0">
+            ${icone}
+          </div>
           <div class="flex flex-col">
-            <span class="text-[10px] text-neutral-300 font-mono">Pino Ativo</span>
-            <span class="text-[10px] text-neutral-500 font-mono">X: ${Math.round(p.x)} &bull; Y: ${Math.round(p.y)}</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs text-neutral-200 font-mono font-medium">${p.rotulo}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-white/[0.04] text-[#d4af37] font-mono">${tipoTexto}</span>
+            </div>
+            <span class="text-[10px] text-neutral-500 font-mono mt-0.5">${detalhesGeom}</span>
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
@@ -744,17 +1135,11 @@ export function inicializarEventosPreviewInterativo() {
     if (!pinId) return;
     const pinoData = editorPins.find((item) => item.id === pinId);
     if (!pinoData || !viewerInstance || !viewerInstance.viewport) return;
-    const pontoViewport = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(pinoData.x, pinoData.y));
+    const targetX = (pinoData.type === "arrow" && pinoData.endX != null) ? pinoData.endX : pinoData.x;
+    const targetY = (pinoData.type === "arrow" && pinoData.endY != null) ? pinoData.endY : pinoData.y;
+    const pontoViewport = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(targetX, targetY));
     viewerInstance.viewport.panTo(pontoViewport);
-    const pinElem = document.getElementById(`editor-pin-${pinId}`);
-    if (pinElem) pinElem.classList.add("ring-4", "ring-amber-400", "ring-offset-2", "ring-offset-black", "!bg-amber-400", "!text-black", "scale-150", "z-50");
-  });
-  editor.addEventListener("mouseout", (evento) => {
-    const alvo = evento.target.closest(".pin-link, [data-pin-id]");
-    if (!alvo) return;
-    const pinId = alvo.getAttribute("data-pin-id");
-    const pinElem = document.getElementById(`editor-pin-${pinId}`);
-    if (pinElem) pinElem.classList.remove("ring-4", "ring-amber-400", "ring-offset-2", "ring-offset-black", "!bg-amber-400", "!text-black", "scale-150", "z-50");
+    destacarPinoTemporariamente(pinId);
   });
   editor._eventosInteracaoInjetados = true;
 }
@@ -788,7 +1173,21 @@ export async function publicarLaminaCms() {
   const rawDescHTML = descEl ? descEl.innerHTML : "";
   const descricaoHTML = sanitizarHTMLDescricao(rawDescHTML);
   if (!nome || !imagemUrl) { alert("Os campos 'Nome da Peca / Lamina' e 'Caminho do arquivo / pasta' sao obrigatorios para gravacao."); return; }
-  const pinos = editorPins.map((p) => ({ id: p.id, rotulo: p.rotulo, x: p.x, y: p.y }));
+  const pinos = editorPins.map((p) => ({
+    id: p.id,
+    rotulo: p.rotulo,
+    type: p.type || "pin",
+    x: p.x,
+    y: p.y,
+    radius: p.type === "circle" ? p.radius : null,
+    endX: p.type === "arrow" ? (p.endX != null ? p.endX : p.end_x) : null,
+    endY: p.type === "arrow" ? (p.endY != null ? p.endY : p.end_y) : null,
+    end_x: p.type === "arrow" ? (p.endX != null ? p.endX : p.end_x) : null,
+    end_y: p.type === "arrow" ? (p.endY != null ? p.endY : p.end_y) : null,
+    angle: p.type === "arrow" ? p.angle : null,
+    stroke_color: p.stroke_color || "#d4af37",
+    fill_color: p.fill_color || null
+  }));
   const questoes = editorQuestoes.map((q) => ({
     id: q.id,
     numero: q.numero,
@@ -817,29 +1216,52 @@ export async function publicarLaminaCms() {
   };
   const statusBox = document.getElementById("dashCmsStatus");
   try {
+    let idGravado = laminaEmEdicaoId;
     if (typeof db !== "undefined" && db) {
       if (laminaEmEdicaoId) {
         await db.collection("laminas").doc(laminaEmEdicaoId).update(laminaData);
-        exibirToastDiscreto("Lamina atualizada com sucesso no Cloud Firestore!", "emerald");
-        resetarFormularioDashboard();
-        return;
+        exibirToastDiscreto("Lamina atualizada com sucesso no Cloud Firestore e Supabase!", "emerald");
       } else {
         const docRef = await db.collection("laminas").add(laminaData);
-        const novoId = docRef.id;
-        await db.collection("laminas").doc(novoId).update({ id: novoId });
-        exibirToastDiscreto("Nova lamina cadastrada no Cloud Firestore!", "emerald");
+        idGravado = docRef.id;
+        await db.collection("laminas").doc(idGravado).update({ id: idGravado });
+        exibirToastDiscreto("Nova lamina cadastrada no Cloud Firestore e Supabase!", "emerald");
         if (statusBox) {
           const corBadge = status === "ativa" ? "emerald" : "rose";
           statusBox.innerHTML = `
             <div class="font-bold uppercase tracking-wider text-${corBadge}-300">Lâmina Sincronizada (${status.toUpperCase()})</div>
-            <div class="mt-1 text-neutral-300 text-xs font-mono">ID: ${novoId} (${pinos.length} pinos, ${questoes.length} questões vinculadas)</div>
-            <a href="microscopio.html?id=${novoId}" target="_blank" rel="noopener noreferrer" class="mt-3 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 text-xs font-mono uppercase tracking-wider shadow-lg inline-flex items-center gap-2 cursor-pointer transition-all duration-300">
+            <div class="mt-1 text-neutral-300 text-xs font-mono">ID: ${idGravado} (${pinos.length} marcações, ${questoes.length} questões vinculadas)</div>
+            <a href="microscopio.html?id=${idGravado}" target="_blank" rel="noopener noreferrer" class="mt-3 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 text-xs font-mono uppercase tracking-wider shadow-lg inline-flex items-center gap-2 cursor-pointer transition-all duration-300">
               <span>Testar no Microscópio</span>
               <span>&rarr;</span>
             </a>
           `;
           statusBox.classList.remove("hidden");
         }
+      }
+
+      // Sincronização em segundo plano com o Supabase PostgreSQL
+      try {
+        fetch("/api/sync-supabase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            laminaId: idGravado,
+            laminaData,
+            pinos
+          })
+        }).then(r => r.json()).then(res => {
+          if (res && res.success) {
+            console.log("[Supabase Sync] Sincronização concluída com PostgreSQL no Supabase.");
+          }
+        }).catch(e => {
+          console.warn("[Supabase Sync] Aviso: sincronização secundária assíncrona:", e.message);
+        });
+      } catch (errSync) {}
+
+      if (laminaEmEdicaoId) {
+        resetarFormularioDashboard();
+        return;
       }
     } else {
       console.warn("[Cloud Firestore] SDK indisponivel.");
@@ -1107,7 +1529,9 @@ Object.assign(window.App, {
   editarRotuloPinoCms, excluirPinoCms, vincularTextoAoPino,
   inicializarEventosPreviewInterativo, osdEditorAction, publicarLaminaCms,
   ativarModoNovaQuestao, atualizarTituloQuestaoCms, excluirQuestaoCms, focarQuestaoNoEditor,
-  atualizarCardAnaliseOpticaCms
+  atualizarCardAnaliseOpticaCms,
+  carregarListaDeAssets, onAssetSelecionado, alternarModoCaminhoManual,
+  definirModoAnotacao, onAtualizarRaioCirculo
 });
 window.inicializarPainelCms = inicializarPainelCms;
 window.encerrarPainelCms = encerrarPainelCms;
@@ -1133,3 +1557,8 @@ window.atualizarTituloQuestaoCms = atualizarTituloQuestaoCms;
 window.excluirQuestaoCms = excluirQuestaoCms;
 window.focarQuestaoNoEditor = focarQuestaoNoEditor;
 window.atualizarCardAnaliseOpticaCms = atualizarCardAnaliseOpticaCms;
+window.carregarListaDeAssets = carregarListaDeAssets;
+window.onAssetSelecionado = onAssetSelecionado;
+window.alternarModoCaminhoManual = alternarModoCaminhoManual;
+window.definirModoAnotacao = definirModoAnotacao;
+window.onAtualizarRaioCirculo = onAtualizarRaioCirculo;

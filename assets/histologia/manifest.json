@@ -1,0 +1,76 @@
+{
+  "geradoEm": "2026-11-03T18:16:30.711Z",
+  "total": 6,
+  "assets": [
+    {
+      "id": "epitelio-simples-escamoso",
+      "nome": "Epitelio Simples Escamoso",
+      "tipo": "dzi",
+      "formato": "Deep Zoom Image (.dzi)",
+      "caminho": "assets/histologia/epitelio-simples-escamoso.dzi",
+      "url": "assets/histologia/epitelio-simples-escamoso.dzi",
+      "largura": 2400,
+      "altura": 2814,
+      "tileSize": 256,
+      "preview": "assets/histologia/epitelio-simples-escamoso-preview.jpg"
+    },
+    {
+      "id": "lamina-real1",
+      "nome": "Lamina Real1",
+      "tipo": "dzi",
+      "formato": "Deep Zoom Image (.dzi)",
+      "caminho": "assets/histologia/lamina-real1.dzi",
+      "url": "assets/histologia/lamina-real1.dzi",
+      "largura": 2536,
+      "altura": 9370,
+      "tileSize": 254,
+      "preview": "assets/histologia/lamina-real1-preview.jpg"
+    },
+    {
+      "id": "medula-espinal-he",
+      "nome": "Medula Espinal He",
+      "tipo": "static",
+      "formato": "PNG Estático",
+      "caminho": "assets/histologia/medula-espinal-he.png",
+      "url": "assets/histologia/medula-espinal-he.png",
+      "largura": 0,
+      "altura": 0,
+      "preview": "assets/histologia/medula-espinal-he.png"
+    },
+    {
+      "id": "muscular-esqueletico-he",
+      "nome": "Muscular Esqueletico He",
+      "tipo": "static",
+      "formato": "JPEG Estático",
+      "caminho": "assets/histologia/muscular-esqueletico-he.jpg",
+      "url": "assets/histologia/muscular-esqueletico-he.jpg",
+      "largura": 0,
+      "altura": 0,
+      "preview": "assets/histologia/muscular-esqueletico-he.jpg"
+    },
+    {
+      "id": "osso_compacto_dzi",
+      "nome": "Osso Compacto Dzi",
+      "tipo": "dzi",
+      "formato": "Deep Zoom Image (.dzi)",
+      "caminho": "assets/histologia/osso_compacto_dzi.dzi",
+      "url": "assets/histologia/osso_compacto_dzi.dzi",
+      "largura": 3239,
+      "altura": 5689,
+      "tileSize": 254,
+      "preview": null
+    },
+    {
+      "id": "osso_maduro_desgaste_ct",
+      "nome": "Osso Maduro Desgaste Ct",
+      "tipo": "dzi",
+      "formato": "Deep Zoom Image (.dzi)",
+      "caminho": "assets/histologia/osso_maduro_desgaste_ct.dzi",
+      "url": "assets/histologia/osso_maduro_desgaste_ct.dzi",
+      "largura": 6120,
+      "altura": 4944,
+      "tileSize": 256,
+      "preview": "assets/histologia/osso_maduro_desgaste_ct-preview.jpg"
+    }
+  ]
+}

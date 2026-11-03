@@ -45,6 +45,37 @@ const server = http.createServer((req, res) => {
     pathname = '/index.html';
   }
 
+  // Endpoint de leitura dinâmica de assets para o CMS
+  if (pathname === '/api/assets') {
+    const manifestPath = path.join(ROOT, 'assets/histologia/manifest.json');
+    if (fs.existsSync(manifestPath)) {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(fs.readFileSync(manifestPath, 'utf8'));
+      return;
+    }
+  }
+
+  // Endpoint de sincronização com o Supabase PostgreSQL
+  if (pathname === '/api/sync-supabase' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const syncFn = require('../netlify/functions/sync-supabase.js');
+        const result = await syncFn.handler({
+          httpMethod: 'POST',
+          body: body
+        }, {});
+        res.writeHead(result.statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(result.body);
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
   const filePath = path.join(ROOT, pathname);
 
   // Security check: ensure file is inside ROOT

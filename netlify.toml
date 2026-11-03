@@ -1,6 +1,18 @@
 [build]
   publish = "."
 
+# Redirecionamento da API de Assets para Serverless Function
+[[redirects]]
+  from = "/api/assets"
+  to = "/.netlify/functions/assets"
+  status = 200
+
+# Redirecionamento da sincronização com Supabase
+[[redirects]]
+  from = "/api/sync-supabase"
+  to = "/.netlify/functions/sync-supabase"
+  status = 200
+
 # Cabeçalhos de segurança globais
 [[headers]]
   for = "/*"

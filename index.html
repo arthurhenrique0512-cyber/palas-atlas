@@ -1136,20 +1136,59 @@
             </div>
 
             <div>
-              <label for="dashImgUrl" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Caminho do arquivo ou pasta</label>
-              <input 
-                type="text" 
-                id="dashImgUrl" 
-                value="/assets/histologia/muscular-esqueletico-he.jpg"
-                placeholder="Ex: /assets/dzi/lamina_rim_cortex.dzi ou /assets/histologia/muscular-esqueletico-he.jpg" 
-                class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors font-mono">
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="dashAssetSelector" class="block text-[10px] tracking-widest text-neutral-400 uppercase font-mono">Arquivo da Lâmina (Seletor Dinâmico)</label>
+                <button 
+                  type="button" 
+                  onclick="window.App.alternarModoCaminhoManual()" 
+                  id="btnToggleModoCaminho"
+                  class="text-[10px] font-mono text-[#d4af37] hover:underline cursor-pointer">
+                  Digitar URL manual
+                </button>
+              </div>
+
+              <!-- Modo Automático: Dropdown alimentado pela API/Manifesto -->
+              <div id="containerAssetSelector" class="relative">
+                <select 
+                  id="dashAssetSelector" 
+                  onchange="window.App.onAssetSelecionado(this.value)"
+                  class="w-full bg-neutral-950/70 border border-white/[0.12] focus:border-[#d4af37] text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-all cursor-pointer font-mono appearance-none">
+                  <option value="">Carregando acervo de lâminas...</option>
+                </select>
+                <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400 text-xs">
+                  ▼
+                </div>
+              </div>
+
+              <!-- Modo Manual: Campo de texto livre (URLs externas / CDN) -->
+              <div id="containerManualPath" class="hidden mt-2">
+                <input 
+                  type="text" 
+                  id="dashImgUrl" 
+                  value="assets/histologia/muscular-esqueletico-he.jpg"
+                  placeholder="Ex: assets/histologia/osso_maduro_desgaste_ct.dzi ou https://.../lamina.dzi" 
+                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors font-mono">
+              </div>
+
+              <div class="flex items-center justify-between mt-2 pt-1">
+                <span id="dashAssetInfoBadge" class="text-[10px] text-neutral-500 font-mono">
+                  Selecione uma lâmina para abrir no canvas
+                </span>
+                <button 
+                  type="button" 
+                  onclick="window.App.carregarListaDeAssets(true)" 
+                  class="text-[10px] font-mono text-neutral-400 hover:text-[#d4af37] flex items-center gap-1 cursor-pointer transition-colors"
+                  title="Atualizar lista de assets do disco">
+                  <span>↻</span><span>Atualizar lista</span>
+                </button>
+              </div>
             </div>
 
             <button 
               type="button" 
               onclick="window.App.carregarImagemNoEditor()" 
               class="w-full bg-white/[0.04] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 rounded-xl py-3 px-4 text-xs font-mono tracking-widest uppercase transition-all duration-300 shadow-lg flex items-center justify-center gap-2 cursor-pointer group">
-              <span>Carregar no Canvas</span>
+              <span>Recarregar no Canvas</span>
               <span class="group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
             </button>
 
@@ -1296,15 +1335,76 @@
             <p class="text-[10px] text-neutral-500 font-mono">Selecione uma palavra no texto acima e clique em "Vincular" para apontar o pino.</p>
           </div>
 
-          <!-- BLOCO D: LISTA DE PINOS ATIVOS -->
+          <!-- BLOCO D: FERRAMENTAS DE MARCAÇÃO E ESTRUTURAS -->
           <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
             <div class="flex items-center justify-between">
-              <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">D. Lista de Pinos Ativos</h3>
-              <span id="dashTotalPinosBadge" class="bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Pinos</span>
+              <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">D. Ferramentas & Lista de Anotações</h3>
+              <span id="dashTotalPinosBadge" class="bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Anotações</span>
+            </div>
+
+            <!-- SELETOR DE MODO DE MARCAÇÃO -->
+            <div>
+              <label class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Tipo de Marcação ao Clicar no Canvas</label>
+              <div class="grid grid-cols-3 gap-1.5 bg-neutral-950/60 p-1 rounded-xl border border-white/[0.08]">
+                <button 
+                  type="button" 
+                  id="dashBtnModoPin"
+                  onclick="window.App.definirModoAnotacao('pin')"
+                  class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer">
+                  <span>📍</span>
+                  <span class="font-medium">Ponto</span>
+                </button>
+                <button 
+                  type="button" 
+                  id="dashBtnModoCircle"
+                  onclick="window.App.definirModoAnotacao('circle')"
+                  class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer">
+                  <span>⭕</span>
+                  <span class="font-medium">Círculo</span>
+                </button>
+                <button 
+                  type="button" 
+                  id="dashBtnModoArrow"
+                  onclick="window.App.definirModoAnotacao('arrow')"
+                  class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer">
+                  <span>↗️</span>
+                  <span class="font-medium">Seta</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- CONFIGURAÇÃO ESPECÍFICA DE CÍRCULO (Delimitação de Estrutura como Ósteon) -->
+            <div id="dashConfigCirculo" class="hidden p-3 bg-neutral-950/80 border border-[#d4af37]/30 rounded-xl space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-mono tracking-wider text-[#d4af37]">Raio do Círculo na Imagem:</span>
+                <span id="dashCircleRadiusLabel" class="text-xs font-mono text-white font-bold">250 px</span>
+              </div>
+              <input 
+                type="range" 
+                id="dashCircleRadiusSlider" 
+                min="50" 
+                max="1200" 
+                step="25" 
+                value="250"
+                oninput="window.App.onAtualizarRaioCirculo(this.value)"
+                class="w-full accent-[#d4af37] bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+              <div class="flex items-center justify-between text-[9px] font-mono text-neutral-500">
+                <span>Pequeno (célula)</span>
+                <span>Médio (vaso/nervo)</span>
+                <span>Grande (ósteon)</span>
+              </div>
+            </div>
+
+            <!-- DICA DO MODO SETA -->
+            <div id="dashConfigSeta" class="hidden p-3 bg-neutral-950/80 border border-[#d4af37]/30 rounded-xl text-[10px] font-mono text-neutral-300">
+              <div class="text-[#d4af37] font-semibold mb-1">↗️ Modo Seta Direcional:</div>
+              <p id="dashArrowStatusText" class="text-neutral-400 leading-tight">
+                Clique 1: Ponto de início da haste. Clique 2: Ponta da seta sobre a estrutura celular.
+              </p>
             </div>
 
             <div id="dashListaPinos" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-              <p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl">Nenhum pino marcado na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações de diagnóstico.</p>
+              <p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl">Nenhuma anotação marcada na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações de diagnóstico.</p>
             </div>
           </div>
 
@@ -1365,6 +1465,34 @@
               <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] inline-block animate-pulse"></span>
               Inspeção
             </span>
+            <div class="h-4 w-px bg-white/10"></div>
+            <!-- SELETOR RÁPIDO DE FERRAMENTA SOBRE O CANVAS -->
+            <div class="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/[0.06]">
+              <button 
+                type="button" 
+                id="dashQuickBtnPin" 
+                onclick="window.App.definirModoAnotacao('pin')" 
+                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer"
+                title="Ponto (Pin Clássico)">
+                <span>📍</span><span class="hidden sm:inline">Ponto</span>
+              </button>
+              <button 
+                type="button" 
+                id="dashQuickBtnCircle" 
+                onclick="window.App.definirModoAnotacao('circle')" 
+                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer"
+                title="Círculo (Delimitar Estrutura/Ósteon)">
+                <span>⭕</span><span class="hidden sm:inline">Círculo</span>
+              </button>
+              <button 
+                type="button" 
+                id="dashQuickBtnArrow" 
+                onclick="window.App.definirModoAnotacao('arrow')" 
+                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer"
+                title="Seta Direcional">
+                <span>↗️</span><span class="hidden sm:inline">Seta</span>
+              </button>
+            </div>
             <div class="h-4 w-px bg-white/10"></div>
             <button 
               type="button" 
@@ -1742,9 +1870,8 @@
   
   <!-- Módulos JS Locais com Cache Busting (Clinical Precision UI) -->
   <!-- main.js importa dashboard-engine e microscope-engine via ES module import -->
-  <!-- NÃO carregar esses arquivos duplicados aqui para evitar duas instâncias isoladas -->
-  <script type="module" src="js/main.js?v=20261028_101"></script>
-  <script type="module" src="js/histology-catalog.js?v=20261028_102"></script>
+  <script type="module" src="js/main.js?v=20261103_geom_v1"></script>
+  <script type="module" src="js/histology-catalog.js?v=20261103_geom_v1"></script>
   <!-- COOKIE CONSENT BANNER -->
   <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[9999] bg-neutral-900/95 backdrop-blur-md border border-neutral-800 p-5 rounded-2xl shadow-2xl text-neutral-300 text-xs leading-relaxed hidden">
     <p>Utilizamos cookies essenciais para otimizar sua experiência de estudo no visualizador morfológico. Ao continuar navegando, você concorda com nossa Política de Privacidade.</p>

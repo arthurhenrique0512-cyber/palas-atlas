@@ -60,18 +60,61 @@ async function runMigrations() {
   }
 
   try {
-    const schemaSql = fs.readFileSync(path.join(__dirname, '../supabase/migrations/01_schema.sql'), 'utf8');
-    console.log(`[Palas Atlas] Executando 01_schema.sql...`);
-    await client.query(schemaSql);
-    console.log(`[Palas Atlas] Tabelas, RLS e Storage criados com sucesso!`);
+    // Tabela de controle de migrações
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public._migrations (
+        name TEXT PRIMARY KEY,
+        applied_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+      );
+    `);
 
-    const seedSql = fs.readFileSync(path.join(__dirname, '../supabase/migrations/02_seed_data.sql'), 'utf8');
-    console.log(`[Palas Atlas] Executando 02_seed_data.sql...`);
-    await client.query(seedSql);
-    console.log(`[Palas Atlas] Disciplinas, tópicos e lâminas iniciais inseridos com sucesso!`);
+    const migrationsDir = path.join(__dirname, '../supabase/migrations');
+    const files = fs.readdirSync(migrationsDir)
+      .filter(f => f.endsWith('.sql'))
+      .sort();
+
+    for (const file of files) {
+      const alreadyApplied = await client.query(
+        'SELECT 1 FROM public._migrations WHERE name = $1',
+        [file]
+      );
+      if (alreadyApplied.rows.length > 0) {
+        console.log(`[Palas Atlas] Migração ${file} já aplicada. Pulando.`);
+        continue;
+      }
+
+      console.log(`[Palas Atlas] Executando ${file}...`);
+      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
+      try {
+        await client.query(sql);
+        await client.query(
+          'INSERT INTO public._migrations (name) VALUES ($1) ON CONFLICT DO NOTHING',
+          [file]
+        );
+        console.log(`✓ [Palas Atlas] Migração ${file} aplicada com sucesso!`);
+      } catch (sqlErr) {
+        // Se falhou por já existir política ou tabela legada, registra como aplicada para não travar migrações subsequentes
+        if (sqlErr.code === '42710' || sqlErr.code === '42P07') {
+          console.warn(`[Palas Atlas] Aviso em ${file} (${sqlErr.message}). Registrando como aplicada.`);
+          await client.query(
+            'INSERT INTO public._migrations (name) VALUES ($1) ON CONFLICT DO NOTHING',
+            [file]
+          );
+        } else {
+          throw sqlErr;
+        }
+      }
+    }
 
     const res = await client.query('SELECT count(*) FROM public.laminas;');
     console.log(`[Palas Atlas] Total de lâminas no banco: ${res.rows[0].count}`);
+    const pinCols = await client.query(`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'pinos' 
+      ORDER BY ordinal_position;
+    `);
+    console.log(`[Palas Atlas] Colunas da tabela pinos:`, pinCols.rows.map(r => `${r.column_name} (${r.data_type})`).join(', '));
   } catch (err) {
     console.error(`[Palas Atlas] Erro ao executar migrações:`, err);
   } finally {

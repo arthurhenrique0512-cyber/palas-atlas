@@ -87,6 +87,12 @@ Exemplo:
   console.log(`- Thumbnail:     ${previewJpg}`);
   console.log(`\nCaminho pronto para registrar no CMS:`);
   console.log(`assets/histologia/${baseName}.dzi`);
+
+  // Atualiza o manifesto de assets automaticamente
+  try {
+    const { execSync } = require('child_process');
+    execSync(`node "${path.join(__dirname, 'scan_assets.js')}"`, { stdio: 'inherit' });
+  } catch (e) {}
 }
 
 generateDZI().catch((err) => {
