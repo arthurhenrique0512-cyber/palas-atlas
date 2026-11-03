@@ -17,6 +17,7 @@
  */
 
 import { db } from "./firebase-config.js";
+import { removerConteudoPerigoso, sanitizarHTMLDescricao } from "./sanitizer.js";
 
 // ---------------------------------------------------------------------------
 // Estado do modulo
@@ -282,98 +283,6 @@ const fallbackLaminas = {
       }
     ]
   },
-  'pele_espessa': {
-    id: 'pele_espessa',
-    aliases: ['a3oRvXvJpMKAtU2RE85q', 'lamina-real1', 'lamina-real-1', 'pele-espessa', 'pele'],
-    nome: 'Pele Espessa (Epiderme e Derme)',
-    disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
-    maxMagnification: 40,
-    zoom4xRatio: 0.65,
-    mpp: 0.25,
-    defaultCenter: { x: 0.5, y: 0.70 },
-    imagemUrl: 'assets/histologia/lamina-real1.dzi',
-    previewImage: 'assets/histologia/lamina-real1-preview.jpg',
-    thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
-    dziUrl: 'assets/histologia/lamina-real1.dzi',
-    descricaoHTML: `
-      <div class="prose-atlas">
-        <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
-        <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
-        <p><strong>Estratificação Epidérmica (da profundidade para a superfície):</strong></p>
-        <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
-          <li><strong>Camada Basal (Germinativa):</strong> Fileira única de células cúbicas a prismáticas com alta atividade mitótica sobre a lâmina basal.</li>
-          <li><strong>Camada Espinhosa:</strong> Múltiplas camadas de queratinócitos poliédricos unidos por densos desmossomos.</li>
-          <li><strong>Camada Granulosa:</strong> Células achatadas com volumosos grânulos basofílicos de querato-hialina no citoplasma.</li>
-          <li><strong>Camada Lúcida:</strong> Fita homogênea, clara e eosinofílica refringente, característica exclusiva da pele espessa.</li>
-          <li><strong>Camada Córnea:</strong> Camada superficial densa de escamas anucleadas de queratina pura (barreira impermeável).</li>
-        </ul>
-        <p>Na derme subjacente evidenciam-se a <strong>derme papilar</strong> (tecido conjuntivo frouxo rico em capilares) e a <strong>derme reticular</strong> (tecido conjuntivo denso não modelado).</p>
-      </div>
-    `,
-    pinos: [
-      {
-        id: "pin_1793069948222_573",
-        rotulo: "Hemácia / Vaso Sanguíneo",
-        x: 1702.79,
-        y: 6851.49,
-        zoom: 3.5
-      },
-      {
-        id: "pin_1787596855230_238",
-        rotulo: "Queratina / Estrato Córneo",
-        x: 1091.31,
-        y: 5586.05,
-        zoom: 2.8
-      },
-      {
-        id: "pin_1793136232358_898",
-        rotulo: "Interface Dermo-Epidérmica",
-        x: 1631.39,
-        y: 6802.9,
-        zoom: 3.2
-      },
-      {
-        id: "pin_1793136245811_274",
-        rotulo: "Papila Dérmica Vascularizada",
-        x: 1682.44,
-        y: 6869.79,
-        zoom: 3.5
-      }
-    ],
-    questoes: [
-      {
-        id: "q-pele-1",
-        numero: 1,
-        titulo: "Identificação da Camada Granulosa",
-        enunciado: "Examine a epiderme e identifique a camada imediatamente abaixo do estrato córneo que contém volumosos grânulos basofílicos de querato-hialina.",
-        x: 1631.39,
-        y: 6802.9,
-        zoom: 3.0
-      },
-      {
-        id: "q-pele-2",
-        numero: 2,
-        titulo: "Papilas Dérmicas e Nutrição Epidérmica",
-        enunciado: "Localize a transição entre o epitélio avascular e o tecido conjuntivo da derme. Como as papilas dérmicas aumentam a adesão e a nutrição do epitélio?",
-        x: 1702.79,
-        y: 6851.49,
-        zoom: 3.2
-      }
-    ]
-  },
-  'medula-espinal-he': {
-    id: 'medula-espinal-he',
-    aliases: ['5kqs5Qv9fvWlpNSJoyPG', 'medula-espinal', 'medula'],
-    nome: 'Medula Espinal (Corte Transversal)',
-    disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E)',
-    imagemUrl: 'assets/histologia/medula-espinal-he.png',
-    previewImage: 'assets/histologia/medula-espinal-he.png',
-    thumbnailUrl: 'assets/histologia/medula-espinal-he.png',
-    descricaoHTML: '<p>Corte transversal de medula espinal exibindo substância cinzenta central em forma de "H" com motoneurônios no corno anterior e substância branca periférica contendo tratos mielinizados.</p>',
-    pinos: []
-  },
   'muscular-esqueletico-he': {
     id: 'muscular-esqueletico-he',
     aliases: ['musculo-esqueletico', 'tecido-muscular'],
@@ -455,53 +364,20 @@ const fallbackLaminas = {
     dziUrl: 'assets/histologia/epitelio-simples-escamoso.dzi',
     descricaoHTML: '<p>Camada única de células epiteliais pavimentosas (achatadas) com núcleos elípticos proeminentes, adaptadas para transporte passivo e difusão de solutos.</p>',
     pinos: []
-  },
-  'lamina-real1': {
-    id: 'lamina-real1',
-    aliases: ['a3oRvXvJpMKAtU2RE85q', 'lamina-real-1', 'pele_espessa', 'pele-espessa', 'pele'],
-    nome: 'Pele Espessa (Epiderme e Derme)',
-    disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
-    maxMagnification: 40,
-    zoom4xRatio: 0.65,
-    mpp: 0.25,
-    defaultCenter: { x: 0.5, y: 0.70 },
-    imagemUrl: 'assets/histologia/lamina-real1.dzi',
-    previewImage: 'assets/histologia/lamina-real1-preview.jpg',
-    thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
-    dziUrl: 'assets/histologia/lamina-real1.dzi',
-    descricaoHTML: `
-      <div class="prose-atlas">
-        <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
-        <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
-        <p><strong>Estratificação Epidérmica:</strong> Camadas Basal, Espinhosa, Granulosa (grânulos de querato-hialina), Lúcida e Córnea (queratina pura).</p>
-      </div>
-    `,
-    pinos: [
-      {
-        id: "pin_1793069948222_573",
-        rotulo: "Hemácia / Vaso Sanguíneo",
-        x: 1702.79,
-        y: 6851.49,
-        zoom: 3.5
-      },
-      {
-        id: "pin_1787596855230_238",
-        rotulo: "Queratina / Estrato Córneo",
-        x: 1091.31,
-        y: 5586.05,
-        zoom: 2.8
-      }
-    ]
   }
 };
 
+// Aliases para identificadores alternativos / legados
+fallbackLaminas['pele_espessa']       = fallbackLaminas['a3oRvXvJpMKAtU2RE85q'];
+fallbackLaminas['lamina-real1']       = fallbackLaminas['a3oRvXvJpMKAtU2RE85q'];
+fallbackLaminas['medula-espinal-he']  = fallbackLaminas['5kqs5Qv9fvWlpNSJoyPG'];
 fallbackLaminas['96ZYqoM2SV8p4fB2QgeM'] = fallbackLaminas['osso_maduro_desgaste_ct'];
 
 // ---------------------------------------------------------------------------
 // 1. Disparo automatico ao carregar a pagina
 // ---------------------------------------------------------------------------
 function iniciarMicroscopio() {
+  if (!document.getElementById("osd-viewer")) return;
   iniciarSidebarRetratil();
   const urlParams = new URLSearchParams(window.location.search);
   const dziParam  = urlParams.get("dzi") || urlParams.get("file");
@@ -758,72 +634,8 @@ function renderizarMetadadosDaLamina() {
   if (docTitle)     docTitle.textContent    = `${tituloLimpo} - Palas Atlas`;
 }
 
-// ---------------------------------------------------------------------------
-// Segurança: remove elementos/atributos executáveis de HTML vindo do CMS/Firestore
-// ---------------------------------------------------------------------------
-function removerConteudoPerigoso(html) {
-  if (typeof DOMParser === "undefined") {
-    return String(html).replace(/<\s*(script|iframe|object|embed|style|link|meta)[\s\S]*?>[\s\S]*?<\s*\/\s*\1\s*>/gi, "");
-  }
-  const doc = new DOMParser().parseFromString(`<body>${html}</body>`, "text/html");
-  doc.querySelectorAll("script,iframe,object,embed,style,link,meta,base,form,frame,frameset").forEach(el => el.remove());
-  doc.body.querySelectorAll("*").forEach(el => {
-    [...el.attributes].forEach(attr => {
-      const nome = attr.name.toLowerCase();
-      const valor = String(attr.value).replace(/[\s\u0000-\u001f]/g, "").toLowerCase();
-      if (nome.startsWith("on") || nome === "srcdoc" ||
-          ((nome === "href" || nome === "src" || nome === "xlink:href" || nome === "action" || nome === "formaction") &&
-           (valor.startsWith("javascript:") || valor.startsWith("vbscript:") || valor.startsWith("data:text/html")))) {
-        el.removeAttribute(attr.name);
-      }
-    });
-  });
-  return doc.body.innerHTML;
-}
-
-// ---------------------------------------------------------------------------
-// 4. Injeta descricaoHTML na barra lateral com hiperlinks inline de pinos
-// ---------------------------------------------------------------------------
-/**
- * Sanitiza o HTML da descrição, removendo artefatos poluentes copiados de chats de IA
- * (como spans parasitas com inline styles de tailwind, animações, blockquotes e &nbsp;)
- * garantindo quebra natural de linha (word-wrap) sem cortar texto à direita.
- * Preserva estritamente os links de pinos (.pin-link ou data-pin-id) e formatações legítimas.
- */
-export function sanitizarHTMLDescricao(html) {
-  if (!html || typeof html !== "string") return "";
-
-  // 0. Segurança: remove scripts, iframes, handlers on* e URLs javascript: (evita XSS armazenado)
-  html = removerConteudoPerigoso(html);
-
-  // 1. Substitui espaços não-quebráveis (&nbsp; e \u00a0) por espaço comum para permitir quebra de linha
-  let limpo = html.replace(/&nbsp;/g, " ").replace(/\u00a0/g, " ");
-
-  // 2. Remove tags blockquote mantendo o conteúdo interno
-  limpo = limpo.replace(/<\/?blockquote[^>]*>/gi, "");
-
-  // 3. Remove spans aninhados parasitas com inline styles (de streaming de IA como ChatGPT)
-  // Preserva estritamente spans que sejam pin-link ou tenham data-pin-id
-  for (let i = 0; i < 6; i++) {
-    limpo = limpo.replace(/<span\s+(?![^>]*class=["'][^"']*pin-link[^"']*["'])(?![^>]*data-pin-id)[^>]*>([\s\S]*?)<\/span>/gi, "$1");
-  }
-
-  // 4. Remove atributos poluentes de bibliotecas externas (ex: node="[object Object]")
-  limpo = limpo.replace(/<(p|div|h1|h2|h3|h4|h5|h6)\s+[^>]*node=[^>]*>/gi, "<$1>");
-  limpo = limpo.replace(/style=["'][^"']*--tw-[^"']*["']/gi, "");
-  limpo = limpo.replace(/style=["'][^"']*animation:[^"']*["']/gi, "");
-
-  // 5. Ajusta pontuações acidentalmente presas dentro ou com espaços antes de vírgula/ponto/parêntese
-  limpo = limpo.replace(/([a-zA-ZÀ-ÿ0-9]+)\)([ \t]*<\/span>)/gi, "$1$2)");
-  limpo = limpo.replace(/([a-zA-ZÀ-ÿ0-9]+),([ \t]*<\/span>)/gi, "$1$2,");
-  limpo = limpo.replace(/\s+([,.;:)])/g, "$1");
-  limpo = limpo.replace(/([(])\s+/g, "$1");
-
-  // 6. Normaliza múltiplos espaços e quebras consecutivas
-  limpo = limpo.replace(/[ \t]{2,}/g, " ");
-
-  return limpo.trim();
-}
+// Re-exporta sanitizarHTMLDescricao para retrocompatibilidade
+export { sanitizarHTMLDescricao };
 
 function renderizarDescricaoETextos() {
   if (!laminaAtualData) return;
