@@ -753,9 +753,32 @@ function renderizarMetadadosDaLamina() {
 
   if (tituloEl)     tituloEl.textContent    = tituloLimpo;
   if (disciplinaEl) disciplinaEl.textContent = (laminaAtualData.disciplina || "histologia").toUpperCase();
-  if (coloracaoEl)  coloracaoEl.innerHTML   = `${laminaAtualData.coloracao || "Hematoxilina e Eosina (H&amp;E)"}`;
+  if (coloracaoEl)  coloracaoEl.textContent = laminaAtualData.coloracao || "Hematoxilina e Eosina (H&E)";
   if (breadcrumb)   { breadcrumb.textContent = tituloLimpo; breadcrumb.classList.remove("hidden"); }
   if (docTitle)     docTitle.textContent    = `${tituloLimpo} - Palas Atlas`;
+}
+
+// ---------------------------------------------------------------------------
+// Segurança: remove elementos/atributos executáveis de HTML vindo do CMS/Firestore
+// ---------------------------------------------------------------------------
+function removerConteudoPerigoso(html) {
+  if (typeof DOMParser === "undefined") {
+    return String(html).replace(/<\s*(script|iframe|object|embed|style|link|meta)[\s\S]*?>[\s\S]*?<\s*\/\s*\1\s*>/gi, "");
+  }
+  const doc = new DOMParser().parseFromString(`<body>${html}</body>`, "text/html");
+  doc.querySelectorAll("script,iframe,object,embed,style,link,meta,base,form,frame,frameset").forEach(el => el.remove());
+  doc.body.querySelectorAll("*").forEach(el => {
+    [...el.attributes].forEach(attr => {
+      const nome = attr.name.toLowerCase();
+      const valor = String(attr.value).replace(/[\s\u0000-\u001f]/g, "").toLowerCase();
+      if (nome.startsWith("on") || nome === "srcdoc" ||
+          ((nome === "href" || nome === "src" || nome === "xlink:href" || nome === "action" || nome === "formaction") &&
+           (valor.startsWith("javascript:") || valor.startsWith("vbscript:") || valor.startsWith("data:text/html")))) {
+        el.removeAttribute(attr.name);
+      }
+    });
+  });
+  return doc.body.innerHTML;
 }
 
 // ---------------------------------------------------------------------------
@@ -769,6 +792,9 @@ function renderizarMetadadosDaLamina() {
  */
 export function sanitizarHTMLDescricao(html) {
   if (!html || typeof html !== "string") return "";
+
+  // 0. Segurança: remove scripts, iframes, handlers on* e URLs javascript: (evita XSS armazenado)
+  html = removerConteudoPerigoso(html);
 
   // 1. Substitui espaços não-quebráveis (&nbsp; e \u00a0) por espaço comum para permitir quebra de linha
   let limpo = html.replace(/&nbsp;/g, " ").replace(/\u00a0/g, " ");
@@ -1569,51 +1595,34 @@ export function getNativeZoomRef() {
 }
 
 /**
- * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
- * Cada lâmina possui seu próprio parâmetro de proporção (zoom4xRatio) calibrado
- * e travado para respeitar a sua morfologia e proporção de tela:
- * - Osso Maduro (mosaico horizontal 1.24:1): zoom4xRatio = 0.28 (28% do homeZoom, margens pretas)
- * - Pele Espessa (faixa vertical 0.27:1): zoom4xRatio = 0.65 (65% do homeZoom)
+ * Objetiva de captura da lâmina (ex: 40). É a âncora física da escala.
  */
-export function getZoom4xRef() {
-  if (!viewer || !viewer.viewport) return 1.0;
-  const baseHome = homeZoomRef || viewer.viewport.getHomeZoom() || 1.0;
-
-  // 1. Lê o parâmetro individual gravado e travado para a lâmina atual:
-  let ratio = Number(laminaAtualData?.zoom4xRatio || laminaAtualData?.optica?.zoom4xRatio);
-
-  // 2. Se a lâmina não possuir parâmetro cadastrado, analisa a proporção geométrica da imagem:
-  if (!ratio || isNaN(ratio) || ratio <= 0) {
-    const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
-    let w = 0, h = 0;
-    if (item && item.source && item.source.dimensions) {
-      w = item.source.dimensions.x;
-      h = item.source.dimensions.y;
-    } else if (item && typeof item.getContentSize === "function") {
-      const cs = item.getContentSize();
-      w = cs.x;
-      h = cs.y;
-    }
-    // Faixa vertical longa (como pele espessa, h > 1.8 * w): 0.65; mosaico horizontal: 0.28
-    ratio = (h > w * 1.8) ? 0.65 : 0.28;
-  }
-
-  return baseHome * ratio;
+function getMaxMagLamina() {
+  return Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 }
 
 /**
- * Converte um valor nominal de ampliação ótica (ex: 4, 10, 40, 60, 100)
- * para o nível de zoom correspondente no OpenSeadragon.
- * A relação ótica é estritamente linear:
- * - 10x = 2.5 * 4x
- * - 40x = 10 * 4x
- * - 60x = 15 * 4x
- * - 100x = 25 * 4x
+ * Converte um valor nominal de ampliação ótica (ex: 4, 10, 40)
+ * para o nível de zoom correspondente no OpenSeadragon — FÍSICA REAL, calculada pelo DZI.
+ *
+ * Âncora: a objetiva em que a lâmina foi capturada (maxMag) = resolução nativa 1:1 do DZI
+ * (1 pixel da imagem = 1 pixel da tela). As demais objetivas são proporcionais:
+ *   zoom(M) = nativeZoom × M / maxMag
+ *   Ex. captura em 40x → 40x = 100% | 10x = 25% | 4x = 10% da resolução capturada.
+ * Lâminas pequenas aparecem com margem preta em 4x (comportamento físico correto).
+ * Vale para QUALQUER lâmina nova, sem parâmetro manual.
  */
 export function calcularZoomParaMagnificacao(mag) {
-  const z4 = getZoom4xRef();
+  const native = getNativeZoomRef();
   const m = Number(mag) || 4;
-  return z4 * (m / 4);
+  return native * (m / getMaxMagLamina());
+}
+
+/**
+ * Retorna o zoom interno do OpenSeadragon correspondente à objetiva de 4x.
+ */
+export function getZoom4xRef() {
+  return calcularZoomParaMagnificacao(4);
 }
 
 /**
