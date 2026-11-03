@@ -21,9 +21,9 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
     modulo.topicos.forEach(topico => {
       const isAtivo = topico.id === topicoAtivoId;
       if (isAtivo) {
-        htmlItens += `<button class="bg-slate-100 text-slate-900 font-semibold px-3 py-2 rounded-lg w-full text-left leading-snug break-words text-[11.5px] border-l-2 border-[#d4af37]" title="${topico.titulo}">${topico.titulo}</button>`;
+        htmlItens += `<button class="bg-white/[0.06] text-[#d4af37] font-medium px-3 py-2 rounded-lg w-full text-left leading-snug break-words text-[11.5px] border-l-2 border-[#d4af37]" title="${topico.titulo}">${topico.titulo}</button>`;
       } else {
-        htmlItens += `<button onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')" class="text-slate-500 hover:text-slate-900 hover:bg-slate-50 px-3 py-2 rounded-lg transition-colors w-full text-left leading-snug break-words text-[11.5px]" title="${topico.titulo}">${topico.titulo}</button>`;
+        htmlItens += `<button onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')" class="text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.03] px-3 py-2 rounded-lg transition-colors w-full text-left leading-snug break-words text-[11.5px]" title="${topico.titulo}">${topico.titulo}</button>`;
       }
     });
   }
@@ -31,8 +31,8 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   const navItem = (id, label, icon) => {
     const isAtivo = disciplinaAtual === id;
     const btnClass = isAtivo 
-      ? "bg-slate-100 text-slate-900 font-semibold px-3 py-2 rounded-lg w-full text-left flex items-center gap-2.5 border-l-2 border-[#d4af37]"
-      : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 px-3 py-2 rounded-lg transition-colors w-full text-left flex items-center gap-2.5";
+      ? "bg-white/[0.06] text-[#d4af37] font-medium px-3 py-2 rounded-lg w-full text-left flex items-center gap-2.5 border-l-2 border-[#d4af37]"
+      : "text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.03] px-3 py-2 rounded-lg transition-colors w-full text-left flex items-center gap-2.5";
     return `
       <button onclick="window.App.selecionarFrente('${id}')" class="${btnClass}">
         ${icon}
@@ -51,9 +51,9 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   const tituloTopicos = mapNomenclatura[disciplinaAtual] || "Tópicos";
 
   return `
-    <aside class="space-y-6 text-xs font-sans text-slate-600 border-r border-slate-200/80 pr-6 hidden md:block">
+    <aside class="space-y-6 text-xs font-sans text-neutral-400 border-r border-white/[0.06] pr-6 hidden md:block">
       <div>
-        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-3 block">Módulos</span>
+        <span class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 font-semibold mb-3 block">Módulos</span>
         <div class="space-y-1">
           ${navItem('histologia', 'Histologia', '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>')}
           ${navItem('anatomia', 'Anatomia Macroscópica', '<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>')}
@@ -65,7 +65,7 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
       
       ${htmlItens ? `
       <div>
-        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-3 block">${tituloTopicos}</span>
+        <span class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 font-semibold mb-3 block">${tituloTopicos}</span>
         <div class="space-y-1">
           ${htmlItens}
         </div>
@@ -92,13 +92,13 @@ function gerarBarraDisciplinasMobile() {
   const chipsHtml = lista.map((item) => {
     const isAtivo = disciplinaAtual === item.id;
     const classes = isAtivo
-      ? "bg-slate-900 text-white font-semibold shadow-sm border-slate-900"
-      : "bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200/80";
+      ? "bg-white/[0.08] text-[#d4af37] font-medium border-[#d4af37]/50 shadow-none"
+      : "bg-neutral-900/60 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/60 border-white/[0.06]";
     return `
       <button
         type="button"
         onclick="window.App.selecionarFrente('${item.id}')"
-        class="shrink-0 flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-full text-xs transition-all border shadow-[0_1px_3px_rgba(0,0,0,0.04)] active:scale-95 cursor-pointer whitespace-nowrap ${classes}">
+        class="shrink-0 flex items-center gap-2 px-3.5 py-2 min-h-[38px] rounded-lg text-xs font-sans transition-all border cursor-pointer whitespace-nowrap ${classes}">
         ${item.icon}
         <span>${item.label}</span>
       </button>
@@ -120,13 +120,13 @@ function gerarBarraTopicosMobile(modulo, topicoAtivoId) {
   const chipsHtml = modulo.topicos.map((topico) => {
     const isAtivo = topico.id === topicoAtivoId;
     const classes = isAtivo
-      ? "bg-slate-900 text-white font-semibold shadow-sm border-slate-900"
-      : "bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200/80";
+      ? "bg-white/[0.08] text-[#d4af37] font-medium border-[#d4af37]/50 shadow-none"
+      : "bg-neutral-900/60 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/60 border-white/[0.06]";
     return `
       <button
         type="button"
         onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
-        class="shrink-0 flex items-center px-4 py-2.5 min-h-[44px] rounded-full text-xs transition-all border shadow-[0_1px_3px_rgba(0,0,0,0.04)] active:scale-95 cursor-pointer whitespace-nowrap ${classes}">
+        class="shrink-0 flex items-center px-3.5 py-2 min-h-[38px] rounded-lg text-xs font-sans transition-all border cursor-pointer whitespace-nowrap ${classes}">
         <span>${topico.titulo}</span>
       </button>
     `;
@@ -169,28 +169,28 @@ function renderizarCatalogoHistologia(disciplina) {
       htmlCards += `
         <div 
           onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
-          class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-lg hover:border-[#d4af37]/50 hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 cursor-pointer flex items-center justify-between min-h-[80px] sm:min-h-[88px] group">
-          <h3 class="font-serif text-base sm:text-lg text-slate-800 font-semibold leading-snug group-hover:text-slate-950 transition-colors">${topico.titulo}</h3>
-          <span class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-[#d4af37]/10 flex items-center justify-center text-slate-400 group-hover:text-[#d4af37] shrink-0 ml-3 transition-colors">
+          class="bg-neutral-900/40 rounded-xl p-5 sm:p-6 border border-white/[0.06] hover:border-[#d4af37]/50 hover:bg-neutral-900/70 hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-150 cursor-pointer flex items-center justify-between min-h-[80px] sm:min-h-[88px] group">
+          <h3 class="font-serif text-base sm:text-lg text-neutral-100 font-semibold leading-snug group-hover:text-[#d4af37] transition-colors">${topico.titulo}</h3>
+          <span class="w-8 h-8 rounded-lg bg-neutral-950/80 border border-white/[0.06] group-hover:border-[#d4af37]/40 flex items-center justify-center text-neutral-500 group-hover:text-[#d4af37] shrink-0 ml-3 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </span>
         </div>
       `;
       
       htmlSubmenu += `
-        <button onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')" class="text-left text-slate-500 hover:text-[#d4af37] hover:bg-[#d4af37]/10 text-xs font-medium py-1.5 px-3 rounded-lg transition-colors leading-snug break-words w-full">
+        <button onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')" class="text-left text-neutral-400 hover:text-[#d4af37] hover:bg-white/[0.03] text-xs font-medium py-1.5 px-3 rounded-lg transition-colors leading-snug break-words w-full">
           ${topico.titulo}
         </button>
       `;
     });
   } else {
     htmlCards = `
-      <div class="col-span-full py-16 flex flex-col items-center justify-center text-center bg-slate-50 border border-dashed border-slate-300 rounded-2xl">
-        <svg class="w-12 h-12 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="col-span-full py-16 flex flex-col items-center justify-center text-center bg-neutral-900/20 border border-dashed border-neutral-800 rounded-xl">
+        <svg class="w-12 h-12 text-neutral-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
         </svg>
-        <p class="text-slate-500 font-sans text-sm font-medium">Nenhuma lâmina ou peça cadastrada neste acervo ainda.</p>
-        <p class="text-slate-400 text-xs mt-2">Utilize o Painel do Desenvolvedor para inserir os primeiros tópicos.</p>
+        <p class="text-neutral-400 font-sans text-sm font-medium">Nenhuma lâmina ou peça cadastrada neste acervo ainda.</p>
+        <p class="text-neutral-500 text-xs mt-2 font-mono">Utilize o Painel do Desenvolvedor para inserir os primeiros tópicos.</p>
       </div>
     `;
   }
@@ -213,17 +213,17 @@ function renderizarCatalogoHistologia(disciplina) {
         <!-- SELETOR HORIZONTAL DE DISCIPLINAS (MOBILE & TABLET: md:hidden) -->
         ${gerarBarraDisciplinasMobile()}
 
-        <div class="mb-6 md:mb-8 pb-5 border-b border-slate-200/70">
+        <div class="mb-6 md:mb-8 pb-5 border-b border-white/[0.06]">
           <!-- BREADCRUMBS -->
-          <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-400 mb-2.5 flex-wrap">
-            <a href="#" onclick="window.App.navegarPara('pgHome'); return false;" class="text-slate-500 hover:text-[#d4af37] hover:underline transition-colors">Início</a>
-            <span class="text-slate-300 select-none">&rsaquo;</span>
-            <span class="text-slate-800 font-medium pointer-events-none">${modulo.tituloDisciplina}</span>
+          <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-neutral-500 mb-2.5 flex-wrap">
+            <a href="#" onclick="window.App.navegarPara('pgHome'); return false;" class="text-neutral-400 hover:text-[#d4af37] transition-colors">Início</a>
+            <span class="text-neutral-600 select-none">&rsaquo;</span>
+            <span class="text-neutral-200 font-medium pointer-events-none">${modulo.tituloDisciplina}</span>
           </nav>
           <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2">
-            <h2 class="text-2xl md:text-3xl font-serif font-semibold text-slate-900 tracking-tight">${modulo.tituloDisciplina}</h2>
-            <p class="text-xs text-slate-500 font-sans tracking-wide">
-              <span class="text-slate-400 font-mono text-[10px] uppercase tracking-wider">Referência:</span> ${modulo.bibliografia}
+            <h2 class="text-2xl md:text-3xl font-serif font-semibold text-neutral-100 tracking-tight">${modulo.tituloDisciplina}</h2>
+            <p class="text-xs text-neutral-400 font-sans tracking-wide">
+              <span class="text-neutral-500 font-mono text-[10px] uppercase tracking-wider">Referência:</span> ${modulo.bibliografia}
             </p>
           </div>
         </div>
@@ -301,31 +301,31 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
         ${gerarBarraTopicosMobile(modulo, topico.id)}
       
         <!-- BREADCRUMBS -->
-        <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-400 mb-2.5 flex-wrap">
-          <a href="#" onclick="window.App.navegarPara('pgHome'); return false;" class="text-slate-500 hover:text-[#d4af37] hover:underline transition-colors">Início</a>
-          <span class="text-slate-300 select-none">&rsaquo;</span>
-          <a href="#" onclick="window.App.voltarNivel(1); return false;" class="text-slate-500 hover:text-[#d4af37] hover:underline transition-colors">${modulo.tituloDisciplina}</a>
-          <span class="text-slate-300 select-none">&rsaquo;</span>
-          <span class="text-slate-800 font-medium pointer-events-none">${topico.titulo}</span>
+        <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-neutral-500 mb-2.5 flex-wrap">
+          <a href="#" onclick="window.App.navegarPara('pgHome'); return false;" class="text-neutral-400 hover:text-[#d4af37] transition-colors">Início</a>
+          <span class="text-neutral-600 select-none">&rsaquo;</span>
+          <a href="#" onclick="window.App.voltarNivel(1); return false;" class="text-neutral-400 hover:text-[#d4af37] transition-colors">${modulo.tituloDisciplina}</a>
+          <span class="text-neutral-600 select-none">&rsaquo;</span>
+          <span class="text-neutral-200 font-medium pointer-events-none">${topico.titulo}</span>
         </nav>
 
         <!-- TÍTULO DO TECIDO -->
-        <h1 class="font-serif text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">
+        <h1 class="font-serif text-2xl md:text-3xl font-semibold text-neutral-100 tracking-tight mb-2">
           ${topico.titulo}
         </h1>
 
         <!-- TEXTO EXPLICATIVO (UNBOXED EDITORIAL) -->
-        <div class="text-slate-700 text-sm md:text-base leading-relaxed space-y-3 mb-6 prose-editor break-words [&_strong]:font-semibold [&_strong]:text-slate-900 [&_b]:font-semibold [&_b]:text-slate-900">
+        <div class="text-neutral-300 text-sm md:text-base leading-relaxed space-y-3 mb-6 prose-editor break-words [&_strong]:font-semibold [&_strong]:text-neutral-100 [&_b]:font-semibold [&_b]:text-neutral-100">
           ${formatarResumoAcademico(topico.resumo)}
         </div>
 
         <!-- SEÇÃO DE LÂMINAS DE MICROSCOPIA ASSOCIADAS -->
         <div class="mt-8 mb-4">
-          <h2 class="text-xl font-serif font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">
+          <h2 class="text-xl font-serif font-semibold text-neutral-100 mb-6 border-b border-white/[0.06] pb-2">
             Lâminas de Microscopia Associadas
           </h2>
           <div id="gridCatalogoLaminas" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <p class="text-sm text-slate-500 col-span-full">Aguardando lâminas...</p>
+            <p class="text-sm text-neutral-500 font-mono col-span-full">Aguardando lâminas...</p>
           </div>
         </div>
 
@@ -366,14 +366,14 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
         if (laminasDoTopico.length === 0) {
           containerGrid.innerHTML = `
-            <div class="col-span-full bg-slate-50 border border-dashed border-slate-300 rounded-2xl p-10 text-center text-slate-600 shadow-sm">
-              <span class="text-xs font-mono text-slate-400 font-bold block uppercase tracking-wider mb-2">Sem Lâminas Ativas no Tópico</span>
-              <h4 class="text-lg font-semibold text-slate-900 font-sans">Nenhuma lâmina matriz publicada para ${topico.titulo} no momento.</h4>
-              <p class="text-xs text-slate-500 font-mono mt-2 max-w-lg mx-auto">Lâminas com status inativo não são listadas aqui. Acesse o Painel do Desenvolvedor para publicar peças neste módulo.</p>
+            <div class="col-span-full bg-neutral-900/30 border border-dashed border-neutral-800 rounded-xl p-10 text-center text-neutral-400">
+              <span class="text-xs font-mono text-neutral-500 font-semibold block uppercase tracking-wider mb-2">Sem Lâminas Ativas no Tópico</span>
+              <h4 class="text-lg font-semibold text-neutral-200 font-sans">Nenhuma lâmina matriz publicada para ${topico.titulo} no momento.</h4>
+              <p class="text-xs text-neutral-500 font-mono mt-2 max-w-lg mx-auto">Lâminas com status inativo não são listadas aqui. Acesse o Painel do Desenvolvedor para publicar peças neste módulo.</p>
               <button 
                 type="button"
                 onclick="window.App.selecionarFrente('dashboard')"
-                class="mt-6 inline-block px-6 py-2.5 rounded-xl bg-slate-900 text-white font-mono font-semibold text-xs uppercase tracking-wider hover:bg-slate-800 transition-all cursor-pointer shadow">
+                class="mt-6 inline-block px-5 py-2.5 rounded-xl bg-white/[0.04] text-neutral-200 border border-white/[0.08] hover:border-[#d4af37]/50 font-mono font-medium text-xs uppercase tracking-wider hover:bg-white/[0.08] transition-all cursor-pointer">
                 Abrir Painel do Desenvolvedor &rarr;
               </button>
             </div>
@@ -408,31 +408,31 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           }
 
           cardsLaminasHtml += `
-            <a href="microscopio.html?id=${lamina.id}" class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/60 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg active:scale-[0.98] transition-all duration-300 overflow-hidden group cursor-pointer flex flex-col justify-between">
+            <a href="microscopio.html?id=${lamina.id}" class="bg-neutral-900/40 rounded-xl p-4 sm:p-5 border border-white/[0.06] hover:border-[#d4af37]/50 hover:bg-neutral-900/70 hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-150 overflow-hidden group cursor-pointer flex flex-col justify-between">
               <!-- Thumbnail da Imagem -->
-              <div class="w-full h-44 sm:h-48 bg-slate-100 relative overflow-hidden rounded-xl flex items-center justify-center">
+              <div class="w-full h-44 sm:h-48 bg-black/60 border border-white/[0.04] relative overflow-hidden rounded-lg flex items-center justify-center">
                 <!-- Placeholder exibido quando a imagem falha (visível via CSS quando a img é ocultada) -->
                 <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden">
-                  <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M12 3v1.5M6.75 4.5l.75 1.3M17.25 4.5l-.75 1.3"/>
                   </svg>
-                  <span class="text-[11px] text-slate-400 font-serif">Sem pré-visualização</span>
-                  <span class="text-[10px] text-slate-300 font-sans">Abra a lâmina para ver</span>
+                  <span class="text-[11px] text-neutral-400 font-serif">Sem pré-visualização</span>
+                  <span class="text-[10px] text-neutral-500 font-mono">Abra a lâmina para ver</span>
                 </div>
                 <img
                   src="${thumbSrc}"
                   alt="${nomeLamina}"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onerror="var fb='${thumbSrcFallback}'; if(fb && this.src!==fb){this.src=fb;}else{this.style.display='none';var ph=this.parentElement.querySelector('.thumb-placeholder');if(ph){ph.classList.remove('hidden');ph.classList.add('flex');}}"
                 >
-                <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2.5 py-1 rounded-md backdrop-blur-sm font-sans">
-                  ${coloracaoNome} - 40x
+                <div class="absolute bottom-2 left-2 bg-black/70 border border-white/10 text-neutral-200 text-[10px] px-2.5 py-1 rounded-md backdrop-blur-sm font-mono tracking-wider">
+                  ${coloracaoNome} &bull; 40x
                 </div>
               </div>
               <!-- Rodapé do Card -->
               <div class="mt-4 flex items-center justify-between gap-2">
-                <h3 class="text-base font-serif font-semibold text-slate-800 group-hover:text-[#d4af37] transition-colors leading-tight">${nomeLamina}</h3>
-                <span class="shrink-0 w-8 h-8 rounded-full bg-slate-50 group-hover:bg-[#d4af37]/10 flex items-center justify-center text-slate-400 group-hover:text-[#d4af37] transition-colors">
+                <h3 class="text-base font-serif font-semibold text-neutral-100 group-hover:text-[#d4af37] transition-colors leading-tight">${nomeLamina}</h3>
+                <span class="shrink-0 w-8 h-8 rounded-lg bg-neutral-950/80 border border-white/[0.06] group-hover:border-[#d4af37]/40 flex items-center justify-center text-neutral-500 group-hover:text-[#d4af37] transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </span>
               </div>

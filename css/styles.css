@@ -15,35 +15,35 @@
 }
 
 /* ==========================================================================
-   ANIMAÇÕES UI/UX HIGH-END
+   ANIMAÇÕES UI/UX HIGH-END (RÁPIDAS E FUNCIONAIS < 200ms)
    ========================================================================== */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in-up {
-  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInUp 0.18s ease-out forwards;
   opacity: 0;
 }
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
+.delay-100 { animation-delay: 0ms; }
+.delay-200 { animation-delay: 0ms; }
+.delay-300 { animation-delay: 0ms; }
+.delay-400 { animation-delay: 0ms; }
 
-/* Efeito Glassmorphism High-End para os Cards */
+/* Efeito Obsidian Glassmorphism Discreto para os Cards */
 .glass-card {
-  background: rgba(24, 24, 27, 0.85); /* Aumentado de 0.65 para 0.85 a pedido do usuário */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 8px 16px -4px rgba(0, 0, 0, 0.3);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(18, 18, 20, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4);
+  transition: all 0.15s ease-out;
 }
 .glass-card:hover {
-  background: rgba(24, 24, 27, 0.95);
-  border-color: rgba(212, 175, 55, 0.4); /* Tom dourado translúcido sutil na borda */
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 20px 30px -10px rgba(0, 0, 0, 0.6);
-  transform: translateY(-6px);
+  background: rgba(24, 24, 27, 0.7);
+  border-color: rgba(212, 175, 55, 0.35); /* Toque pontual de ouro-champanhe */
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
 }
 
 html {
@@ -58,7 +58,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background-color: #090b10;
+  background-color: #050505;
   color: #f8fafc;
   overflow-x: clip;
   line-height: 1.5;
@@ -122,20 +122,11 @@ body {
   will-change: transform, box-shadow;
 }
 
-/* Card 1: Anatomia Macroscópica (Dark Mode) */
+/* Cards de Acesso da Home (Sóbrios & Borderless) */
 #pgHome .bg-zinc-950:hover {
-  transform: translateY(-4px);
-  border-color: #3f3f46 !important;
-  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.8), 
-              0 0 25px rgba(37, 99, 235, 0.18) !important;
-}
-
-/* Card 2: Histologia (Light Mode) */
-#pgHome .bg-slate-50:hover {
-  transform: translateY(-4px);
-  border-color: #cbd5e1 !important;
-  box-shadow: 0 20px 30px -10px rgba(148, 163, 184, 0.35), 
-              0 10px 15px -5px rgba(0, 0, 0, 0.05) !important;
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.4) !important;
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.7) !important;
 }
 
 /* Efeito de compressão tátil em botões ao clicar (Active State) */
@@ -209,9 +200,9 @@ button:active {
   margin-left: -12px;
   margin-right: -12px;
   border-radius: 50%;
-  background-color: #2563eb;
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8), 
+  background-color: #d4af37;
+  border: 2px solid #050505;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.4), 
               0 3px 10px rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
@@ -219,13 +210,13 @@ button:active {
   cursor: pointer;
   font-family: 'Inter', monospace;
   font-weight: 700;
-  color: #ffffff;
+  color: #050505;
   z-index: 20;
   user-select: none;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), 
-              background-color 0.2s ease, 
-              border-color 0.2s ease, 
-              box-shadow 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.15s ease, 
+              border-color 0.15s ease, 
+              box-shadow 0.15s ease;
   will-change: transform;
 }
 
@@ -236,18 +227,17 @@ button:active {
   margin-left: -7px !important;
   margin-top: -7px !important;
   font-size: 0 !important;
-  background-color: #06b6d4 !important; /* Turquesa clínico de alta nitidez */
-  box-shadow: 0 0 0 2px #ffffff, 
+  background-color: #d4af37 !important; /* Ouro-champanhe clínico de alta nitidez */
+  box-shadow: 0 0 0 2px #050505, 
               0 2px 8px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Hover no pino para realce interativo antes da seleção */
 .pin-marker:hover,
 .anatomy-pin-marker:hover {
-  background-color: #f59e0b !important; /* Cor Âmbar de atenção e contraste */
-  border-color: #ffffff;
-  box-shadow: 0 0 0 3px #ffffff, 
-              0 0 15px rgba(245, 158, 11, 0.65), 
+  background-color: #f1db8b !important;
+  border-color: #050505;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.6), 
               0 4px 12px rgba(0, 0, 0, 0.6);
   z-index: 30;
 }

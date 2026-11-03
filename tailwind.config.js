@@ -9,8 +9,8 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['Merriweather', 'serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        serif: ['"Cormorant Garamond"', 'Merriweather', 'serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
       }
     },
   },
