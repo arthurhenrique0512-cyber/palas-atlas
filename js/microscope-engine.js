@@ -1389,8 +1389,8 @@ function inicializarOpenSeadragon() {
 
       const urlParams = new URLSearchParams(window.location.search);
       const initialMagParam = urlParams.get("mag");
-      // Padrão de abertura do laboratório: abre diretamente na resolução de captura (40x), permitindo override via ?mag=
-      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : (maxMag >= 40 ? 40 : maxMag);
+      // Padrão de abertura do laboratório: começa na objetiva de 4x (como no microscópio real), permitindo override via ?mag=
+      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : 4;
       const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
 
       const imgBounds = viewer.world.getItemAt(0)?.getBounds();
