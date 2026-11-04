@@ -1,187 +1,220 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <title>Política de Privacidade e Cookies - Palas Atlas</title>
+  <title>Política de Privacidade — Palas Atlas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('palas_theme');
+        var theme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+    window.setPalasTheme = function(theme) {
+      var next = theme === 'light' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('palas_theme', next); } catch (e) {}
+      document.querySelectorAll('brand-logo').forEach(function(el) {
+        if (typeof el.render === 'function') el.render();
+      });
+      var btn = document.getElementById('btnThemeToggle');
+      if (btn) {
+        var isDark = next === 'dark';
+        var iconSun = btn.querySelector('.theme-icon-sun');
+        var iconMoon = btn.querySelector('.theme-icon-moon');
+        if (iconSun && iconMoon) {
+          iconSun.classList.toggle('hidden', !isDark);
+          iconMoon.classList.toggle('hidden', isDark);
+        }
+      }
+    };
+    window.togglePalasTheme = function() {
+      var current = document.documentElement.getAttribute('data-theme') || 'dark';
+      window.setPalasTheme(current === 'dark' ? 'light' : 'dark');
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+      window.setPalasTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+    });
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <!-- Favicon Oficial Palas Atlas -->
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=1">
-  <link rel="stylesheet" href="css/styles.css?v=6">
-  <script src="js/brand-logo.js?v=6"></script>
+  <link rel="stylesheet" href="css/tailwind.min.css?v=13">
+  <link rel="stylesheet" href="css/styles.css?v=20">
+  <script src="js/brand-logo.js?v=13"></script>
 </head>
 
-<body class="bg-slate-50 text-slate-800 font-sans selection:bg-[#d4af37]/30 selection:text-slate-900">
-  
-  <!-- HEADER GLOBAL (Studio Dark) -->
-  <header class="w-full h-20 bg-neutral-950/90 backdrop-blur-md border-b border-white/[0.08] sticky top-0 z-50 px-6 flex items-center justify-between transition-all duration-300">
-    <div class="flex items-center">
-      <a href="index.html" class="px-3.5 py-2 text-zinc-400 hover:text-white hover:bg-white/[0.06] rounded-full transition-all text-xs font-medium items-center gap-2 inline-flex border border-white/[0.08] cursor-pointer" aria-label="Voltar para a página inicial">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>Voltar ao Atlas</span>
+<body class="sobre-page bg-[#f8fafc] text-slate-800 font-sans selection:bg-sky-600/20 selection:text-slate-900 min-h-screen flex flex-col">
+
+  <!-- HEADER GLOBAL UNIFICADO -->
+  <header id="palasMinimalHeader" class="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/90 sticky top-0 z-50 transition-all duration-300 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)]">
+    <div class="h-[2.5px] w-full bg-gradient-to-r from-slate-900 via-sky-600 to-slate-900"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-[68px] flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 z-10">
+        <a href="index.html" class="min-h-[40px] px-3.5 py-2 text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 rounded-xl transition-all text-xs font-sans font-semibold items-center gap-2 inline-flex border border-slate-200/90 cursor-pointer no-underline" aria-label="Voltar para a página inicial">
+          <span>&larr;</span>
+          <span class="hidden sm:inline">Voltar ao Início</span>
+        </a>
+      </div>
+
+      <a href="index.html" class="absolute left-1/2 -translate-x-1/2 flex items-center cursor-pointer select-none no-underline z-10" aria-label="Palas Atlas - Início">
+        <brand-logo is-home="false" theme="light-bg" show-subtitle="false" size="sm"></brand-logo>
       </a>
-    </div>
-    <div class="flex items-center justify-center text-center">
-      <a href="index.html" class="flex items-center cursor-pointer select-none no-underline" aria-label="Palas Atlas - Início">
-        <brand-logo is-home="false" theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
-      </a>
-    </div>
-    <div class="flex items-center gap-2">
-      <a href="index.html" class="inline-flex px-3.5 py-1.5 text-xs font-medium text-zinc-400 hover:text-[#d4af37] rounded-full hover:bg-white/[0.04] transition-colors">Início</a>
+
+      <div class="flex items-center gap-2 z-10">
+        <button id="btnThemeToggle" type="button" onclick="window.togglePalasTheme()" class="h-10 w-10 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 flex items-center justify-center active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none" aria-label="Alternar Tema" title="Alternar Tema">
+          <svg class="theme-icon-sun w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+          </svg>
+          <svg class="theme-icon-moon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+          </svg>
+        </button>
+        <a href="termos.html" class="inline-flex px-3.5 py-2 text-xs font-sans font-semibold text-slate-600 hover:text-sky-700 rounded-xl hover:bg-slate-100 transition-colors no-underline">Termos de Uso</a>
+      </div>
     </div>
   </header>
 
-  <!-- CONTEÚDO PRINCIPAL (Light Mode) -->
-  <div class="min-h-screen pt-6 pb-16 px-6 max-w-4xl mx-auto">
-    
-    <!-- BREADCRUMBS -->
-    <div class="flex items-center gap-2 text-xs md:text-sm font-sans text-slate-500 mb-1.5 flex-wrap">
-      <a href="index.html" class="text-slate-600 hover:text-[#d4af37] hover:underline transition-colors">Início</a>
-      <span class="text-slate-400 select-none">&rsaquo;</span>
-      <span class="text-slate-900 font-semibold pointer-events-none">Política de Privacidade</span>
+  <!-- HERO INSTITUCIONAL -->
+  <section class="w-full bg-white text-slate-900 border-b border-slate-200/80 relative overflow-hidden py-12 sm:py-16 px-6">
+    <div id="homeBgGrid" class="absolute inset-0 pointer-events-none" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div>
+    <div class="max-w-4xl mx-auto relative z-10">
+      <nav class="flex items-center gap-2 text-xs font-sans text-slate-400 mb-4 flex-wrap" aria-label="Navegação">
+        <a href="index.html" class="text-slate-500 hover:text-sky-700 transition-colors no-underline">Início</a>
+        <span class="text-slate-300 select-none">&rsaquo;</span>
+        <span class="text-slate-900 font-semibold">Política de Privacidade</span>
+      </nav>
+
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-serif font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+        Privacidade e <span class="text-sky-700">Proteção de Dados</span>
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 max-w-2xl font-sans leading-relaxed">
+        Transparência sobre como o Palas Atlas armazena preferências locais e protege informações em conformidade com a LGPD (Lei nº 13.709/2018).
+      </p>
+      <div class="mt-5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-xs font-mono text-slate-500">
+        <span>Conformidade LGPD</span>
+        <span>&bull;</span>
+        <span>Vigência: 2026</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTEÚDO PRINCIPAL EM CARDS NUMERADOS -->
+  <main class="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-5">
+
+    <!-- Introdução -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_8px_28px_-8px_rgba(15,23,42,0.05)]">
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+        O <strong class="text-slate-900 font-semibold">Palas Atlas</strong> valoriza a sua privacidade e adota práticas de coleta mínima de dados. Esta Política de Privacidade descreve como tratamos informações técnicas e preferências de interface durante o uso dos módulos de <strong class="text-slate-900 font-semibold">Histologia</strong>, <strong class="text-slate-900 font-semibold">Patologia</strong>, <strong class="text-slate-900 font-semibold">Parasitologia</strong> e <strong class="text-slate-900 font-semibold">Microbiologia</strong>.
+      </p>
     </div>
 
-    <!-- TÍTULO -->
-    <header class="border-b border-slate-200 pb-6 mb-8 mt-2">
-      <h1 class="font-serif text-3xl md:text-4xl font-bold text-slate-900 mb-2">Política de Privacidade e Cookies</h1>
-      <p class="text-sm text-slate-500 font-sans">Última atualização: 09 de Agosto de 2026</p>
-    </header>
+    <!-- 01 -->
+    <section class="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_8px_28px_-8px_rgba(15,23,42,0.05)] space-y-3">
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg">01</span>
+        <h2 class="text-lg sm:text-xl font-serif font-bold text-slate-900">Coleta e Uso de Informações</h2>
+      </div>
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+        Para oferecer uma experiência rápida e estável, operamos com o mínimo de dados técnicos necessários:
+      </p>
+      <ul class="list-disc pl-5 space-y-1.5 text-slate-600 text-sm sm:text-base">
+        <li><strong class="text-slate-900 font-semibold">Telemetria Técnica:</strong> Requisições padrão de carregamento das matrizes de imagem (<code>.dzi</code>) para entrega eficiente dos blocos de alta resolução.</li>
+        <li><strong class="text-slate-900 font-semibold">Autenticação Restrita (CMS):</strong> Credenciais de acesso são utilizadas exclusivamente pelos curadores e docentes autorizados no gerenciamento do acervo.</li>
+      </ul>
+    </section>
 
-    <!-- TEXTO EDITORIAL -->
-    <main class="space-y-8 text-slate-700 leading-relaxed text-sm md:text-base">
-      <section class="space-y-3">
-        <h2 class="text-lg md:text-xl font-bold text-slate-900">Introdução</h2>
-        <p>
-          O Palas Atlas valoriza a sua privacidade e está comprometido com a proteção dos dados pessoais de seus usuários. Esta Política de Privacidade explica como coletamos, usamos, armazenamos e protegemos suas informações ao utilizar nossa plataforma de estudo morfológico, em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018).
-        </p>
-      </section>
+    <!-- 02 -->
+    <section class="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_8px_28px_-8px_rgba(15,23,42,0.05)] space-y-3">
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg">02</span>
+        <h2 class="text-lg sm:text-xl font-serif font-bold text-slate-900">Armazenamento Local (<code>localStorage</code>) e Cookies</h2>
+      </div>
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+        Utilizamos o armazenamento local do seu navegador apenas para preservar suas preferências visuais:
+      </p>
+      <ul class="list-disc pl-5 space-y-1.5 text-slate-600 text-sm sm:text-base">
+        <li><strong class="text-slate-900 font-semibold">Preferência de Tema:</strong> Memoriza sua escolha entre o Tema Escuro (Preto &amp; Dourado) e o Tema Claro (Branco &amp; Azul-Petróleo).</li>
+        <li><strong class="text-slate-900 font-semibold">Estado do Leitor Óptico:</strong> Guarda se o painel lateral de descrição estava expandido ou recolhido na última sessão.</li>
+      </ul>
+    </section>
 
-      <section class="space-y-3">
-        <h2 class="text-lg md:text-xl font-bold text-slate-900">1. Coleta e Uso de Informações</h2>
-        <p>
-          Para proporcionar uma experiência de aprendizado fluida e personalizada, coletamos apenas o número mínimo de informações necessárias para o funcionamento do sistema:
-        </p>
-        <ul class="list-disc pl-5 space-y-1 text-slate-600">
-          <li><strong>Dados de Navegação e Telemetria:</strong> Endereço IP, tipo de navegador, sistema operacional, páginas e lâminas acessadas, e tempo de permanência na plataforma para otimização dos servidores de imagem (DZI).</li>
-          <li><strong>Dados de Cadastro e Autenticação:</strong> Nome, endereço de e-mail e preferências de conta para autenticação segura e salvamento do progresso de estudo.</li>
-        </ul>
-      </section>
+    <!-- 03 -->
+    <section class="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_8px_28px_-8px_rgba(15,23,42,0.05)] space-y-3">
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg">03</span>
+        <h2 class="text-lg sm:text-xl font-serif font-bold text-slate-900">Compartilhamento e Segurança</h2>
+      </div>
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+        O Palas Atlas não comercializa, aluga nem compartilha dados de usuários com terceiros para fins publicitários. Toda a comunicação com o banco de dados em nuvem ocorre via conexões criptografadas (HTTPS/TLS).
+      </p>
+    </section>
 
-      <section class="space-y-3">
-        <h2 class="text-lg md:text-xl font-bold text-slate-900">2. Cookies e Armazenamento Local (<code>localStorage</code>)</h2>
-        <p>
-          Utilizamos cookies e tecnologias de armazenamento local do navegador (<code>localStorage</code> e <code>sessionStorage</code>) para memorizar preferências e otimizar o desempenho do visualizador interativo:
-        </p>
-        <ul class="list-disc pl-5 space-y-1 text-slate-600">
-          <li><strong>Estritamente Necessários:</strong> Essenciais para manter sua sessão ativa de forma segura entre os módulos de Anatomia e Histologia.</li>
-          <li><strong>Desempenho e Preferências:</strong> Armazenam configurações visuais (como tema e nível de zoom do OpenSeadragon) para evitar reconfigurações a cada acesso.</li>
-          <li><strong>Análise (Analytics):</strong> Auxiliam nossa equipe a entender quais lâminas e estruturas são mais consultadas, direcionando melhorias contínuas no acervo.</li>
-        </ul>
-      </section>
+    <!-- 04 -->
+    <section class="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_8px_28px_-8px_rgba(15,23,42,0.05)] space-y-3">
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg">04</span>
+        <h2 class="text-lg sm:text-xl font-serif font-bold text-slate-900">Direitos do Titular e Contato</h2>
+      </div>
+      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+        Você pode limpar os dados locais a qualquer instante pelas configurações do navegador. Para esclarecimentos sobre privacidade ou solicitações relacionadas à LGPD, entre em contato pelo e-mail <a href="mailto:contato@palasatlas.com" class="text-sky-700 font-semibold hover:underline">contato@palasatlas.com</a>.
+      </p>
+    </section>
 
-      <section class="space-y-3">
-        <h2 class="text-lg md:text-xl font-bold text-slate-900">3. Gerenciamento de Armazenamento no Navegador</h2>
-        <p>
-          Você pode optar por desativar ou limpar cookies e dados de sites diretamente nas configurações do seu navegador. Alertamos que a desativação de recursos essenciais pode impactar o funcionamento do visualizador de imagens e a gravação do seu progresso.
-        </p>
-      </section>
+  </main>
 
-      <section class="space-y-3">
-        <h2 class="text-lg md:text-xl font-bold text-slate-900">4. Compartilhamento e Segurança dos Dados</h2>
-        <p>
-          O Palas Atlas não vende, aluga ou compartilha dados pessoais com terceiros para fins de marketing. As informações de autenticação e banco de dados são processadas de forma criptografada em infraestrutura de nuvem segura. Adotamos medidas técnicas adequadas de segurança cibernética para proteger seus dados contra acessos não autorizados, vazamentos ou alterações ilícitas.
-        </p>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-lg md:text-xl font-bold text-slate-900">5. Retenção de Dados e Seus Direitos (LGPD)</h2>
-        <p>
-          Os dados de cadastro permanecem armazenados enquanto a conta do usuário estiver ativa na plataforma. Como titular dos dados, você tem o direito de solicitar a qualquer momento:
-        </p>
-        <ul class="list-disc pl-5 space-y-1 text-slate-600">
-          <li>Confirmação e acesso aos dados pessoais tratados.</li>
-          <li>Correção de dados incompletos, inexatos ou desatualizados.</li>
-          <li>Exclusão definitiva de sua conta e histórico de dados do banco.</li>
-        </ul>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-lg md:text-xl font-bold text-slate-900">6. Contato e Esclarecimento de Dúvidas</h2>
-        <p>
-          Para dúvidas sobre esta Política de Privacidade, gerenciamento de dados ou exercício de seus direitos como titular, entre em contato com nossa equipe através dos canais oficiais de comunicação disponíveis na plataforma.
-        </p>
-      </section>
-    </main>
-  </div>
-
-  <!-- FOOTER INSTITUCIONAL (GLOBAL - LIGHT MODE) -->
-  <footer id="footer-light" class="w-full bg-zinc-100 text-zinc-700 border-t border-zinc-200 mt-auto font-sans">
-    <div class="max-w-7xl mx-auto px-6 py-16 sm:py-20">
+  <!-- FOOTER INSTITUCIONAL UNIFICADO -->
+  <footer id="footer-light" class="w-full bg-white text-slate-600 border-t border-slate-200/90 mt-auto font-sans">
+    <div class="max-w-7xl mx-auto px-6 py-14 sm:py-16">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12">
-        
-        <!-- Coluna 1: Marca -->
-        <div class="space-y-4">
+        <div class="space-y-3.5">
           <div class="flex items-center gap-2">
-            <span class="text-lg font-serif font-bold text-zinc-900">PALAS</span>
-            <span class="text-lg font-serif font-bold text-zinc-900">ATLAS</span>
+            <span class="text-lg font-bold text-slate-900 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">PALAS</span>
+            <span class="text-lg font-bold text-sky-700 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">ATLAS</span>
           </div>
-          <p class="text-xs leading-relaxed max-w-xs text-zinc-700">
-            Atlas Morfológico Digital. Integração científica e prática laboratorial para o ciclo básico da saúde.
+          <p class="text-xs leading-relaxed max-w-xs text-slate-500">
+            Integração científica e prática laboratorial para estudantes da área da saúde.
           </p>
-          <div class="flex items-center gap-3 pt-2">
-            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Twitter">
-              <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Instagram">
-              <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-            </a>
-            <a href="mailto:contato@palasatlas.com" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Email">
-              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </a>
-          </div>
         </div>
 
-        <!-- Coluna 2: Módulos Morfológicos -->
         <div class="space-y-3">
-          <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Módulos</h4>
+          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Disciplinas</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Histologia</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Anatomia Macroscópica</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Patologia Geral</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Parasitologia</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Microbiologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Histologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Patologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Parasitologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Microbiologia</a></li>
           </ul>
         </div>
 
-        <!-- Coluna 3: Plataforma -->
         <div class="space-y-3">
-          <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Plataforma</h4>
+          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Plataforma</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Início (Home)</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Início (Home)</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
           </ul>
         </div>
 
-        <!-- Coluna 4: Suporte e Legal -->
         <div class="space-y-3">
-          <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Suporte &amp; Legal</h4>
+          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Suporte &amp; Legal</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="mailto:contato@palasatlas.com">Reportar Erro</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="termos.html">Termos de Uso</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="privacidade.html">Privacidade</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="termos.html">Termos de Uso</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="privacidade.html">Privacidade</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
           </ul>
         </div>
-
       </div>
 
-      <!-- Rodapé Bottom -->
-      <div class="mt-16 pt-8 border-t border-zinc-200 text-center text-xs text-zinc-500">
+      <div class="mt-14 pt-8 border-t border-slate-200/80 text-center text-xs text-slate-400">
         &copy; 2026 Palas Atlas &mdash; Todos os direitos reservados. Projeto Acadêmico sem fins lucrativos.
       </div>
     </div>

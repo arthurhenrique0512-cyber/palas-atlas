@@ -1,72 +1,118 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <title>Sobre o Projeto - Palas Atlas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('palas_theme');
+        var theme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+    window.setPalasTheme = function(theme) {
+      var next = theme === 'light' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('palas_theme', next); } catch (e) {}
+      document.querySelectorAll('brand-logo').forEach(function(el) {
+        if (typeof el.render === 'function') el.render();
+      });
+      var btn = document.getElementById('btnThemeToggle');
+      if (btn) {
+        var isDark = next === 'dark';
+        var iconSun = btn.querySelector('.theme-icon-sun');
+        var iconMoon = btn.querySelector('.theme-icon-moon');
+        if (iconSun && iconMoon) {
+          iconSun.classList.toggle('hidden', !isDark);
+          iconMoon.classList.toggle('hidden', isDark);
+        }
+      }
+    };
+    window.togglePalasTheme = function() {
+      var current = document.documentElement.getAttribute('data-theme') || 'dark';
+      window.setPalasTheme(current === 'dark' ? 'light' : 'dark');
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+      window.setPalasTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+    });
+  </script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <!-- Favicon Oficial Palas Atlas -->
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=1">
-  <link rel="stylesheet" href="css/styles.css?v=8">
-  <script src="js/brand-logo.js?v=6"></script>
+  <link rel="stylesheet" href="css/tailwind.min.css?v=13">
+  <link rel="stylesheet" href="css/styles.css?v=20">
+  <script src="js/brand-logo.js?v=13"></script>
 </head>
 
-<body class="bg-neutral-950 text-neutral-200 font-sans selection:bg-[#d4af37]/25 selection:text-white">
+<body class="sobre-page bg-[#f8fafc] text-slate-800 font-sans selection:bg-sky-600/20 selection:text-slate-900">
   
-  <!-- HEADER GLOBAL (Studio Dark) -->
-  <header class="w-full h-20 bg-neutral-950/90 backdrop-blur-md border-b border-white/[0.06] sticky top-0 z-50 px-6 flex items-center justify-between transition-all duration-150">
-    <div class="flex items-center">
-      <a href="index.html" class="px-3.5 py-2 text-neutral-400 hover:text-white hover:bg-white/[0.04] rounded-xl transition-all text-xs font-mono uppercase tracking-wider items-center gap-2 inline-flex border border-white/[0.08] cursor-pointer" aria-label="Voltar para a página inicial">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>Voltar ao Atlas</span>
+  <!-- HEADER GLOBAL UNIFICADO -->
+  <header id="palasMinimalHeader" class="w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/90 sticky top-0 z-50 transition-all duration-300 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)]">
+    <div class="h-[2.5px] w-full bg-gradient-to-r from-slate-900 via-sky-600 to-slate-900"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-[68px] flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 z-10">
+        <a href="index.html" class="min-h-[40px] px-3.5 py-2 text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 rounded-xl transition-all text-xs font-sans font-semibold items-center gap-2 inline-flex border border-slate-200/90 cursor-pointer no-underline" aria-label="Voltar para a página inicial">
+          <span>&larr;</span>
+          <span class="hidden sm:inline">Voltar ao Início</span>
+        </a>
+      </div>
+      <a href="index.html" class="absolute left-1/2 -translate-x-1/2 flex items-center cursor-pointer select-none no-underline z-10" aria-label="Palas Atlas - Início">
+        <brand-logo is-home="false" theme="light-bg" show-subtitle="false" size="sm"></brand-logo>
       </a>
-    </div>
-    <div class="flex items-center justify-center text-center">
-      <a href="index.html" class="flex items-center cursor-pointer select-none no-underline" aria-label="Palas Atlas - Início">
-        <brand-logo is-home="false" theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
-      </a>
-    </div>
-    <div class="flex items-center gap-2">
-      <a href="index.html" class="hidden sm:inline-flex px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-[#d4af37] rounded-lg hover:bg-white/[0.04] transition-colors">Início</a>
-      <a href="#equipe" class="inline-flex px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-[#d4af37] rounded-lg hover:bg-white/[0.04] transition-colors">Equipe</a>
+      <div class="flex items-center gap-2 z-10">
+        <button id="btnThemeToggle" type="button" onclick="window.togglePalasTheme()" class="h-10 w-10 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 flex items-center justify-center active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none" aria-label="Alternar Tema" title="Alternar Tema">
+          <svg class="theme-icon-sun w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+          </svg>
+          <svg class="theme-icon-moon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+          </svg>
+        </button>
+        <a href="#equipe" class="inline-flex px-3.5 py-2 text-xs font-sans font-semibold text-slate-600 hover:text-sky-700 rounded-xl hover:bg-slate-100 transition-colors no-underline">Equipe</a>
+      </div>
     </div>
   </header>
 
-  <!-- HERO INSTITUCIONAL PREMIUM -->
-  <section class="w-full bg-[#050505] text-white border-b border-white/[0.06] relative overflow-hidden py-16 sm:py-20 px-6">
+  <!-- HERO INSTITUCIONAL -->
+  <section class="w-full bg-white text-slate-900 border-b border-slate-200/80 relative overflow-hidden py-14 sm:py-18 px-6">
+    <div id="homeBgGrid" class="absolute inset-0 pointer-events-none" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div>
     <div class="max-w-4xl mx-auto relative z-10">
       
       <!-- Breadcrumb Sóbrio -->
-      <nav class="flex items-center gap-2 text-xs font-mono text-neutral-500 mb-6 flex-wrap" aria-label="Navegação">
-        <a href="index.html" class="text-neutral-400 hover:text-[#d4af37] transition-colors">Início</a>
-        <span class="text-neutral-600 select-none">&rsaquo;</span>
-        <span class="text-neutral-200 font-medium">Sobre o Projeto</span>
+      <nav class="flex items-center gap-2 text-xs font-sans text-slate-400 mb-6 flex-wrap" aria-label="Navegação">
+        <a href="index.html" class="text-slate-500 hover:text-sky-700 transition-colors no-underline">Início</a>
+        <span class="text-slate-300 select-none">&rsaquo;</span>
+        <span class="text-slate-900 font-semibold">Sobre o Projeto</span>
       </nav>
 
       <!-- Título de Alto Impacto -->
-      <h1 class="text-3xl sm:text-5xl font-serif font-bold text-white tracking-tight leading-tight mb-5">
+      <h1 class="text-3xl sm:text-5xl font-serif font-extrabold text-slate-900 tracking-tight leading-tight mb-5">
         Ciência Morfológica <br class="hidden sm:inline"/>
-        <span class="text-[#d4af37]">Fiel à Realidade Prática</span>
+        <span class="text-sky-700 font-extrabold">Fiel à Realidade Prática</span>
       </h1>
 
       <!-- Subtítulo Didático -->
-      <p class="text-base sm:text-lg text-neutral-400 max-w-2xl font-sans leading-relaxed">
+      <p class="text-base sm:text-lg text-slate-600 max-w-2xl font-sans leading-relaxed">
         O Palas Atlas integra tecnologia digital e vivência microscópica autêntica para enriquecer a formação médica e o ciclo básico da saúde.
       </p>
 
     </div>
   </section>
 
-  <!-- CONTEÚDO PRINCIPAL (Obsidian Editorial) -->
+  <!-- CONTEÚDO PRINCIPAL (Editorial Claro) -->
   <div class="min-h-screen pt-12 pb-20 px-6 max-w-4xl mx-auto">
 
     <!-- TEXTO EDITORIAL -->
-    <main class="text-neutral-300 text-base leading-relaxed space-y-6 mb-8 font-sans">
+    <main class="text-slate-600 text-base leading-relaxed space-y-6 mb-8 font-sans">
       <p>
         O Palas Atlas nasceu de uma iniciativa conjunta entre estudantes e professores movidos pelo desejo de transformar a aprendizagem nas ciências morfológicas. O projeto surgiu de uma constatação simples: a maioria dos acervos digitais atuais disponibiliza apenas lâminas "perfeitas" e altamente selecionadas, que muitas vezes se distanciam da vivência prática real do laboratório acadêmico.
       </p>
@@ -79,47 +125,47 @@
         O objetivo do Palas Atlas é expandir continuamente sua estrutura até alcançar a integralidade de todas as disciplinas e áreas morfológicas, consolidando um ecossistema completo, prático e acessível para a formação nas ciências da saúde.
       </p>
 
-      <blockquote class="border-l-2 border-[#d4af37] pl-5 py-3 my-8 italic text-neutral-200 font-serif text-lg bg-neutral-900/30 border-white/[0.04] rounded-r-xl">
+      <blockquote class="border-l-2 border-sky-600 pl-5 py-4 my-8 italic text-slate-800 font-serif text-lg bg-white border border-slate-200/80 shadow-sm rounded-r-xl">
         "Aproximar a tecnologia digital da realidade prática do laboratório é o caminho para transformar o ensino morfológico em uma experiência viva, autêntica e acessível a todos os estudantes."
       </blockquote>
     </main>
 
     <!-- EQUIPE E CORPO EDITORIAL -->
     <section id="equipe" class="mt-12 space-y-6">
-      <header class="border-b border-white/[0.06] pb-4">
-        <h2 class="text-2xl font-serif font-bold text-neutral-100">Equipe e Curadoria</h2>
-        <p class="text-sm text-neutral-400 mt-1">Concepção científica e tecnológica do Palas Atlas.</p>
+      <header class="border-b border-slate-200/80 pb-4">
+        <h2 class="text-2xl font-serif font-bold text-slate-900">Equipe e Curadoria</h2>
+        <p class="text-sm text-slate-500 mt-1">Concepção científica e tecnológica do Palas Atlas.</p>
       </header>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         <!-- Membro 1 (Card de Destaque Principal): Arthur Ribeiro -->
-        <div class="md:col-span-2 flex flex-col justify-between p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group">
+        <div class="md:col-span-2 flex flex-col justify-between p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 hover:border-sky-500/50 transition-all shadow-[0_12px_32px_-8px_rgba(15,23,42,0.08)] group">
           <div class="space-y-4">
             <!-- Cabeçalho Limpo: Foto e Nome -->
             <div class="flex items-center gap-4">
               <!-- Foto Avatar -->
-              <div class="shrink-0 relative w-16 h-16 rounded-full bg-neutral-950 border border-white/[0.08] flex items-center justify-center text-neutral-500 overflow-hidden aspect-square">
-                <svg class="w-8 h-8 absolute z-0 text-neutral-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <picture>
                   <source srcset="images/team/arthur.webp" type="image/webp">
                   <img src="images/team/arthur.png" loading="lazy" width="64" height="64" alt="Arthur Ribeiro" onerror="this.src='assets/equipe/arthur.png'; this.onerror=function(){this.style.display='none';};" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
                 </picture>
               </div>
               <div>
-                <h3 class="text-lg sm:text-xl font-serif font-bold text-neutral-100 group-hover:text-[#d4af37] transition-colors">Arthur Ribeiro</h3>
-                <p class="text-xs text-neutral-400 font-mono uppercase tracking-wider">Idealização &amp; Desenvolvimento</p>
+                <h3 class="text-lg sm:text-xl font-serif font-bold text-slate-900 group-hover:text-sky-800 transition-colors">Arthur Ribeiro</h3>
+                <p class="text-xs text-sky-700 font-sans font-semibold uppercase tracking-wider">Idealização &amp; Desenvolvimento</p>
               </div>
             </div>
 
             <!-- Descrição Principal -->
-            <p class="text-sm text-neutral-300 leading-relaxed pt-1 font-sans">
+            <p class="text-sm text-slate-600 leading-relaxed pt-1 font-sans">
               Estudante de Medicina e idealizador do Palas Atlas, responsável pela concepção, desenvolvimento da plataforma digital e curadoria do acervo morfológico.
             </p>
 
             <!-- Relato Expandido -->
-            <div id="relato-membro1" class="hidden pt-3 border-t border-white/[0.06] animate-fadeIn">
-              <p class="text-xs text-neutral-300 italic leading-relaxed bg-neutral-950/80 p-3.5 rounded-xl border border-white/[0.06] font-sans">
+            <div id="relato-membro1" class="hidden pt-3 border-t border-slate-200/80 animate-fadeIn">
+              <p class="text-xs text-slate-600 italic leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 font-sans">
                 "Desde o início da minha caminhada na medicina, busquei formas de contribuir com a comunidade acadêmica. O interesse pela docência e a experiência em grupos de estudo me ensinaram que o conhecimento se consolida na troca coletiva. Criei o Palas Atlas para materializar essa visão — uma plataforma pensada para aproximar o estudante da realidade prática, facilitando o ensino e inspirando a busca pelo conhecimento."
               </p>
             </div>
@@ -128,7 +174,7 @@
           <!-- Botão de Expansão -->
           <button
             onclick="document.getElementById('relato-membro1').classList.toggle('hidden'); this.querySelector('span').textContent = document.getElementById('relato-membro1').classList.contains('hidden') ? 'Ler relato completo' : 'Ocultar relato'; this.querySelector('svg').style.transform = document.getElementById('relato-membro1').classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';"
-            class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-neutral-400 hover:text-neutral-200 font-mono uppercase tracking-wider w-full transition-colors cursor-pointer"
+            class="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500 hover:text-sky-700 font-sans font-semibold uppercase tracking-wider w-full transition-colors cursor-pointer"
           >
             <span>Ler relato completo</span>
             <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -136,88 +182,88 @@
         </div>
 
         <!-- Membro 2: Prof. Dr. Fernando Fellicioni -->
-        <div class="flex flex-col justify-between p-6 rounded-xl bg-neutral-900/35 border border-white/[0.06] hover:border-[#d4af37]/40 transition-all group">
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-sky-500/50 shadow-sm transition-all group">
           <div class="space-y-4">
             <div class="flex items-center gap-4">
-              <div class="shrink-0 relative w-16 h-16 rounded-full bg-neutral-950 border border-white/[0.08] flex items-center justify-center text-neutral-500 overflow-hidden aspect-square">
-                <svg class="w-8 h-8 absolute z-0 text-neutral-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <picture>
                   <source srcset="images/team/fernando.webp" type="image/webp">
                   <img src="images/team/fernando.png" loading="lazy" width="64" height="64" alt="Prof. Dr. Fernando Fellicioni" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
                 </picture>
               </div>
               <div>
-                <h3 class="text-base sm:text-lg font-serif font-bold text-neutral-100 group-hover:text-[#d4af37] transition-colors">Prof. Dr. Fernando Fellicioni</h3>
-                <p class="text-xs text-neutral-400 font-mono uppercase tracking-wider">Orientação Acadêmica</p>
+                <h3 class="text-base sm:text-lg font-serif font-bold text-slate-900 group-hover:text-sky-800 transition-colors">Prof. Dr. Fernando Fellicioni</h3>
+                <p class="text-xs text-sky-700 font-sans font-semibold uppercase tracking-wider">Orientação Acadêmica</p>
               </div>
             </div>
-            <p class="text-sm text-neutral-400 leading-relaxed pt-1 font-sans">
+            <p class="text-sm text-slate-600 leading-relaxed pt-1 font-sans">
               Docente e orientador acadêmico, responsável pelo direcionamento pedagógico, rigor científico e consultoria institucional às atividades do Palas Atlas.
             </p>
           </div>
         </div>
 
         <!-- Membro 3: Iago Mutti -->
-        <div class="flex flex-col justify-between p-6 rounded-xl bg-neutral-900/35 border border-white/[0.06] hover:border-[#d4af37]/40 transition-all group">
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-sky-500/50 shadow-sm transition-all group">
           <div class="space-y-4">
             <div class="flex items-center gap-4">
-              <div class="shrink-0 relative w-16 h-16 rounded-full bg-neutral-950 border border-white/[0.08] flex items-center justify-center text-neutral-500 overflow-hidden aspect-square">
-                <svg class="w-8 h-8 absolute z-0 text-neutral-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <picture>
                   <source srcset="images/team/iago.webp" type="image/webp">
                   <img src="images/team/iago.png" loading="lazy" width="64" height="64" alt="Iago Mutti" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
                 </picture>
               </div>
               <div>
-                <h3 class="text-base sm:text-lg font-serif font-bold text-neutral-100 group-hover:text-[#d4af37] transition-colors">Iago Mutti</h3>
-                <p class="text-xs text-neutral-400 font-mono uppercase tracking-wider">Corpo Editorial &amp; Curadoria</p>
+                <h3 class="text-base sm:text-lg font-serif font-bold text-slate-900 group-hover:text-sky-800 transition-colors">Iago Mutti</h3>
+                <p class="text-xs text-sky-700 font-sans font-semibold uppercase tracking-wider">Corpo Editorial &amp; Curadoria</p>
               </div>
             </div>
-            <p class="text-sm text-neutral-400 leading-relaxed pt-1 font-sans">
+            <p class="text-sm text-slate-600 leading-relaxed pt-1 font-sans">
               Membro do corpo editorial e acadêmico do Palas Atlas, dedicado à revisão morfológica, estruturação e catalogação do acervo digital.
             </p>
           </div>
         </div>
 
         <!-- Membro 4: Carolina Tatagiba -->
-        <div class="flex flex-col justify-between p-6 rounded-xl bg-neutral-900/35 border border-white/[0.06] hover:border-[#d4af37]/40 transition-all group">
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-sky-500/50 shadow-sm transition-all group">
           <div class="space-y-4">
             <div class="flex items-center gap-4">
-              <div class="shrink-0 relative w-16 h-16 rounded-full bg-neutral-950 border border-white/[0.08] flex items-center justify-center text-neutral-500 overflow-hidden aspect-square">
-                <svg class="w-8 h-8 absolute z-0 text-neutral-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <picture>
                   <source srcset="images/team/carolina.webp" type="image/webp">
                   <img src="images/team/carolina.png" loading="lazy" width="64" height="64" alt="Carolina Tatagiba" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
                 </picture>
               </div>
               <div>
-                <h3 class="text-base sm:text-lg font-serif font-bold text-neutral-100 group-hover:text-[#d4af37] transition-colors">Carolina Tatagiba</h3>
-                <p class="text-xs text-neutral-400 font-mono uppercase tracking-wider">Corpo Editorial &amp; Curadoria</p>
+                <h3 class="text-base sm:text-lg font-serif font-bold text-slate-900 group-hover:text-sky-800 transition-colors">Carolina Tatagiba</h3>
+                <p class="text-xs text-sky-700 font-sans font-semibold uppercase tracking-wider">Corpo Editorial &amp; Curadoria</p>
               </div>
             </div>
-            <p class="text-sm text-neutral-400 leading-relaxed pt-1 font-sans">
+            <p class="text-sm text-slate-600 leading-relaxed pt-1 font-sans">
               Membro do corpo editorial e acadêmico do Palas Atlas, dedicada à curadoria científica, análise tecidual e validação de correlações clínicas.
             </p>
           </div>
         </div>
 
         <!-- Membro 5: Guilherme Berto -->
-        <div class="flex flex-col justify-between p-6 rounded-xl bg-neutral-900/35 border border-white/[0.06] hover:border-[#d4af37]/40 transition-all group">
+        <div class="flex flex-col justify-between p-6 rounded-2xl bg-white border border-slate-200/80 hover:border-sky-500/50 shadow-sm transition-all group">
           <div class="space-y-4">
             <div class="flex items-center gap-4">
-              <div class="shrink-0 relative w-16 h-16 rounded-full bg-neutral-950 border border-white/[0.08] flex items-center justify-center text-neutral-500 overflow-hidden aspect-square">
-                <svg class="w-8 h-8 absolute z-0 text-neutral-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <div class="shrink-0 relative w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden aspect-square">
+                <svg class="w-8 h-8 absolute z-0 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <picture>
                   <source srcset="images/team/guilherme.webp" type="image/webp">
                   <img src="images/team/guilherme.png" loading="lazy" width="64" height="64" alt="Guilherme Berto" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-transform duration-300 group-hover:scale-105">
                 </picture>
               </div>
               <div>
-                <h3 class="text-base sm:text-lg font-serif font-bold text-neutral-100 group-hover:text-[#d4af37] transition-colors">Guilherme Berto</h3>
-                <p class="text-xs text-neutral-400 font-mono uppercase tracking-wider">Corpo Editorial &amp; Curadoria</p>
+                <h3 class="text-base sm:text-lg font-serif font-bold text-slate-900 group-hover:text-sky-800 transition-colors">Guilherme Berto</h3>
+                <p class="text-xs text-sky-700 font-sans font-semibold uppercase tracking-wider">Corpo Editorial &amp; Curadoria</p>
               </div>
             </div>
-            <p class="text-sm text-neutral-400 leading-relaxed pt-1 font-sans">
+            <p class="text-sm text-slate-600 leading-relaxed pt-1 font-sans">
               Membro do corpo editorial e acadêmico do Palas Atlas, dedicado ao suporte metodológico, organização do conteúdo didático e precisão terminológica.
             </p>
           </div>
@@ -228,61 +274,60 @@
 
   </div>
 
-  <!-- FOOTER INSTITUCIONAL (GLOBAL - OBSIDIAN DARK) -->
-  <footer id="footer-dark" class="w-full bg-neutral-950 text-neutral-400 border-t border-white/[0.06] mt-auto font-sans transition-opacity duration-150">
+  <!-- FOOTER INSTITUCIONAL (GLOBAL - ACADÊMICO CLARO) -->
+  <footer id="footer-light" class="w-full bg-white text-slate-600 border-t border-slate-200/90 mt-auto font-sans transition-opacity duration-150">
     <div class="max-w-7xl mx-auto px-6 py-16 sm:py-20">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12">
         
         <!-- Coluna 1: Marca -->
         <div class="space-y-4">
           <div class="flex items-center gap-2">
-            <span class="text-lg font-serif font-bold text-neutral-100 tracking-wider">PALAS</span>
-            <span class="text-lg font-serif font-bold text-[#d4af37] tracking-wider">ATLAS</span>
+            <span class="text-lg font-bold text-slate-900 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">PALAS</span>
+            <span class="text-lg font-bold text-sky-700 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">ATLAS</span>
           </div>
-          <p class="text-xs leading-relaxed max-w-xs text-neutral-400 font-sans">
-            Atlas Morfológico Digital. Integração científica e prática laboratorial para o ciclo básico da saúde.
+          <p class="text-xs leading-relaxed max-w-xs text-slate-500 font-sans">
+            Integração científica e prática laboratorial para estudantes da área da saúde.
           </p>
           <div class="flex items-center gap-3 pt-2">
-            <a href="mailto:contato@palasatlas.com" class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400" aria-label="Email">
+            <a href="mailto:contato@palasatlas.com" class="hover:text-sky-700 transition-colors text-xs text-slate-500" aria-label="Email">
               <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </a>
           </div>
         </div>
 
-        <!-- Coluna 2: Módulos Morfológicos -->
+        <!-- Coluna 2: Disciplinas -->
         <div class="space-y-3">
-          <h4 class="text-neutral-200 font-mono font-semibold tracking-wider text-xs uppercase">Módulos</h4>
+          <h4 class="text-slate-900 font-sans font-semibold tracking-wider text-xs uppercase">Disciplinas</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="index.html">Histologia</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="index.html">Anatomia Macroscópica</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="index.html">Patologia Geral</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="index.html">Parasitologia</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="index.html">Microbiologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Histologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Patologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Parasitologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Microbiologia</a></li>
           </ul>
         </div>
 
         <!-- Coluna 3: Plataforma -->
         <div class="space-y-3">
-          <h4 class="text-neutral-200 font-mono font-semibold tracking-wider text-xs uppercase">Plataforma</h4>
+          <h4 class="text-slate-900 font-sans font-semibold tracking-wider text-xs uppercase">Plataforma</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="index.html">Início (Home)</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Início (Home)</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
           </ul>
         </div>
 
         <!-- Coluna 4: Suporte e Legal -->
         <div class="space-y-3">
-          <h4 class="text-neutral-200 font-mono font-semibold tracking-wider text-xs uppercase">Suporte &amp; Contato</h4>
+          <h4 class="text-slate-900 font-sans font-semibold tracking-wider text-xs uppercase">Suporte &amp; Contato</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="mailto:contato@palasatlas.com">Reportar Erro ou Sugestão</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-neutral-400 block" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="mailto:contato@palasatlas.com">Reportar Erro ou Sugestão</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
           </ul>
         </div>
 
       </div>
 
       <!-- Rodapé Bottom -->
-      <div class="mt-16 pt-8 border-t border-white/[0.06] text-center text-xs font-mono text-neutral-500">
+      <div class="mt-16 pt-8 border-t border-slate-200/80 text-center text-xs font-sans text-slate-400">
         &copy; 2026 Palas Atlas &mdash; Todos os direitos reservados. Projeto Acadêmico sem fins lucrativos.
       </div>
     </div>

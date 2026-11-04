@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR" class="dark" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -8,12 +8,50 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <!-- Favicon Oficial Palas Atlas -->
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=1">
-  <link rel="stylesheet" href="css/styles.css?v=8">
+  <!-- Motor de Tema Dinâmico (Preto Ônix + Dourado vs. Claro Azul-Petróleo) -->
+  <script>
+    (function() {
+      function applyPalasTheme(theme) {
+        var root = document.documentElement;
+        root.setAttribute('data-theme', theme);
+        if (theme === 'dark') {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+        var logoTheme = theme === 'dark' ? 'dark-bg' : 'light-bg';
+        document.querySelectorAll('brand-logo').forEach(function(el) {
+          el.setAttribute('theme', logoTheme);
+        });
+        document.querySelectorAll('.theme-icon-sun').forEach(function(el) {
+          el.classList.toggle('hidden', theme !== 'dark');
+        });
+        document.querySelectorAll('.theme-icon-moon').forEach(function(el) {
+          el.classList.toggle('hidden', theme === 'dark');
+        });
+      }
+      var saved = localStorage.getItem('palas_theme') || 'dark';
+      applyPalasTheme(saved);
+      window.setPalasTheme = function(theme) {
+        localStorage.setItem('palas_theme', theme);
+        applyPalasTheme(theme);
+      };
+      window.togglePalasTheme = function() {
+        var current = document.documentElement.getAttribute('data-theme') || 'dark';
+        window.setPalasTheme(current === 'dark' ? 'light' : 'dark');
+      };
+      document.addEventListener('DOMContentLoaded', function() {
+        applyPalasTheme(localStorage.getItem('palas_theme') || 'dark');
+      });
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/tailwind.min.css?v=12">
+  <link rel="stylesheet" href="css/styles.css?v=20">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -21,8 +59,8 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <!-- Web Component da Marca e Configurações -->
-  <script src="js/brand-logo.js?v=4"></script>
-  <script src="js/settings-panel.js"></script>
+  <script src="js/brand-logo.js?v=13"></script>
+  <script src="js/settings-panel.js?v=2"></script>
 
   <link rel="stylesheet" href="css/splash.css?v=1">
   <style>
@@ -40,6 +78,7 @@
       margin: 0 !important;
       padding: 0 !important;
       -webkit-text-size-adjust: 100% !important;
+      background-color: #060608 !important;
     }
 
     #viewerLensPanel {
@@ -69,37 +108,38 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Prose do texto descritivo lateral (off-white + detalhes em ouro-champanhe) */
+    /* Prose do texto descritivo lateral (off-white + detalhes em dourado clássico #d4af37) */
     .prose-atlas {
       overflow-wrap: break-word;
       word-break: break-word;
     }
-    .prose-atlas h3       { color:#f5f5f4; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
-    .prose-atlas p        { color:#d6d3d1; line-height:1.8; margin-bottom:1rem; }
-    .prose-atlas strong   { color:#fafaf9; font-weight:600; }
+    .prose-atlas h3       { color:#f4f2ed; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
+    .prose-atlas p        { color:#d4d4d8; line-height:1.8; margin-bottom:1rem; }
+    .prose-atlas strong   { color:#ffffff; font-weight:600; }
     .prose-atlas blockquote { border: none !important; margin: 0 !important; padding: 0 !important; }
     .prose-atlas .pin-link {
-      color: #c8ad5f;
-      text-decoration: underline;
-      text-decoration-color: rgba(200, 173, 95, 0.4);
-      text-underline-offset: 3px;
-      font-weight: 500;
+      color: #e5c158;
+      background-color: rgba(212, 175, 55, 0.10);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      text-decoration: none;
+      font-weight: 600;
       cursor: pointer;
-      padding: 2px 4px;
-      border-radius: 4px;
-      transition: color .15s, background-color .15s;
+      padding: 1px 7px;
+      border-radius: 6px;
+      transition: all .15s ease;
       white-space: normal;
       touch-action: manipulation;
     }
-    .prose-atlas .pin-link:hover { color: #e0c97f; }
-    .prose-atlas .pin-link:active { background-color: rgba(200, 173, 95, 0.15); }
+    .prose-atlas .pin-link:hover {
+      color: #09090b;
+      background-color: #d4af37;
+      border-color: #d4af37;
+    }
+    .prose-atlas .pin-link:active { background-color: #e5c158; color: #09090b; }
 
     /* Botão de recolher painel: preenchimento do painel indica estado aberto */
     .viewer-sidebar-toggle .sidebar-icon-fill { opacity: .35; transition: opacity .3s ease; }
     .viewer-sidebar-toggle[aria-expanded="false"] .sidebar-icon-fill { opacity: 0; }
-
-    /* Logo do cabeçalho: ATLAS em ouro-champanhe discreto */
-    header brand-logo span.font-normal { color: #c8ad5f !important; }
 
     /* Drawer Slide-over para qualquer tela < 1024px OU altura de celular em paisagem (<= 500px) */
     @media (max-width: 1023px), (max-height: 500px) {
@@ -110,10 +150,10 @@
         bottom: 0 !important;
         height: 100% !important;
         z-index: 40 !important;
-        box-shadow: -10px 0 35px rgba(0, 0, 0, 0.8) !important;
-        background-color: rgba(10, 10, 10, 0.95) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
+        box-shadow: -10px 0 35px rgba(0, 0, 0, 0.85) !important;
+        background-color: rgba(12, 12, 15, 0.96) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
       }
       .openseadragon-navigator {
         width: 80px !important;
@@ -128,7 +168,7 @@
       #viewerSidebar {
         position: relative !important;
         box-shadow: none !important;
-        background-color: #0a0a0a !important;
+        background-color: #0c0c0f !important;
         backdrop-filter: none !important;
       }
       #viewerBackdrop {
@@ -142,60 +182,279 @@
 
     /* Scrollbar minimalista */
     ::-webkit-scrollbar       { width: 5px; }
-    ::-webkit-scrollbar-track { background: #0a0a0a; }
-    ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #404040; }
+    ::-webkit-scrollbar-track { background: #0c0c0f; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+    /* ==========================================================================
+       TEMA CLARO NO MICROSCÓPIO VIRTUAL (Branco Frio #F8FAFC & Azul-Petróleo #0369A1)
+       ========================================================================== */
+    html[data-theme="light"],
+    html[data-theme="light"] body {
+      background-color: #f8fafc !important;
+      color: #1e293b !important;
+    }
+
+    html[data-theme="light"] ::-webkit-scrollbar-track { background: #f1f5f9; }
+    html[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+    html[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    html[data-theme="light"] header {
+      background-color: rgba(255, 255, 255, 0.94) !important;
+      border-bottom-color: #e2e8f0 !important;
+      box-shadow: 0 4px 24px -6px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    html[data-theme="light"] header > div:first-child {
+      background: linear-gradient(to right, #0f172a, #0284c7, #0f172a) !important;
+    }
+
+    html[data-theme="light"] header button {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+      color: #334155 !important;
+    }
+
+    html[data-theme="light"] header button:hover {
+      background-color: #0f172a !important;
+      border-color: #0f172a !important;
+      color: #ffffff !important;
+    }
+
+    html[data-theme="light"] #viewerBreadcrumb {
+      color: #64748b !important;
+    }
+
+    html[data-theme="light"] #viewerStage,
+    html[data-theme="light"] #osd-viewer {
+      background-color: #eef2f6 !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel {
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14) !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel .lens-btn:not(.active-lens) {
+      color: #475569 !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel .lens-btn:not(.active-lens):hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel .lens-btn.active-lens {
+      background-color: #0284c7 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel .w-px {
+      background-color: #e2e8f0 !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel button:not(.lens-btn) {
+      color: #334155 !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel button:not(.lens-btn):hover {
+      background-color: #f1f5f9 !important;
+      color: #0369a1 !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel > div:last-child {
+      background-color: #f0f9ff !important;
+      border-color: rgba(2, 132, 199, 0.35) !important;
+    }
+
+    html[data-theme="light"] #viewerLensPanel > div:last-child span.rounded-full {
+      background-color: #0284c7 !important;
+    }
+
+    html[data-theme="light"] #zoomIndicatorDisplay {
+      color: #0369a1 !important;
+    }
+
+    html[data-theme="light"] #viewerHint {
+      background-color: rgba(255, 255, 255, 0.92) !important;
+      border-color: #cbd5e1 !important;
+      color: #475569 !important;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+    }
+
+    html[data-theme="light"] #viewerSidebar {
+      background-color: #ffffff !important;
+      border-left-color: #e2e8f0 !important;
+      color: #334155 !important;
+    }
+
+    @media (max-width: 1023px), (max-height: 500px) {
+      html[data-theme="light"] #viewerSidebar {
+        background-color: rgba(255, 255, 255, 0.97) !important;
+        box-shadow: -10px 0 35px rgba(15, 23, 42, 0.18) !important;
+      }
+    }
+
+    html[data-theme="light"] #viewerSidebar > div > div:first-child {
+      background-color: #f8fafc !important;
+      border-bottom-color: #e2e8f0 !important;
+    }
+
+    html[data-theme="light"] #slideTitle {
+      color: #0f172a !important;
+    }
+
+    html[data-theme="light"] #slideColoracao {
+      background-color: #f0f9ff !important;
+      border-color: #bae6fd !important;
+      color: #0369a1 !important;
+    }
+
+    html[data-theme="light"] #viewerSidebar > div > div:nth-child(2) {
+      background-color: #f1f5f9 !important;
+      border-bottom-color: #e2e8f0 !important;
+    }
+
+    html[data-theme="light"] #btnTabDescricao.bg-white\/\[0\.08\],
+    html[data-theme="light"] #btnTabQuestoes.bg-white\/\[0\.08\],
+    html[data-theme="light"] #btnTabDescricao.bg-\[\#d4af37\]\/15 {
+      background-color: #ffffff !important;
+      color: #0369a1 !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    html[data-theme="light"] #btnTabDescricao:not(.bg-white\/\[0\.08\]):not(.bg-\[\#d4af37\]\/15),
+    html[data-theme="light"] #btnTabQuestoes:not(.bg-white\/\[0\.08\]) {
+      color: #64748b !important;
+    }
+
+    html[data-theme="light"] #badgeContadorQuestoes {
+      background-color: #e0f2fe !important;
+      color: #0369a1 !important;
+      border-color: #bae6fd !important;
+    }
+
+    html[data-theme="light"] #slideDescriptionContainer,
+    html[data-theme="light"] #slideQuestionsContainer {
+      background-color: #ffffff !important;
+    }
+
+    html[data-theme="light"] .prose-atlas h3     { color: #0f172a !important; }
+    html[data-theme="light"] .prose-atlas p,
+    html[data-theme="light"] .prose-atlas li     { color: #334155 !important; }
+    html[data-theme="light"] .prose-atlas strong { color: #0f172a !important; }
+    html[data-theme="light"] .prose-atlas .pin-link {
+      color: #0369a1 !important;
+      background-color: rgba(2, 132, 199, 0.08) !important;
+      border-color: rgba(2, 132, 199, 0.28) !important;
+    }
+    html[data-theme="light"] .prose-atlas .pin-link:hover {
+      color: #ffffff !important;
+      background-color: #0284c7 !important;
+      border-color: #0284c7 !important;
+    }
+
+    html[data-theme="light"] #slideDescriptionContainer button {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html[data-theme="light"] #slideDescriptionContainer button:hover {
+      background-color: #f0f9ff !important;
+      border-color: rgba(2, 132, 199, 0.4) !important;
+    }
+    html[data-theme="light"] #slideDescriptionContainer button span.text-neutral-200 {
+      color: #0f172a !important;
+    }
+    html[data-theme="light"] #slideDescriptionContainer button span.rounded-full {
+      background-color: #0284c7 !important;
+    }
+
+    html[data-theme="light"] .card-questao {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html[data-theme="light"] .card-questao h4 {
+      color: #0f172a !important;
+    }
+    html[data-theme="light"] .card-questao textarea {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
   </style>
 </head>
 
-<body class="bg-neutral-950 w-full h-screen overflow-hidden flex flex-col font-sans text-slate-200 selection:bg-neutral-800 selection:text-white">
+<body class="bg-[#060608] w-full h-screen overflow-hidden flex flex-col font-sans text-slate-200 selection:bg-[#d4af37]/25 selection:text-white">
 
   <!-- ════════════════════════════════════════════════════════════════════
-       BARRA SUPERIOR DO LEITOR (item 1)
-       bg-neutral-950 | borda inferior | Studio Dark
+       BARRA SUPERIOR DO LEITOR (Estúdio Óptico Preto Ônix & Dourado / Claro Azul-Petróleo)
        ════════════════════════════════════════════════════════════════════ -->
-  <header class="shrink-0 w-full bg-neutral-950 px-3 sm:px-5 py-2 sm:py-3 flex items-center justify-between z-50 relative border-b border-white/[0.06]">
+  <header class="shrink-0 w-full bg-[#09090c] z-50 relative border-b border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.75)]">
+    <!-- Filete Superior Dourado Clássico -->
+    <div class="h-[2px] w-full bg-gradient-to-r from-[#060608] via-[#d4af37] to-[#060608]"></div>
 
-    <!-- Esquerda: Voltar + Breadcrumb -->
-    <div class="flex items-center gap-2 sm:gap-3 min-w-0 z-10">
-      <button
-        type="button"
-        onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
-        class="h-11 px-2 -ml-2 flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-white active:text-[#c8ad5f] transition-all duration-200 cursor-pointer shrink-0 touch-manipulation"
-        aria-label="Voltar para Tecido"
-      >
-        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-        <span class="hidden sm:inline">Voltar para Tecido</span>
-        <span class="inline sm:hidden">Voltar</span>
-      </button>
-      <span class="text-neutral-700 select-none hidden sm:block">|</span>
-      <span id="viewerBreadcrumb" class="text-xs text-neutral-500 font-sans tracking-wide truncate max-w-[120px] sm:max-w-[160px] md:max-w-xs hidden"></span>
-    </div>
+    <div class="px-3 sm:px-5 h-14 sm:h-16 flex items-center justify-between">
+      <!-- Esquerda: Voltar + Breadcrumb -->
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 z-10">
+        <button
+          type="button"
+          onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
+          class="h-9 sm:h-10 px-3 sm:px-3.5 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/15 border border-white/[0.1] hover:border-[#d4af37]/40 flex items-center gap-1.5 text-xs font-semibold text-neutral-200 hover:text-[#e5c158] active:scale-95 transition-all duration-200 cursor-pointer shrink-0 touch-manipulation"
+          aria-label="Voltar"
+        >
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          <span class="hidden sm:inline">Voltar</span>
+        </button>
+        <span class="text-neutral-700 select-none hidden sm:block">|</span>
+        <span id="viewerBreadcrumb" class="text-xs text-neutral-400 font-sans tracking-wide truncate max-w-[120px] sm:max-w-[180px] md:max-w-xs hidden"></span>
+      </div>
 
-    <!-- Centro: Logo PALAS ATLAS (centralizado absolutamente para não ser deslocado pelas laterais) -->
-    <div class="absolute left-1/2 -translate-x-1/2 flex items-center z-10 pointer-events-none">
-      <brand-logo theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
-    </div>
+      <!-- Centro: Logo PALAS ATLAS (centralizado absolutamente) -->
+      <a href="index.html" class="absolute left-1/2 -translate-x-1/2 flex items-center z-10 no-underline cursor-pointer" aria-label="Palas Atlas - Início">
+        <brand-logo theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
+      </a>
 
-    <!-- Direita: Recolher / Expandir painel lateral -->
-    <div class="flex items-center shrink-0 z-10">
-      <button
-        id="btnToggleSidebar"
-        type="button"
-        class="viewer-sidebar-toggle w-11 h-11 flex items-center justify-center rounded-lg text-neutral-400 hover:text-[#c8ad5f] active:bg-white/[0.06] transition-colors duration-200 cursor-pointer touch-manipulation"
-        aria-label="Recolher painel de informações"
-        aria-controls="viewerSidebar"
-        aria-expanded="true"
-        title="Recolher painel"
-      >
-        <svg class="w-5 h-5 lg:w-[18px] lg:h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4.5" width="18" height="15" rx="2.5"></rect>
-          <path d="M15 4.5v15"></path>
-          <rect class="sidebar-icon-fill" x="15" y="4.5" width="6" height="15" rx="2" fill="currentColor" stroke="none"></rect>
-        </svg>
-      </button>
+      <!-- Direita: Alternador de Tema (Sol / Lua) + Recolher / Expandir painel lateral -->
+      <div class="flex items-center gap-2 shrink-0 z-10">
+        <button
+          id="btnThemeToggle"
+          type="button"
+          onclick="window.togglePalasTheme()"
+          class="h-9 sm:h-10 w-9 sm:w-10 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/15 border border-white/[0.1] hover:border-[#d4af37]/40 text-neutral-200 hover:text-[#e5c158] flex items-center justify-center active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none touch-manipulation"
+          aria-label="Alternar Tema"
+          title="Alternar Tema (Claro / Escuro)"
+        >
+          <svg class="theme-icon-sun w-4 h-4 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+          </svg>
+          <svg class="theme-icon-moon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+          </svg>
+        </button>
+
+        <button
+          id="btnToggleSidebar"
+          type="button"
+          class="viewer-sidebar-toggle h-9 sm:h-10 px-3 sm:px-3.5 flex items-center justify-center gap-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/15 border border-white/[0.1] hover:border-[#d4af37]/40 text-neutral-200 hover:text-[#e5c158] active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
+          aria-label="Recolher painel de informações"
+          aria-controls="viewerSidebar"
+          aria-expanded="true"
+          title="Alternar painel lateral"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4.5" width="18" height="15" rx="2.5"></rect>
+            <path d="M15 4.5v15"></path>
+            <rect class="sidebar-icon-fill" x="15" y="4.5" width="6" height="15" rx="2" fill="currentColor" stroke="none"></rect>
+          </svg>
+          <span class="hidden sm:inline text-xs font-semibold">Painel</span>
+        </button>
+      </div>
     </div>
 
   </header>
@@ -232,7 +491,7 @@
               </svg>
             </div>
 
-            <span class="font-serif font-normal text-xl sm:text-2xl md:text-3xl tracking-[0.24em] leading-none splash-shimmer-atlas">ATLAS</span>
+            <span class="font-serif font-bold text-xl sm:text-2xl md:text-3xl tracking-[0.24em] leading-none splash-shimmer-atlas">ATLAS</span>
           </div>
 
           <p class="text-[10px] sm:text-[11px] text-neutral-400 tracking-[0.25em] font-mono uppercase font-normal mt-4">Mapeando estruturas morfológicas...</p>
@@ -245,84 +504,84 @@
 
       <!-- Container Deep Zoom (OpenSeadragon) -->
       <div id="osd-viewer"
-        class="w-full h-full bg-neutral-950 relative overflow-hidden transition-opacity duration-500 opacity-0"
+        class="w-full h-full bg-[#060608] relative overflow-hidden transition-opacity duration-500 opacity-0"
       ></div>
 
       <!-- REVÓLVER DE OBJETIVAS + CONTROLES DE ZOOM DINÂMICOS -->
       <div
         id="viewerLensPanel"
-        class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-36 flex items-center gap-1 sm:gap-1.5 lg:gap-2 p-1 sm:p-1.5 lg:p-1.5 rounded-2xl bg-neutral-900/90 backdrop-blur-md border border-white/[0.12] shadow-2xl text-xs font-mono select-none max-w-[calc(100%-16px)] sm:max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
+        class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-36 flex items-center gap-1 sm:gap-1.5 lg:gap-1.5 p-1.5 sm:p-2 rounded-2xl bg-[#0d0d11]/95 backdrop-blur-xl border border-white/[0.14] shadow-[0_20px_50px_rgba(0,0,0,0.85)] text-xs font-mono select-none max-w-[calc(100%-16px)] sm:max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
       >
         <!-- Valores nominais das objetivas -->
         <button
           type="button"
           onclick="window.trocarLente(4, this)"
-          class="lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn bg-[#d4af37] text-[#09090b] font-bold shadow-md shadow-[#d4af37]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="4"
         >4x</button>
         <button
           type="button"
           onclick="window.trocarLente(10, this)"
-          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="10"
         >10x</button>
         <button
           type="button"
           onclick="window.trocarLente(40, this)"
-          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="40"
         >40x</button>
         <button
           type="button"
           onclick="window.trocarLente(60, this)"
-          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="60"
         >60x</button>
         <button
           type="button"
           onclick="window.trocarLente(100, this)"
-          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="100"
         >100x</button>
         
         <!-- Divisor sutil -->
-        <div class="w-px h-5 lg:h-4 bg-white/[0.08] shrink-0"></div>
+        <div class="w-px h-5 lg:h-4 bg-white/[0.1] shrink-0"></div>
 
         <!-- Controles manuais de Zoom (+ / - / Home) -->
         <button
           type="button"
           onclick="window.alterarZoom(1.35)"
-          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-6 lg:h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
+          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-neutral-300 hover:text-[#e5c158] hover:bg-white/[0.06] active:bg-white/10 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
           title="Aproximar (+)"
           aria-label="Aproximar zoom"
         >+</button>
         <button
           type="button"
           onclick="window.alterarZoom(0.75)"
-          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-6 lg:h-6 flex items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
+          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-neutral-300 hover:text-[#e5c158] hover:bg-white/[0.06] active:bg-white/10 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
           title="Afastar (&minus;)"
           aria-label="Afastar zoom"
         >&minus;</button>
         <button
           type="button"
           onclick="window.osdViewerAction('home')"
-          class="min-h-[38px] sm:min-h-[40px] lg:min-h-0 px-2.5 sm:px-3 lg:px-2 py-1 lg:py-0.5 flex items-center justify-center rounded-lg text-neutral-400 hover:text-[#c8ad5f] hover:bg-white/[0.06] active:bg-white/10 transition-all text-xs lg:text-[10px] tracking-wider uppercase font-medium cursor-pointer touch-manipulation shrink-0"
+          class="min-h-[38px] sm:min-h-[40px] lg:min-h-0 px-2.5 sm:px-3 lg:px-2.5 py-1 lg:py-1 flex items-center justify-center rounded-xl text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.06] active:bg-white/10 transition-all text-xs lg:text-[10.5px] tracking-wider uppercase font-semibold cursor-pointer touch-manipulation shrink-0"
           title="Enquadramento geral"
           aria-label="Enquadramento geral 1 para 1"
         >1:1</button>
 
         <!-- Divisor sutil -->
-        <div class="w-px h-5 lg:h-4 bg-white/[0.08] shrink-0"></div>
+        <div class="w-px h-5 lg:h-4 bg-white/[0.1] shrink-0"></div>
 
         <!-- Display do Zoom Dinâmico em Tempo Real -->
-        <div class="flex items-center gap-1.5 px-2.5 py-1.5 lg:py-1 rounded-lg bg-neutral-950/70 border border-white/[0.06] shrink-0 min-h-[38px] sm:min-h-[40px] lg:min-h-0">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#c8ad5f] animate-pulse"></span>
-          <span class="text-[#c8ad5f] font-bold text-xs" id="zoomIndicatorDisplay">4.0x</span>
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 lg:py-1 rounded-xl bg-[#060608] border border-[#d4af37]/30 shrink-0 min-h-[38px] sm:min-h-[40px] lg:min-h-0">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] animate-pulse"></span>
+          <span class="text-[#d4af37] font-bold text-xs" id="zoomIndicatorDisplay">4.0x</span>
         </div>
       </div>
 
       <!-- Dica operacional -->
-      <div id="viewerHint" class="absolute top-4 right-4 pointer-events-none text-[10px] text-neutral-400 font-mono tracking-wider uppercase whitespace-nowrap z-10 hidden xl:block bg-neutral-900/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/[0.06] shadow-lg">
+      <div id="viewerHint" class="absolute top-4 right-4 pointer-events-none text-[10px] text-neutral-400 font-mono tracking-wider uppercase whitespace-nowrap z-10 hidden xl:block bg-[#0d0d11]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/[0.08] shadow-lg">
         Scroll &rarr; Zoom &bull; Arrastar &rarr; Pan &bull; Clique duplo &rarr; Ampliar
       </div>
 
@@ -338,18 +597,19 @@
     <!-- Direita — Painel de Informações (retrátil) -->
     <aside
       id="viewerSidebar"
-      class="h-full bg-neutral-950/95 lg:bg-neutral-950 backdrop-blur-md lg:backdrop-blur-none border-l border-white/[0.08] text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
+      class="h-full bg-[#0c0c0f]/95 lg:bg-[#0c0c0f] backdrop-blur-md lg:backdrop-blur-none border-l border-white/[0.09] text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
       aria-hidden="false"
     >
       <div class="w-[85vw] sm:w-[380px] max-w-[380px] h-full flex flex-col">
 
-        <!-- Cabeçalho do Painel: Título e Coloração -->
-        <div class="px-5 sm:px-7 pt-5 sm:pt-7 pb-4 sm:pb-5 shrink-0 flex items-start justify-between gap-3">
+        <!-- Cabeçalho do Painel: Título e Coloração (Bloco Elevado) -->
+        <div class="px-5 sm:px-7 pt-5 sm:pt-6 pb-4 sm:pb-5 bg-[#111115] border-b border-white/[0.08] shrink-0 flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-bold text-neutral-100 leading-tight tracking-tight truncate sm:whitespace-normal">
+            <span class="inline-block text-[9.5px] font-mono uppercase tracking-[0.2em] text-neutral-500 mb-1">Análise Morfológica</span>
+            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] leading-snug tracking-tight truncate sm:whitespace-normal">
               Carregando lâmina...
             </h2>
-            <p id="slideColoracao" class="mt-1.5 sm:mt-2 text-[11px] font-mono tracking-wide text-[#c8ad5f]/80">
+            <p id="slideColoracao" class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-[10.5px] font-mono tracking-wide text-[#d4af37]">
               Hematoxilina e Eosina (H&amp;E)
             </p>
             <span id="slideDisciplina" class="hidden">—</span>
@@ -357,7 +617,7 @@
           <button
             type="button"
             id="btnCloseSidebarMobile"
-            class="lg:hidden w-11 h-11 flex items-center justify-center text-neutral-400 hover:text-white active:bg-white/10 rounded-xl transition-colors shrink-0 touch-manipulation cursor-pointer -mr-2 -mt-1"
+            class="lg:hidden w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-white active:bg-white/10 rounded-xl transition-colors shrink-0 touch-manipulation cursor-pointer -mr-1 -mt-0.5"
             aria-label="Fechar painel"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -365,12 +625,12 @@
         </div>
 
         <!-- Abas de Navegação do Painel Lateral -->
-        <div class="px-5 sm:px-7 pb-3 flex items-center gap-2 border-b border-white/[0.06] shrink-0">
+        <div class="px-5 sm:px-7 py-3 flex items-center gap-2 border-b border-white/[0.07] bg-[#0e0e12] shrink-0">
           <button
             id="btnTabDescricao"
             type="button"
             onclick="window.alternarAbaPainel('descricao')"
-            class="min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-white/[0.08] text-white border border-white/[0.1] shadow-sm touch-manipulation flex items-center justify-center"
+            class="min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-[#d4af37]/15 text-[#e5c158] border border-[#d4af37]/35 font-semibold shadow-sm touch-manipulation flex items-center justify-center"
           >
             Descrição
           </button>
@@ -378,17 +638,17 @@
             id="btnTabQuestoes"
             type="button"
             onclick="window.alternarAbaPainel('questoes')"
-            class="min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5 touch-manipulation justify-center"
+            class="min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5 touch-manipulation justify-center"
           >
             <span>Questões</span>
-            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.06] text-neutral-400 font-mono">0</span>
+            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.08] text-[#d4af37] font-mono font-semibold">0</span>
           </button>
         </div>
 
         <!-- Descrição completa com hiperlinks de pinos -->
         <div
           id="slideDescriptionContainer"
-          class="px-5 sm:px-7 pb-7 flex-1 overflow-y-auto bg-neutral-950"
+          class="px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-[#0c0c0f]"
           style="-webkit-overflow-scrolling:touch;"
         >
           <div class="text-sm text-neutral-500 font-sans italic">
@@ -398,7 +658,7 @@
 
         <div
           id="slideQuestionsContainer"
-          class="hidden px-5 sm:px-7 pb-7 flex-1 overflow-y-auto bg-neutral-950 space-y-4"
+          class="hidden px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-[#0c0c0f] space-y-4"
           style="-webkit-overflow-scrolling:touch;"
         >
           <!-- Questões renderizadas dinamicamente aqui -->

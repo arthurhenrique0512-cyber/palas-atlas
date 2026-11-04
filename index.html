@@ -1,22 +1,82 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palas Atlas | Atlas Morfológico Digital</title>
-  <meta name="description" content="Plataforma de ensino morfológico focado em Histologia e Anatomia Macroscópica para o ciclo básico." />
+  <script>
+    // Inicialização instantânea do Tema (Padrão: Tema Escuro Azul-Abissal #0B1120)
+    (function() {
+      try {
+        var saved = localStorage.getItem('palas_theme');
+        if (!saved) {
+          var legacy = localStorage.getItem('@PalasAtlas:Settings');
+          if (legacy) {
+            var parsed = JSON.parse(legacy);
+            if (parsed && (parsed.theme === 'light' || parsed.theme === 'dark')) saved = parsed.theme;
+          }
+        }
+        var theme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+
+    window.setPalasTheme = function(theme) {
+      var next = theme === 'light' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try {
+        localStorage.setItem('palas_theme', next);
+        var legacy = localStorage.getItem('@PalasAtlas:Settings');
+        var obj = legacy ? JSON.parse(legacy) : {};
+        obj.theme = next;
+        localStorage.setItem('@PalasAtlas:Settings', JSON.stringify(obj));
+      } catch (e) {}
+      document.querySelectorAll('brand-logo').forEach(function(el) {
+        if (typeof el.render === 'function') el.render();
+      });
+      var btn = document.getElementById('btnThemeToggle');
+      if (btn) {
+        var isDark = next === 'dark';
+        btn.setAttribute('title', isDark ? 'Alternar para Tema Claro' : 'Alternar para Tema Escuro');
+        btn.setAttribute('aria-label', isDark ? 'Alternar para Tema Claro' : 'Alternar para Tema Escuro');
+        var iconSun = btn.querySelector('.theme-icon-sun');
+        var iconMoon = btn.querySelector('.theme-icon-moon');
+        if (iconSun && iconMoon) {
+          iconSun.classList.toggle('hidden', !isDark);
+          iconMoon.classList.toggle('hidden', isDark);
+        }
+      }
+      var sp = document.querySelector('settings-panel');
+      if (sp && sp.settings) {
+        sp.settings.theme = next;
+        if (typeof sp.updateUI === 'function') sp.updateUI();
+      }
+    };
+
+    window.togglePalasTheme = function() {
+      var current = document.documentElement.getAttribute('data-theme') || 'dark';
+      window.setPalasTheme(current === 'dark' ? 'light' : 'dark');
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      window.setPalasTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+    });
+  </script>
+  <meta name="description" content="Plataforma de ensino morfológico focado em Histologia, Patologia, Parasitologia e Microbiologia para o ciclo básico." />
 
   <!-- Open Graph / WhatsApp / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://palasatlas.com/" />
   <meta property="og:title" content="Palas Atlas | Atlas Morfológico Digital" />
-  <meta property="og:description" content="Explore lâminas histológicas digitais e peças de dissecação anatômica em alta resolução." />
+  <meta property="og:description" content="Explore lâminas microscópicas digitais em alta resolução." />
   <meta property="og:image" content="https://palasatlas.com/og-preview.png" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Palas Atlas | Atlas Morfológico Digital" />
-  <meta name="twitter:description" content="Explore lâminas histológicas digitais e peças de dissecação anatômica em alta resolução." />
+  <meta name="twitter:description" content="Explore lâminas microscópicas digitais em alta resolução." />
   <meta name="twitter:image" content="https://palasatlas.com/og-preview.png" />
 
   <!-- Favicon Oficial Palas Atlas -->
@@ -26,18 +86,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- Google Fonts — Requisição combinada editorial (Cormorant Garamond + Inter + JetBrains Mono + Merriweather) -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+  <!-- Google Fonts — Plus Jakarta Sans + Inter + Cormorant Garamond (Logo) -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Folha de Estilos Tailwind Compilada + Estilos Customizados -->
-  <link rel="stylesheet" href="css/tailwind.min.css?v=1">
-  <link rel="stylesheet" href="css/styles.css?v=8">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=13">
+  <link rel="stylesheet" href="css/styles.css?v=20">
   <link rel="stylesheet" href="css/splash.css?v=1">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
-  <script src="js/brand-logo.js?v=4"></script>
-  <script src="js/settings-panel.js"></script>
+  <script src="js/brand-logo.js?v=13"></script>
+  <script src="js/settings-panel.js?v=2"></script>
 
   <!-- Firebase SDK v8: carregado no final do body em ordem correta -->
   <!-- NÃO carregar aqui para evitar duplicata. Ver final do </body> -->
@@ -55,8 +115,6 @@
   </script>
   <style>
     html, body, #root, #__next {
-      background-color: #050505 !important;
-      color: #f8fafc;
       margin: 0 !important;
       padding: 0 !important;
       width: 100% !important;
@@ -65,7 +123,7 @@
     }
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-200 min-h-screen flex flex-col selection:bg-[#d4af37]/25 selection:text-white antialiased">
+<body class="bg-[#f8fafc] text-slate-900 min-h-screen flex flex-col selection:bg-sky-500/20 selection:text-slate-900 antialiased">
 
   <!-- ============================================================
        TELA DE CARREGAMENTO VETORIAL (SPLASH SCREEN IMERSIVA)
@@ -95,11 +153,8 @@
           </svg>
         </div>
 
-        <span class="font-serif font-normal text-2xl sm:text-3xl md:text-4xl tracking-[0.24em] leading-none splash-shimmer-atlas">ATLAS</span>
+        <span class="font-serif font-bold text-2xl sm:text-3xl md:text-4xl tracking-[0.24em] leading-none splash-shimmer-atlas">ATLAS</span>
       </div>
-
-      <!-- Subtítulo de Precisão Clínica -->
-      <span class="font-mono text-[9px] sm:text-[10px] md:text-xs tracking-[0.32em] uppercase text-neutral-400 mt-3 font-medium">Atlas Morfológico Digital</span>
 
       <!-- Linha de progresso discreta -->
       <div class="w-44 sm:w-52 h-px splash-progress-track overflow-hidden relative mt-8">
@@ -130,30 +185,45 @@
     setTimeout(window.__appReady, 1200);
   </script>
 
-  <header id="palasMinimalHeader" class="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 pointer-events-none">
-    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+  <header id="palasMinimalHeader" class="fixed top-0 left-0 right-0 z-50 w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/90 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)] transition-all duration-300 pointer-events-auto">
+    <!-- Filete Superior de Identidade Azul-Petróleo -->
+    <div class="h-[2.5px] w-full bg-gradient-to-r from-slate-900 via-sky-600 to-slate-900"></div>
+
+    <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-[68px] flex items-center justify-between gap-4">
       
-      <!-- Lado Esquerdo: Botão Voltar + Logotipo Oficial (Top-Left) -->
+      <!-- Lado Esquerdo: Botão Voltar + Logotipo Oficial -->
       <div class="flex items-center gap-3 pointer-events-auto">
-        <button id="btnVoltarGlobal" onclick="window.App.voltarGlobal()" class="hidden min-h-[44px] min-w-[44px] lg:min-h-0 lg:min-w-0 p-2 text-slate-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] rounded-full transition-all text-sm font-bold items-center justify-center gap-1.5 px-3 py-2 cursor-pointer shadow-sm active:scale-95" aria-label="Voltar">
-          &larr; <span class="text-xs font-sans font-normal hidden sm:inline">Voltar</span>
+        <button id="btnVoltarGlobal" onclick="window.App.voltarGlobal()" class="hidden min-h-[40px] text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 border border-slate-200/90 rounded-xl transition-all text-xs font-sans font-semibold items-center justify-center gap-2 px-3.5 py-2 cursor-pointer active:scale-95" aria-label="Voltar">
+          <span>&larr;</span> <span class="hidden sm:inline">Voltar</span>
         </button>
 
-        <a href="index.html" class="group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-5 sm:px-6 py-3 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline" style="text-decoration: none;" aria-label="Palas Atlas - Início">
-          <brand-logo id="globalBrandLogo" is-home="true" theme="dark-bg" show-subtitle="true" size="md"></brand-logo>
+        <a id="headerBrandLink" href="index.html" class="group inline-flex items-center gap-3 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline" style="text-decoration: none;" aria-label="Palas Atlas - Início">
+          <brand-logo id="globalBrandLogo" is-home="true" theme="light-bg" show-subtitle="false" size="lg"></brand-logo>
         </a>
       </div>
 
-      <!-- Centro do Topo: Totalmente desobstruído -->
+      <!-- Centro do Topo: Limpo e sem links repetidos -->
       <div class="flex-1"></div>
 
-      <!-- Lado Direito: Cápsula Flutuante Minimalista do Menu Hambúrguer -->
-      <div class="pointer-events-auto flex items-center rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] p-1 sm:p-1.5 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)]">
-        <!-- Botão Menu Drawer -->
-        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="w-11 h-11 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none" aria-label="Abrir Menu Lateral" title="Menu">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+      <!-- Lado Direito: Alternador Sol/Lua (Tema Escuro / Claro) + Menu Lateral -->
+      <div class="pointer-events-auto flex items-center gap-2">
+        <button id="btnThemeToggle" type="button" onclick="window.togglePalasTheme()" class="h-10 w-10 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs" aria-label="Alternar Tema" title="Alternar Tema">
+          <!-- Ícone Sol (visível no Tema Escuro para mudar para Claro) -->
+          <svg class="theme-icon-sun w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+          </svg>
+          <!-- Ícone Lua (visível no Tema Claro para mudar para Escuro) -->
+          <svg class="theme-icon-moon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+          </svg>
+        </button>
+
+        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="h-10 px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs" aria-label="Abrir Menu Lateral" title="Menu">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
+          <span class="text-xs font-sans font-semibold hidden sm:inline">Menu</span>
         </button>
       </div>
 
@@ -164,26 +234,26 @@
       <div
         id="drawerBackdrop"
         onclick="window.App.fecharMenuLateral()"
-        class="!fixed inset-0 bg-black/60 backdrop-blur-md !z-[99990] hidden transition-opacity duration-300">
+        class="!fixed inset-0 bg-slate-900/35 backdrop-blur-sm !z-[99990] hidden transition-opacity duration-300">
       </div>
 
-      <!-- GAVETA DO MENU LATERAL (SIDE DRAWER) - DESIGN MINIMALISTA E BORDERLESS -->
+      <!-- GAVETA DO MENU LATERAL (SIDE DRAWER) - DESIGN CLÍNICO CLARO -->
       <aside
         id="sideDrawer"
         style="z-index: 99999; position: fixed; top: 0; right: 0;"
-        class="hidden !fixed !top-0 !right-0 h-full w-[85vw] max-w-[340px] sm:w-96 sm:max-w-none bg-neutral-950/90 backdrop-blur-2xl text-white border-l border-white/[0.06] !z-[99999] transform translate-x-full transition-transform duration-300 ease-out p-5 sm:p-8 flex flex-col justify-between shadow-[0_0_60px_rgba(0,0,0,0.85)] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+        class="hidden !fixed !top-0 !right-0 h-full w-[85vw] max-w-[340px] sm:w-96 sm:max-w-none bg-white/95 backdrop-blur-2xl text-slate-800 border-l border-slate-200/80 !z-[99999] transform translate-x-full transition-transform duration-300 ease-out p-5 sm:p-8 flex flex-col justify-between shadow-[0_0_60px_rgba(15,23,42,0.18)] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
 
         <div class="space-y-7">
           <!-- Topo: Cabeçalho com Logotipo e Fechar -->
-          <div class="flex items-center justify-between pb-6 border-b border-white/[0.06]">
+          <div class="flex items-center justify-between pb-6 border-b border-slate-200/80">
             <div class="flex flex-col text-left cursor-pointer select-none">
-              <brand-logo theme="pure-white" show-subtitle="false" size="md"></brand-logo>
+              <brand-logo theme="light-bg" show-subtitle="false" size="md"></brand-logo>
             </div>
             
             <button
               type="button"
               onclick="window.App.fecharMenuLateral()"
-              class="w-11 h-11 lg:w-10 lg:h-10 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/[0.06] rounded-full transition-all duration-200 cursor-pointer focus:outline-none active:scale-95"
+              class="w-11 h-11 lg:w-10 lg:h-10 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-all duration-200 cursor-pointer focus:outline-none active:scale-95"
               aria-label="Fechar menu lateral">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -193,81 +263,72 @@
 
           <!-- BLOCO 1: NAVEGAÇÃO PRINCIPAL E MÓDULOS -->
           <div>
-            <span class="text-[10px] tracking-[0.25em] font-mono font-medium text-neutral-500 uppercase mb-3 px-3 block">Navegação Principal</span>
+            <span class="text-[10px] tracking-[0.25em] font-mono font-semibold text-slate-400 uppercase mb-3 px-3 block">Navegação Principal</span>
             
             <div class="space-y-1">
               <button
                 type="button"
                 onclick="window.App.navegarPara('pgHome'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-200 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] shrink-0"></span>
+                class="flex items-center gap-3 group text-slate-800 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0"></span>
                 <span>Início</span>
               </button>
 
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('histologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
+                class="flex items-center gap-3 group text-slate-600 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-sky-600 transition-colors duration-200 shrink-0"></span>
                 <span>Histologia</span>
               </button>
 
               <button
                 type="button"
-                onclick="window.App.selecionarFrente('anatomia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
-                <span>Anatomia Macroscópica</span>
-              </button>
-
-              <button
-                type="button"
                 onclick="window.App.selecionarFrente('patologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
-                <span>Patologia Geral e Sistêmica</span>
+                class="flex items-center gap-3 group text-slate-600 hover:text-rose-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-rose-600 transition-colors duration-200 shrink-0"></span>
+                <span>Patologia</span>
               </button>
 
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('parasitologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
-                <span>Parasitologia Médica</span>
+                class="flex items-center gap-3 group text-slate-600 hover:text-emerald-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-emerald-600 transition-colors duration-200 shrink-0"></span>
+                <span>Parasitologia</span>
               </button>
 
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('microbiologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <span class="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#d4af37] transition-colors duration-200 shrink-0"></span>
-                <span>Microbiologia e Micologia</span>
+                class="flex items-center gap-3 group text-slate-600 hover:text-violet-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-violet-600 transition-colors duration-200 shrink-0"></span>
+                <span>Microbiologia</span>
               </button>
             </div>
           </div>
 
           <!-- BLOCO 2: GUIA & FERRAMENTAS -->
-          <div class="pt-5 border-t border-white/[0.06]">
-            <span class="text-[10px] tracking-[0.25em] font-mono font-medium text-neutral-500 uppercase mb-3 px-3 block">Recursos & Guia</span>
+          <div class="pt-5 border-t border-slate-200/80">
+            <span class="text-[10px] tracking-[0.25em] font-mono font-semibold text-slate-400 uppercase mb-3 px-3 block">Recursos & Guia</span>
 
             <div class="space-y-1">
               <!-- Item Destaque: Como Usar o Site -->
               <button
                 type="button"
                 onclick="window.App.fecharMenuLateral(); window.App.abrirModalAjuda();"
-                class="flex items-center gap-3 group text-neutral-200 hover:text-[#d4af37] hover:bg-white/[0.04] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                class="flex items-center gap-3 group text-slate-800 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
                 <span>Como Usar o Site</span>
-                <span class="ml-auto text-[10px] font-mono uppercase tracking-wider text-[#d4af37]/80 border border-[#d4af37]/30 bg-[#d4af37]/10 px-2 py-0.5 rounded-full">Guia</span>
               </button>
 
               <button
                 type="button"
                 onclick="window.App.selecionarFrente('histologia'); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                class="flex items-center gap-3 group text-slate-600 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
                 <span>Catálogo de Lâminas</span>
@@ -276,9 +337,9 @@
           </div>
 
           <!-- BLOCO 3: INSTITUCIONAL E DESENVOLVIMENTO -->
-          <div class="pt-5 border-t border-white/[0.06]">
-            <span class="text-[10px] tracking-[0.25em] font-mono font-medium text-neutral-500 uppercase mb-3 px-3 block">Sobre Nós</span>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-normal text-justify px-3 mb-4">
+          <div class="pt-5 border-t border-slate-200/80">
+            <span class="text-[10px] tracking-[0.25em] font-mono font-semibold text-slate-400 uppercase mb-3 px-3 block">Sobre Nós</span>
+            <p class="font-sans text-xs text-slate-500 leading-relaxed font-normal text-justify px-3 mb-4">
               O Palas Atlas nasce da iniciativa de estudantes de Medicina para integrar a Morfologia, a Histopatologia e a Microbiologia em uma única plataforma diagnóstica.
             </p>
 
@@ -286,8 +347,8 @@
               <a
                 href="sobre.html"
                 onclick="window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
-                <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                class="flex items-center gap-3 group text-slate-600 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <span>Sobre o Palas Atlas</span>
@@ -296,8 +357,8 @@
               <a
                 href="sobre.html#equipe"
                 onclick="window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
-                <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                class="flex items-center gap-3 group text-slate-600 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
                 <span>Equipe Curadora</span>
@@ -306,8 +367,8 @@
               <button
                 type="button"
                 onclick="window.App.toggleDashboard(); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.03] px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <svg class="w-4 h-4 text-neutral-400 group-hover:text-[#d4af37] transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                class="flex items-center gap-3 group text-slate-600 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                 </svg>
                 <span>Painel do Desenvolvedor</span>
@@ -317,172 +378,168 @@
         </div>
 
         <!-- Rodapé do Menu -->
-        <div class="pt-5 border-t border-white/[0.06] text-center text-[10px] text-neutral-500 font-mono tracking-widest uppercase mt-6">
-          Palas Atlas &bull; Acervo Morfológico Digital
+        <div class="pt-5 border-t border-slate-200/80 text-center text-[10px] text-slate-400 font-mono tracking-widest uppercase mt-6">
+          Palas Atlas
         </div>
       </aside>
 
   <!-- Conteúdo Principal / Roteador -->
   <main id="mainRouterContainer" class="flex-1 w-full flex flex-col justify-center transition-all duration-300">
     
-    <!-- HUB DE ENTRADA (#pgHome) - COMPÊNDIO ACADÊMICO -->
-    <section id="pgHome" class="w-full h-full flex-1 text-neutral-100 p-4 md:p-8 pt-8 pb-24 relative overflow-x-hidden">
+    <!-- HUB DE ENTRADA (#pgHome) - BRANCO FRIO & AZUL-PETRÓLEO COM DETALHES DE FUNDO -->
+    <section id="pgHome" class="w-full h-full flex-1 text-slate-900 px-4 sm:px-6 md:px-8 pt-3 sm:pt-5 pb-20 relative overflow-x-hidden bg-[#f8fafc]">
 
-      <!-- Imagem de Fundo -->
-      <img src="assets/hero-bg.jpeg" alt="Fundo Palas Atlas" class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;">
+      <!-- CAMADA DE DETALHE DE FUNDO SUTIL: Malha Arquitetônica Limpa -->
+      <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        <div id="homeBgGrid" class="absolute inset-0" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.032) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.032) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%);"></div>
+        <div id="homeBgGlow" class="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(2,132,199,0.09)_0%,_transparent_70%)]"></div>
+      </div>
 
-      <!-- Overlay Dark Gradient (Mais escuro, conforme solicitado) -->
-      <div class="absolute inset-0 bg-gradient-to-b from-neutral-950/75 via-neutral-950/85 to-neutral-950/95 pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;"></div>
-
-      <!-- Textura Sutil de Fundo -->
-      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')] opacity-20 pointer-events-none z-0" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw;"></div>
-
-      <!-- SEÇÃO 1: HERO SECTION (LAYOUT SIDE-BY-SIDE / DUAS COLUNAS) -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 lg:py-20 relative z-10 animate-fade-in-up">
+      <!-- SEÇÃO 1: HERO SECTION (RETÂNGULO ATÉ A BORDA ESQUERDA DA TELA + VITRINE) -->
+      <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-3 pb-10 lg:pt-5 lg:pb-12 relative z-10 animate-fade-in-up">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          <!-- COLUNA ESQUERDA: Texto Principal Redimensionado & Ações (lg:col-span-7) -->
-          <div class="lg:col-span-7 flex flex-col items-start text-left">
-            
-            <!-- Título Principal -->
-            <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-100 leading-tight antialiased drop-shadow-xl mb-4 text-left">
-              Atlas Integrado de <span class="text-[#d4af37]">Ciências Morfológicas</span>
-            </h1>
-            
-            <!-- Parágrafo de Apoio -->
-            <p class="text-neutral-300 text-sm sm:text-base lg:text-lg max-w-xl font-sans font-light leading-relaxed mb-8 text-left">
-              O mais completo acervo digital focado no ciclo básico da Medicina. Explore estruturas microscópicas e anatômicas em altíssima definição com navegação piramidal profunda.
-            </p>
+          <!-- COLUNA ESQUERDA: Retângulo Sangrando até a Esquerda da Tela & Busca (lg:col-span-6 = 50%) -->
+          <div class="lg:col-span-6 flex flex-col items-start text-left">
 
-            <!-- Barra de Busca Rápida (Search Widget) -->
-            <div class="w-full max-w-xl relative mb-6 group" id="global-search-container">
-              <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-neutral-500 group-focus-within:text-neutral-300 transition-colors z-10">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <!-- RETÂNGULO DO TÍTULO PRINCIPAL: Vai até a borda esquerda absoluta da tela (left: -50vw) -->
+            <div class="relative w-full py-7 sm:py-9 pr-6 sm:pr-10 mb-7">
+              <!-- Painel de fundo que se estende até a borda esquerda da tela -->
+              <div id="heroTitleBoxBg" class="absolute inset-y-0 right-0 left-[-50vw] bg-white border-y border-r border-slate-200/95 rounded-r-3xl shadow-[0_18px_45px_-15px_rgba(15,23,42,0.07)] pointer-events-none transition-colors duration-300"></div>
+
+              <!-- Conteúdo alinhado à margem do container -->
+              <div class="relative z-10">
+                <h1 class="font-serif text-3xl sm:text-4xl lg:text-[3.05rem] font-extrabold tracking-[-0.02em] text-slate-900 mb-3.5 text-left" style="line-height: 1.24;">
+                  Atlas Integrado de <br class="hidden sm:inline" />
+                  <span class="text-sky-700 font-extrabold block sm:inline mt-0.5 sm:mt-0">Ciências Morfológicas</span>
+                </h1>
+                
+                <p class="text-slate-600 text-sm sm:text-base font-sans font-normal leading-relaxed max-w-lg text-left">
+                  Explore lâminas microscópicas reais em alta definição com navegação óptica interativa.
+                </p>
               </div>
-              <input type="search" id="global-search-input" name="palas_atlas_search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-neutral-900/60 border border-neutral-800 focus:border-[#d4af37]/60 rounded-xl py-3.5 pl-12 pr-12 text-sm text-white placeholder-neutral-500 outline-none transition-all relative z-10" placeholder="Buscar tecidos, órgãos, lâminas em H&E...">
+            </div>
+
+            <!-- Barra de Busca Rápida (z-30 garante que o dropdown fique acima dos botões abaixo) -->
+            <div class="w-full max-w-xl relative z-30 mb-6 group" id="global-search-container">
+              <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-sky-600 transition-colors z-10">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
+              <input type="text" id="global-search-input" name="palas_atlas_search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-white border border-slate-200/90 focus:border-sky-600 rounded-2xl py-4 pl-12 pr-12 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all relative z-10 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.07)] focus:shadow-[0_16px_40px_-8px_rgba(2,132,199,0.14)]" placeholder="Buscar tecidos, órgãos ou lâminas em H&E...">
               
               <!-- Botão de limpar -->
-              <button type="button" id="global-search-clear" class="absolute inset-y-0 right-4 hidden items-center text-neutral-500 hover:text-white transition-colors cursor-pointer z-10">
+              <button type="button" id="global-search-clear" class="absolute inset-y-0 right-4 hidden items-center text-slate-400 hover:text-slate-800 transition-colors cursor-pointer z-20">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
 
               <!-- Dropdown de Resultados -->
               <div id="global-search-dropdown" class="absolute top-full left-0 w-full z-50 mt-2 hidden text-left">
-                <div class="bg-zinc-900/95 border border-zinc-800 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden max-h-80 overflow-y-auto">
+                <div class="bg-white border border-slate-200/90 rounded-2xl shadow-[0_24px_60px_rgba(15,23,42,0.18)] overflow-hidden max-h-80 overflow-y-auto">
                   <ul id="global-search-results" class="flex flex-col">
                     <!-- Resultados injetados via search-engine.js -->
                   </ul>
-                  <div id="global-search-empty" class="hidden p-4 text-center text-zinc-400 text-sm">
+                  <div id="global-search-empty" class="hidden p-4 text-center text-slate-500 text-sm">
                     Nenhuma lâmina encontrada.
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Botões de Ação Clínicos & Editoriais -->
-            <div class="flex flex-wrap gap-3 items-center justify-start w-full">
-              <button type="button" onclick="window.App.selecionarFrente('histologia')" class="bg-[#d4af37]/10 hover:bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 hover:border-[#d4af37]/80 rounded-xl px-5 py-2.5 transition-all duration-150 flex items-center justify-center gap-2 group cursor-pointer text-xs font-mono font-medium tracking-wider uppercase">
+            <!-- Botões de Ação -->
+            <div class="relative z-10 flex flex-wrap gap-3.5 items-center justify-start w-full">
+              <button id="btnHeroPrimary" type="button" onclick="window.App.selecionarFrente('histologia')" class="bg-slate-900 hover:bg-sky-900 text-white rounded-xl px-6 py-3.5 transition-all duration-200 flex items-center justify-center gap-2.5 group cursor-pointer text-xs font-sans font-semibold tracking-wide shadow-[0_10px_24px_-6px_rgba(15,23,42,0.25)]">
                 <span>Explorar Lâminas</span>
-                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <svg class="w-4 h-4 text-sky-300 group-hover:translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
               </button>
-              <a href="sobre.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/20 text-neutral-300 hover:text-white transition-all duration-150 text-xs font-mono tracking-wider uppercase">
+              <a href="sobre.html" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-sans font-semibold shadow-sm no-underline">
                 Sobre o Projeto
               </a>
             </div>
 
           </div>
 
-          <!-- COLUNA DIREITA: Vitrine de Lâminas (Zero-Box / Borderless Editorial) -->
-          <div class="lg:col-span-5 w-full">
-            <div id="heroSlideShowcase" class="relative group/showcase w-full flex flex-col space-y-4">
+          <!-- COLUNA DIREITA: Vitrine de Lâminas Full-Bleed com Título Sobreposto (lg:col-span-6 = 50%) -->
+          <div class="lg:col-span-6 w-full">
+            <div id="heroSlideShowcase" class="group/showcase relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/90 shadow-[0_22px_50px_-12px_rgba(15,23,42,0.18)] flex flex-col justify-between p-5 sm:p-7">
               
-              <!-- Imagem Principal Flutuante (Refinada & Borderless) -->
-              <div class="relative group/preview w-full">
-                <div class="aspect-[16/10] w-full rounded-xl overflow-hidden relative shadow-2xl shadow-black/90 border border-white/[0.06] bg-neutral-950">
-                  <img
-                    id="vitrineImage"
-                    src="assets/histologia/medula-espinal-he.png"
-                    alt="Medula Espinal"
-                    class="w-full h-full object-cover transition-all duration-150 ease-out opacity-100 group-hover/preview:scale-[1.02]"
-                    onerror="this.onerror=null; this.src='assets/histologia/medula-espinal-he.png';"
-                  />
-                  <!-- Sombra/gradiente sutil nas bordas internas para profundidade -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none"></div>
+              <!-- Imagem de Microscopia Full-Bleed 100% -->
+              <img
+                id="vitrineImage"
+                src="assets/histologia/medula-espinal-he.png"
+                alt="Medula Espinal"
+                class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out opacity-100 group-hover/showcase:scale-105"
+                onerror="this.onerror=null; this.src='assets/histologia/medula-espinal-he.png';"
+              />
 
-                  <!-- Badges Técnicos Minimalistas Flutuantes -->
-                  <div id="vitrineBadgeWrapper" class="absolute top-3 left-3 flex items-center gap-1.5 z-10 transition-all duration-150 ease-out opacity-100">
-                    <span id="vitrineStainBadge" class="bg-black/60 border border-white/10 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-mono tracking-wider text-neutral-300">
-                      H&amp;E &bull; 40x
-                    </span>
-                  </div>
-                  <div class="absolute top-3 right-3 z-10">
-                    <span class="bg-black/60 border border-white/10 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-mono tracking-wider text-[#d4af37] flex items-center gap-1.5 font-medium">
-                      <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                      Deep Zoom DZI
-                    </span>
-                  </div>
-                </div>
+              <!-- Gradiente Escuro Suave na Base para Leitura Nitída do Título Sobreposto -->
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/45 to-slate-950/10 pointer-events-none"></div>
+
+              <!-- Topo da Vitrine: Badge de Coloração -->
+              <div id="vitrineBadgeWrapper" class="relative z-10 flex items-center justify-start gap-2 transition-all duration-150 ease-out opacity-100">
+                <span id="vitrineStainBadge" class="bg-slate-950/75 border border-white/15 backdrop-blur-md px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold tracking-wider text-white shadow-sm">
+                  H&amp;E &bull; 40x
+                </span>
               </div>
 
-              <!-- Tipografia Editorial Solta (Sem Caixas ou Molduras) com Fade Fluido -->
-              <div id="vitrineTextContent" class="space-y-1.5 text-left pt-1 transition-all duration-150 ease-out opacity-100">
-                <div class="flex items-center justify-between">
-                  <span id="vitrineCategory" class="text-[10px] sm:text-[11px] tracking-widest uppercase text-[#d4af37]/80 font-mono font-medium">
-                    Histologia &bull; Sistema Nervoso
-                  </span>
-                  <span id="vitrineSpecimen" class="text-[10px] sm:text-[11px] tracking-wider text-neutral-500 font-mono">
-                    Corte Transversal
-                  </span>
+              <!-- Base da Vitrine: Título, Metadados e Controles Sobrepostos à Imagem -->
+              <div class="relative z-10 flex flex-col gap-3 mt-auto">
+                <div id="vitrineTextContent" class="space-y-1 text-left transition-all duration-150 ease-out opacity-100">
+                  <div class="flex items-center justify-between gap-2">
+                    <span id="vitrineCategory" class="text-[11px] tracking-[0.14em] uppercase text-sky-300 font-sans font-semibold">
+                      Histologia &bull; Sistema Nervoso
+                    </span>
+                    <span id="vitrineSpecimen" class="text-xs text-slate-300/90 font-sans font-medium">
+                      Corte Transversal
+                    </span>
+                  </div>
+                  <h3 id="vitrineTitle" class="font-serif font-bold text-xl sm:text-2xl text-white leading-snug tracking-tight drop-shadow-sm">
+                    Medula Espinal
+                  </h3>
+                  <p id="vitrineDesc" class="text-xs sm:text-sm text-slate-200/90 line-clamp-1 leading-relaxed font-sans">
+                    Substância cinzenta central em formato de H e substância branca periférica com motoneurônios.
+                  </p>
                 </div>
-                <h3 id="vitrineTitle" class="font-serif font-semibold text-xl sm:text-2xl text-neutral-100 leading-snug tracking-tight">
-                  Medula Espinal
-                </h3>
-                <p id="vitrineDesc" class="text-xs sm:text-sm text-neutral-400 line-clamp-2 leading-relaxed font-sans min-h-[2.5rem]">
-                  Substância cinzenta central em formato de H e substância branca periférica com motoneurônios.
-                </p>
-              </div>
 
-              <!-- Rodapé Interativo: Link CTA e Paginação Minimalista (Sem Bolinhas / Borderless) -->
-              <div class="flex items-center justify-between gap-4 pt-2">
-                <!-- Botão Link Interativo Avançado (Sem Caixa Pesada) -->
-                <a
-                  id="vitrineActionBtn"
-                  href="microscopio.html?id=5kqs5Qv9fvWlpNSJoyPG"
-                  class="inline-flex items-center gap-2 text-xs sm:text-sm font-mono tracking-wider uppercase text-neutral-300 hover:text-[#d4af37] transition-colors duration-150 group/link"
-                >
-                  <span class="tracking-wide">Abrir no Microscópio Óptico</span>
-                  <svg class="w-4 h-4 text-neutral-400 group-hover/link:text-[#d4af37] group-hover/link:translate-x-1.5 transition-all duration-300" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                  </svg>
-                </a>
-
-                <!-- Indicador de Página e Navegação Minimalista (< 01 / 02 >) -->
-                <div class="flex items-center gap-1 text-xs font-mono text-neutral-400 select-none">
-                  <button
-                    type="button"
-                    id="vitrinePrevBtn"
-                    class="text-neutral-500 hover:text-[#d4af37] transition-all duration-200 p-1.5 rounded-full hover:bg-white/[0.05] cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
-                    aria-label="Lâmina anterior"
-                    title="Lâmina anterior"
+                <!-- Rodapé da Vitrine Sobreposto: Link CTA e Paginação -->
+                <div class="pt-3 border-t border-white/15 flex items-center justify-between gap-4">
+                  <a
+                    id="vitrineActionBtn"
+                    href="microscopio.html?id=5kqs5Qv9fvWlpNSJoyPG"
+                    class="inline-flex items-center gap-2 text-xs sm:text-sm font-sans font-semibold text-white hover:text-sky-300 transition-colors duration-150 group/link no-underline"
                   >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                    <span>Abrir no Microscópio</span>
+                    <svg class="w-4 h-4 text-sky-400 group-hover/link:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
-                  </button>
+                  </a>
 
-                  <span id="vitrineCounter" class="text-[11px] tracking-widest text-neutral-300 font-mono px-2 py-0.5">01 / 02</span>
+                  <div class="flex items-center gap-1 text-xs font-sans text-white select-none bg-white/10 border border-white/15 backdrop-blur-md rounded-full px-2 py-0.5">
+                    <button
+                      type="button"
+                      id="vitrinePrevBtn"
+                      class="text-slate-200 hover:text-white transition-all duration-200 p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
+                      aria-label="Lâmina anterior"
+                      title="Lâmina anterior"
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                      </svg>
+                    </button>
 
-                  <button
-                    type="button"
-                    id="vitrineNextBtn"
-                    class="text-neutral-500 hover:text-[#d4af37] transition-all duration-200 p-1.5 rounded-full hover:bg-white/[0.05] cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
-                    aria-label="Próxima lâmina"
-                    title="Próxima lâmina"
-                  >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                    </svg>
-                  </button>
+                    <span id="vitrineCounter" class="text-[11px] tracking-wider text-white font-semibold px-2">01 / 03</span>
+
+                    <button
+                      type="button"
+                      id="vitrineNextBtn"
+                      class="text-slate-200 hover:text-white transition-all duration-200 p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
+                      aria-label="Próxima lâmina"
+                      title="Próxima lâmina"
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -790,114 +847,80 @@
         })();
       </script>
 
-      <!-- SEÇÃO 2: BENTO GRID DE MÓDULOS -->
-      <div class="max-w-6xl mx-auto px-4 md:px-8 py-6 relative z-10 animate-fade-in-up delay-200">
-        <!-- Grid Base -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+      <!-- SEÇÃO 2: DISCIPLINAS (HISTOLOGIA EM DESTAQUE PRINCIPAL + 3 DISCIPLINAS ABAIXO) -->
+      <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6 relative z-10 animate-fade-in-up delay-200">
+        
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6 pb-4 border-b border-slate-200/80">
+          <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-[-0.02em]">Disciplinas</h2>
+          <p class="text-xs sm:text-sm text-slate-500 font-sans">Selecione uma área para acessar as lâminas.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
           
-          <!-- FILEIRA SUPERIOR -->
-          
-          <!-- Histologia (2 colunas) -->
-          <div onclick="window.App.selecionarFrente('histologia')" class="glass-card md:col-span-2 rounded-xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[200px]">
-            <div class="relative z-10">
-              <div class="flex items-center justify-between mb-3">
-                <span class="font-mono text-[10px] tracking-widest text-[#d4af37]/80 uppercase font-medium">Fascículo 01 &bull; Histologia</span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30 uppercase tracking-wider">Disponível</span>
-              </div>
-              <h2 class="text-white font-serif text-2xl md:text-3xl mb-2 font-semibold tracking-tight">Histologia</h2>
-              <p class="text-neutral-400 text-sm leading-relaxed max-w-lg">Estudo da organização tecidual e celular em lâminas virtuais de alta definição com diferentes colorações histológicas.</p>
+          <!-- HISTOLOGIA (CARD DE DESTAQUE MAIOR E MAIS ALTO VERTICALMENTE) -->
+          <div id="cardDestaqueHistologia" onclick="window.App.selecionarFrente('histologia')" class="md:col-span-3 relative overflow-hidden group bg-gradient-to-br from-[#0f172a] via-[#0c2136] to-[#082f49] rounded-2xl border border-sky-500/35 hover:border-sky-400 border-l-4 border-l-sky-400 p-8 sm:p-11 min-h-[220px] sm:min-h-[250px] shadow-[0_20px_45px_-12px_rgba(15,23,42,0.20)] hover:shadow-[0_24px_55px_-12px_rgba(2,132,199,0.30)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col justify-between gap-8">
+            
+            <div class="space-y-3 relative z-10 max-w-2xl">
+              <h3 class="text-white font-serif text-2xl sm:text-4xl font-extrabold tracking-[-0.02em] group-hover:text-sky-300 transition-colors">Histologia</h3>
+              <p class="text-slate-300 text-sm sm:text-base leading-relaxed font-sans max-w-xl">Tecidos fundamentais e sistemas orgânicos em microscopia óptica de alta definição.</p>
             </div>
-            <div class="relative z-10 mt-5 flex justify-end">
-              <div class="w-8 h-8 rounded-lg bg-neutral-900/80 border border-white/[0.08] flex items-center justify-center text-neutral-400 group-hover:text-[#d4af37] group-hover:border-[#d4af37]/50 transition-colors">
-                <span class="group-hover:translate-x-0.5 transition-transform text-sm">&rarr;</span>
-              </div>
+
+            <div class="relative z-10 pt-5 border-t border-white/10 flex items-center justify-between gap-4">
+              <span class="text-xs sm:text-sm text-sky-300/90 font-sans font-medium">Epitelial, Conjuntivo, Muscular, Nervoso e Sistemas</span>
+              <span class="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-sky-500 group-hover:bg-sky-400 text-slate-950 font-sans font-bold text-xs sm:text-sm transition-all shadow-md shrink-0">
+                <span>Acessar Lâminas</span>
+                <span class="group-hover:translate-x-1 transition-transform text-base leading-none">&rarr;</span>
+              </span>
             </div>
           </div>
 
-          <!-- Anatomia (1 coluna) -->
-          <div onclick="window.App.selecionarFrente('anatomia')" class="glass-card md:col-span-1 rounded-xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[200px]">
-            <div class="relative z-10">
-              <div class="flex items-center justify-between mb-3">
-                <span class="font-mono text-[10px] tracking-widest text-neutral-400 uppercase font-medium">Fascículo 02 &bull; Anatomia</span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-neutral-400 border border-white/[0.08] uppercase tracking-wider">Em Breve</span>
-              </div>
-              <h2 class="text-white font-serif text-xl md:text-2xl mb-2 font-semibold tracking-tight">Anatomia</h2>
-              <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">Estudo topográfico da arquitetura corporal e acidentes anatômicos em peças e cortes cadavéricos reais.</p>
+          <!-- Patologia (Carmim / Eosina) -->
+          <div onclick="window.App.selecionarFrente('patologia')" class="group bg-white/95 backdrop-blur-xs rounded-2xl border border-slate-200/90 hover:border-rose-600/50 border-l-[3px] border-l-rose-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(225,29,72,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4">
+            <div class="space-y-1.5">
+              <h3 class="text-slate-900 font-serif text-lg sm:text-xl font-bold tracking-[-0.02em] group-hover:text-rose-700 transition-colors">Patologia</h3>
+              <p class="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans">Adaptação, lesão celular, processos inflamatórios e neoplasias.</p>
             </div>
-            <div class="relative z-10 mt-5 flex justify-end">
-              <div class="w-8 h-8 rounded-lg bg-neutral-900/80 border border-white/[0.08] flex items-center justify-center text-neutral-400 group-hover:text-[#d4af37] group-hover:border-[#d4af37]/50 transition-colors">
-                <span class="group-hover:translate-x-0.5 transition-transform text-sm">&rarr;</span>
-              </div>
+            <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-rose-600 group-hover:text-white group-hover:border-rose-600 transition-all duration-200 shrink-0">
+              <span class="group-hover:translate-x-0.5 transition-transform font-semibold">&rarr;</span>
             </div>
           </div>
 
-          <!-- FILEIRA INFERIOR -->
-
-          <!-- Patologia Geral (1 coluna) -->
-          <div onclick="window.App.selecionarFrente('patologia')" class="glass-card md:col-span-1 rounded-xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
-            <div class="relative z-10">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-mono text-[10px] tracking-widest text-neutral-400 uppercase font-medium">Fascículo 03 &bull; Patologia</span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-neutral-400 border border-white/[0.08] uppercase tracking-wider">Em Breve</span>
-              </div>
-              <h2 class="text-white font-serif text-lg sm:text-xl mb-1.5 font-semibold tracking-tight">Patologia Geral</h2>
-              <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">Alterações morfológicas teciduais, inflamação, processos regressivos e neoplasias.</p>
+          <!-- Parasitologia (Verde-Esmeralda) -->
+          <div onclick="window.App.selecionarFrente('parasitologia')" class="group bg-white/95 backdrop-blur-xs rounded-2xl border border-slate-200/90 hover:border-emerald-600/50 border-l-[3px] border-l-emerald-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(5,150,105,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4">
+            <div class="space-y-1.5">
+              <h3 class="text-slate-900 font-serif text-lg sm:text-xl font-bold tracking-[-0.02em] group-hover:text-emerald-700 transition-colors">Parasitologia</h3>
+              <p class="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans">Morfologia diagnóstica de protozoários e helmintos de interesse médico.</p>
             </div>
-            <div class="relative z-10 mt-4 flex justify-end">
-              <div class="w-8 h-8 rounded-lg bg-neutral-900/80 border border-white/[0.08] flex items-center justify-center text-neutral-400 group-hover:text-[#d4af37] group-hover:border-[#d4af37]/50 transition-colors">
-                <span class="group-hover:translate-x-0.5 transition-transform text-sm">&rarr;</span>
-              </div>
+            <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-all duration-200 shrink-0">
+              <span class="group-hover:translate-x-0.5 transition-transform font-semibold">&rarr;</span>
             </div>
           </div>
 
-          <!-- Parasitologia (1 coluna) -->
-          <div onclick="window.App.selecionarFrente('parasitologia')" class="glass-card md:col-span-1 rounded-xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
-            <div class="relative z-10">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-mono text-[10px] tracking-widest text-neutral-400 uppercase font-medium">Fascículo 04 &bull; Parasitologia</span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-neutral-400 border border-white/[0.08] uppercase tracking-wider">Em Breve</span>
-              </div>
-              <h2 class="text-white font-serif text-lg sm:text-xl mb-1.5 font-semibold tracking-tight">Parasitologia</h2>
-              <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">Morfologia de protozoários e helmintos de interesse médico e diagnóstico.</p>
+          <!-- Microbiologia (Violeta de Gram) -->
+          <div onclick="window.App.selecionarFrente('microbiologia')" class="group bg-white/95 backdrop-blur-xs rounded-2xl border border-slate-200/90 hover:border-violet-600/50 border-l-[3px] border-l-violet-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(124,58,237,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4">
+            <div class="space-y-1.5">
+              <h3 class="text-slate-900 font-serif text-lg sm:text-xl font-bold tracking-[-0.02em] group-hover:text-violet-700 transition-colors">Microbiologia</h3>
+              <p class="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans">Bactérias, coloração de Gram, BAAR e estruturas fúngicas.</p>
             </div>
-            <div class="relative z-10 mt-4 flex justify-end">
-              <div class="w-8 h-8 rounded-lg bg-neutral-900/80 border border-white/[0.08] flex items-center justify-center text-neutral-400 group-hover:text-[#d4af37] group-hover:border-[#d4af37]/50 transition-colors">
-                <span class="group-hover:translate-x-0.5 transition-transform text-sm">&rarr;</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Microbiologia (1 coluna) -->
-          <div onclick="window.App.selecionarFrente('microbiologia')" class="glass-card md:col-span-1 rounded-xl p-5 md:p-6 group relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[160px]">
-            <div class="relative z-10">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-mono text-[10px] tracking-widest text-neutral-400 uppercase font-medium">Fascículo 05 &bull; Micro</span>
-                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-neutral-400 border border-white/[0.08] uppercase tracking-wider">Em Breve</span>
-              </div>
-              <h2 class="text-white font-serif text-lg sm:text-xl mb-1.5 font-semibold tracking-tight">Microbiologia</h2>
-              <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">Análise morfotintorial de arranjos bacterianos e estruturas fúngicas em lâminas.</p>
-            </div>
-            <div class="relative z-10 mt-4 flex justify-end">
-              <div class="w-8 h-8 rounded-lg bg-neutral-900/80 border border-white/[0.08] flex items-center justify-center text-neutral-400 group-hover:text-[#d4af37] group-hover:border-[#d4af37]/50 transition-colors">
-                <span class="group-hover:translate-x-0.5 transition-transform text-sm">&rarr;</span>
-              </div>
+            <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white group-hover:border-violet-600 transition-all duration-200 shrink-0">
+              <span class="group-hover:translate-x-0.5 transition-transform font-semibold">&rarr;</span>
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- SEÇÃO 3: SOBRE O PROJETO (BLOCO EDITORIAL UNIFICADO) -->
-      <section class="max-w-3xl mx-auto text-center py-16 px-6 border-t border-neutral-800/60 mt-12 mb-16 relative z-10 animate-fade-in-up delay-300">
-        <h3 class="font-serif text-2xl md:text-3xl text-slate-100 mb-4 tracking-wide">
-          Um compêndio morfológico construído por estudantes para estudantes.
+      <!-- SEÇÃO 3: SOBRE O PROJETO (EDITORIAL CLÍNICO) -->
+      <section class="max-w-2xl mx-auto text-center py-14 px-6 border-t border-slate-200/90 mt-10 mb-6 relative z-10 animate-fade-in-up delay-300">
+        <h3 class="font-serif text-2xl md:text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+          Feito por estudantes para estudantes.
         </h3>
-        <p class="text-neutral-400 font-sans text-sm md:text-base leading-relaxed mb-6">
-          O Palas Atlas nasceu da necessidade de integrar a teoria morfológica à rotina prática laboratorial. Unimos a precisão científica dos principais manuais à curadoria acadêmica de estudantes, monitores e professores de Medicina.
+        <p class="text-slate-600 font-sans text-sm sm:text-base leading-relaxed mb-5">
+          Integramos a teoria morfológica à rotina prática do laboratório acadêmico.
         </p>
         <a href="sobre.html" 
-           class="inline-flex items-center gap-2 text-[#d4af37] hover:text-[#e0c97f] font-medium text-sm transition-all group no-underline">
-          <span>Conhecer a história, proposta e corpo editorial</span>
+           class="inline-flex items-center gap-2 text-sky-700 hover:text-sky-900 font-semibold text-xs uppercase tracking-wider transition-all group no-underline">
+          <span>Conhecer o projeto e a equipe</span>
           <span class="transition-transform group-hover:translate-x-1">&rarr;</span>
         </a>
       </section>
@@ -907,7 +930,7 @@
 
 
     <!-- CONTAINER 2: Histologia (#pgHistologia) - 3 NÍVEIS HIERÁRQUICOS -->
-    <section id="pgHistologia" class="hidden w-full min-h-screen bg-neutral-950 text-neutral-200">
+    <section id="pgHistologia" class="hidden w-full min-h-screen bg-[#f8fafc] text-slate-900">
       
       <!-- NÍVEL 1: Sumário Limpo de Cards Visuais (#histoCatalog) -->
       <div id="histoCatalog" class="w-full"></div>
@@ -1005,18 +1028,18 @@
     </section>
 
     <!-- CONTAINER 3: Dashboard / CMS de Acervo & Pinos (#pgDashboard) -->
-    <section id="pgDashboard" class="hidden h-screen pt-20 sm:pt-24 w-full bg-neutral-950 text-slate-100 overflow-hidden flex flex-col">
+    <section id="pgDashboard" class="hidden h-screen pt-16 sm:pt-[68px] w-full bg-[#060608] text-slate-100 overflow-hidden flex flex-col">
 
       <!-- ── MODAL DE LOGIN DO ADMINISTRADOR ─────────────────────────────── -->
       <!-- Exibido quando o usuário não está autenticado. Sobrepõe o CMS. -->
-      <div id="dashLoginOverlay" class="absolute inset-0 z-50 bg-neutral-950/80 backdrop-blur-xl flex items-center justify-center p-4 hidden">
-        <div class="w-full max-w-sm mx-auto bg-neutral-900/60 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col gap-5 sm:gap-6 relative">
+      <div id="dashLoginOverlay" class="absolute inset-0 z-50 bg-[#060608]/88 backdrop-blur-xl flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md mx-auto bg-[#101014] border border-[#d4af37]/30 rounded-2xl shadow-[0_25px_70px_rgba(0,0,0,0.9)] p-6 sm:p-8 flex flex-col gap-5 sm:gap-6 relative">
 
           <!-- Botão Fechar Modal de Login / Voltar ao Início -->
           <button
             type="button"
             onclick="window.App.navegarPara('pgHome')"
-            class="absolute top-4 right-4 w-11 h-11 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-all duration-200 cursor-pointer active:scale-95"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/[0.08] transition-all duration-200 cursor-pointer active:scale-95"
             aria-label="Fechar e voltar ao início"
             title="Voltar ao início">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
@@ -1026,25 +1049,25 @@
 
           <!-- Cabeçalho do Modal -->
           <div class="flex flex-col items-center gap-2 text-center">
-            <div class="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-1">
-              <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+            <div class="w-12 h-12 rounded-2xl bg-[#d4af37]/10 border border-[#d4af37]/30 flex items-center justify-center mb-1">
+              <svg class="w-5 h-5 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
               </svg>
             </div>
-            <h2 class="font-serif text-white text-xl tracking-wide">Acesso Restrito</h2>
-            <p class="text-neutral-400 text-xs leading-relaxed">Painel de administração do Palas Atlas.<br>Apenas editores autorizados.</p>
+            <h2 class="font-serif font-extrabold text-[#f4f2ed] text-2xl tracking-tight">Acesso Restrito</h2>
+            <p class="text-neutral-400 text-xs leading-relaxed">Painel de Curadoria e Administração do Palas Atlas.<br>Exclusivo para editores credenciados.</p>
           </div>
 
           <!-- Formulário -->
           <div class="flex flex-col gap-4">
             <div>
-              <label class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono mb-1.5 block" for="dashLoginEmail">E-mail</label>
+              <label class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono mb-1.5 block" for="dashLoginEmail">E-mail Institucional</label>
               <input
                 id="dashLoginEmail"
                 type="email"
                 autocomplete="email"
                 placeholder="admin@palasatlas.com"
-                class="w-full bg-neutral-950/50 border border-white/[0.08] rounded-xl px-4 py-3 min-h-[44px] text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37]/40 transition-colors"
+                class="w-full bg-[#09090c] border border-white/[0.1] rounded-xl px-4 py-3 min-h-[44px] text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37] transition-colors"
               />
             </div>
             <div>
@@ -1054,7 +1077,7 @@
                 type="password"
                 autocomplete="current-password"
                 placeholder="••••••••"
-                class="w-full bg-neutral-950/50 border border-white/[0.08] rounded-xl px-4 py-3 min-h-[44px] text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37]/40 transition-colors"
+                class="w-full bg-[#09090c] border border-white/[0.1] rounded-xl px-4 py-3 min-h-[44px] text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37] transition-colors"
               />
             </div>
           </div>
@@ -1067,27 +1090,27 @@
             id="btnDashLogin"
             type="button"
             onclick="window.App.dashboardLogin()"
-            class="w-full min-h-[44px] bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 font-mono tracking-widest uppercase text-xs rounded-xl py-3.5 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.99]"
+            class="w-full min-h-[44px] bg-[#d4af37] hover:bg-[#e5c158] text-[#09090b] font-sans font-bold tracking-wide uppercase text-xs rounded-xl py-3.5 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-[0_10px_28px_-6px_rgba(212,175,55,0.3)] active:scale-[0.99]"
           >
             <span id="dashLoginBtnText">Entrar no Painel</span>
-            <span id="dashLoginSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            <span id="dashLoginSpinner" class="hidden w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
           </button>
 
-          <p class="text-center text-[10px] text-neutral-600 font-mono tracking-wider">Palas Atlas &mdash; Sistema Restrito</p>
+          <p class="text-center text-[10px] text-neutral-500 font-mono tracking-wider uppercase">Palas Atlas &mdash; Curadoria Digital</p>
         </div>
       </div>
       <!-- ── FIM DO MODAL DE LOGIN ────────────────────────────────────────── -->
 
 
       <!-- NAVEGAÇÃO INTERNA DO PAINEL DEV (TÓPICOS DO CMS) -->
-      <div class="flex items-center justify-between px-6 py-3 shrink-0 w-full border-b border-white/[0.06] bg-neutral-950/80 backdrop-blur-md z-10">
+      <div class="flex items-center justify-between px-4 sm:px-6 py-2.5 shrink-0 w-full border-b border-white/[0.08] bg-[#09090c] z-10">
         <!-- Cápsula de Abas Minimalista -->
-        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-900/40 border border-white/[0.06] backdrop-blur-md">
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#121216] border border-white/[0.08]">
           <button
             type="button"
             id="btnTopicoEditor"
             onclick="window.App.alternarTopicoCms('editor')"
-            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer bg-white/[0.06] text-white border border-white/[0.08] shadow-sm">
+            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer bg-[#d4af37]/15 text-[#e5c158] border border-[#d4af37]/35 font-semibold shadow-sm">
             <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37]"></span>
             <span>Editor &amp; Cadastro</span>
           </button>
@@ -1095,45 +1118,51 @@
             type="button"
             id="btnTopicoAcervo"
             onclick="window.App.alternarTopicoCms('acervo')"
-            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.03]">
+            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04]">
             <span class="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
             <span>Lâminas &amp; Acervo</span>
           </button>
         </div>
 
-        <div class="flex items-center gap-3 font-mono">
-          <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm font-mono tracking-wider uppercase">
+        <div class="flex items-center gap-2.5 font-mono">
+          <span class="hidden sm:inline-flex bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-[10px] px-3 py-1 rounded-full items-center gap-1.5 shadow-sm font-mono tracking-wider uppercase">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             Firestore Sync
           </span>
+          <button
+            type="button"
+            onclick="window.App.navegarPara('pgHome')"
+            class="px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-neutral-300 hover:text-white text-xs font-sans font-semibold transition-all cursor-pointer">
+            &larr; Sair do Painel
+          </button>
         </div>
       </div>
 
       <!-- TÓPICO 1: EDITOR DO ACERVO & MAPEAMENTO OPTICO (#topicoCmsEditor) -->
-      <div id="topicoCmsEditor" class="w-full flex-1 grid grid-cols-1 md:grid-cols-[420px_1fr] overflow-hidden bg-neutral-950">
+      <div id="topicoCmsEditor" class="w-full flex-1 grid grid-cols-1 md:grid-cols-[430px_1fr] overflow-hidden bg-[#060608]">
         
         <!-- COLUNA DA ESQUERDA - FORMULÁRIO E EDITOR (Scroll Independente) -->
-        <div class="h-full overflow-y-auto p-6 space-y-6 border-r border-white/[0.06] bg-neutral-950 custom-scrollbar pb-16">
+        <div class="h-full overflow-y-auto p-5 sm:p-6 space-y-5 border-r border-white/[0.08] bg-[#09090c] custom-scrollbar pb-16">
           
-          <!-- Cabeçalho Institucional do Editor CMS e Botão Voltar -->
-          <div class="pb-4 border-b border-white/[0.06] flex flex-col gap-3 shrink-0">
+          <!-- Cabeçalho Institucional do Editor CMS -->
+          <div class="pb-4 border-b border-white/[0.08] flex flex-col gap-2 shrink-0">
             <div class="flex items-center justify-between">
               <div>
-                <span class="text-[10px] font-mono tracking-widest uppercase text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/30 px-2.5 py-0.5 rounded-full">CMS Palas Atlas</span>
-                <h2 class="text-xl font-light text-white tracking-wide mt-2 font-sans">Editor de Acervo &amp; Pinos</h2>
+                <span class="text-[10px] font-mono tracking-widest uppercase text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/30 px-2.5 py-0.5 rounded-full font-semibold">CMS Palas Atlas</span>
+                <h2 class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] tracking-tight mt-2">Editor de Acervo &amp; Pinos</h2>
               </div>
               <button 
                 type="button" 
                 onclick="window.App.carregarImagemNoEditor()" 
-                class="bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 px-3.5 py-1.5 rounded-xl text-xs font-mono tracking-wider uppercase transition-all duration-200 shadow-sm cursor-pointer">
+                class="bg-white/[0.04] hover:bg-[#d4af37]/15 text-neutral-300 hover:text-[#e5c158] border border-white/[0.1] hover:border-[#d4af37]/40 px-3.5 py-1.5 rounded-xl text-xs font-mono tracking-wider uppercase transition-all duration-200 shadow-sm cursor-pointer">
                 Recarregar
               </button>
             </div>
           </div>
 
           <!-- BLOCO A: FONTE DA IMAGEM E DZI -->
-          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
-            <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">A. Fonte da Imagem e Leitor</h3>
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
+            <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">A. Fonte da Imagem e Leitor</h3>
             
             <div class="flex flex-wrap items-center gap-6 bg-neutral-950/40 p-3 rounded-xl border border-white/[0.06]">
               <label class="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-300 font-mono select-none">
@@ -1236,8 +1265,8 @@
           </div>
 
           <!-- BLOCO B: METADADOS CLÍNICOS E ACADÊMICOS -->
-          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
-            <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">B. Metadados Clínicos e Acadêmicos</h3>
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
+            <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">B. Metadados Clínicos e Acadêmicos</h3>
             
             <div>
               <label for="dashNomeLamina" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Nome da Peça / Lâmina</label>
@@ -1257,7 +1286,6 @@
                   onchange="window.App.atualizarTopicosCms(this.value)" 
                   class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
                   <option value="histologia" selected>Histologia</option>
-                  <option value="anatomia">Anatomia</option>
                   <option value="patologia">Patologia</option>
                   <option value="parasitologia">Parasitologia</option>
                   <option value="microbiologia">Microbiologia</option>
@@ -1315,9 +1343,9 @@
           </div>
 
           <!-- BLOCO C: EDITOR DE TEXTO DESCRITIVO COM VÍNCULO DE PINOS -->
-          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">C. Descrição Histopatológica / Anatômica</h3>
+              <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">C. Descrição Histopatológica</h3>
               <span class="text-[10px] font-mono text-neutral-500">Interativo: passe o cursor</span>
             </div>
 
@@ -1347,9 +1375,9 @@
           </div>
 
           <!-- BLOCO D: FERRAMENTAS DE MARCAÇÃO E ESTRUTURAS -->
-          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
             <div class="flex items-center justify-between">
-              <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">D. Ferramentas & Lista de Anotações</h3>
+              <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">D. Ferramentas &amp; Lista de Anotações</h3>
               <span id="dashTotalPinosBadge" class="bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Anotações</span>
             </div>
 
@@ -1362,7 +1390,7 @@
                   id="dashBtnModoPin"
                   onclick="window.App.definirModoAnotacao('pin')"
                   class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer">
-                  <span>📍</span>
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8c0 7-7.5 13-7.5 13S4.5 15 4.5 8a7.5 7.5 0 1115 0z"/></svg>
                   <span class="font-medium">Ponto</span>
                 </button>
                 <button 
@@ -1370,7 +1398,7 @@
                   id="dashBtnModoCircle"
                   onclick="window.App.definirModoAnotacao('circle')"
                   class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer">
-                  <span>⭕</span>
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
                   <span class="font-medium">Círculo</span>
                 </button>
                 <button 
@@ -1378,7 +1406,7 @@
                   id="dashBtnModoArrow"
                   onclick="window.App.definirModoAnotacao('arrow')"
                   class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer">
-                  <span>↗️</span>
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H8M17 7v9"/></svg>
                   <span class="font-medium">Seta</span>
                 </button>
               </div>
@@ -1408,7 +1436,7 @@
 
             <!-- DICA DO MODO SETA -->
             <div id="dashConfigSeta" class="hidden p-3 bg-neutral-950/80 border border-[#d4af37]/30 rounded-xl text-[10px] font-mono text-neutral-300">
-              <div class="text-[#d4af37] font-semibold mb-1">↗️ Modo Seta Direcional:</div>
+              <div class="text-[#d4af37] font-semibold mb-1">Modo Seta Direcional:</div>
               <p id="dashArrowStatusText" class="text-neutral-400 leading-tight">
                 Clique 1: Ponto de início da haste. Clique 2: Ponta da seta sobre a estrutura celular.
               </p>
@@ -1420,9 +1448,9 @@
           </div>
 
           <!-- BLOCO E: QUESTÕES PRÁTICAS / SIMULADO DE BANCADA -->
-          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shadow-2xl space-y-4 shrink-0">
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
             <div class="flex items-center justify-between">
-              <h3 class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono">E. Questões Práticas / Simulado de Bancada</h3>
+              <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">E. Questões Práticas / Simulado</h3>
               <span id="dashTotalQuestoesBadge" class="bg-amber-400/10 text-amber-300 border border-amber-400/30 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Questões</span>
             </div>
 
@@ -1443,13 +1471,13 @@
           </div>
 
           <!-- BLOCO F: AÇÕES DE PUBLICAÇÃO -->
-          <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-5 shrink-0 shadow-2xl mb-6">
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shrink-0 shadow-xl mb-6">
             <div class="flex flex-col sm:flex-row items-center gap-3">
               <button 
                 type="button" 
                 id="btnPublicarCms"
                 onclick="window.App.publicarLaminaCms()" 
-                class="flex-1 w-full bg-white/[0.05] hover:bg-emerald-500/10 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500/60 rounded-xl py-3 px-4 text-xs font-mono tracking-widest uppercase transition-all duration-300 cursor-pointer shadow-lg flex items-center justify-center gap-2">
+                class="flex-1 w-full bg-[#d4af37] hover:bg-[#e5c158] text-[#09090b] font-sans font-bold border border-[#d4af37] rounded-xl py-3.5 px-4 text-xs tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-[0_10px_28px_-6px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2">
                 <span id="txtBtnPublicar">Cadastrar Lâmina</span>
               </button>
               
@@ -1485,7 +1513,8 @@
                 onclick="window.App.definirModoAnotacao('pin')" 
                 class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer"
                 title="Ponto (Pin Clássico)">
-                <span>📍</span><span class="hidden sm:inline">Ponto</span>
+                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8c0 7-7.5 13-7.5 13S4.5 15 4.5 8a7.5 7.5 0 1115 0z"/></svg>
+                <span class="hidden sm:inline">Ponto</span>
               </button>
               <button 
                 type="button" 
@@ -1493,7 +1522,8 @@
                 onclick="window.App.definirModoAnotacao('circle')" 
                 class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer"
                 title="Círculo (Delimitar Estrutura/Ósteon)">
-                <span>⭕</span><span class="hidden sm:inline">Círculo</span>
+                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
+                <span class="hidden sm:inline">Círculo</span>
               </button>
               <button 
                 type="button" 
@@ -1501,7 +1531,8 @@
                 onclick="window.App.definirModoAnotacao('arrow')" 
                 class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer"
                 title="Seta Direcional">
-                <span>↗️</span><span class="hidden sm:inline">Seta</span>
+                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+                <span class="hidden sm:inline">Seta</span>
               </button>
             </div>
             <div class="h-4 w-px bg-white/10"></div>
@@ -1534,64 +1565,64 @@
       </div>
 
       <!-- TÓPICO 2: LÂMINAS & STATUS DO ACERVO (#topicoCmsAcervo) -->
-      <div id="topicoCmsAcervo" class="hidden w-full flex-1 overflow-y-auto p-6 md:p-8 pb-16 custom-scrollbar">
+      <div id="topicoCmsAcervo" class="hidden w-full flex-1 overflow-y-auto p-6 md:p-8 pb-16 custom-scrollbar bg-[#060608]">
         
         <!-- PAINEL DE ESTATÍSTICAS E RESUMO CLÍNICO -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div class="p-5 rounded-2xl bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] shadow-2xl flex items-center justify-between">
+          <div class="p-5 rounded-2xl bg-[#111115] border border-white/[0.08] border-l-4 border-l-[#d4af37] shadow-xl flex items-center justify-between">
             <div>
               <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Total de Lâminas</span>
-              <span id="statTotalLaminas" class="text-2xl font-mono font-light text-white">0</span>
+              <span id="statTotalLaminas" class="text-2xl font-mono font-bold text-[#f4f2ed]">0</span>
             </div>
-            <div class="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-mono text-neutral-400 uppercase tracking-wider">Geral</div>
+            <div class="px-2.5 py-1 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-[10px] font-mono text-[#d4af37] uppercase tracking-wider">Geral</div>
           </div>
 
-          <div class="p-5 rounded-2xl bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] shadow-2xl flex items-center justify-between">
+          <div class="p-5 rounded-2xl bg-[#111115] border border-white/[0.08] border-l-4 border-l-emerald-500 shadow-xl flex items-center justify-between">
             <div>
               <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Lâminas Ativas</span>
-              <span id="statAtivas" class="text-2xl font-mono font-light text-emerald-400">0</span>
+              <span id="statAtivas" class="text-2xl font-mono font-bold text-emerald-400">0</span>
             </div>
             <div class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400 uppercase tracking-wider">Publicadas</div>
           </div>
 
-          <div class="p-5 rounded-2xl bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] shadow-2xl flex items-center justify-between">
+          <div class="p-5 rounded-2xl bg-[#111115] border border-white/[0.08] border-l-4 border-l-rose-500 shadow-xl flex items-center justify-between">
             <div>
               <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Lâminas Inativas</span>
-              <span id="statInativas" class="text-2xl font-mono font-light text-rose-400">0</span>
+              <span id="statInativas" class="text-2xl font-mono font-bold text-rose-400">0</span>
             </div>
             <div class="px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-[10px] font-mono text-rose-400 uppercase tracking-wider">Rascunho</div>
           </div>
         </div>
 
         <!-- TABELA / LISTA DO ACERVO COM CLASSIFICAÇÃO ATIVA/INATIVA -->
-        <div class="bg-neutral-900/30 backdrop-blur-md border border-white/[0.06] rounded-2xl p-6 shadow-2xl relative">
-          <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-white/[0.06] pb-5 mb-5 gap-4">
+        <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl relative">
+          <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-white/[0.08] pb-5 mb-5 gap-4">
             <div>
-              <span class="text-[10px] tracking-widest text-[#d4af37] font-mono uppercase block mb-1">Gestão de Peças e Lâminas</span>
-              <h3 class="text-xl font-light text-white tracking-wide">Acervo Cadastrado e Controle de Publicação</h3>
+              <span class="text-[10px] tracking-widest text-[#d4af37] font-mono uppercase font-semibold block mb-1">Gestão de Peças e Lâminas</span>
+              <h3 class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] tracking-tight">Acervo Cadastrado e Controle de Publicação</h3>
             </div>
             
             <!-- FILTROS DE VISUALIZAÇÃO -->
-            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-neutral-950/60 border border-white/[0.06] text-xs font-mono">
+            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono">
               <button
                 type="button"
                 id="btnFiltroTodos"
                 onclick="window.App.filtroAcervoCms('todos')"
-                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 bg-white/[0.06] text-white border border-white/[0.08] cursor-pointer shadow-sm tracking-wider uppercase text-[10px]">
+                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 bg-[#d4af37]/15 text-[#e5c158] border border-[#d4af37]/35 font-semibold cursor-pointer shadow-sm tracking-wider uppercase text-[10px]">
                 Todas
               </button>
               <button
                 type="button"
                 id="btnFiltroAtivas"
                 onclick="window.App.filtroAcervoCms('ativa')"
-                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.03] cursor-pointer tracking-wider uppercase text-[10px]">
+                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.04] cursor-pointer tracking-wider uppercase text-[10px]">
                 Ativas
               </button>
               <button
                 type="button"
                 id="btnFiltroInativas"
                 onclick="window.App.filtroAcervoCms('inativa')"
-                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.03] cursor-pointer tracking-wider uppercase text-[10px]">
+                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.04] cursor-pointer tracking-wider uppercase text-[10px]">
                 Inativas
               </button>
             </div>
@@ -1600,17 +1631,17 @@
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="text-[10px] font-mono uppercase text-neutral-400 border-b border-white/[0.06]">
-                  <th class="py-3 px-4 font-normal tracking-widest">Peça / Lâmina</th>
-                  <th class="py-3 px-4 font-normal tracking-widest">Disciplina</th>
-                  <th class="py-3 px-4 font-normal tracking-widest">Tópico</th>
-                  <th class="py-3 px-4 font-normal tracking-widest">Coloração</th>
-                  <th class="py-3 px-4 font-normal tracking-widest text-center">Status</th>
-                  <th class="py-3 px-4 font-normal tracking-widest text-center">Pinos</th>
-                  <th class="py-3 px-4 font-normal tracking-widest text-right">Ações</th>
+                <tr class="text-[10px] font-mono uppercase text-neutral-400 border-b border-white/[0.08]">
+                  <th class="py-3 px-4 font-semibold tracking-widest">Peça / Lâmina</th>
+                  <th class="py-3 px-4 font-semibold tracking-widest">Disciplina</th>
+                  <th class="py-3 px-4 font-semibold tracking-widest">Tópico</th>
+                  <th class="py-3 px-4 font-semibold tracking-widest">Coloração</th>
+                  <th class="py-3 px-4 font-semibold tracking-widest text-center">Status</th>
+                  <th class="py-3 px-4 font-semibold tracking-widest text-center">Pinos</th>
+                  <th class="py-3 px-4 font-semibold tracking-widest text-right">Ações</th>
                 </tr>
               </thead>
-              <tbody id="tabelaAcervoCms" class="divide-y divide-white/[0.04] text-xs text-neutral-300">
+              <tbody id="tabelaAcervoCms" class="divide-y divide-white/[0.05] text-xs text-neutral-300">
                 <tr>
                   <td colspan="7" class="py-8 text-center text-xs font-mono text-neutral-500">Conectando ao Google Cloud Firestore e sincronizando lâminas...</td>
                 </tr>
@@ -1626,39 +1657,27 @@
   </main>
 
   <!-- FOOTER INSTITUCIONAL (GLOBAL - DARK MODE) -->
-  <footer id="footer-dark" class="w-full bg-zinc-950 text-zinc-400 border-t border-zinc-900 mt-auto font-sans transition-opacity duration-300 relative z-20">
-    <div class="max-w-7xl mx-auto px-6 py-16 sm:py-20">
+  <footer id="footer-dark" class="w-full bg-[#070709] text-neutral-400 border-t border-white/[0.06] mt-auto font-sans transition-opacity duration-300 hidden relative z-20">
+    <div class="max-w-7xl mx-auto px-6 py-14 sm:py-16">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12">
         
         <!-- Coluna 1: Marca -->
-        <div class="space-y-4">
+        <div class="space-y-3.5">
           <div class="flex items-center gap-2">
-            <span class="text-lg font-serif font-bold text-amber-500/90">PALAS</span>
-            <span class="text-lg font-serif font-bold text-amber-500/90">ATLAS</span>
+            <span class="text-lg font-serif font-bold text-[#f4f2ed] tracking-[0.18em]">PALAS</span>
+            <span class="text-lg font-serif font-bold text-[#d4af37] tracking-[0.18em]">ATLAS</span>
           </div>
-          <p class="text-xs leading-relaxed max-w-xs text-zinc-400">
-            Atlas Morfológico Digital. Integração científica e prática laboratorial para o ciclo básico da saúde.
+          <p class="text-xs leading-relaxed max-w-xs text-neutral-400">
+            Integração científica e prática laboratorial para estudantes da área da saúde.
           </p>
-          <div class="flex items-center gap-3 pt-2">
-            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400" aria-label="Twitter">
-              <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400" aria-label="Instagram">
-              <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-            </a>
-            <a href="mailto:contato@palasatlas.com" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400" aria-label="Email">
-              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </a>
-          </div>
         </div>
 
-        <!-- Coluna 2: Módulos Morfológicos -->
+        <!-- Coluna 2: Disciplinas -->
         <div class="space-y-3">
-          <h4 class="text-white font-bold tracking-wider text-xs uppercase">Módulos</h4>
+          <h4 class="text-white font-bold tracking-wider text-xs uppercase">Disciplinas</h4>
           <ul class="space-y-2.5">
             <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Histologia</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Anatomia Macroscópica</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Patologia Geral</a></li>
+            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Patologia</a></li>
             <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Parasitologia</a></li>
             <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-400 block" href="index.html">Microbiologia</a></li>
           </ul>
@@ -1694,68 +1713,56 @@
   </footer>
 
   <!-- FOOTER INSTITUCIONAL (GLOBAL - LIGHT MODE) -->
-  <footer id="footer-light" class="w-full bg-zinc-100 text-zinc-700 border-t border-zinc-200 mt-auto font-sans transition-opacity duration-300 hidden relative z-20">
-    <div class="max-w-7xl mx-auto px-6 py-16 sm:py-20">
+  <footer id="footer-light" class="w-full bg-white text-slate-600 border-t border-slate-200/90 mt-auto font-sans transition-opacity duration-300 relative z-20">
+    <div class="max-w-7xl mx-auto px-6 py-14 sm:py-16">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-10 lg:gap-12">
         
         <!-- Coluna 1: Marca -->
-        <div class="space-y-4">
+        <div class="space-y-3.5">
           <div class="flex items-center gap-2">
-            <span class="text-lg font-serif font-bold text-zinc-900">PALAS</span>
-            <span class="text-lg font-serif font-bold text-zinc-900">ATLAS</span>
+            <span class="text-lg font-bold text-slate-900 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">PALAS</span>
+            <span class="text-lg font-bold text-sky-700 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">ATLAS</span>
           </div>
-          <p class="text-xs leading-relaxed max-w-xs text-zinc-700">
-            Atlas Morfológico Digital. Integração científica e prática laboratorial para o ciclo básico da saúde.
+          <p class="text-xs leading-relaxed max-w-xs text-slate-500">
+            Integração científica e prática laboratorial para estudantes da área da saúde.
           </p>
-          <div class="flex items-center gap-3 pt-2">
-            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Twitter">
-              <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="#" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Instagram">
-              <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-            </a>
-            <a href="mailto:contato@palasatlas.com" class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700" aria-label="Email">
-              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </a>
-          </div>
         </div>
 
-        <!-- Coluna 2: Módulos Morfológicos -->
+        <!-- Coluna 2: Disciplinas -->
         <div class="space-y-3">
-          <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Módulos</h4>
+          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Disciplinas</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Histologia</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Anatomia Macroscópica</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Patologia Geral</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Parasitologia</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Microbiologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Histologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Patologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Parasitologia</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Microbiologia</a></li>
           </ul>
         </div>
 
         <!-- Coluna 3: Plataforma -->
         <div class="space-y-3">
-          <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Plataforma</h4>
+          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Plataforma</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="index.html">Início (Home)</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Início (Home)</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
           </ul>
         </div>
 
         <!-- Coluna 4: Suporte e Legal -->
         <div class="space-y-3">
-          <h4 class="text-zinc-900 font-bold tracking-wider text-xs uppercase">Suporte &amp; Legal</h4>
+          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Suporte &amp; Legal</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="mailto:contato@palasatlas.com">Reportar Erro</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="termos.html">Termos de Uso</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="privacidade.html">Privacidade</a></li>
-            <li><a class="hover:text-[#d4af37] transition-colors text-xs text-zinc-700 block" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="mailto:contato@palasatlas.com">Reportar Erro</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="termos.html">Termos de Uso</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="privacidade.html">Privacidade</a></li>
+            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
           </ul>
         </div>
 
       </div>
 
       <!-- Rodapé Bottom -->
-      <div class="mt-16 pt-8 border-t border-zinc-200 text-center text-xs text-zinc-500">
+      <div class="mt-14 pt-8 border-t border-slate-200/80 text-center text-xs text-slate-400">
         &copy; 2026 Palas Atlas &mdash; Todos os direitos reservados. Projeto Acadêmico sem fins lucrativos.
       </div>
     </div>
@@ -1764,28 +1771,24 @@
   <!-- MODAL INTERATIVO "COMO USAR O SITE" (GUIA DE USO) -->
   <div
     id="helpModal"
-    class="fixed inset-0 z-[99995] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-xl hidden transition-all duration-300">
+    class="fixed inset-0 z-[99995] flex items-center justify-center p-3 sm:p-6 bg-slate-900/45 backdrop-blur-sm hidden transition-all duration-300">
     
     <!-- Backdrop fechamento ao clicar na área escurecida -->
     <div class="absolute inset-0 z-0 cursor-pointer" onclick="window.App.fecharModalAjuda()"></div>
 
     <!-- Container do Modal -->
-    <div class="bg-neutral-950/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 text-neutral-200 shadow-[0_25px_70px_rgba(0,0,0,0.85)] relative z-10 max-h-[85vh] flex flex-col overflow-hidden">
+    <div class="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 text-slate-800 shadow-[0_25px_70px_rgba(15,23,42,0.22)] relative z-10 max-h-[85vh] flex flex-col overflow-hidden">
       
       <!-- Cabeçalho do Modal -->
-      <div class="flex items-start justify-between pb-4 sm:pb-5 border-b border-white/[0.06] shrink-0">
+      <div class="flex items-start justify-between pb-4 sm:pb-5 border-b border-slate-200/80 shrink-0">
         <div class="space-y-1">
-          <div class="inline-flex items-center gap-2 mb-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37]"></span>
-            <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/25 px-2.5 py-0.5 rounded-full">Guia de Navegação &bull; Uso Prático</span>
-          </div>
-          <h3 class="text-lg sm:text-2xl font-light text-white font-serif tracking-wide">Como Usar o Palas Atlas</h3>
-          <p class="text-xs text-neutral-400 font-sans font-light">Orientações essenciais para explorar lâminas em alta definição e recursos interativos.</p>
+          <h3 class="text-lg sm:text-2xl font-bold text-slate-900 font-serif tracking-tight">Como Usar o Palas Atlas</h3>
+          <p class="text-xs text-slate-500 font-sans">Orientações essenciais para explorar lâminas em alta definição e recursos interativos.</p>
         </div>
         <button
           type="button"
           onclick="window.App.fecharModalAjuda()"
-          class="w-11 h-11 lg:w-9 lg:h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-neutral-400 hover:text-white flex items-center justify-center transition-all border border-white/[0.06] cursor-pointer shrink-0 ml-2 sm:ml-4 active:scale-95"
+          class="w-11 h-11 lg:w-9 lg:h-9 rounded-full bg-slate-100 hover:bg-slate-200/80 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all border border-slate-200/80 cursor-pointer shrink-0 ml-2 sm:ml-4 active:scale-95"
           aria-label="Fechar guia de uso">
           <svg class="w-5 h-5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -1794,64 +1797,64 @@
       </div>
 
       <!-- Conteúdo do Guia (4 Passos práticos) -->
-      <div class="py-4 space-y-3 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
+      <div class="py-4 space-y-3 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200">
         
         <!-- Passo 1: Zoom & Pan -->
-        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
-          <div class="w-8 h-8 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 flex items-center justify-center font-mono font-medium text-xs shrink-0 mt-0.5">
+        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-sky-500/40 transition-all duration-200">
+          <div class="w-8 h-8 rounded-full bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center font-mono font-bold text-xs shrink-0 mt-0.5">
             01
           </div>
           <div class="space-y-1 min-w-0">
-            <h4 class="text-sm font-medium text-white tracking-wide">
-              Navegação Óptica &amp; Zoom Profundo (DZI)
+            <h4 class="text-sm font-semibold text-slate-900 tracking-wide">
+              Zoom e Navegação na Lâmina
             </h4>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light break-words">
-              Utilize o <strong class="text-neutral-200 font-normal">scroll do mouse</strong> ou gestos de <strong class="text-neutral-200 font-normal">pinça no celular</strong> para transitar continuamente da visão panorâmica até o detalhamento celular em alta resolução. Clique e arraste (<em class="text-neutral-300">pan</em>) para percorrer todos os quadrantes da lâmina.
+            <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
+              Utilize o <strong class="text-slate-900 font-semibold">scroll do mouse</strong> ou gestos de <strong class="text-slate-900 font-semibold">pinça no celular</strong> para transitar continuamente da visão panorâmica até o detalhamento celular em alta resolução. Clique e arraste (<em class="text-slate-800">pan</em>) para percorrer todos os quadrantes da lâmina.
             </p>
           </div>
         </div>
 
         <!-- Passo 2: Pontos de Interesse -->
-        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
-          <div class="w-8 h-8 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 flex items-center justify-center font-mono font-medium text-xs shrink-0 mt-0.5">
+        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-sky-500/40 transition-all duration-200">
+          <div class="w-8 h-8 rounded-full bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center font-mono font-bold text-xs shrink-0 mt-0.5">
             02
           </div>
           <div class="space-y-1 min-w-0">
-            <h4 class="text-sm font-medium text-white tracking-wide">
-              Pontos de Interesse &amp; Painel Diagnóstico
+            <h4 class="text-sm font-semibold text-slate-900 tracking-wide">
+              Pontos de Interesse e Anotações
             </h4>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light break-words">
-              Clique nos <strong class="text-neutral-200 font-normal">pinos marcadores</strong> sobre a imagem histológica ou macroscópica. O painel lateral exibirá instantaneamente a nomenclatura anatômica, critérios de reconhecimento e notas de correlação clínica.
+            <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
+              Clique nos <strong class="text-slate-900 font-semibold">pinos marcadores</strong> sobre a lâmina. O painel lateral exibirá instantaneamente a nomenclatura estrutural, critérios de reconhecimento e notas de correlação clínica.
             </p>
           </div>
         </div>
 
-        <!-- Passo 3: Módulos Acadêmicos -->
-        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
-          <div class="w-8 h-8 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 flex items-center justify-center font-mono font-medium text-xs shrink-0 mt-0.5">
+        <!-- Passo 3: Disciplinas -->
+        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-sky-500/40 transition-all duration-200">
+          <div class="w-8 h-8 rounded-full bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center font-mono font-bold text-xs shrink-0 mt-0.5">
             03
           </div>
           <div class="space-y-1 min-w-0">
-            <h4 class="text-sm font-medium text-white tracking-wide">
-              Alternância Entre Módulos Acadêmicos
+            <h4 class="text-sm font-semibold text-slate-900 tracking-wide">
+              Alternância Entre Disciplinas
             </h4>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light break-words">
-              Alterne a qualquer instante entre as disciplinas — <strong class="text-neutral-200 font-normal">Histologia</strong>, <strong class="text-neutral-200 font-normal">Anatomia</strong>, <strong class="text-neutral-200 font-normal">Patologia</strong>, <strong class="text-neutral-200 font-normal">Parasitologia</strong> e <strong class="text-neutral-200 font-normal">Microbiologia</strong> — abrindo o menu lateral ou pelos atalhos do compêndio na tela inicial.
+            <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
+              Alterne a qualquer instante entre as disciplinas — <strong class="text-slate-900 font-semibold">Histologia</strong>, <strong class="text-slate-900 font-semibold">Patologia</strong>, <strong class="text-slate-900 font-semibold">Parasitologia</strong> e <strong class="text-slate-900 font-semibold">Microbiologia</strong> — abrindo o menu lateral ou pelos atalhos na tela inicial.
             </p>
           </div>
         </div>
 
         <!-- Passo 4: Objetivas & Tela Cheia -->
-        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-200">
-          <div class="w-8 h-8 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 flex items-center justify-center font-mono font-medium text-xs shrink-0 mt-0.5">
+        <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-sky-500/40 transition-all duration-200">
+          <div class="w-8 h-8 rounded-full bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center font-mono font-bold text-xs shrink-0 mt-0.5">
             04
           </div>
           <div class="space-y-1 min-w-0">
-            <h4 class="text-sm font-medium text-white tracking-wide">
-              Revólver de Objetivas &amp; Tela Cheia
+            <h4 class="text-sm font-semibold text-slate-900 tracking-wide">
+              Objetivas e Tela Cheia
             </h4>
-            <p class="font-sans text-xs text-neutral-400 leading-relaxed font-light break-words">
-              No microscópio virtual, selecione aumentos padronizados (<strong class="text-neutral-200 font-normal">4x, 10x, 40x e 100x</strong>) no seletor rápido do cabeçalho. Ative o modo <strong class="text-neutral-200 font-normal">Tela Cheia</strong> para sessões imersivas de estudo ou projeções em salas de aula.
+            <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
+              No microscópio virtual, selecione aumentos padronizados (<strong class="text-slate-900 font-semibold">4x, 10x, 40x e 100x</strong>) no seletor rápido do cabeçalho. Ative o modo <strong class="text-slate-900 font-semibold">Tela Cheia</strong> para sessões imersivas de estudo ou projeções em salas de aula.
             </p>
           </div>
         </div>
@@ -1859,12 +1862,12 @@
       </div>
 
       <!-- Rodapé do Modal -->
-      <div class="pt-3 sm:pt-4 border-t border-white/[0.06] flex items-center justify-between w-full mt-1 shrink-0">
-        <span class="text-[10px] font-mono text-neutral-500 uppercase tracking-widest hidden sm:inline">Palas Atlas &bull; Acervo Morfológico</span>
+      <div class="pt-3 sm:pt-4 border-t border-slate-200/80 flex items-center justify-between w-full mt-1 shrink-0">
+        <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest hidden sm:inline">Palas Atlas</span>
         <button
           type="button"
           onclick="window.App.fecharModalAjuda()"
-          class="bg-[#d4af37] hover:bg-[#e6ca65] text-neutral-950 font-medium px-6 py-2.5 min-h-[44px] rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-200 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_25px_rgba(212,175,55,0.35)] cursor-pointer ml-auto flex items-center justify-center active:scale-95">
+          class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 min-h-[44px] rounded-full text-xs font-sans uppercase tracking-wider transition-all duration-200 shadow-md cursor-pointer ml-auto flex items-center justify-center active:scale-95">
           Entendi
         </button>
       </div>
@@ -1879,14 +1882,13 @@
   <!-- Módulo de Autenticação do Dashboard — carregado após os SDKs do Firebase (escopo global via CDN) -->
   <script src="js/auth.js"></script>
   
-  <!-- Módulos JS Locais com Cache Busting (Clinical Precision UI) -->
-  <!-- main.js importa dashboard-engine e microscope-engine via ES module import -->
-  <script type="module" src="js/main.js?v=20261103_geom_v1"></script>
-  <script type="module" src="js/histology-catalog.js?v=20261103_geom_v1"></script>
+  <!-- Módulos JS Locais com Cache Busting -->
+  <script type="module" src="js/main.js?v=20261103_ice_v9"></script>
+  <script type="module" src="js/histology-catalog.js?v=20261103_ice_v9"></script>
   <!-- COOKIE CONSENT BANNER -->
-  <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[9999] bg-neutral-900/95 backdrop-blur-md border border-neutral-800 p-5 rounded-2xl shadow-2xl text-neutral-300 text-xs leading-relaxed hidden">
+  <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[9999] bg-white/95 backdrop-blur-md border border-slate-200/90 p-5 rounded-2xl shadow-[0_20px_50px_rgba(15,23,42,0.16)] text-slate-600 text-xs leading-relaxed hidden">
     <p>Utilizamos cookies essenciais para otimizar sua experiência de estudo no visualizador morfológico. Ao continuar navegando, você concorda com nossa Política de Privacidade.</p>
-    <button id="btnAcceptCookies" class="bg-[#d4af37] hover:bg-[#e6ca65] text-neutral-950 font-medium px-4 py-2 rounded-xl transition-all duration-200 cursor-pointer w-full mt-3 shadow-md shadow-[#d4af37]/20">Aceitar e Continuar</button>
+    <button id="btnAcceptCookies" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 cursor-pointer w-full mt-3 shadow-sm">Aceitar e Continuar</button>
   </div>
 
   <script>

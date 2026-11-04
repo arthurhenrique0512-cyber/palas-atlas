@@ -16,8 +16,8 @@ export const catalogData = {
     tituloDisciplina: "Histologia",
     bibliografia: "Junqueira & Carneiro - Histologia Básica",
     caminhoBase: "/assets/histologia/",
-    corDestaque: "border-[#d4af37] bg-[#d4af37]/10 text-slate-900",
-    corPino: "bg-[#d4af37]",
+    corDestaque: "border-sky-600 bg-sky-50 text-slate-900",
+    corPino: "bg-sky-600",
     topicos: [
       {
         id: "epitelial",
@@ -170,7 +170,7 @@ export const catalogData = {
     ]
   },
   patologia: {
-    tituloDisciplina: "Patologia Geral e Sistêmica",
+    tituloDisciplina: "Patologia",
     bibliografia: "Robbins & Cotran - Bases Patológicas das Doenças",
     caminhoBase: "/assets/patologia/",
     corDestaque: "border-rose-600 bg-rose-50 text-rose-900",
@@ -204,7 +204,7 @@ export const catalogData = {
     ]
   },
   parasitologia: {
-    tituloDisciplina: "Parasitologia Médica",
+    tituloDisciplina: "Parasitologia",
     bibliografia: "Neves - Parasitologia Humana",
     caminhoBase: "/assets/parasitologia/",
     corDestaque: "border-emerald-600 bg-emerald-50 text-emerald-900",
@@ -233,7 +233,7 @@ export const catalogData = {
     ]
   },
   microbiologia: {
-    tituloDisciplina: "Microbiologia e Micologia Médica",
+    tituloDisciplina: "Microbiologia",
     bibliografia: "Murray - Microbiologia Médica",
     caminhoBase: "/assets/microbiologia/",
     corDestaque: "border-amber-600 bg-amber-50 text-amber-900",
@@ -278,7 +278,7 @@ export const catalogData = {
     topicos: []
   },
   parasitologia: {
-    tituloDisciplina: "Parasitologia Médica",
+    tituloDisciplina: "Parasitologia",
     bibliografia: "Neves - Parasitologia Humana",
     caminhoBase: "/assets/parasitologia/",
     corDestaque: "border-amber-600 bg-amber-50 text-amber-800",

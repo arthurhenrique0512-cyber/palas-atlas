@@ -119,7 +119,7 @@ export function initGlobalSearch() {
 
     matches.forEach(slide => {
       const li = document.createElement("li");
-      li.className = "px-4 py-3 hover:bg-zinc-800/80 cursor-pointer border-b border-zinc-800/50 last:border-0 transition-colors flex flex-col gap-1";
+      li.className = "px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors flex flex-col gap-1";
       
       const title = slide.nome || slide.titulo || "Lâmina Sem Título";
       const topico = slide.topico || "Geral";
@@ -127,11 +127,11 @@ export function initGlobalSearch() {
 
       li.innerHTML = `
         <div class="flex items-center justify-between">
-          <span class="text-zinc-200 font-medium text-sm">${title}</span>
-          <span class="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">${topico}</span>
+          <span class="text-slate-900 font-medium text-sm">${title}</span>
+          <span class="text-[10px] bg-sky-50 text-sky-700 border border-sky-200/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold">${topico}</span>
         </div>
-        <div class="text-xs text-zinc-500 font-mono flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37]/50"></span>
+        <div class="text-xs text-slate-500 font-sans flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
           ${coloracao}
         </div>
       `;

@@ -30,19 +30,16 @@
 .delay-300 { animation-delay: 0ms; }
 .delay-400 { animation-delay: 0ms; }
 
-/* Efeito Obsidian Glassmorphism Discreto para os Cards */
+/* Superfícies Clínicas Claras (Branco Frio & Azul-Petróleo) */
 .glass-card {
-  background: rgba(18, 18, 20, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4);
-  transition: all 0.15s ease-out;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.07), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-card:hover {
-  background: rgba(24, 24, 27, 0.7);
-  border-color: rgba(212, 175, 55, 0.35); /* Toque pontual de ouro-champanhe */
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+  border-color: rgba(3, 105, 161, 0.45);
+  box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.12), 0 6px 16px -4px rgba(3, 105, 161, 0.08);
   transform: translateY(-2px);
 }
 
@@ -58,8 +55,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background-color: #050505;
-  color: #f8fafc;
+  background-color: #f8fafc;
+  color: #0f172a;
   overflow-x: clip;
   line-height: 1.5;
 }
@@ -119,7 +116,25 @@ body {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
               box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
               border-color 0.3s ease;
-  will-change: transform, box-shadow;
+}
+
+/* Garante que o container e o dropdown da busca fiquem sempre acima dos botões abaixo */
+#global-search-container {
+  position: relative;
+  z-index: 40 !important;
+}
+#global-search-dropdown {
+  z-index: 60 !important;
+}
+
+/* Remove o X nativo duplicado do navegador em campos de busca */
+#global-search-input::-webkit-search-decoration,
+#global-search-input::-webkit-search-cancel-button,
+#global-search-input::-webkit-search-results-button,
+#global-search-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
 }
 
 /* Cards de Acesso da Home (Sóbrios & Borderless) */
@@ -136,15 +151,15 @@ button:active {
 }
 
 /* ==========================================================================
-   3. DASHBOARD E FORMULÁRIOS (Design System Minimalista & Imersivo)
+   3. DASHBOARD E FORMULÁRIOS (Design System Minimalista & Imersivo — Claro & Escuro)
    ========================================================================== */
 
-#pgDashboard input[type="text"],
-#pgDashboard input[type="number"],
-#pgDashboard input[type="email"],
-#pgDashboard input[type="password"],
-#pgDashboard select,
-#pgDashboard textarea {
+html[data-theme="dark"] #pgDashboard input[type="text"],
+html[data-theme="dark"] #pgDashboard input[type="number"],
+html[data-theme="dark"] #pgDashboard input[type="email"],
+html[data-theme="dark"] #pgDashboard input[type="password"],
+html[data-theme="dark"] #pgDashboard select,
+html[data-theme="dark"] #pgDashboard textarea {
   background-color: rgba(10, 10, 10, 0.6) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 0.75rem !important;
@@ -153,21 +168,21 @@ button:active {
   font-weight: 400 !important;
 }
 
-#pgDashboard input[type="text"]::placeholder,
-#pgDashboard input[type="number"]::placeholder,
-#pgDashboard input[type="email"]::placeholder,
-#pgDashboard input[type="password"]::placeholder,
-#pgDashboard textarea::placeholder {
+html[data-theme="dark"] #pgDashboard input[type="text"]::placeholder,
+html[data-theme="dark"] #pgDashboard input[type="number"]::placeholder,
+html[data-theme="dark"] #pgDashboard input[type="email"]::placeholder,
+html[data-theme="dark"] #pgDashboard input[type="password"]::placeholder,
+html[data-theme="dark"] #pgDashboard textarea::placeholder {
   color: #737373 !important;
   font-weight: 400 !important;
 }
 
-#pgDashboard input[type="text"]:focus,
-#pgDashboard input[type="number"]:focus,
-#pgDashboard input[type="email"]:focus,
-#pgDashboard input[type="password"]:focus,
-#pgDashboard select:focus,
-#pgDashboard textarea:focus {
+html[data-theme="dark"] #pgDashboard input[type="text"]:focus,
+html[data-theme="dark"] #pgDashboard input[type="number"]:focus,
+html[data-theme="dark"] #pgDashboard input[type="email"]:focus,
+html[data-theme="dark"] #pgDashboard input[type="password"]:focus,
+html[data-theme="dark"] #pgDashboard select:focus,
+html[data-theme="dark"] #pgDashboard textarea:focus {
   background-color: rgba(15, 15, 15, 0.85) !important;
   border-color: rgba(212, 175, 55, 0.4) !important;
   outline: none !important;
@@ -509,7 +524,7 @@ button:active {
 
 .group:hover .brand-owl-icon {
   transform: scale(1.07);
-  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.65)) drop-shadow(0 0 22px rgba(212, 175, 55, 0.22));
+  filter: drop-shadow(0 0 10px rgba(3, 105, 161, 0.45)) drop-shadow(0 0 20px rgba(3, 105, 161, 0.18));
 }
 
 .group:hover .brand-shimmer-palas {
@@ -533,15 +548,15 @@ button:active {
   }
 }
 
-/* Previne autofill com fundo claro/azul do Chrome no campo de busca escuro */
+/* Previne autofill com fundo azul do Chrome no campo de busca claro */
 input#global-search-input:-webkit-autofill,
 input#global-search-input:-webkit-autofill:hover,
 input#global-search-input:-webkit-autofill:focus,
 input#global-search-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #171717 inset !important;
-  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
   transition: background-color 5000s ease-in-out 0s;
-  caret-color: #ffffff;
+  caret-color: #0f172a;
 }
 
 
@@ -661,3 +676,462 @@ input#global-search-input:-webkit-autofill:active {
     }
   }
 }
+
+/* ==========================================================================
+   9. TEMA ESCURO OFICIAL: PRETO ÔNIX & DOURADO CLÁSSICO (#060608 + #D4AF37)
+   Mantém o Tema Claro 100% intacto quando html[data-theme="light"]
+   ========================================================================== */
+
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] #pgHome,
+html[data-theme="dark"] #pgHistologia,
+html[data-theme="dark"] #histoCatalog,
+html[data-theme="dark"] #histoSubCatalog {
+  background-color: #060608 !important;
+  color: #f4f2ed !important;
+}
+
+/* Seleção de texto no Tema Escuro Dourado */
+html[data-theme="dark"] ::selection {
+  background-color: rgba(212, 175, 55, 0.25) !important;
+  color: #ffffff !important;
+}
+
+/* Malha arquitetônica e brilho de fundo no Tema Escuro Preto + Dourado */
+html[data-theme="dark"] #homeBgGrid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.032) 1px, transparent 1px) !important;
+}
+html[data-theme="dark"] #homeBgGlow {
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.07) 0%, transparent 70%) !important;
+}
+
+/* Barra Superior e Filete Dourado no Tema Escuro Preto */
+html[data-theme="dark"] #palasMinimalHeader,
+html[data-theme="dark"] header.sticky {
+  background-color: rgba(8, 8, 10, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.8) !important;
+}
+html[data-theme="dark"] #palasMinimalHeader > div:first-child {
+  background: linear-gradient(to right, #060608, #d4af37, #060608) !important;
+}
+
+/* Brilho dourado da coruja no hover em Tema Escuro */
+html[data-theme="dark"] .group:hover .brand-owl-icon {
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.45)) drop-shadow(0 0 20px rgba(212, 175, 55, 0.18)) !important;
+}
+
+/* Ícone do Sol no Alternador de Tema em Dourado */
+html[data-theme="dark"] #btnThemeToggle .theme-icon-sun {
+  color: #d4af37 !important;
+}
+
+/* Retângulo do Título Principal (Sangrando até a esquerda) em Preto/Grafite com Borda Sutil Dourada */
+html[data-theme="dark"] #heroTitleBoxBg {
+  background: linear-gradient(135deg, #121215 0%, #0b0b0e 100%) !important;
+  border-color: rgba(212, 175, 55, 0.22) !important;
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Card Principal de Histologia no Tema Escuro Preto (Ônix & Dourado Clássico) */
+html[data-theme="dark"] #cardDestaqueHistologia {
+  background: linear-gradient(135deg, #171510 0%, #111114 55%, #0b0b0e 100%) !important;
+  border-color: rgba(212, 175, 55, 0.32) !important;
+  border-left-color: #d4af37 !important;
+  box-shadow: 0 22px 55px -12px rgba(0, 0, 0, 0.85) !important;
+}
+html[data-theme="dark"] #cardDestaqueHistologia:hover {
+  border-color: rgba(212, 175, 55, 0.65) !important;
+  border-left-color: #e5c158 !important;
+  box-shadow: 0 24px 55px -12px rgba(212, 175, 55, 0.16) !important;
+}
+html[data-theme="dark"] #cardDestaqueHistologia:hover h3 {
+  color: #e5c158 !important;
+}
+html[data-theme="dark"] #cardDestaqueHistologia .bg-sky-500 {
+  background-color: #d4af37 !important;
+  color: #09090b !important;
+}
+html[data-theme="dark"] #cardDestaqueHistologia:hover .bg-sky-500 {
+  background-color: #e5c158 !important;
+}
+
+/* Superfícies e Cards (Ônix Escuro #101013) */
+html[data-theme="dark"] #pgHome .bg-white,
+html[data-theme="dark"] #pgHome .bg-white\/95,
+html[data-theme="dark"] #pgHome .bg-white\/90,
+html[data-theme="dark"] #pgHistologia .bg-white,
+html[data-theme="dark"] #sideDrawer,
+html[data-theme="dark"] #footer-light,
+html[data-theme="dark"] #helpModal > div.bg-white,
+html[data-theme="dark"] #cookieBanner,
+html[data-theme="dark"] .sobre-page .bg-white {
+  background-color: #101013 !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  color: #f4f2ed !important;
+}
+
+/* Hover nos Cards das Disciplinas e Lista Numerada no Tema Escuro Preto */
+html[data-theme="dark"] #pgHome .bg-white\/95:hover,
+html[data-theme="dark"] #pgHistologia .bg-white .cursor-pointer:hover,
+html[data-theme="dark"] .hover\:bg-sky-50\/50:hover {
+  background-color: #171614 !important;
+}
+
+/* Preservação e Brilho dos Filetes Coloridos das Disciplinas no Tema Escuro */
+html[data-theme="dark"] .border-l-rose-600 {
+  border-left-color: #fb7185 !important;
+}
+html[data-theme="dark"] .border-l-emerald-600 {
+  border-left-color: #34d399 !important;
+}
+html[data-theme="dark"] .border-l-violet-600 {
+  border-left-color: #a78bfa !important;
+}
+
+/* Superfícies Secundárias Internas (Círculos de Seta, Botões, Passos do Modal) */
+html[data-theme="dark"] #pgHome .bg-slate-50,
+html[data-theme="dark"] #pgHistologia .bg-slate-50,
+html[data-theme="dark"] #helpModal .bg-slate-50\/80,
+html[data-theme="dark"] #helpModal .bg-slate-100,
+html[data-theme="dark"] #palasMinimalHeader .bg-slate-100\/90,
+html[data-theme="dark"] .sobre-page .bg-slate-50,
+html[data-theme="dark"] .sobre-page .bg-slate-100 {
+  background-color: #18181d !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #e4e4e7 !important;
+}
+
+html[data-theme="dark"] #palasMinimalHeader #btnOpenDrawer:hover,
+html[data-theme="dark"] #palasMinimalHeader #btnThemeToggle:hover,
+html[data-theme="dark"] #palasMinimalHeader #btnVoltarGlobal:hover {
+  background-color: #22211d !important;
+  border-color: rgba(212, 175, 55, 0.4) !important;
+  color: #ffffff !important;
+}
+
+/* Barra de Busca e Dropdown de Resultados no Tema Escuro Preto + Dourado */
+html[data-theme="dark"] #global-search-input {
+  background-color: #101013 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f4f2ed !important;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7) !important;
+}
+html[data-theme="dark"] #global-search-input::placeholder {
+  color: #71717a !important;
+}
+html[data-theme="dark"] #global-search-input:focus {
+  border-color: #d4af37 !important;
+  box-shadow: 0 16px 40px -8px rgba(212, 175, 55, 0.16) !important;
+}
+html[data-theme="dark"] #global-search-container:focus-within svg,
+html[data-theme="dark"] #global-search-clear {
+  color: #d4af37 !important;
+}
+html[data-theme="dark"] #global-search-dropdown > div {
+  background-color: #141418 !important;
+  border-color: rgba(212, 175, 55, 0.35) !important;
+  box-shadow: 0 24px 60px -8px rgba(0, 0, 0, 0.92) !important;
+}
+html[data-theme="dark"] #global-search-results li {
+  background-color: #141418 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] #global-search-results li:hover {
+  background-color: #1f1d18 !important;
+}
+html[data-theme="dark"] input#global-search-input:-webkit-autofill,
+html[data-theme="dark"] input#global-search-input:-webkit-autofill:hover,
+html[data-theme="dark"] input#global-search-input:-webkit-autofill:focus,
+html[data-theme="dark"] input#global-search-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #101013 inset !important;
+  -webkit-text-fill-color: #f4f2ed !important;
+  caret-color: #f4f2ed !important;
+}
+
+/* Botão Principal "Explorar Lâminas" na Home em Dourado Clássico */
+html[data-theme="dark"] #btnHeroPrimary {
+  background-color: #d4af37 !important;
+  color: #09090b !important;
+  box-shadow: 0 10px 28px -6px rgba(212, 175, 55, 0.25) !important;
+}
+html[data-theme="dark"] #btnHeroPrimary svg {
+  color: #09090b !important;
+}
+html[data-theme="dark"] #btnHeroPrimary:hover {
+  background-color: #e5c158 !important;
+}
+
+/* Tipografia, Destaques e Acentos em Dourado Clássico (#D4AF37 / #E5C158) */
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800 {
+  color: #f4f2ed !important;
+}
+html[data-theme="dark"] .text-slate-950 {
+  color: #09090b !important;
+}
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-slate-600 {
+  color: #d4d4d8 !important;
+}
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400 {
+  color: #a1a1aa !important;
+}
+
+/* Substituição de Acentos Azul-Petróleo por Dourado Clássico no Tema Escuro */
+html[data-theme="dark"] .text-sky-700,
+html[data-theme="dark"] .text-sky-800,
+html[data-theme="dark"] .text-sky-600,
+html[data-theme="dark"] .text-sky-400,
+html[data-theme="dark"] .text-sky-300,
+html[data-theme="dark"] .text-sky-300\/90 {
+  color: #d4af37 !important;
+}
+html[data-theme="dark"] .hover\:text-sky-700:hover,
+html[data-theme="dark"] .group:hover .group-hover\:text-sky-600,
+html[data-theme="dark"] .group:hover .group-hover\:text-sky-700,
+html[data-theme="dark"] .group:hover .group-hover\:text-sky-800,
+html[data-theme="dark"] .group:hover .group-hover\:text-sky-300 {
+  color: #e5c158 !important;
+}
+html[data-theme="dark"] .bg-sky-600 {
+  background-color: #d4af37 !important;
+}
+html[data-theme="dark"] .group:hover .group-hover\:bg-sky-600,
+html[data-theme="dark"] .group:hover .group-hover\:bg-sky-500 {
+  background-color: #d4af37 !important;
+  color: #09090b !important;
+}
+html[data-theme="dark"] .group:hover .group-hover\:border-sky-600,
+html[data-theme="dark"] .group:hover .group-hover\:border-sky-500 {
+  border-color: #d4af37 !important;
+}
+html[data-theme="dark"] .group:hover .group-hover\:bg-sky-300 {
+  background-color: rgba(212, 175, 55, 0.5) !important;
+}
+html[data-theme="dark"] .bg-sky-50,
+html[data-theme="dark"] .bg-sky-50\/70 {
+  background-color: rgba(212, 175, 55, 0.12) !important;
+}
+html[data-theme="dark"] .border-sky-600,
+html[data-theme="dark"] .border-l-sky-600 {
+  border-color: #d4af37 !important;
+}
+html[data-theme="dark"] .border-sky-200,
+html[data-theme="dark"] .hover\:border-sky-500\/50:hover,
+html[data-theme="dark"] .hover\:border-sky-500\/40:hover {
+  border-color: rgba(212, 175, 55, 0.45) !important;
+}
+
+/* Cores das outras 3 disciplinas no hover em Tema Escuro */
+html[data-theme="dark"] .group:hover .group-hover\:text-rose-700 {
+  color: #fb7185 !important;
+}
+html[data-theme="dark"] .group:hover .group-hover\:text-emerald-700 {
+  color: #34d399 !important;
+}
+html[data-theme="dark"] .group:hover .group-hover\:text-violet-700 {
+  color: #a78bfa !important;
+}
+
+/* Divisores e Bordas no Tema Escuro Preto */
+html[data-theme="dark"] .border-slate-200\/90,
+html[data-theme="dark"] .border-slate-200\/80,
+html[data-theme="dark"] .border-slate-200,
+html[data-theme="dark"] .border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+html[data-theme="dark"] .divide-slate-200\/80 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] .bg-slate-200 {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Hover de itens no Menu Lateral (#sideDrawer) no Tema Escuro Preto */
+html[data-theme="dark"] #sideDrawer button:hover,
+html[data-theme="dark"] #sideDrawer a:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ==========================================================================
+   9. TEMA CLARO NO PAINEL CMS (#pgDashboard) & MICROSCÓPIO INTERNO (#histoMicroscope)
+   ========================================================================== */
+
+html[data-theme="light"] #pgDashboard,
+html[data-theme="light"] #topicoCmsEditor,
+html[data-theme="light"] #topicoCmsAcervo {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] #dashLoginOverlay {
+  background-color: rgba(248, 250, 252, 0.88) !important;
+}
+
+html[data-theme="light"] #dashLoginOverlay > div {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.16) !important;
+}
+
+html[data-theme="light"] #pgDashboard .bg-\[\#09090c\],
+html[data-theme="light"] #pgDashboard .bg-\[\#111115\] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.05) !important;
+}
+
+html[data-theme="light"] #pgDashboard .bg-\[\#121216\],
+html[data-theme="light"] #pgDashboard .bg-neutral-950\/40,
+html[data-theme="light"] #pgDashboard .bg-neutral-950\/60,
+html[data-theme="light"] #pgDashboard .bg-neutral-950\/80,
+html[data-theme="light"] #pgDashboard .bg-black\/40 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] #pgDashboard input[type="text"],
+html[data-theme="light"] #pgDashboard input[type="number"],
+html[data-theme="light"] #pgDashboard input[type="email"],
+html[data-theme="light"] #pgDashboard input[type="password"],
+html[data-theme="light"] #pgDashboard select,
+html[data-theme="light"] #pgDashboard textarea,
+html[data-theme="light"] #dashEditorTexto {
+  background-color: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 0.75rem !important;
+  color: #0f172a !important;
+  transition: all 0.2s ease !important;
+}
+
+html[data-theme="light"] #pgDashboard input::placeholder,
+html[data-theme="light"] #pgDashboard textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="light"] #pgDashboard input:focus,
+html[data-theme="light"] #pgDashboard select:focus,
+html[data-theme="light"] #pgDashboard textarea:focus,
+html[data-theme="light"] #dashEditorTexto:focus {
+  background-color: #ffffff !important;
+  border-color: #0284c7 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12) !important;
+}
+
+html[data-theme="light"] #pgDashboard .text-\[\#f4f2ed\],
+html[data-theme="light"] #pgDashboard .text-white,
+html[data-theme="light"] #pgDashboard .text-neutral-200 {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] #pgDashboard .text-neutral-300 {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] #pgDashboard .text-neutral-400,
+html[data-theme="light"] #pgDashboard .text-neutral-500 {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] #pgDashboard .text-\[\#d4af37\],
+html[data-theme="light"] #pgDashboard .text-\[\#e5c158\] {
+  color: #0369a1 !important;
+}
+
+html[data-theme="light"] #pgDashboard .bg-\[\#d4af37\]\/10,
+html[data-theme="light"] #pgDashboard .bg-\[\#d4af37\]\/15,
+html[data-theme="light"] #pgDashboard .bg-\[\#d4af37\]\/20,
+html[data-theme="light"] #pgDashboard .bg-white\/\[0\.06\] {
+  background-color: rgba(2, 132, 199, 0.10) !important;
+  border-color: rgba(2, 132, 199, 0.30) !important;
+  color: #0369a1 !important;
+}
+
+html[data-theme="light"] #pgDashboard .bg-\[\#d4af37\] {
+  background-color: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px -6px rgba(2, 132, 199, 0.30) !important;
+}
+
+html[data-theme="light"] #pgDashboard .bg-\[\#d4af37\]:hover {
+  background-color: #0369a1 !important;
+}
+
+html[data-theme="light"] #pgDashboard .border-l-\[\#d4af37\] {
+  border-left-color: #0284c7 !important;
+}
+
+html[data-theme="light"] #pgDashboard .border-white\/\[0\.08\],
+html[data-theme="light"] #pgDashboard .border-white\/\[0\.06\],
+html[data-theme="light"] #pgDashboard .border-white\/\[0\.1\] {
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] #pgDashboard .bg-white\/\[0\.04\],
+html[data-theme="light"] #pgDashboard .bg-white\/\[0\.05\],
+html[data-theme="light"] #pgDashboard .bg-white\/\[0\.03\] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+html[data-theme="light"] #pgDashboard .bg-white\/\[0\.04\]:hover,
+html[data-theme="light"] #pgDashboard .bg-white\/\[0\.05\]:hover {
+  background-color: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+  color: #0369a1 !important;
+}
+
+html[data-theme="light"] #pgDashboard #osd-editor-viewer,
+html[data-theme="light"] #pgDashboard .bg-\[\#0a0a0a\] {
+  background-color: #eef2f6 !important;
+}
+
+html[data-theme="light"] #pgDashboard .bg-neutral-950\/70 {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12) !important;
+}
+
+html[data-theme="light"] #tabelaAcervoCms tr {
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+html[data-theme="light"] #tabelaAcervoCms tr:hover {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Microscópio Interno (#histoMicroscope) no Tema Claro */
+html[data-theme="light"] #histoMicroscope,
+html[data-theme="light"] #histoMicroscope .bg-neutral-950,
+html[data-theme="light"] #histoMicroscope .bg-neutral-900\/50,
+html[data-theme="light"] #histoMicroscope .bg-neutral-900\/20 {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] #histoMicroscope .bg-neutral-900,
+html[data-theme="light"] #histoMicroscope #openseadragon-viewer {
+  background-color: #eef2f6 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] #histoMicroscope #laminaTitulo {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] #histoMicroscope #microscopeText {
+  color: #334155 !important;
+}
+
+

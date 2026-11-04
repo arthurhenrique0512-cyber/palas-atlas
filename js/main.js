@@ -86,38 +86,17 @@ function init() {
     }
   });
 
-  // Listener de Scroll para Header Dinâmico (Compactação da Navbar e Desaparecimento da Coruja)
+  // Listener de Scroll para Header Dinâmico
   const headerMin = document.getElementById("palasMinimalHeader");
   
   if (headerMin) {
     const handleDynamicNavbarScroll = () => {
-      // O header de páginas internas é estático, então não deve mudar no scroll
-      if (getState().frenteAtiva) return; // Se houver frente ativa, não está na Home
-
+      if (getState().frenteAtiva === "dashboard") return;
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-      const brandLogo = document.querySelector("#palasMinimalHeader brand-logo");
-      const logoPill = document.querySelector("#palasMinimalHeader a");
-
-      if (scrollY > 20) {
-        if (brandLogo && brandLogo.getAttribute("compact") !== "true") {
-          brandLogo.setAttribute("compact", "true");
-        }
-        if (brandLogo && typeof brandLogo.updateCompactState === "function") {
-          brandLogo.updateCompactState(true);
-        }
-        if (logoPill && !logoPill.classList.contains("py-2")) {
-          logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-4 sm:px-5 py-2 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
-        }
+      if (scrollY > 16) {
+        headerMin.classList.add("shadow-[0_8px_30px_-8px_rgba(15,23,42,0.10)]");
       } else {
-        if (brandLogo && brandLogo.getAttribute("compact") === "true") {
-          brandLogo.setAttribute("compact", "false");
-        }
-        if (brandLogo && typeof brandLogo.updateCompactState === "function") {
-          brandLogo.updateCompactState(false);
-        }
-        if (logoPill && !logoPill.classList.contains("py-3")) {
-          logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] px-5 sm:px-6 py-3 transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline";
-        }
+        headerMin.classList.remove("shadow-[0_8px_30px_-8px_rgba(15,23,42,0.10)]");
       }
     };
 
@@ -178,88 +157,59 @@ function renderView(state) {
 
   const footerDark = document.getElementById("footer-dark");
   const footerLight = document.getElementById("footer-light");
-  const isLightMode = ["histologia", "patologia", "anatomia", "parasitologia", "microbiologia"].includes(state.frenteAtiva);
 
   if (isDashboard) {
     if (footerDark) footerDark.classList.add("hidden");
     if (footerLight) footerLight.classList.add("hidden");
-  } else if (isLightMode) {
+  } else {
     if (footerDark) footerDark.classList.add("hidden");
     if (footerLight) footerLight.classList.remove("hidden");
-  } else {
-    if (footerDark) footerDark.classList.remove("hidden");
-    if (footerLight) footerLight.classList.add("hidden");
   }
 
-  const logoPill = document.querySelector("#palasMinimalHeader a");
-  const drawerPill = document.querySelector("#palasMinimalHeader .pointer-events-auto:last-child");
+  const logoLink = document.getElementById("headerBrandLink");
+  const desktopNav = document.getElementById("headerDesktopNav");
 
   const mainContainer = document.getElementById("mainRouterContainer");
   if (mainContainer) {
     if (isDashboard) {
       mainContainer.className = "flex-1 w-full flex flex-col transition-all duration-300 pt-0";
     } else {
-      mainContainer.className = "flex-1 w-full flex flex-col transition-all duration-300 pt-16 sm:pt-20";
+      mainContainer.className = "flex-1 w-full flex flex-col transition-all duration-300 pt-16 sm:pt-[70px]";
     }
   }
 
   if (isHomePage) {
-    // HOME: emblema dourado + header com elevação suave
-    const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    // HOME: Barra Superior Arquitetônica com Logo Grande (size="lg") à Esquerda
     if (headerMin) {
-      headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 pointer-events-none";
+      headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/90 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)] transition-all duration-300 pointer-events-auto";
     }
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "true");
-      brandLogo.setAttribute("theme", "dark-bg");
+      brandLogo.setAttribute("theme", "light-bg");
+      brandLogo.setAttribute("size", "lg");
     }
-    if (logoPill) {
-      const isScrolled = scrollY > 20;
-      const padClasses = isScrolled ? "px-4 sm:px-5 py-2" : "px-5 sm:px-6 py-3";
-      logoPill.className = `group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] ${padClasses} transition-all duration-300 ease-in-out shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.12)] cursor-pointer select-none no-underline`;
+    if (logoLink) {
+      logoLink.className = "group inline-flex items-center gap-3 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline";
     }
-    if (drawerPill) {
-      drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.16] p-1 sm:p-1.5 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)]";
-    }
-    if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
-    if (btnVoltarGlobal) {
-      btnVoltarGlobal.classList.add("hidden");
-      btnVoltarGlobal.classList.remove("flex");
-    }
-  } else if (isDashboard) {
-    // DASHBOARD CMS: monocromático claro + header escuro fixo
-    if (headerMin) headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-neutral-950 border-b border-neutral-800/80 transition-all duration-300 pointer-events-auto shadow-md";
-    if (brandLogo) {
-      brandLogo.setAttribute("is-home", "false");
-      brandLogo.setAttribute("theme", "dark-bg");
-    }
-    if (logoPill) {
-      logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] px-4 sm:px-5 py-2 transition-all duration-300 cursor-pointer select-none no-underline";
-    }
-    if (drawerPill) {
-      drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] p-1 transition-all duration-300";
-    }
-    if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
+    if (btnOpenDrawer) btnOpenDrawer.className = "h-10 px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.add("hidden");
       btnVoltarGlobal.classList.remove("flex");
     }
   } else {
-    // PÁGINAS INTERNAS (fundo claro): header claro fixo com contraste clínico perfeito
-    if (headerMin) headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all duration-300 pointer-events-auto shadow-sm";
+    // SUBPÁGINAS (ACERVO & DASHBOARD CMS): Barra Superior com PALAS ATLAS centralizado e Botão Voltar à esquerda
+    if (headerMin) headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/90 transition-all duration-300 pointer-events-auto shadow-xs";
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
       brandLogo.setAttribute("theme", "light-bg");
+      brandLogo.setAttribute("size", "sm");
     }
-    if (logoPill) {
-      logoPill.className = "group inline-flex items-center gap-3 rounded-full bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 px-4 sm:px-5 py-2 transition-all duration-300 ease-in-out cursor-pointer select-none no-underline";
+    if (logoLink) {
+      logoLink.className = "group absolute left-1/2 -translate-x-1/2 inline-flex items-center gap-2.5 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline z-10";
     }
-    if (drawerPill) {
-      drawerPill.className = "pointer-events-auto flex items-center rounded-full bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 p-1 sm:p-1.5 transition-all duration-300";
-    }
-    if (btnOpenDrawer) btnOpenDrawer.className = "w-10 h-10 rounded-full flex items-center justify-center text-slate-700 hover:text-[#d4af37] active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none";
+    if (btnOpenDrawer) btnOpenDrawer.className = "h-10 px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs";
     if (btnVoltarGlobal) {
-      btnVoltarGlobal.className = "p-2 text-slate-700 hover:text-slate-900 bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200 rounded-full transition-all text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 cursor-pointer shadow-sm";
+      btnVoltarGlobal.className = "min-h-[38px] text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 border border-slate-200/90 rounded-xl transition-all text-xs font-sans font-semibold flex items-center justify-center gap-2 px-3.5 py-1.5 cursor-pointer active:scale-95";
       btnVoltarGlobal.classList.remove("hidden");
       btnVoltarGlobal.classList.add("flex");
     }

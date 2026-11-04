@@ -82,45 +82,27 @@ class SettingsPanel extends HTMLElement {
       root.classList.remove('reduce-motion');
     }
 
-    // 3. Tema Light/Dark
-    // Injeta estilo dinâmico global se for Light Mode
-    let themeStyle = document.getElementById('dynamic-theme-style');
-    if (!themeStyle) {
-      themeStyle = document.createElement('style');
-      themeStyle.id = 'dynamic-theme-style';
-      document.head.appendChild(themeStyle);
+    // 3. Tema Light/Dark (Sincronizado com data-theme global do Palas Atlas)
+    const themeVal = this.settings.theme === 'light' ? 'light' : 'dark';
+    root.setAttribute('data-theme', themeVal);
+    try {
+      localStorage.setItem('palas_theme', themeVal);
+    } catch (e) {}
+    if (typeof window.setPalasTheme === 'function' && document.documentElement.getAttribute('data-theme') !== themeVal) {
+      window.setPalasTheme(themeVal);
     }
-
-    if (this.settings.theme === 'light') {
-      themeStyle.textContent = `
-        body.theme-override-enabled, 
-        body.theme-override-enabled main.bg-neutral-900,
-        body.theme-override-enabled .bg-neutral-950,
-        body.theme-override-enabled .bg-neutral-900 {
-          background-color: #f8fafc !important;
-          color: #1e293b !important;
-        }
-        body.theme-override-enabled .text-white { color: #0f172a !important; }
-        body.theme-override-enabled .text-neutral-400 { color: #475569 !important; }
-        body.theme-override-enabled .text-neutral-300 { color: #334155 !important; }
-        body.theme-override-enabled .border-neutral-800 { border-color: #e2e8f0 !important; }
-        body.theme-override-enabled .border-neutral-700 { border-color: #cbd5e1 !important; }
-        body.theme-override-enabled .glass-card {
-          background: rgba(255, 255, 255, 0.85) !important;
-          border-color: rgba(0, 0, 0, 0.1) !important;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-        }
-        body.theme-override-enabled .glass-card:hover {
-          background: rgba(255, 255, 255, 0.95) !important;
-          border-color: rgba(212, 175, 55, 0.5) !important;
-        }
-        body.theme-override-enabled h2.text-white, 
-        body.theme-override-enabled h3.text-white { color: #0f172a !important; }
-      `;
-      document.body.classList.add('theme-override-enabled');
-    } else {
-      themeStyle.textContent = '';
-      document.body.classList.remove('theme-override-enabled');
+    document.querySelectorAll('brand-logo').forEach(el => {
+      if (typeof el.render === 'function') el.render();
+    });
+    const btnToggle = document.getElementById('btnThemeToggle');
+    if (btnToggle) {
+      const isDark = themeVal === 'dark';
+      const iconSun = btnToggle.querySelector('.theme-icon-sun');
+      const iconMoon = btnToggle.querySelector('.theme-icon-moon');
+      if (iconSun && iconMoon) {
+        iconSun.classList.toggle('hidden', !isDark);
+        iconMoon.classList.toggle('hidden', isDark);
+      }
     }
 
     // 4. Densidade
