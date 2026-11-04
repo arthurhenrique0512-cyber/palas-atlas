@@ -110,11 +110,21 @@ function init() {
   // Verifica parâmetros de rota (Deep Linking)
   const urlParams = new URLSearchParams(window.location.search);
   let frenteParam = urlParams.get("frente");
+  let topicoParam = urlParams.get("topico");
   if (frenteParam === "admin" || frenteParam === "cms") {
     frenteParam = "dashboard";
   }
-  if (frenteParam && ["anatomia", "histologia", "patologia", "parasitologia", "microbiologia", "dashboard"].includes(frenteParam)) {
-    setFrenteAtiva(frenteParam);
+  if (frenteParam && topicoParam && window.App && typeof window.App.abrirTopico === "function") {
+    window.App.abrirTopico(topicoParam, frenteParam);
+  } else if (frenteParam && ["anatomia", "histologia", "patologia", "parasitologia", "microbiologia"].includes(frenteParam)) {
+    renderView(getState());
+    setTimeout(() => {
+      if (window.App && typeof window.App.abrirDisciplinaHome === "function") {
+        window.App.abrirDisciplinaHome(frenteParam);
+      }
+    }, 150);
+  } else if (frenteParam === "dashboard") {
+    setFrenteAtiva("dashboard");
   } else {
     // Executa a renderização inicial baseada no estado nulo (Home)
     renderView(getState());
@@ -236,8 +246,15 @@ function renderView(state) {
   if (minimalHeader) minimalHeader.classList.remove("hidden");
   if (["anatomia", "histologia", "patologia", "parasitologia", "microbiologia"].includes(state.frenteAtiva)) {
     if (elements.pgHistologia) elements.pgHistologia.classList.remove("hidden");
-    if (window.App && typeof window.App.voltarNivel === "function") {
-      window.App.voltarNivel(1);
+    const subCatalog = document.getElementById("histoSubCatalog");
+    const isTopicOpen = subCatalog && !subCatalog.classList.contains("hidden");
+    const urlParams = new URLSearchParams(window.location.search);
+    const topicoParam = urlParams.get("topico");
+
+    if (!isTopicOpen && !topicoParam) {
+      if (window.App && typeof window.App.voltarParaDisciplinaHome === "function") {
+        window.App.voltarParaDisciplinaHome(state.frenteAtiva);
+      }
     }
   } else if (state.frenteAtiva === "dashboard") {
     if (elements.pgDashboard) elements.pgDashboard.classList.remove("hidden");
@@ -254,10 +271,18 @@ function renderView(state) {
 
 /**
  * Aciona o seletor de frentes no store reativo com suporte a History API.
+ * Para frentes do ciclo básico, agora expande o accordion diretamente na Home sem página intermediária.
  * @param {string} frente - Identificador ('anatomia', 'histologia', etc.).
  * @param {boolean} skipHistory - Impede o pushState se a chamada vier de um evento popstate.
  */
 function selecionarFrente(frente, skipHistory = false) {
+  if (["anatomia", "histologia", "patologia", "parasitologia", "microbiologia"].includes(frente)) {
+    if (window.App && typeof window.App.abrirDisciplinaHome === "function") {
+      window.App.abrirDisciplinaHome(frente);
+      return;
+    }
+  }
+
   if (!skipHistory) {
     history.pushState({ frente: frente }, "", `?frente=${frente}`);
   }
@@ -381,16 +406,24 @@ window.addEventListener("popstate", (event) => {
     } else if (event.state.nivel === 2 && window.App.abrirTopico) {
       window.App.abrirTopico(event.state.topico, event.state.frente, true);
     } else if (event.state.frente) {
-      if (window.App.voltarNivel) window.App.voltarNivel(1, true);
-      selecionarFrente(event.state.frente, true);
+      goHome(true);
+      if (window.App && typeof window.App.abrirDisciplinaHome === "function") {
+        window.App.abrirDisciplinaHome(event.state.frente);
+      }
     } else {
       goHome(true);
     }
   } else {
     const urlParams = new URLSearchParams(window.location.search);
     const frente = urlParams.get("frente");
-    if (frente) {
-      selecionarFrente(frente === "admin" || frente === "cms" ? "dashboard" : frente, true);
+    const topico = urlParams.get("topico");
+    if (frente && topico && window.App && typeof window.App.abrirTopico === "function") {
+      window.App.abrirTopico(topico, frente, true);
+    } else if (frente) {
+      goHome(true);
+      if (window.App && typeof window.App.abrirDisciplinaHome === "function") {
+        window.App.abrirDisciplinaHome(frente);
+      }
     } else {
       goHome(true);
     }

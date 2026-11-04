@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 420" width="100%" height="100%">
+  <defs>
+    <linearGradient id="epiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbcfe8"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+    </linearGradient>
+
+    <linearGradient id="stromaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe4e6"/>
+      <stop offset="100%" stop-color="#fecdd3"/>
+    </linearGradient>
+
+    <filter id="blockShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Fundo Orgânico Suave -->
+  <path d="M 90,210 C 70,100 160,40 290,50 C 420,60 490,140 480,260 C 470,360 360,400 230,390 C 130,370 110,290 90,210 Z" fill="#f0f9ff" fill-opacity="0.6"/>
+
+  <!-- ============================================== -->
+  <!-- BLOCO TECIDUAL ISOMÉTRICO (ESTILO KENHUB)     -->
+  <!-- ============================================== -->
+  <g transform="translate(140, 110)" filter="url(#blockShadow)" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round">
+    
+    <!-- CAMADA 2: TECIDO CONJUNTIVO (BASE INFERIOR DO BLOCO) -->
+    <!-- Face Frontal do Estroma -->
+    <path d="M 0,110 L 140,170 L 140,210 L 0,150 Z" fill="#fecdd3"/>
+    <!-- Face Lateral Direita do Estroma -->
+    <path d="M 140,170 L 260,115 L 260,155 L 140,210 Z" fill="#fda4af"/>
+
+    <!-- Detalhes no Estroma: Fibras e Capilar Sanguíneo -->
+    <!-- Capilar cortado na face frontal -->
+    <ellipse cx="60" cy="138" rx="14" ry="9" fill="#881337" fill-opacity="0.3" stroke="#e11d48" stroke-width="1.8"/>
+    <circle cx="58" cy="138" r="4.5" fill="#e11d48"/>
+    <circle cx="65" cy="137" r="4" fill="#e11d48"/>
+    
+    <!-- Fibras de Colágeno onduladas -->
+    <path d="M 160,180 Q 185,165 210,180 T 245,170" fill="none" stroke="#fb7185" stroke-width="1.8" stroke-dasharray="3 3"/>
+    <path d="M 20,135 Q 45,120 70,135 T 115,130" fill="none" stroke="#fb7185" stroke-width="1.8" stroke-dasharray="3 3"/>
+
+    <!-- LINHA DA MEMBRANA BASAL (DIVISÃO CRÍTICA) -->
+    <path d="M 0,110 L 140,170 L 260,115" fill="none" stroke="#7e22ce" stroke-width="3" stroke-dasharray="5 3"/>
+
+    <!-- CAMADA 1: EPITÉLIO DE REVESTIMENTO (TOPO DO BLOCO) -->
+    <!-- Face Frontal do Epitélio -->
+    <path d="M 0,65 L 140,125 L 140,170 L 0,110 Z" fill="url(#epiGrad)"/>
+    <!-- Face Lateral Direita do Epitélio -->
+    <path d="M 140,125 L 260,70 L 260,115 L 140,170 Z" fill="#f472b6"/>
+    <!-- Topo da Superfície Epitelial (Face Apical) -->
+    <path d="M 0,65 L 120,10 L 260,70 L 140,125 Z" fill="#fdf2f8"/>
+
+    <!-- Núcleos Celulares Alinhados no Epitélio (Corte Frontal) -->
+    <ellipse cx="25" cy="85" rx="7" ry="11" fill="#6b21a8" transform="rotate(-5 25 85)"/>
+    <ellipse cx="55" cy="98" rx="7.5" ry="11" fill="#7e22ce" transform="rotate(-5 55 98)"/>
+    <ellipse cx="85" cy="112" rx="7.5" ry="11" fill="#6b21a8" transform="rotate(-5 85 112)"/>
+    <ellipse cx="115" cy="125" rx="7" ry="11" fill="#7e22ce" transform="rotate(-5 115 125)"/>
+
+    <!-- Núcleos Celulares na Face Lateral Direita -->
+    <ellipse cx="170" cy="128" rx="7" ry="10" fill="#6b21a8" transform="rotate(15 170 128)"/>
+    <ellipse cx="205" cy="112" rx="7" ry="10" fill="#7e22ce" transform="rotate(15 205 112)"/>
+    <ellipse cx="235" cy="96" rx="7" ry="10" fill="#6b21a8" transform="rotate(15 235 96)"/>
+
+    <!-- Linhas Celulares Suaves no Topo Apical -->
+    <g stroke="#f472b6" stroke-width="1.2" opacity="0.6">
+      <line x1="30" y1="52" x2="150" y2="108"/>
+      <line x1="60" y1="38" x2="180" y2="94"/>
+      <line x1="90" y1="24" x2="210" y2="80"/>
+    </g>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- CARD FLUTUANTE ESTILO KENHUB                   -->
+  <!-- ============================================== -->
+  <g transform="translate(160, 315)" filter="url(#blockShadow)">
+    <rect x="0" y="0" width="220" height="52" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <circle cx="28" cy="26" r="14" fill="#eff6ff"/>
+    <!-- Ícone de Camadas / Blocos -->
+    <path d="M 28,18 L 36,22 L 28,26 L 20,22 Z M 20,26 L 28,30 L 36,26 M 20,30 L 28,34 L 36,30" fill="none" stroke="#0284c7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <text x="52" y="22" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#0f172a">
+      Arquitetura Tecidual
+    </text>
+    <text x="52" y="37" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="9.5" font-weight="500" fill="#64748b">
+      Epitélio, Membrana Basal &amp; Estroma
+    </text>
+  </g>
+</svg>

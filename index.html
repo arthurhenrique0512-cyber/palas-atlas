@@ -90,8 +90,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Folha de Estilos Tailwind Compilada + Estilos Customizados -->
-  <link rel="stylesheet" href="css/tailwind.min.css?v=13">
-  <link rel="stylesheet" href="css/styles.css?v=20">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=18">
+  <link rel="stylesheet" href="css/styles.css?v=35">
   <link rel="stylesheet" href="css/splash.css?v=1">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
@@ -387,45 +387,40 @@
   <main id="mainRouterContainer" class="flex-1 w-full flex flex-col justify-center transition-all duration-300">
     
     <!-- HUB DE ENTRADA (#pgHome) - BRANCO FRIO & AZUL-PETRÓLEO COM DETALHES DE FUNDO -->
-    <section id="pgHome" class="w-full h-full flex-1 text-slate-900 px-4 sm:px-6 md:px-8 pt-3 sm:pt-5 pb-20 relative overflow-x-hidden bg-[#f8fafc]">
+    <section id="pgHome" class="w-full h-full flex-1 text-slate-900 pb-20 relative overflow-x-hidden bg-[#f8fafc]">
+
+      <!-- RETÂNGULO DO TÍTULO PRINCIPAL: Sangra até a esquerda toda, até a direita toda e vai até o topo absoluto -->
+      <div id="heroTitleBoxBg" class="w-full bg-white border-b border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] relative z-20 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9 relative z-10">
+          <h1 class="font-serif text-3xl sm:text-4xl lg:text-[3.05rem] font-extrabold tracking-[-0.02em] text-slate-900 mb-3 text-left" style="line-height: 1.24;">
+            Atlas Integrado de <br class="hidden sm:inline" />
+            <span class="text-sky-700 font-extrabold block sm:inline mt-0.5 sm:mt-0">Ciências Morfológicas</span>
+          </h1>
+          <p class="text-slate-600 text-sm sm:text-base font-sans font-normal leading-relaxed max-w-2xl text-left">
+            Explore lâminas microscópicas reais em alta definição com navegação óptica interativa.
+          </p>
+        </div>
+      </div>
 
       <!-- CAMADA DE DETALHE DE FUNDO SUTIL: Malha Arquitetônica Limpa -->
       <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
         <div id="homeBgGrid" class="absolute inset-0" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.032) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.032) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%);"></div>
-        <div id="homeBgGlow" class="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(2,132,199,0.09)_0%,_transparent_70%)]"></div>
+        <div id="homeBgGlow" class="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(212,175,55,0.08)_0%,_transparent_70%)]"></div>
       </div>
 
-      <!-- SEÇÃO 1: HERO SECTION (RETÂNGULO ATÉ A BORDA ESQUERDA DA TELA + VITRINE) -->
-      <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-3 pb-10 lg:pt-5 lg:pb-12 relative z-10 animate-fade-in-up">
+      <!-- SEÇÃO 1: HERO WORKSPACE (BUSCA + AÇÕES + VITRINE) -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-7 sm:pt-9 pb-10 lg:pb-12 relative z-10 animate-fade-in-up">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          <!-- COLUNA ESQUERDA: Retângulo Sangrando até a Esquerda da Tela & Busca (lg:col-span-6 = 50%) -->
-          <div class="lg:col-span-6 flex flex-col items-start text-left">
-
-            <!-- RETÂNGULO DO TÍTULO PRINCIPAL: Vai até a borda esquerda absoluta da tela (left: -50vw) -->
-            <div class="relative w-full py-7 sm:py-9 pr-6 sm:pr-10 mb-7">
-              <!-- Painel de fundo que se estende até a borda esquerda da tela -->
-              <div id="heroTitleBoxBg" class="absolute inset-y-0 right-0 left-[-50vw] bg-white border-y border-r border-slate-200/95 rounded-r-3xl shadow-[0_18px_45px_-15px_rgba(15,23,42,0.07)] pointer-events-none transition-colors duration-300"></div>
-
-              <!-- Conteúdo alinhado à margem do container -->
-              <div class="relative z-10">
-                <h1 class="font-serif text-3xl sm:text-4xl lg:text-[3.05rem] font-extrabold tracking-[-0.02em] text-slate-900 mb-3.5 text-left" style="line-height: 1.24;">
-                  Atlas Integrado de <br class="hidden sm:inline" />
-                  <span class="text-sky-700 font-extrabold block sm:inline mt-0.5 sm:mt-0">Ciências Morfológicas</span>
-                </h1>
-                
-                <p class="text-slate-600 text-sm sm:text-base font-sans font-normal leading-relaxed max-w-lg text-left">
-                  Explore lâminas microscópicas reais em alta definição com navegação óptica interativa.
-                </p>
-              </div>
-            </div>
+          <!-- COLUNA ESQUERDA: Busca & Ações Rápidas (lg:col-span-6 = 50%) -->
+          <div class="lg:col-span-6 flex flex-col items-start text-left justify-center">
 
             <!-- Barra de Busca Rápida (z-30 garante que o dropdown fique acima dos botões abaixo) -->
             <div class="w-full max-w-xl relative z-30 mb-6 group" id="global-search-container">
-              <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-sky-600 transition-colors z-10">
+              <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#d4af37] transition-colors z-10">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
               </div>
-              <input type="text" id="global-search-input" name="palas_atlas_search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-white border border-slate-200/90 focus:border-sky-600 rounded-2xl py-4 pl-12 pr-12 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all relative z-10 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.07)] focus:shadow-[0_16px_40px_-8px_rgba(2,132,199,0.14)]" placeholder="Buscar tecidos, órgãos ou lâminas em H&E...">
+              <input type="text" id="global-search-input" name="palas_atlas_search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-white border border-slate-200/90 focus:border-[#d4af37] rounded-none py-4 pl-12 pr-12 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all relative z-10 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.07)] focus:shadow-[0_16px_40px_-8px_rgba(212,175,55,0.16)]" placeholder="Buscar tecidos, órgãos ou lâminas em H&E...">
               
               <!-- Botão de limpar -->
               <button type="button" id="global-search-clear" class="absolute inset-y-0 right-4 hidden items-center text-slate-400 hover:text-slate-800 transition-colors cursor-pointer z-20">
@@ -434,7 +429,7 @@
 
               <!-- Dropdown de Resultados -->
               <div id="global-search-dropdown" class="absolute top-full left-0 w-full z-50 mt-2 hidden text-left">
-                <div class="bg-white border border-slate-200/90 rounded-2xl shadow-[0_24px_60px_rgba(15,23,42,0.18)] overflow-hidden max-h-80 overflow-y-auto">
+                <div class="bg-white border border-slate-200/90 rounded-none shadow-[0_24px_60px_rgba(15,23,42,0.18)] overflow-hidden max-h-80 overflow-y-auto">
                   <ul id="global-search-results" class="flex flex-col">
                     <!-- Resultados injetados via search-engine.js -->
                   </ul>
@@ -447,11 +442,11 @@
 
             <!-- Botões de Ação -->
             <div class="relative z-10 flex flex-wrap gap-3.5 items-center justify-start w-full">
-              <button id="btnHeroPrimary" type="button" onclick="window.App.selecionarFrente('histologia')" class="bg-slate-900 hover:bg-sky-900 text-white rounded-xl px-6 py-3.5 transition-all duration-200 flex items-center justify-center gap-2.5 group cursor-pointer text-xs font-sans font-semibold tracking-wide shadow-[0_10px_24px_-6px_rgba(15,23,42,0.25)]">
+              <button id="btnHeroPrimary" type="button" onclick="window.App.abrirAccordionHero('histologia')" class="bg-slate-900 hover:bg-black text-white rounded-none px-6 py-3.5 transition-all duration-200 flex items-center justify-center gap-2.5 group cursor-pointer text-xs font-sans font-semibold tracking-wide shadow-[0_10px_24px_-6px_rgba(0,0,0,0.25)]">
                 <span>Explorar Lâminas</span>
-                <svg class="w-4 h-4 text-sky-300 group-hover:translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <svg class="w-4 h-4 text-[#d4af37] group-hover:translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
               </button>
-              <a href="sobre.html" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-sans font-semibold shadow-sm no-underline">
+              <a href="sobre.html" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-none bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-sans font-semibold shadow-sm no-underline">
                 Sobre o Projeto
               </a>
             </div>
@@ -460,7 +455,7 @@
 
           <!-- COLUNA DIREITA: Vitrine de Lâminas Full-Bleed com Título Sobreposto (lg:col-span-6 = 50%) -->
           <div class="lg:col-span-6 w-full">
-            <div id="heroSlideShowcase" class="group/showcase relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/90 shadow-[0_22px_50px_-12px_rgba(15,23,42,0.18)] flex flex-col justify-between p-5 sm:p-7">
+            <div id="heroSlideShowcase" class="group/showcase relative z-20 w-full aspect-[4/3] sm:aspect-[16/10] rounded-none overflow-hidden bg-[#060608] border border-slate-200/90 shadow-[0_22px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col justify-between p-5 sm:p-7">
               
               <!-- Imagem de Microscopia Full-Bleed 100% -->
               <img
@@ -471,12 +466,12 @@
                 onerror="this.onerror=null; this.src='assets/histologia/medula-espinal-he.png';"
               />
 
-              <!-- Gradiente Escuro Suave na Base para Leitura Nitída do Título Sobreposto -->
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/45 to-slate-950/10 pointer-events-none"></div>
+              <!-- Gradiente Escuro Neutro na Base (Zero Tonalidade Azulada) para Leitura Nítida do Título Sobreposto -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none"></div>
 
-              <!-- Topo da Vitrine: Badge de Coloração -->
+              <!-- Topo da Vitrine: Badge de Coloração Neutro Escurecido -->
               <div id="vitrineBadgeWrapper" class="relative z-10 flex items-center justify-start gap-2 transition-all duration-150 ease-out opacity-100">
-                <span id="vitrineStainBadge" class="bg-slate-950/75 border border-white/15 backdrop-blur-md px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold tracking-wider text-white shadow-sm">
+                <span id="vitrineStainBadge" class="bg-black/70 border border-white/15 backdrop-blur-md px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold tracking-wider text-white shadow-sm">
                   H&amp;E &bull; 40x
                 </span>
               </div>
@@ -485,17 +480,17 @@
               <div class="relative z-10 flex flex-col gap-3 mt-auto">
                 <div id="vitrineTextContent" class="space-y-1 text-left transition-all duration-150 ease-out opacity-100">
                   <div class="flex items-center justify-between gap-2">
-                    <span id="vitrineCategory" class="text-[11px] tracking-[0.14em] uppercase text-sky-300 font-sans font-semibold">
+                    <span id="vitrineCategory" class="text-[11px] tracking-[0.14em] uppercase text-white font-sans font-light">
                       Histologia &bull; Sistema Nervoso
                     </span>
-                    <span id="vitrineSpecimen" class="text-xs text-slate-300/90 font-sans font-medium">
+                    <span id="vitrineSpecimen" class="text-xs text-white/75 font-sans font-light">
                       Corte Transversal
                     </span>
                   </div>
                   <h3 id="vitrineTitle" class="font-serif font-bold text-xl sm:text-2xl text-white leading-snug tracking-tight drop-shadow-sm">
                     Medula Espinal
                   </h3>
-                  <p id="vitrineDesc" class="text-xs sm:text-sm text-slate-200/90 line-clamp-1 leading-relaxed font-sans">
+                  <p id="vitrineDesc" class="text-xs sm:text-sm text-white/85 line-clamp-1 leading-relaxed font-sans">
                     Substância cinzenta central em formato de H e substância branca periférica com motoneurônios.
                   </p>
                 </div>
@@ -505,19 +500,19 @@
                   <a
                     id="vitrineActionBtn"
                     href="microscopio.html?id=5kqs5Qv9fvWlpNSJoyPG"
-                    class="inline-flex items-center gap-2 text-xs sm:text-sm font-sans font-semibold text-white hover:text-sky-300 transition-colors duration-150 group/link no-underline"
+                    class="inline-flex items-center gap-2 text-xs sm:text-sm font-sans font-semibold text-white hover:text-[#d4af37] transition-colors duration-150 group/link no-underline"
                   >
                     <span>Abrir no Microscópio</span>
-                    <svg class="w-4 h-4 text-sky-400 group-hover/link:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#d4af37] group-hover/link:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                   </a>
 
-                  <div class="flex items-center gap-1 text-xs font-sans text-white select-none bg-white/10 border border-white/15 backdrop-blur-md rounded-full px-2 py-0.5">
+                  <div class="flex items-center gap-1 text-xs font-sans text-white select-none bg-black/60 border border-white/15 backdrop-blur-md rounded-full px-2 py-0.5">
                     <button
                       type="button"
                       id="vitrinePrevBtn"
-                      class="text-slate-200 hover:text-white transition-all duration-200 p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
+                      class="text-white/80 hover:text-white transition-all duration-200 p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
                       aria-label="Lâmina anterior"
                       title="Lâmina anterior"
                     >
@@ -531,7 +526,7 @@
                     <button
                       type="button"
                       id="vitrineNextBtn"
-                      class="text-slate-200 hover:text-white transition-all duration-200 p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
+                      class="text-white/80 hover:text-white transition-all duration-200 p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
                       aria-label="Próxima lâmina"
                       title="Próxima lâmina"
                     >
@@ -848,17 +843,17 @@
       </script>
 
       <!-- SEÇÃO 2: DISCIPLINAS (HISTOLOGIA EM DESTAQUE PRINCIPAL + 3 DISCIPLINAS ABAIXO) -->
-      <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6 relative z-10 animate-fade-in-up delay-200">
+      <div id="secaoDisciplinas" class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6 relative z-10 animate-fade-in-up delay-200">
         
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6 pb-4 border-b border-slate-200/80">
           <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-[-0.02em]">Disciplinas</h2>
-          <p class="text-xs sm:text-sm text-slate-500 font-sans">Selecione uma área para acessar as lâminas.</p>
+          <p class="text-xs sm:text-sm text-slate-500 font-sans">Selecione uma área para acessar os módulos e lâminas.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
           
-          <!-- HISTOLOGIA (CARD DE DESTAQUE MAIOR E MAIS ALTO VERTICALMENTE) -->
-          <div id="cardDestaqueHistologia" onclick="window.App.selecionarFrente('histologia')" class="md:col-span-3 relative overflow-hidden group bg-gradient-to-br from-[#0f172a] via-[#0c2136] to-[#082f49] rounded-2xl border border-sky-500/35 hover:border-sky-400 border-l-4 border-l-sky-400 p-8 sm:p-11 min-h-[220px] sm:min-h-[250px] shadow-[0_20px_45px_-12px_rgba(15,23,42,0.20)] hover:shadow-[0_24px_55px_-12px_rgba(2,132,199,0.30)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col justify-between gap-8">
+          <!-- HISTOLOGIA (CARD DE DESTAQUE COM ACCORDION INLINE NA HOME) -->
+          <div id="cardDestaqueHistologia" onclick="window.App.toggleAccordionDisciplinas('histologia')" class="md:col-span-3 relative overflow-hidden group bg-gradient-to-br from-[#0f172a] via-[#0c2136] to-[#082f49] rounded-none border border-sky-500/35 hover:border-sky-400 border-l-4 border-l-sky-400 p-8 sm:p-11 min-h-[220px] sm:min-h-[250px] shadow-[0_20px_45px_-12px_rgba(15,23,42,0.20)] hover:shadow-[0_24px_55px_-12px_rgba(2,132,199,0.30)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col justify-between gap-8 select-none">
             
             <div class="space-y-3 relative z-10 max-w-2xl">
               <h3 class="text-white font-serif text-2xl sm:text-4xl font-extrabold tracking-[-0.02em] group-hover:text-sky-300 transition-colors">Histologia</h3>
@@ -866,44 +861,148 @@
             </div>
 
             <div class="relative z-10 pt-5 border-t border-white/10 flex items-center justify-between gap-4">
-              <span class="text-xs sm:text-sm text-sky-300/90 font-sans font-medium">Epitelial, Conjuntivo, Muscular, Nervoso e Sistemas</span>
-              <span class="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-sky-500 group-hover:bg-sky-400 text-slate-950 font-sans font-bold text-xs sm:text-sm transition-all shadow-md shrink-0">
-                <span>Acessar Lâminas</span>
-                <span class="group-hover:translate-x-1 transition-transform text-base leading-none">&rarr;</span>
+              <span class="text-xs sm:text-sm text-sky-300/90 font-sans font-medium">Epitelial, Conjuntivo, Adiposo, Cartilaginoso, Ósseo, Nervoso, Muscular e Vascular</span>
+              <span class="inline-flex items-center gap-2.5 px-5 py-3 rounded-none bg-sky-500 group-hover:bg-sky-400 text-slate-950 font-sans font-bold text-xs sm:text-sm transition-all shadow-md shrink-0">
+                <span id="btnTxtHistologia">Explorar</span>
+                <svg id="arrowIconHistologia" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
               </span>
             </div>
           </div>
 
+          <!-- ACCORDION COM OS MÓDULOS DE HISTOLOGIA NA HOME (ZERO PÁGINA INTERMEDIÁRIA) -->
+          <div id="accordionContainerHistologia" class="md:col-span-3 hidden overflow-hidden transition-all duration-300 animate-fade-in-up">
+            <!-- LISTA VERTICAL NUMERADA (ESTILO SUMÁRIO DE LIVRO COM BORDAS RETAS) -->
+            <div class="overflow-hidden">
+              <!-- Item 01 -->
+              <div onclick="window.App.abrirTopico('epitelial', 'histologia')" class="accordion-item-row px-5 sm:px-8 py-4 sm:py-4.5 cursor-pointer flex items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+                  <span class="accordion-num text-xs sm:text-sm select-none">01</span>
+                  <span class="accordion-sep shrink-0"></span>
+                  <h3 class="accordion-title font-serif text-base sm:text-lg font-bold tracking-[-0.015em] leading-snug">Tecido Epitelial de Revestimento e Glandular</h3>
+                </div>
+                <span class="accordion-action-btn rounded-none shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+              <!-- Item 02 -->
+              <div onclick="window.App.abrirTopico('conjuntivo', 'histologia')" class="accordion-item-row px-5 sm:px-8 py-4 sm:py-4.5 cursor-pointer flex items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+                  <span class="accordion-num text-xs sm:text-sm select-none">02</span>
+                  <span class="accordion-sep shrink-0"></span>
+                  <h3 class="accordion-title font-serif text-base sm:text-lg font-bold tracking-[-0.015em] leading-snug">Tecido Conjuntivo Propriamente Dito</h3>
+                </div>
+                <span class="accordion-action-btn rounded-none shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+              <!-- Item 03 -->
+              <div onclick="window.App.abrirTopico('adiposo', 'histologia')" class="accordion-item-row px-5 sm:px-8 py-4 sm:py-4.5 cursor-pointer flex items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+                  <span class="accordion-num text-xs sm:text-sm select-none">03</span>
+                  <span class="accordion-sep shrink-0"></span>
+                  <h3 class="accordion-title font-serif text-base sm:text-lg font-bold tracking-[-0.015em] leading-snug">Tecido Adiposo Unilocular e Multilocular</h3>
+                </div>
+                <span class="accordion-action-btn rounded-none shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+              <!-- Item 04 -->
+              <div onclick="window.App.abrirTopico('cartilaginoso', 'histologia')" class="accordion-item-row px-5 sm:px-8 py-4 sm:py-4.5 cursor-pointer flex items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+                  <span class="accordion-num text-xs sm:text-sm select-none">04</span>
+                  <span class="accordion-sep shrink-0"></span>
+                  <h3 class="accordion-title font-serif text-base sm:text-lg font-bold tracking-[-0.015em] leading-snug">Tecido Cartilaginoso Hialino, Elástico e Fibroso</h3>
+                </div>
+                <span class="accordion-action-btn rounded-none shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+              <!-- Item 05 -->
+              <div onclick="window.App.abrirTopico('osseo', 'histologia')" class="accordion-item-row px-5 sm:px-8 py-4 sm:py-4.5 cursor-pointer flex items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+                  <span class="accordion-num text-xs sm:text-sm select-none">05</span>
+                  <span class="accordion-sep shrink-0"></span>
+                  <h3 class="accordion-title font-serif text-base sm:text-lg font-bold tracking-[-0.015em] leading-snug">Tecido Ósseo Compacto e Esponjoso</h3>
+                </div>
+                <span class="accordion-action-btn rounded-none shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+              <!-- Item 06 -->
+              <div onclick="window.App.abrirTopico('nervoso', 'histologia')" class="accordion-item-row px-5 sm:px-8 py-4 sm:py-4.5 cursor-pointer flex items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+                  <span class="accordion-num text-xs sm:text-sm select-none">06</span>
+                  <span class="accordion-sep shrink-0"></span>
+                  <h3 class="accordion-title font-serif text-base sm:text-lg font-bold tracking-[-0.015em] leading-snug">Tecido Nervoso e Células da Neuroglia</h3>
+                </div>
+                <span class="accordion-action-btn rounded-none shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+              <!-- Item 07 -->
+              <div onclick="window.App.abrirTopico('muscular', 'histologia')" class="accordion-item-row px-5 sm:px-8 py-4 sm:py-4.5 cursor-pointer flex items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+                  <span class="accordion-num text-xs sm:text-sm select-none">07</span>
+                  <span class="accordion-sep shrink-0"></span>
+                  <h3 class="accordion-title font-serif text-base sm:text-lg font-bold tracking-[-0.015em] leading-snug">Tecido Muscular Estriado Esquelético, Cardíaco e Liso</h3>
+                </div>
+                <span class="accordion-action-btn rounded-none shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+              <!-- Item 08 -->
+              <div onclick="window.App.abrirTopico('circulatorio', 'histologia')" class="accordion-item-row px-5 sm:px-8 py-4 sm:py-4.5 cursor-pointer flex items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+                  <span class="accordion-num text-xs sm:text-sm select-none">08</span>
+                  <span class="accordion-sep shrink-0"></span>
+                  <h3 class="accordion-title font-serif text-base sm:text-lg font-bold tracking-[-0.015em] leading-snug">Sistema Circulatório e Microvascularização</h3>
+                </div>
+                <span class="accordion-action-btn rounded-none shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
           <!-- Patologia (Carmim / Eosina) -->
-          <div onclick="window.App.selecionarFrente('patologia')" class="group bg-white/95 backdrop-blur-xs rounded-2xl border border-slate-200/90 hover:border-rose-600/50 border-l-[3px] border-l-rose-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(225,29,72,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4">
+          <div onclick="window.App.toggleAccordionDisciplinas('patologia')" class="group bg-white/95 backdrop-blur-xs rounded-none border border-slate-200/90 hover:border-rose-600/50 border-l-[3px] border-l-rose-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(225,29,72,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4 select-none">
             <div class="space-y-1.5">
               <h3 class="text-slate-900 font-serif text-lg sm:text-xl font-bold tracking-[-0.02em] group-hover:text-rose-700 transition-colors">Patologia</h3>
               <p class="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans">Adaptação, lesão celular, processos inflamatórios e neoplasias.</p>
             </div>
-            <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-rose-600 group-hover:text-white group-hover:border-rose-600 transition-all duration-200 shrink-0">
+            <div class="w-10 h-10 rounded-none bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-rose-600 group-hover:text-white group-hover:border-rose-600 transition-all duration-200 shrink-0">
               <span class="group-hover:translate-x-0.5 transition-transform font-semibold">&rarr;</span>
             </div>
           </div>
 
           <!-- Parasitologia (Verde-Esmeralda) -->
-          <div onclick="window.App.selecionarFrente('parasitologia')" class="group bg-white/95 backdrop-blur-xs rounded-2xl border border-slate-200/90 hover:border-emerald-600/50 border-l-[3px] border-l-emerald-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(5,150,105,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4">
+          <div onclick="window.App.toggleAccordionDisciplinas('parasitologia')" class="group bg-white/95 backdrop-blur-xs rounded-none border border-slate-200/90 hover:border-emerald-600/50 border-l-[3px] border-l-emerald-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(5,150,105,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4 select-none">
             <div class="space-y-1.5">
               <h3 class="text-slate-900 font-serif text-lg sm:text-xl font-bold tracking-[-0.02em] group-hover:text-emerald-700 transition-colors">Parasitologia</h3>
               <p class="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans">Morfologia diagnóstica de protozoários e helmintos de interesse médico.</p>
             </div>
-            <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-all duration-200 shrink-0">
+            <div class="w-10 h-10 rounded-none bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-all duration-200 shrink-0">
               <span class="group-hover:translate-x-0.5 transition-transform font-semibold">&rarr;</span>
             </div>
           </div>
 
           <!-- Microbiologia (Violeta de Gram) -->
-          <div onclick="window.App.selecionarFrente('microbiologia')" class="group bg-white/95 backdrop-blur-xs rounded-2xl border border-slate-200/90 hover:border-violet-600/50 border-l-[3px] border-l-violet-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(124,58,237,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4">
+          <div onclick="window.App.toggleAccordionDisciplinas('microbiologia')" class="group bg-white/95 backdrop-blur-xs rounded-none border border-slate-200/90 hover:border-violet-600/50 border-l-[3px] border-l-violet-600 p-6 shadow-[0_8px_24px_-8px_rgba(15,23,42,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(124,58,237,0.12)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4 select-none">
             <div class="space-y-1.5">
               <h3 class="text-slate-900 font-serif text-lg sm:text-xl font-bold tracking-[-0.02em] group-hover:text-violet-700 transition-colors">Microbiologia</h3>
               <p class="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans">Bactérias, coloração de Gram, BAAR e estruturas fúngicas.</p>
             </div>
-            <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white group-hover:border-violet-600 transition-all duration-200 shrink-0">
+            <div class="w-10 h-10 rounded-none bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white group-hover:border-violet-600 transition-all duration-200 shrink-0">
               <span class="group-hover:translate-x-0.5 transition-transform font-semibold">&rarr;</span>
+            </div>
+          </div>
+
+          <!-- ACCORDION PARA OUTRAS DISCIPLINAS NA HOME -->
+          <div id="accordionContainerOutras" class="md:col-span-3 hidden overflow-hidden transition-all duration-300 animate-fade-in-up" data-disciplina-ativa="">
+            <!-- Conteúdo Dinâmico da Disciplina Secundária -->
+            <div id="listaAccordionOutras" class="overflow-hidden">
             </div>
           </div>
 
@@ -1883,8 +1982,8 @@
   <script src="js/auth.js"></script>
   
   <!-- Módulos JS Locais com Cache Busting -->
-  <script type="module" src="js/main.js?v=20261103_ice_v9"></script>
-  <script type="module" src="js/histology-catalog.js?v=20261103_ice_v9"></script>
+  <script type="module" src="js/main.js?v=20261104_topic_editorial_v3"></script>
+  <script type="module" src="js/histology-catalog.js?v=20261104_topic_editorial_v3"></script>
   <!-- COOKIE CONSENT BANNER -->
   <div id="cookieBanner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[9999] bg-white/95 backdrop-blur-md border border-slate-200/90 p-5 rounded-2xl shadow-[0_20px_50px_rgba(15,23,42,0.16)] text-slate-600 text-xs leading-relaxed hidden">
     <p>Utilizamos cookies essenciais para otimizar sua experiência de estudo no visualizador morfológico. Ao continuar navegando, você concorda com nossa Política de Privacidade.</p>

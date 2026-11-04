@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 420" width="100%" height="100%">
+  <defs>
+    <linearGradient id="acinarCell" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fecdd3"/>
+      <stop offset="100%" stop-color="#fda4af"/>
+    </linearGradient>
+
+    <radialGradient id="lumenLight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </radialGradient>
+
+    <filter id="acinarShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Fundo Orgânico Suave -->
+  <path d="M 100,200 C 80,90 170,40 300,50 C 430,60 490,140 480,260 C 470,360 360,400 230,390 C 120,370 120,290 100,200 Z" fill="#fdf2f8" fill-opacity="0.7"/>
+
+  <!-- ============================================== -->
+  <!-- ÁCINO SECRETOR GLANDULAR (ESTILO KENHUB)       -->
+  <!-- ============================================== -->
+  <g transform="translate(270, 180)" filter="url(#acinarShadow)" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    
+    <!-- Membrana Basal Externa -->
+    <circle cx="0" cy="0" r="115" fill="none" stroke="#7e22ce" stroke-width="3" stroke-dasharray="5 3"/>
+
+    <!-- Base do Ácino / Fundo Citoplasmático -->
+    <circle cx="0" cy="0" r="112" fill="url(#acinarCell)"/>
+
+    <!-- Lúmen Central (Canal de Drenagem da Secreção) -->
+    <circle cx="0" cy="0" r="34" fill="url(#lumenLight)"/>
+
+    <!-- Gotículas de Secreção no Lúmen -->
+    <g fill="#38bdf8" stroke="none">
+      <circle cx="-8" cy="-5" r="4"/>
+      <circle cx="7" cy="8" r="4.5"/>
+      <circle cx="9" cy="-7" r="3.5"/>
+      <circle cx="-6" cy="9" r="3"/>
+    </g>
+
+    <!-- Linhas Intercelulares Radiais (Separando Células Piramidais) -->
+    <g stroke="#9f1239" stroke-width="2" opacity="0.6">
+      <line x1="0" y1="-34" x2="0" y2="-112"/>
+      <line x1="24" y1="-24" x2="79" y2="-79"/>
+      <line x1="34" y1="0" x2="112" y2="0"/>
+      <line x1="24" y1="24" x2="79" y2="79"/>
+      <line x1="0" y1="34" x2="0" y2="112"/>
+      <line x1="-24" y1="24" x2="-79" y2="79"/>
+      <line x1="-34" y1="0" x2="-112" y2="0"/>
+      <line x1="-24" y1="-24" x2="-79" y2="-79"/>
+    </g>
+
+    <!-- Grânulos de Zimogênio / Secreção Apicais (Próximos ao Lúmen) -->
+    <g fill="#e11d48" stroke="none" opacity="0.85">
+      <circle cx="0" cy="-45" r="2.8"/><circle cx="-6" cy="-42" r="2"/><circle cx="6" cy="-43" r="2"/>
+      <circle cx="32" cy="-32" r="2.8"/><circle cx="26" cy="-36" r="2"/>
+      <circle cx="45" cy="0" r="2.8"/><circle cx="42" cy="-6" r="2"/><circle cx="43" cy="6" r="2"/>
+      <circle cx="32" cy="32" r="2.8"/><circle cx="36" cy="26" r="2"/>
+      <circle cx="0" cy="45" r="2.8"/><circle cx="-6" cy="42" r="2"/><circle cx="6" cy="43" r="2"/>
+      <circle cx="-32" cy="32" r="2.8"/><circle cx="-26" cy="36" r="2"/>
+      <circle cx="-45" cy="0" r="2.8"/><circle cx="-42" cy="-6" r="2"/><circle cx="-43" cy="6" r="2"/>
+      <circle cx="-32" cy="-32" r="2.8"/><circle cx="-36" cy="-26" r="2"/>
+    </g>
+
+    <!-- NÚCLEOS BASAIS ESFÉRICOS (HEMATOXILINA PURA) -->
+    <!-- Célula Superior -->
+    <g transform="translate(0, -82)">
+      <circle cx="0" cy="0" r="15" fill="#6b21a8"/>
+      <circle cx="-3" cy="-3" r="3.5" fill="#ffffff" stroke="none" opacity="0.8"/>
+    </g>
+    <!-- Célula Superior-Direita -->
+    <g transform="translate(58, -58)">
+      <circle cx="0" cy="0" r="15" fill="#7e22ce"/>
+      <circle cx="-3" cy="-3" r="3.5" fill="#ffffff" stroke="none" opacity="0.8"/>
+    </g>
+    <!-- Célula Direita -->
+    <g transform="translate(82, 0)">
+      <circle cx="0" cy="0" r="15" fill="#6b21a8"/>
+      <circle cx="-3" cy="-3" r="3.5" fill="#ffffff" stroke="none" opacity="0.8"/>
+    </g>
+    <!-- Célula Inferior-Direita -->
+    <g transform="translate(58, 58)">
+      <circle cx="0" cy="0" r="15" fill="#7e22ce"/>
+      <circle cx="-3" cy="-3" r="3.5" fill="#ffffff" stroke="none" opacity="0.8"/>
+    </g>
+    <!-- Célula Inferior -->
+    <g transform="translate(0, 82)">
+      <circle cx="0" cy="0" r="15" fill="#6b21a8"/>
+      <circle cx="-3" cy="-3" r="3.5" fill="#ffffff" stroke="none" opacity="0.8"/>
+    </g>
+    <!-- Célula Inferior-Esquerda -->
+    <g transform="translate(-58, 58)">
+      <circle cx="0" cy="0" r="15" fill="#7e22ce"/>
+      <circle cx="-3" cy="-3" r="3.5" fill="#ffffff" stroke="none" opacity="0.8"/>
+    </g>
+    <!-- Célula Esquerda -->
+    <g transform="translate(-82, 0)">
+      <circle cx="0" cy="0" r="15" fill="#6b21a8"/>
+      <circle cx="-3" cy="-3" r="3.5" fill="#ffffff" stroke="none" opacity="0.8"/>
+    </g>
+    <!-- Célula Superior-Esquerda -->
+    <g transform="translate(-58, -58)">
+      <circle cx="0" cy="0" r="15" fill="#7e22ce"/>
+      <circle cx="-3" cy="-3" r="3.5" fill="#ffffff" stroke="none" opacity="0.8"/>
+    </g>
+
+    <!-- Célula Mioepitelial Achatada Abraçando o Ácino -->
+    <path d="M -95,-60 C -120,-10 -115,50 -80,90" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="-108" cy="10" rx="7" ry="4" fill="#0369a1" stroke="none"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- CARD FLUTUANTE ESTILO KENHUB                   -->
+  <!-- ============================================== -->
+  <g transform="translate(150, 325)" filter="url(#acinarShadow)">
+    <rect x="0" y="0" width="240" height="52" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <circle cx="28" cy="26" r="14" fill="#fdf2f8"/>
+    <!-- Ícone de Secreção / Glândula -->
+    <circle cx="28" cy="26" r="6" fill="#f43f5e"/>
+    <circle cx="28" cy="26" r="2" fill="#ffffff"/>
+    
+    <text x="52" y="22" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#0f172a">
+      Epitélio Glandular
+    </text>
+    <text x="52" y="37" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="9.5" font-weight="500" fill="#64748b">
+      Ácino Secretor, Grânulos &amp; Lúmen
+    </text>
+  </g>
+</svg>

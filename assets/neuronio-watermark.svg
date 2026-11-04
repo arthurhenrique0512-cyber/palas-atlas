@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Gradiente de Fade na Esquerda para Fusão Perfeita com o Fundo -->
+    <linearGradient id="wmFadeMaskGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="25%" stop-color="#fff" stop-opacity="0.4"/>
+      <stop offset="60%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0.85"/>
+    </linearGradient>
+
+    <mask id="wmFadeMask">
+      <rect x="0" y="0" width="820" height="300" fill="url(#wmFadeMaskGrad)"/>
+    </mask>
+
+    <radialGradient id="wmGlowCenter" cx="35%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="currentColor" stop-opacity="0.08"/>
+      <stop offset="70%" stop-color="currentColor" stop-opacity="0.01"/>
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g mask="url(#wmFadeMask)">
+    <!-- Halo Radial Suave de Iluminação Microscópica -->
+    <circle cx="340" cy="150" r="220" fill="url(#wmGlowCenter)"/>
+
+    <!-- ============================================== -->
+    <!-- 1. RETÍCULO TÉCNICO ÓPTICO & ESCALAS (BACKGROUND) -->
+    <!-- ============================================== -->
+    <g class="wm-reticle-line" stroke="currentColor" stroke-width="0.75" opacity="0.45">
+      <!-- Círculos Concêntricos de Foco Óptico -->
+      <circle cx="280" cy="150" r="130" stroke-dasharray="3 5"/>
+      <circle cx="280" cy="150" r="220" stroke-dasharray="2 8" opacity="0.5"/>
+      
+      <!-- Linhas de Coordenadas de Retículo com Ticks -->
+      <line x1="60" y1="150" x2="780" y2="150" stroke-dasharray="6 10" opacity="0.35"/>
+      <line x1="280" y1="20" x2="280" y2="280" stroke-dasharray="6 10" opacity="0.35"/>
+
+      <!-- Ticks Micrométricos ao longo do Eixo Principal -->
+      <line x1="200" y1="146" x2="200" y2="154"/>
+      <line x1="240" y1="146" x2="240" y2="154"/>
+      <line x1="320" y1="146" x2="320" y2="154"/>
+      <line x1="360" y1="146" x2="360" y2="154"/>
+      <line x1="400" y1="146" x2="400" y2="154"/>
+      <line x1="440" y1="146" x2="440" y2="154"/>
+      <line x1="480" y1="146" x2="480" y2="154"/>
+      <line x1="520" y1="146" x2="520" y2="154"/>
+      <line x1="560" y1="146" x2="560" y2="154"/>
+      <line x1="600" y1="146" x2="600" y2="154"/>
+      <line x1="640" y1="146" x2="640" y2="154"/>
+      <line x1="680" y1="146" x2="680" y2="154"/>
+    </g>
+
+    <!-- Rótulos Técnicos Microscópicos Sutis -->
+    <g class="wm-tech-text" fill="currentColor" opacity="0.4" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8" font-weight="600" letter-spacing="0.16em">
+      <text x="290" y="35">OPTICAL FIELD // REF: 40x</text>
+      <text x="590" y="115">AXONAL TRACT [120µm]</text>
+      <text x="690" y="275">SYNAPSE [20nm CLEFT]</text>
+    </g>
+
+    <!-- ============================================== -->
+    <!-- 2. DESENHO VETORIAL MONOCROMÁTICO DO NEURÔNIO  -->
+    <!-- ============================================== -->
+    <g class="wm-neuron-traces" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      
+      <!-- DENDRITOS PRINCIPAIS & RAMIFICAÇÕES SECUNDÁRIAS (TRAÇO FINO DE PRECISÃO) -->
+      <!-- Ramo Superior-Esquerdo -->
+      <path d="M 245,115 C 225,85 195,55 155,35 M 195,65 L 180,45 M 155,35 L 135,25 M 175,50 L 165,30" stroke-width="1.25"/>
+      <!-- Ramo Superior -->
+      <path d="M 270,105 C 280,65 305,40 335,20 M 305,45 L 325,35 M 335,20 L 350,15" stroke-width="1.25"/>
+      <!-- Ramo Esquerdo -->
+      <path d="M 225,145 C 185,140 145,130 110,110 M 155,135 L 135,145 M 110,110 L 85,100" stroke-width="1.25"/>
+      <!-- Ramo Inferior-Esquerdo -->
+      <path d="M 235,180 C 205,210 175,245 135,270 M 180,230 L 195,255 M 135,270 L 115,285" stroke-width="1.25"/>
+      <!-- Ramo Inferior -->
+      <path d="M 265,190 C 275,225 295,255 320,280 M 295,250 L 315,265" stroke-width="1.25"/>
+
+      <!-- Espinhos Dendríticos Sutis (Dendritic Spines) -->
+      <path d="M 175,50 l -3,-5 M 185,60 l -4,-4 M 140,125 l -5,-2 M 165,220 l -4,5 M 210,195 l -5,4" stroke-width="1" opacity="0.6"/>
+
+      <!-- CORPO CELULAR (SOMA) COM DUPLA LINHA ANATÔMICA -->
+      <path d="M 225,145 C 230,120 255,110 275,125 C 295,140 300,165 290,185 C 280,205 250,210 235,185 C 220,165 220,155 225,145 Z" stroke-width="1.75" fill="currentColor" fill-opacity="0.04"/>
+
+      <!-- NÚCLEO EUCROMÁTICO & NUCLÉOLO CENTRAL -->
+      <circle cx="260" cy="155" r="18" stroke-width="1.2"/>
+      <circle cx="260" cy="155" r="7" stroke-width="1.5" fill="currentColor" fill-opacity="0.15"/>
+      <circle cx="258" cy="153" r="2" fill="currentColor" stroke="none" opacity="0.6"/>
+
+      <!-- CONE DE IMPLANTAÇÃO AXONAL & AXÔNIO CENTRAL (LINHA GUIA) -->
+      <path d="M 295,160 L 670,160" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.7"/>
+
+      <!-- SEGMENTOS DA BAINHA DE MIELINA (TRAÇOS PRECISOS DE CÉLULAS GLIAIS) -->
+      <!-- Segmento 1 -->
+      <rect x="315" y="146" width="46" height="28" rx="6" stroke-width="1.4" fill="currentColor" fill-opacity="0.03"/>
+      <circle cx="338" cy="160" r="3" stroke-width="1" fill="none"/>
+      
+      <!-- Segmento 2 -->
+      <rect x="375" y="146" width="46" height="28" rx="6" stroke-width="1.4" fill="currentColor" fill-opacity="0.03"/>
+      <circle cx="398" cy="160" r="3" stroke-width="1" fill="none"/>
+
+      <!-- Segmento 3 -->
+      <rect x="435" y="146" width="46" height="28" rx="6" stroke-width="1.4" fill="currentColor" fill-opacity="0.03"/>
+      <circle cx="458" cy="160" r="3" stroke-width="1" fill="none"/>
+
+      <!-- Segmento 4 -->
+      <rect x="495" y="146" width="46" height="28" rx="6" stroke-width="1.4" fill="currentColor" fill-opacity="0.03"/>
+      <circle cx="518" cy="160" r="3" stroke-width="1" fill="none"/>
+
+      <!-- Segmento 5 -->
+      <rect x="555" y="146" width="46" height="28" rx="6" stroke-width="1.4" fill="currentColor" fill-opacity="0.03"/>
+      <circle cx="578" cy="160" r="3" stroke-width="1" fill="none"/>
+
+      <!-- Segmento 6 -->
+      <rect x="615" y="146" width="46" height="28" rx="6" stroke-width="1.4" fill="currentColor" fill-opacity="0.03"/>
+      <circle cx="638" cy="160" r="3" stroke-width="1" fill="none"/>
+
+      <!-- NÓDULOS DE RANVIER COM MARCADORES TÉCNICOS VERTICAIS -->
+      <g stroke-width="1.75" opacity="0.8">
+        <line x1="368" y1="148" x2="368" y2="172"/>
+        <line x1="428" y1="148" x2="428" y2="172"/>
+        <line x1="488" y1="148" x2="488" y2="172"/>
+        <line x1="548" y1="148" x2="548" y2="172"/>
+        <line x1="608" y1="148" x2="608" y2="172"/>
+      </g>
+
+      <!-- TELODENDRO & BOTÕES TERMINAIS DA SINAPSE -->
+      <path d="M 661,160 C 685,160 705,135 730,115" stroke-width="1.3"/>
+      <circle cx="733" cy="113" r="5" stroke-width="1.4" fill="currentColor" fill-opacity="0.1"/>
+
+      <path d="M 661,160 C 690,160 715,160 740,160" stroke-width="1.3"/>
+      <circle cx="744" cy="160" r="5" stroke-width="1.4" fill="currentColor" fill-opacity="0.1"/>
+
+      <path d="M 661,160 C 685,160 705,185 730,205" stroke-width="1.3"/>
+      <circle cx="733" cy="207" r="5" stroke-width="1.4" fill="currentColor" fill-opacity="0.1"/>
+
+      <!-- Vesículas Sinápticas Flutuantes (Micro-pontos) -->
+      <g fill="currentColor" stroke="none" opacity="0.75">
+        <circle cx="748" cy="112" r="1.8"/>
+        <circle cx="754" cy="116" r="1.5"/>
+        <circle cx="750" cy="122" r="1.6"/>
+        <circle cx="758" cy="158" r="1.8"/>
+        <circle cx="765" cy="162" r="1.5"/>
+        <circle cx="759" cy="166" r="1.6"/>
+        <circle cx="748" cy="204" r="1.8"/>
+        <circle cx="754" cy="208" r="1.5"/>
+        <circle cx="750" cy="214" r="1.6"/>
+      </g>
+
+      <!-- Membrana Receptora Pós-Sináptica -->
+      <path d="M 770,95 C 778,130 778,190 770,225" stroke-width="2" stroke-dasharray="4 3" opacity="0.6"/>
+    </g>
+  </g>
+</svg>

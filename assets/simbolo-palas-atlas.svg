@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 850" width="100%" height="100%">
+  <defs>
+    <!-- Paleta Oficial Palas Atlas: Ouro Champanhe, Azul Petróleo, Ônix & Marfim -->
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="30%" stop-color="#f59e0b"/>
+      <stop offset="70%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+
+    <linearGradient id="goldBright" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d4af37"/>
+      <stop offset="50%" stop-color="#fef9c3"/>
+      <stop offset="100%" stop-color="#d4af37"/>
+    </linearGradient>
+
+    <linearGradient id="petroleoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#0284c7"/>
+      <stop offset="80%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+
+    <radialGradient id="opticGaze" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#38bdf8"/>
+      <stop offset="75%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#021526"/>
+    </radialGradient>
+
+    <radialGradient id="canvasBg" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="45%" stop-color="#070c18"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+
+    <radialGradient id="coreGlow" cx="50%" cy="42%" r="48%">
+      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#d4af37" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#020617" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Sombras e Filtros de Alta Precisão (Clinical Precision) -->
+    <filter id="royalShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.75"/>
+    </filter>
+
+    <filter id="goldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Fundo Ônix com Iluminação Focal Central -->
+  <rect width="800" height="850" fill="url(#canvasBg)"/>
+  <circle cx="400" cy="380" r="340" fill="url(#coreGlow)"/>
+
+  <!-- ======================================================== -->
+  <!-- 1. O CONCEITO "ATLAS": MERIDIANOS, RETÍCULO E COORDENADAS -->
+  <!-- ======================================================== -->
+  <g id="atlasRings" opacity="0.85">
+    <!-- Anel Externo Principal (Borda de Precisão do Microscópio / Esfera Armilar) -->
+    <circle cx="400" cy="375" r="310" fill="none" stroke="#1e293b" stroke-width="2"/>
+    <circle cx="400" cy="375" r="298" fill="none" stroke="url(#goldGradient)" stroke-width="1.8" opacity="0.6"/>
+    <circle cx="400" cy="375" r="286" fill="none" stroke="#0369a1" stroke-width="1" stroke-dasharray="2 6" opacity="0.5"/>
+    
+    <!-- Linhas Orbitais / Meridianos do Atlas Celeste & Anatômico -->
+    <ellipse cx="400" cy="375" rx="275" ry="110" fill="none" stroke="url(#petroleoGradient)" stroke-width="1.2" opacity="0.35" transform="rotate(-18 400 375)"/>
+    <ellipse cx="400" cy="375" rx="275" ry="110" fill="none" stroke="url(#goldGradient)" stroke-width="1.2" opacity="0.35" transform="rotate(18 400 375)"/>
+    
+    <!-- Tiques de Graduação Microscópica Circular (Eixo 360°) -->
+    <g stroke="url(#goldGradient)" stroke-width="1.5" opacity="0.65">
+      <!-- Cardeais -->
+      <line x1="400" y1="67" x2="400" y2="82"/>
+      <line x1="400" y1="668" x2="400" y2="683"/>
+      <line x1="92" y1="375" x2="107" y2="375"/>
+      <line x1="693" y1="375" x2="708" y2="375"/>
+      <!-- Intercardeais -->
+      <line x1="182" y1="157" x2="193" y2="168" stroke-width="1"/>
+      <line x1="618" y1="157" x2="607" y2="168" stroke-width="1"/>
+      <line x1="182" y1="593" x2="193" y2="582" stroke-width="1"/>
+      <line x1="618" y1="593" x2="607" y2="582" stroke-width="1"/>
+    </g>
+
+    <!-- Marcadores Técnicos de Precisão Morfológica -->
+    <text x="400" y="58" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="700" letter-spacing="4" fill="#38bdf8" opacity="0.75">MICROSCOPIA &amp; MORFOLOGIA</text>
+    <text x="135" y="380" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#d4af37" opacity="0.6">λ 550nm</text>
+    <text x="665" y="380" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#d4af37" opacity="0.6">400X</text>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 2. COROA DE LOUROS / RAMOS DE OLIVEIRA DE PALAS ATENA    -->
+  <!-- Simboliza a deusa da sabedoria, ciência e discernimento  -->
+  <!-- ======================================================== -->
+  <g id="laurelWreath" fill="url(#goldGradient)" opacity="0.82" filter="url(#royalShadow)">
+    <!-- Ramo Esquerdo -->
+    <g transform="translate(400, 375)">
+      <!-- Folha 1 -->
+      <path d="M -160,180 C -180,140 -205,100 -215,50 C -205,75 -185,110 -150,140 Z"/>
+      <path d="M -180,120 C -215,90 -235,40 -240,-10 C -225,20 -195,65 -165,90 Z"/>
+      <path d="M -200,40 C -230,0 -245,-50 -242,-105 C -230,-60 -195,-20 -180,15 Z"/>
+      <path d="M -195,-45 C -215,-90 -225,-140 -210,-190 C -205,-145 -180,-100 -165,-65 Z"/>
+      <path d="M -160,-130 C -170,-170 -165,-215 -145,-250 C -145,-210 -130,-175 -125,-145 Z"/>
+    </g>
+    <!-- Ramo Direito (Espelhado) -->
+    <g transform="translate(400, 375) scale(-1, 1)">
+      <!-- Folha 1 -->
+      <path d="M -160,180 C -180,140 -205,100 -215,50 C -205,75 -185,110 -150,140 Z"/>
+      <path d="M -180,120 C -215,90 -235,40 -240,-10 C -225,20 -195,65 -165,90 Z"/>
+      <path d="M -200,40 C -230,0 -245,-50 -242,-105 C -230,-60 -195,-20 -180,15 Z"/>
+      <path d="M -195,-45 C -215,-90 -225,-140 -210,-190 C -205,-145 -180,-100 -165,-65 Z"/>
+      <path d="M -160,-130 C -170,-170 -165,-215 -145,-250 C -145,-210 -130,-175 -125,-145 Z"/>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 3. A CORUJA DE PALAS (EMBLEMA VETORIAL MAJESTOSO)        -->
+  <!-- Geometria nobre, simétrica com Olhos-Lente de Microscópio-->
+  <!-- ======================================================== -->
+  <g id="pallasOwl" filter="url(#royalShadow)">
+    
+    <!-- Escudo / Corpo da Coruja com Geometria Histológica (Égide) -->
+    <!-- Estrutura do Peitoral -->
+    <path d="M 400,320 L 465,360 L 485,465 L 400,545 L 315,465 L 335,360 Z" fill="#090f1d" stroke="url(#goldGradient)" stroke-width="2.5"/>
+    
+    <!-- Textura Interna: Rede Morfológica / Treliça Hexagonal de Tecido -->
+    <g stroke="url(#petroleoGradient)" stroke-width="1.2" opacity="0.4" fill="none">
+      <polygon points="400,350 435,370 435,410 400,430 365,410 365,370"/>
+      <polygon points="400,430 435,450 435,490 400,510 365,490 365,450"/>
+      <polygon points="435,410 470,430 470,470 435,490 400,470 400,430"/>
+      <polygon points="365,410 400,430 400,470 365,490 330,470 330,430"/>
+      <!-- Feixes de luz verticais no escudo -->
+      <line x1="400" y1="330" x2="400" y2="535" stroke="url(#goldGradient)" stroke-width="1.5" opacity="0.6"/>
+    </g>
+
+    <!-- Asas Laterais Estilizadas (Plumagem de Lâminas / Sabedoria) -->
+    <!-- Asa Esquerda -->
+    <g fill="url(#petroleoGradient)">
+      <path d="M 335,360 C 275,340 230,375 195,435 C 220,440 270,425 315,465 C 310,420 315,385 335,360 Z" opacity="0.95"/>
+      <path d="M 315,465 C 265,470 220,505 185,555 C 220,545 270,520 335,510 C 322,492 316,478 315,465 Z" fill="#0369a1" opacity="0.85"/>
+      <path d="M 345,505 C 305,535 260,575 220,630 C 260,605 310,570 370,540 Z" fill="#0c4a6e" opacity="0.75"/>
+    </g>
+    <!-- Asa Direita (Espelhada) -->
+    <g fill="url(#petroleoGradient)">
+      <path d="M 465,360 C 525,340 570,375 605,435 C 580,440 530,425 485,465 C 490,420 485,385 465,360 Z" opacity="0.95"/>
+      <path d="M 485,465 C 535,470 580,505 615,555 C 580,545 530,520 465,510 C 478,492 484,478 485,465 Z" fill="#0369a1" opacity="0.85"/>
+      <path d="M 455,505 C 495,535 540,575 580,630 C 540,605 490,570 430,540 Z" fill="#0c4a6e" opacity="0.75"/>
+    </g>
+
+    <!-- Contorno Dourado das Penas das Asas -->
+    <path d="M 195,435 C 255,420 300,390 335,360" fill="none" stroke="url(#goldGradient)" stroke-width="2"/>
+    <path d="M 605,435 C 545,420 500,390 465,360" fill="none" stroke="url(#goldGradient)" stroke-width="2"/>
+    <path d="M 185,555 C 245,525 290,490 315,465" fill="none" stroke="url(#goldGradient)" stroke-width="1.8"/>
+    <path d="M 615,555 C 555,525 510,490 485,465" fill="none" stroke="url(#goldGradient)" stroke-width="1.8"/>
+
+    <!-- CABEÇA DA CORUJA DE PALAS -->
+    <!-- Plumas Auriculares Superiores ("Orelhas" / Coroa da Sabedoria) -->
+    <path d="M 400,210 L 435,145 L 450,225 L 400,240 Z" fill="url(#goldGradient)"/>
+    <path d="M 400,210 L 365,145 L 350,225 L 400,240 Z" fill="url(#goldGradient)"/>
+    
+    <!-- Penas Frontais / Têmpora -->
+    <path d="M 435,145 L 485,175 L 450,225 Z" fill="#b45309" opacity="0.85"/>
+    <path d="M 365,145 L 315,175 L 350,225 Z" fill="#b45309" opacity="0.85"/>
+
+    <!-- Disco Facial Principal (Base) -->
+    <path d="M 400,230 C 475,200 515,250 490,325 C 465,365 425,370 400,355 C 375,370 335,365 310,325 C 285,250 325,200 400,230 Z" fill="#080e1a" stroke="url(#goldGradient)" stroke-width="3"/>
+
+    <!-- SOBRANCELHA & CRISTA DA SABEDORIA (Inspirado no Capacete Coríntio de Atena) -->
+    <path d="M 400,250 L 460,230 L 455,255 L 400,285 L 345,255 L 340,230 Z" fill="url(#goldBright)" filter="url(#goldGlow)"/>
+    <path d="M 400,235 L 400,315" stroke="url(#goldGradient)" stroke-width="2.5"/>
+
+    <!-- ===================================================== -->
+    <!-- OS OLHOS DA CORUJA: A OCULAR DO MICROSCÓPIO (O CORAÇÃO DO SÍMBOLO) -->
+    <!-- ===================================================== -->
+    <!-- Olho Esquerdo (Ocular Esquerda) -->
+    <g id="leftEye">
+      <!-- Borda Externa de Latão Dourado / Ocular -->
+      <circle cx="355" cy="295" r="34" fill="#030712" stroke="url(#goldGradient)" stroke-width="3"/>
+      <!-- Anel Óptico de Ajuste Diométrico -->
+      <circle cx="355" cy="295" r="28" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <!-- Íris / Lente Microscópica com Gradiente de Foco Azul Petróleo -->
+      <circle cx="355" cy="295" r="23" fill="url(#opticGaze)"/>
+      <!-- Pupila com Ponto Focal Clínico -->
+      <circle cx="355" cy="295" r="10" fill="#020617"/>
+      <circle cx="355" cy="295" r="5" fill="#38bdf8" opacity="0.9"/>
+      <!-- Brilho Especular na Lente -->
+      <circle cx="350" cy="289" r="3.5" fill="#ffffff" opacity="0.9"/>
+      <circle cx="361" cy="299" r="1.5" fill="#ffffff" opacity="0.7"/>
+    </g>
+
+    <!-- Olho Direito (Ocular Direita) -->
+    <g id="rightEye">
+      <!-- Borda Externa de Latão Dourado / Ocular -->
+      <circle cx="445" cy="295" r="34" fill="#030712" stroke="url(#goldGradient)" stroke-width="3"/>
+      <!-- Anel Óptico de Ajuste Diométrico -->
+      <circle cx="445" cy="295" r="28" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <!-- Íris / Lente Microscópica com Gradiente de Foco Azul Petróleo -->
+      <circle cx="445" cy="295" r="23" fill="url(#opticGaze)"/>
+      <!-- Pupila com Ponto Focal Clínico -->
+      <circle cx="445" cy="295" r="10" fill="#020617"/>
+      <circle cx="445" cy="295" r="5" fill="#38bdf8" opacity="0.9"/>
+      <!-- Brilho Especular na Lente -->
+      <circle cx="440" cy="289" r="3.5" fill="#ffffff" opacity="0.9"/>
+      <circle cx="451" cy="299" r="1.5" fill="#ffffff" opacity="0.7"/>
+    </g>
+
+    <!-- Bico Triangular Dourado Afiado (Foco e Precisão) -->
+    <polygon points="400,285 410,335 400,355 390,335" fill="url(#goldGradient)" stroke="#78350f" stroke-width="1"/>
+    <!-- Linha de corte facetada central -->
+    <line x1="400" y1="285" x2="400" y2="355" stroke="#fef08a" stroke-width="1.2"/>
+
+    <!-- Lâmina Histológica / Base de Apoio das Garras (Pedestal do Conhecimento) -->
+    <g transform="translate(400, 545)">
+      <!-- Lâmina de Vidro Retangular em Perspectiva -->
+      <rect x="-110" y="0" width="220" height="12" rx="3" fill="#0f172a" stroke="url(#goldGradient)" stroke-width="1.8"/>
+      <line x1="-90" y1="6" x2="90" y2="6" stroke="#38bdf8" stroke-width="1.5" opacity="0.7"/>
+      <!-- Garras Estilizadas em Ouro Segurando a Lâmina -->
+      <path d="M -35,-8 L -30,4 L -22,-6 L -18,4 L -10,-8" fill="none" stroke="url(#goldGradient)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 35,-8 L 30,4 L 22,-6 L 18,4 L 10,-8" fill="none" stroke="url(#goldGradient)" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- 4. TIPOGRAFIA OFICIAL PALAS ATLAS & IDENTIDADE VISUAL    -->
+  <!-- ======================================================== -->
+  <g transform="translate(400, 695)" text-anchor="middle">
+    <!-- Divisor Dourado Minimalista com Diamante Central -->
+    <path d="M -180,-35 L -20,-35 M 20,-35 L 180,-35" stroke="url(#goldGradient)" stroke-width="1" opacity="0.6"/>
+    <polygon points="0,-39 4,-35 0,-31 -4,-35" fill="url(#goldGradient)"/>
+
+    <!-- Nome Principal: PALAS ATLAS (Cormorant Garamond Serif) -->
+    <text y="0" font-family="'Cormorant Garamond', 'Times New Roman', Georgia, serif" font-size="38" font-weight="700" letter-spacing="10">
+      <tspan fill="#f4f2ed">PALAS </tspan>
+      <tspan fill="url(#goldGradient)">ATLAS</tspan>
+    </text>
+
+    <!-- Subtítulo Oficial da Plataforma -->
+    <text y="28" font-family="'Plus Jakarta Sans', 'Inter', system-ui, sans-serif" font-size="10.5" font-weight="600" letter-spacing="5" fill="#94a3b8">
+      ATLAS MORFOLÓGICO DIGITAL
+    </text>
+
+    <!-- Selo de Especialidade Médica -->
+    <text y="48" font-family="'Plus Jakarta Sans', 'Inter', system-ui, sans-serif" font-size="8.5" font-weight="500" letter-spacing="3" fill="#0284c7" opacity="0.9">
+      HISTOLOGIA • ANATOMIA • EDUCAÇÃO MÉDICA
+    </text>
+  </g>
+</svg>

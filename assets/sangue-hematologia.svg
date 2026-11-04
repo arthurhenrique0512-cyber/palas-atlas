@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 420" width="100%" height="100%">
+  <defs>
+    <radialGradient id="rbc1" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fca5a5"/>
+      <stop offset="45%" stop-color="#f87171"/>
+      <stop offset="85%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </radialGradient>
+
+    <radialGradient id="rbc2" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fda4af"/>
+      <stop offset="50%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </radialGradient>
+
+    <filter id="bloodShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Fundo Orgânico Suave -->
+  <path d="M 120,220 C 80,110 180,40 310,50 C 440,60 490,150 470,270 C 450,370 330,410 210,380 C 110,350 140,280 120,220 Z" fill="#fff1f2" fill-opacity="0.6"/>
+
+  <!-- Linhas de Fluxo de Plasma Sanguíneo Minimalistas -->
+  <path d="M 50,160 C 140,140 220,180 340,150 C 420,130 460,160 500,150" fill="none" stroke="#fed7aa" stroke-width="2" stroke-dasharray="6 6" opacity="0.5"/>
+  <path d="M 70,260 C 180,240 280,270 390,230" fill="none" stroke="#bae6fd" stroke-width="2" stroke-dasharray="5 5" opacity="0.6"/>
+
+  <!-- ============================================== -->
+  <!-- ELEMENTOS FIGURADOS DO SANGUE (ESTILO KENHUB) -->
+  <!-- ============================================== -->
+  
+  <!-- 1. NEUTRÓFILO SEGMENTADO (LEUCÓCITO PRINCIPAL) -->
+  <g transform="translate(190, 160)" filter="url(#bloodShadow)">
+    <!-- Citoplasma Granular Claro -->
+    <circle cx="0" cy="0" r="54" fill="#fdf4ff" stroke="#1e293b" stroke-width="2.5"/>
+    <circle cx="0" cy="0" r="50" fill="#fae8ff" opacity="0.6"/>
+
+    <!-- Grânulos Específicos Dispersos -->
+    <g fill="#d946ef" opacity="0.35">
+      <circle cx="-25" cy="-20" r="2"/><circle cx="-15" cy="-35" r="1.5"/><circle cx="10" cy="-30" r="2"/>
+      <circle cx="28" cy="-15" r="1.8"/><circle cx="32" cy="10" r="2"/><circle cx="20" cy="28" r="1.5"/>
+      <circle cx="-10" cy="32" r="2"/><circle cx="-30" cy="18" r="1.8"/>
+    </g>
+
+    <!-- Núcleo Trilobulado Clássico de Neutrófilo (Coloração Leishman / Giemsa) -->
+    <!-- Lobo 1 -->
+    <ellipse cx="-16" cy="-12" rx="14" ry="17" fill="#6b21a8" transform="rotate(-15 -16 -12)"/>
+    <circle cx="-19" cy="-15" r="3" fill="#ffffff" opacity="0.6"/>
+    <!-- Lobo 2 -->
+    <ellipse cx="18" cy="-10" rx="13" ry="16" fill="#7e22ce" transform="rotate(20 18 -10)"/>
+    <circle cx="16" cy="-13" r="2.8" fill="#ffffff" opacity="0.6"/>
+    <!-- Lobo 3 -->
+    <ellipse cx="2" cy="18" rx="16" ry="13" fill="#581c87" transform="rotate(5 2 18)"/>
+    <circle cx="0" cy="16" r="3" fill="#ffffff" opacity="0.6"/>
+
+    <!-- Filamentos Finos de Cromatina Conectando os Lobos -->
+    <path d="M -7,-12 C 0,-15 10,-14 9,-10" fill="none" stroke="#581c87" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 12,-2 C 14,8 8,14 3,15" fill="none" stroke="#581c87" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M -12,-3 C -10,8 -5,14 -1,15" fill="none" stroke="#581c87" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- 2. ERITRÓCITOS / HEMÁCIAS BICÔNCAVAS -->
+  <!-- Hemácia 1 (Frente Plana com Centro Pálido) -->
+  <g transform="translate(325, 125) rotate(15)" filter="url(#bloodShadow)">
+    <circle cx="0" cy="0" r="36" fill="url(#rbc1)" stroke="#1e293b" stroke-width="2.5"/>
+    <!-- Depressão Central Bicôncava (Mais Clara) -->
+    <circle cx="0" cy="0" r="16" fill="#fecaca" opacity="0.75"/>
+    <ellipse cx="-4" cy="-5" rx="5" ry="3" fill="#ffffff" opacity="0.6"/>
+  </g>
+
+  <!-- Hemácia 2 (Perspectiva Oblíqua) -->
+  <g transform="translate(100, 195) rotate(-30)" filter="url(#bloodShadow)">
+    <ellipse cx="0" cy="0" rx="38" ry="24" fill="url(#rbc2)" stroke="#1e293b" stroke-width="2.5"/>
+    <ellipse cx="0" cy="0" rx="17" ry="9" fill="#fecdd3" opacity="0.8"/>
+  </g>
+
+  <!-- Hemácia 3 (Inferior) -->
+  <g transform="translate(350, 245) rotate(-10)" filter="url(#bloodShadow)">
+    <circle cx="0" cy="0" r="32" fill="url(#rbc1)" stroke="#1e293b" stroke-width="2.5"/>
+    <circle cx="0" cy="0" r="13" fill="#fecaca" opacity="0.75"/>
+  </g>
+
+  <!-- 3. PLAQUETAS (TROMBÓCITOS) COM PSEUDÓPODES -->
+  <g transform="translate(145, 105)">
+    <path d="M 0,0 C 8,-6 15,2 10,10 C 6,16 -4,12 -8,8 C -12,2 -6,-5 0,0 Z" fill="#c084fc" stroke="#1e293b" stroke-width="2"/>
+    <circle cx="1" cy="4" r="1.5" fill="#581c87"/>
+  </g>
+  <g transform="translate(255, 75)">
+    <path d="M 0,0 C 6,-4 10,2 8,7 C 4,12 -2,10 -5,6 C -7,2 -4,-3 0,0 Z" fill="#c084fc" stroke="#1e293b" stroke-width="2"/>
+    <circle cx="0" cy="3" r="1.5" fill="#581c87"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- CARD FLUTUANTE ESTILO KENHUB                   -->
+  <!-- ============================================== -->
+  <g transform="translate(160, 315)" filter="url(#bloodShadow)">
+    <rect x="0" y="0" width="230" height="52" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <circle cx="28" cy="26" r="14" fill="#fee2e2"/>
+    <!-- Ícone de Gota de Sangue -->
+    <path d="M 28,18 C 24,23 21,26 21,29 C 21,33 24,36 28,36 C 32,36 35,33 35,29 C 35,26 32,23 28,18 Z" fill="#ef4444"/>
+    
+    <text x="52" y="22" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#0f172a">
+      Esfregaço Sanguíneo
+    </text>
+    <text x="52" y="37" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="9.5" font-weight="500" fill="#64748b">
+      Eritrócito, Neutrófilo &amp; Plaquetas
+    </text>
+  </g>
+</svg>

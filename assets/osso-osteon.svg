@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 420" width="100%" height="100%">
+  <defs>
+    <radialGradient id="boneGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#fef9c3"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </radialGradient>
+
+    <filter id="boneShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Fundo Orgânico Suave -->
+  <path d="M 110,210 C 80,100 170,40 300,50 C 430,60 490,140 480,260 C 470,360 360,400 230,390 C 130,370 120,290 110,210 Z" fill="#fefce8" fill-opacity="0.8"/>
+
+  <!-- ============================================== -->
+  <!-- SISTEMA DE HAVERS / ÓSTEON (ESTILO KENHUB)     -->
+  <!-- ============================================== -->
+  <g transform="translate(270, 180)" filter="url(#boneShadow)">
+    
+    <!-- Círculo Externo do Ósteon (Linha Cimentante) -->
+    <circle cx="0" cy="0" r="120" fill="url(#boneGrad)" stroke="#1e293b" stroke-width="2.5"/>
+
+    <!-- LAMELAS ÓSSEAS CONCÊNTRICAS (ANÉIS DA MATRIZ MINERALIZADA) -->
+    <circle cx="0" cy="0" r="100" fill="none" stroke="#ca8a04" stroke-width="1.8" stroke-dasharray="6 4" opacity="0.6"/>
+    <circle cx="0" cy="0" r="80" fill="none" stroke="#ca8a04" stroke-width="1.8" stroke-dasharray="6 4" opacity="0.6"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#ca8a04" stroke-width="1.8" stroke-dasharray="6 4" opacity="0.6"/>
+    <circle cx="0" cy="0" r="42" fill="none" stroke="#ca8a04" stroke-width="1.8" stroke-dasharray="6 4" opacity="0.6"/>
+
+    <!-- CANAL DE HAVERS CENTRAL COM VASOS SANGUÍNEOS -->
+    <circle cx="0" cy="0" r="26" fill="#f1f5f9" stroke="#1e293b" stroke-width="2.5"/>
+    <!-- Artéria Capilar (Vermelha) -->
+    <circle cx="-8" cy="-4" r="9" fill="#ef4444" stroke="#1e293b" stroke-width="1.8"/>
+    <!-- Vênula Capilar (Azul) -->
+    <circle cx="8" cy="4" r="8" fill="#0284c7" stroke="#1e293b" stroke-width="1.8"/>
+    <!-- Filamento Nervoso (Amarelo) -->
+    <circle cx="-3" cy="11" r="3.5" fill="#eab308"/>
+
+    <!-- ============================================ -->
+    <!-- OSTEÓCITOS EM LACUNAS COM CANALÍCULOS RADIAIS-->
+    <!-- ============================================ -->
+    <!-- Anel 1 (raio 42) -->
+    <g transform="translate(42, 0) rotate(0)">
+      <ellipse cx="0" cy="0" rx="6" ry="3.5" fill="#6b21a8" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -10,-6 M 4,-2 L 10,-6 M -4,2 L -10,6 M 4,2 L 10,6" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(-42, 0) rotate(0)">
+      <ellipse cx="0" cy="0" rx="6" ry="3.5" fill="#6b21a8" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -10,-6 M 4,-2 L 10,-6 M -4,2 L -10,6 M 4,2 L 10,6" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(0, 42) rotate(90)">
+      <ellipse cx="0" cy="0" rx="6" ry="3.5" fill="#6b21a8" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -10,-6 M 4,-2 L 10,-6 M -4,2 L -10,6 M 4,2 L 10,6" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(0, -42) rotate(90)">
+      <ellipse cx="0" cy="0" rx="6" ry="3.5" fill="#6b21a8" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -10,-6 M 4,-2 L 10,-6 M -4,2 L -10,6 M 4,2 L 10,6" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+
+    <!-- Anel 2 (raio 75) -->
+    <g transform="translate(53, 53) rotate(45)">
+      <ellipse cx="0" cy="0" rx="6.5" ry="4" fill="#7e22ce" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -11,-7 M 4,-2 L 11,-7 M -4,2 L -11,7 M 4,2 L 11,7" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(-53, 53) rotate(-45)">
+      <ellipse cx="0" cy="0" rx="6.5" ry="4" fill="#7e22ce" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -11,-7 M 4,-2 L 11,-7 M -4,2 L -11,7 M 4,2 L 11,7" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(-53, -53) rotate(45)">
+      <ellipse cx="0" cy="0" rx="6.5" ry="4" fill="#7e22ce" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -11,-7 M 4,-2 L 11,-7 M -4,2 L -11,7 M 4,2 L 11,7" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(53, -53) rotate(-45)">
+      <ellipse cx="0" cy="0" rx="6.5" ry="4" fill="#7e22ce" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -11,-7 M 4,-2 L 11,-7 M -4,2 L -11,7 M 4,2 L 11,7" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+
+    <!-- Anel 3 (raio 100) -->
+    <g transform="translate(100, 0) rotate(0)">
+      <ellipse cx="0" cy="0" rx="7" ry="4" fill="#6b21a8" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -12,-8 M 4,-2 L 12,-8 M -4,2 L -12,8 M 4,2 L 12,8" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(-100, 0) rotate(0)">
+      <ellipse cx="0" cy="0" rx="7" ry="4" fill="#6b21a8" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -12,-8 M 4,-2 L 12,-8 M -4,2 L -12,8 M 4,2 L 12,8" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(0, 100) rotate(90)">
+      <ellipse cx="0" cy="0" rx="7" ry="4" fill="#6b21a8" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -12,-8 M 4,-2 L 12,-8 M -4,2 L -12,8 M 4,2 L 12,8" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+    <g transform="translate(0, -100) rotate(90)">
+      <ellipse cx="0" cy="0" rx="7" ry="4" fill="#6b21a8" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M -4,-2 L -12,-8 M 4,-2 L 12,-8 M -4,2 L -12,8 M 4,2 L 12,8" stroke="#ca8a04" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- CARD FLUTUANTE ESTILO KENHUB                   -->
+  <!-- ============================================== -->
+  <g transform="translate(150, 325)" filter="url(#boneShadow)">
+    <rect x="0" y="0" width="240" height="52" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <circle cx="28" cy="26" r="14" fill="#fefce8"/>
+    <!-- Ícone de Osso Minimalista -->
+    <path d="M 23,24 C 20,22 20,20 22,18 C 24,16 26,16 27,19 L 33,25 C 36,24 37,26 36,28 C 35,30 33,30 31,27 Z" fill="#ca8a04"/>
+    
+    <text x="52" y="22" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#0f172a">
+      Tecido Ósseo Compacto
+    </text>
+    <text x="52" y="37" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="9.5" font-weight="500" fill="#64748b">
+      Sistema de Havers &amp; Osteócitos
+    </text>
+  </g>
+</svg>

@@ -736,6 +736,8 @@ html[data-theme="dark"] #heroTitleBoxBg {
   box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.85) !important;
 }
 
+
+
 /* Card Principal de Histologia no Tema Escuro Preto (Ônix & Dourado Clássico) */
 html[data-theme="dark"] #cardDestaqueHistologia {
   background: linear-gradient(135deg, #171510 0%, #111114 55%, #0b0b0e 100%) !important;
@@ -757,6 +759,50 @@ html[data-theme="dark"] #cardDestaqueHistologia .bg-sky-500 {
 }
 html[data-theme="dark"] #cardDestaqueHistologia:hover .bg-sky-500 {
   background-color: #e5c158 !important;
+}
+
+/* Vitrine Hero de Lâminas: Ônix Puro e Zero Névoa Azulada */
+#heroSlideShowcase {
+  background-color: #060608 !important;
+}
+html[data-theme="dark"] #heroSlideShowcase {
+  background-color: #060608 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.95) !important;
+}
+html[data-theme="dark"] #heroSlideShowcase:hover {
+  border-color: rgba(212, 175, 55, 0.35) !important;
+}
+
+/* Categoria da Vitrine (ex: Histologia • Epitelial): Fonte fina e branca pura */
+#vitrineCategory {
+  color: #ffffff !important;
+  font-weight: 300 !important;
+  letter-spacing: 0.14em !important;
+}
+html[data-theme="dark"] #vitrineCategory {
+  color: #ffffff !important;
+  font-weight: 300 !important;
+}
+
+/* Gaveta Teórico-Prática de Tópicos (#histoSubCatalog): Navegação Fixa e Painel Editorial */
+#histoSubCatalog aside {
+  position: sticky;
+  top: 5rem;
+}
+
+html[data-theme="dark"] #histoSubCatalog .bg-white {
+  background-color: #0c0c0f !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+
+html[data-theme="dark"] #histoSubCatalog .prose-editor {
+  color: #d4d4d8 !important;
+}
+
+html[data-theme="dark"] #histoSubCatalog .prose-editor strong,
+html[data-theme="dark"] #histoSubCatalog .prose-editor b {
+  color: #ffffff !important;
 }
 
 /* Superfícies e Cards (Ônix Escuro #101013) */
@@ -1134,4 +1180,189 @@ html[data-theme="light"] #histoMicroscope #microscopeText {
   color: #334155 !important;
 }
 
+/* ==========================================================================
+   11. ACCORDION DE DISCIPLINAS NA HOME (TEMA CLARO & TEMA ESCURO ÔNIX/DOURADO)
+   ========================================================================== */
+
+/* Container Principal do Accordion */
+#accordionContainerHistologia,
+#accordionContainerOutras {
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-top: 3px solid #0284c7;
+  background-color: #ffffff;
+  box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.08);
+}
+
+/* No Tema Escuro: Ônix Nobre (#0c0c10) & Dourado Clássico (#D4AF37) */
+html[data-theme="dark"] #accordionContainerHistologia,
+html[data-theme="dark"] #accordionContainerOutras {
+  background: linear-gradient(180deg, #111116 0%, #09090d 100%) !important;
+  border: 1px solid rgba(212, 175, 55, 0.22) !important;
+  border-top: 3px solid #d4af37 !important;
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.92), 0 0 35px -10px rgba(212, 175, 55, 0.09) !important;
+}
+
+/* Cabeçalho do Accordion */
+.accordion-header-band {
+  background-color: rgba(248, 250, 252, 0.85);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+html[data-theme="dark"] .accordion-header-band {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Badge do Sumário */
+.accordion-badge {
+  background-color: rgba(2, 132, 199, 0.08);
+  color: #0369a1;
+  border: 1px solid rgba(2, 132, 199, 0.2);
+}
+html[data-theme="dark"] .accordion-badge {
+  background-color: rgba(212, 175, 55, 0.1) !important;
+  color: #d4af37 !important;
+  border: 1px solid rgba(212, 175, 55, 0.25) !important;
+}
+
+/* Linhas / Itens do Accordion */
+.accordion-item-row {
+  border-bottom: 1px solid rgba(241, 245, 249, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.accordion-item-row:last-child {
+  border-bottom: none;
+}
+.accordion-item-row:hover {
+  background-color: rgba(240, 249, 255, 0.7);
+}
+html[data-theme="dark"] .accordion-item-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045) !important;
+}
+html[data-theme="dark"] .accordion-item-row:last-child {
+  border-bottom: none !important;
+}
+html[data-theme="dark"] .accordion-item-row:hover {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.02) 60%, transparent 100%) !important;
+}
+
+/* Filete vertical de destaque no hover da linha */
+.accordion-item-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+.accordion-item-row:hover::before {
+  background: #0284c7;
+}
+html[data-theme="dark"] .accordion-item-row:hover::before {
+  background: #d4af37 !important;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.6) !important;
+}
+
+/* Número do Módulo (01, 02...) */
+.accordion-num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  color: #0284c7;
+  transition: color 0.15s ease;
+  width: 1.6rem;
+  letter-spacing: 0.04em;
+}
+html[data-theme="dark"] .accordion-num {
+  color: #d4af37 !important;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.25) !important;
+}
+
+/* Barra vertical separadora "|" */
+.accordion-sep {
+  height: 1.125rem;
+  width: 1px;
+  background-color: rgba(203, 213, 225, 0.8);
+  transition: background-color 0.15s ease;
+}
+html[data-theme="dark"] .accordion-sep {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+html[data-theme="dark"] .accordion-item-row:hover .accordion-sep {
+  background-color: rgba(212, 175, 55, 0.45) !important;
+}
+
+/* Título do Tópico */
+.accordion-title {
+  color: #0f172a;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.accordion-item-row:hover .accordion-title {
+  color: #0369a1;
+  transform: translateX(2px);
+}
+html[data-theme="dark"] .accordion-title {
+  color: #e4e4e7 !important;
+}
+html[data-theme="dark"] .accordion-item-row:hover .accordion-title {
+  color: #ffffff !important;
+  text-shadow: 0 0 16px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Botão Quadrado com Chevron (>) à Direita */
+.accordion-action-btn {
+  width: 2.35rem;
+  height: 2.35rem;
+  background-color: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.accordion-item-row:hover .accordion-action-btn {
+  background-color: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+  transform: translateX(2px);
+  box-shadow: 0 4px 12px -2px rgba(2, 132, 199, 0.35);
+}
+html[data-theme="dark"] .accordion-action-btn {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #a1a1aa !important;
+}
+html[data-theme="dark"] .accordion-item-row:hover .accordion-action-btn {
+  background-color: #d4af37 !important;
+  border-color: #d4af37 !important;
+  color: #09090b !important;
+  transform: translateX(3px) scale(1.05) !important;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.45) !important;
+}
+
+/* Botão Recolher */
+.accordion-btn-recolher {
+  color: #64748b;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  transition: all 0.15s ease;
+}
+.accordion-btn-recolher:hover {
+  color: #0f172a;
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+}
+html[data-theme="dark"] .accordion-btn-recolher {
+  color: #a1a1aa !important;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] .accordion-btn-recolher:hover {
+  color: #d4af37 !important;
+  background-color: rgba(212, 175, 55, 0.1) !important;
+  border-color: rgba(212, 175, 55, 0.35) !important;
+}
 
