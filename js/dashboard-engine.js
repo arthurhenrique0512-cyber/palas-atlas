@@ -172,6 +172,8 @@ export async function carregarListaDeAssets(forcar = false) {
     console.warn("[Palas Atlas CMS] Falha ao carregar lista dinâmica de assets:", err);
     seletor.innerHTML = `
       <option value="">(Selecione ou digite o caminho)</option>
+      <option value="assets/histologia/osso_maduro_desgaste_ct_3.0.dzi">Osso Maduro Desgaste 3.0 HD (40x DZI)</option>
+      <option value="assets/histologia/osso_maduro_desgaste_ct_2.0.dzi">Osso Maduro Desgaste 2.0 (10x DZI)</option>
       <option value="assets/histologia/osso_maduro_desgaste_ct.dzi">Osso Maduro Desgaste (DZI)</option>
       <option value="assets/histologia/epitelio-simples-escamoso.dzi">Epitélio Simples Escamoso (DZI)</option>
       <option value="assets/histologia/lamina-real1.dzi">Lâmina Real 1 (DZI)</option>
