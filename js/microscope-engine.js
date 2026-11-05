@@ -22,15 +22,19 @@ import { removerConteudoPerigoso, sanitizarHTMLDescricao } from "./sanitizer.js"
 // ---------------------------------------------------------------------------
 // Estado do modulo
 // ---------------------------------------------------------------------------
-let viewer       = null;
-let listaPinosAtual = [];
-let listaQuestoesAtual = [];
-let questaoAtivaId = null;
-let overlayQuestaoAtiva = null;
-let laminaAtualData = null;
-let pinAtivo     = null;
-let homeZoomRef   = null; // Zoom de referencia para enquadramento geral (4x)
-let nativeZoomRef = null; // Zoom de referencia para resolucao nativa 1:1 da camera (maxMag)
+let viewer                  = null;
+let listaPinosAtual         = [];
+let listaQuestoesAtual      = [];
+let questaoAtivaId          = null;
+let overlayQuestaoAtiva     = null;
+let overlayPinAtivo         = null;
+let laminaAtualData         = null;
+let pinAtivo                = null;
+let homeZoomRef              = null; // Zoom de referencia para enquadramento geral (4x)
+let nativeZoomRef            = null; // Zoom de referencia para resolucao nativa 1:1 da camera (maxMag)
+let _delegacaoPinosRegistrada = false;
+let abaAtivaPainel          = "descricao";
+const debounceTimersRespostas = {};
 
 // Motor do Microscópio: Interatividade completa e ampliação profunda ativa
 const LAMINA_ESTATICA = false;
@@ -471,12 +475,6 @@ function iniciarMicroscopio() {
   registrarDelegacaoGlobalDePinos();
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", iniciarMicroscopio);
-} else {
-  iniciarMicroscopio();
-}
-
 // ---------------------------------------------------------------------------
 // 2. Carrega a lamina pelo ID (Instantâneo no Acervo Base + Firestore)
 // ---------------------------------------------------------------------------
@@ -709,8 +707,6 @@ function renderizarDescricaoETextos() {
 // ---------------------------------------------------------------------------
 // 4.5 Abas do Painel Lateral e Questões Práticas de Bancada
 // ---------------------------------------------------------------------------
-let abaAtivaPainel = "descricao";
-const debounceTimersRespostas = {};
 
 /**
  * Alterna a visualização entre a aba de Descrição Morfológica e a aba de Questões de Bancada.
@@ -1576,7 +1572,6 @@ function aplicarBloqueioObjetivas(maxMag) {
 // ---------------------------------------------------------------------------
 // 7. Delegacao global de eventos para pin-link no texto descritivo
 // ---------------------------------------------------------------------------
-let _delegacaoPinosRegistrada = false;
 function registrarDelegacaoGlobalDePinos() {
   if (_delegacaoPinosRegistrada) return;
   _delegacaoPinosRegistrada = true;
@@ -1591,7 +1586,6 @@ function registrarDelegacaoGlobalDePinos() {
                      alvo.textContent?.trim();
     if (!pinIdRaw) return;
     evento.preventDefault();
-    evento.stopPropagation();
 
     // Feedback visual imediato e tátil no link clicado
     alvo.classList.add("ring-2", "ring-[#c8ad5f]", "ring-offset-2", "ring-offset-neutral-950", "rounded");
@@ -1606,8 +1600,6 @@ function registrarDelegacaoGlobalDePinos() {
 // ---------------------------------------------------------------------------
 // 8. Foca o pino no viewer com zoom real e centralização precisa
 // ---------------------------------------------------------------------------
-let overlayPinAtivo = null;
-
 export function focarPinoNoViewer(pinIdRaw) {
   if (!viewer || !viewer.viewport || !window.OpenSeadragon) {
     console.warn("[Palas Atlas] Viewer OpenSeadragon não inicializado ao tentar focar pino.");
@@ -2138,3 +2130,15 @@ export {
   carregarLaminaNoMicroscopio as carregarLaminaPorId,
   aplicarEstadoSidebar
 };
+
+// ---------------------------------------------------------------------------
+// 12. Inicializacao do ciclo de vida
+// ---------------------------------------------------------------------------
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciarMicroscopio);
+  } else {
+    iniciarMicroscopio();
+  }
+}
+
