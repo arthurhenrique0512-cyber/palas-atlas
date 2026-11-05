@@ -1366,3 +1366,99 @@ html[data-theme="dark"] .accordion-btn-recolher:hover {
   border-color: rgba(212, 175, 55, 0.35) !important;
 }
 
+/* ==========================================================================
+   NOVA HOME PAGE — RECURSOS DE PORTAL WEB (LIGHT & DARK MODE)
+   ========================================================================== */
+
+/* Navbar Desktop Links */
+#desktopNavLinks a {
+  position: relative;
+  transition: all 0.2s ease;
+}
+#desktopNavLinks a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #0284c7;
+  transition: width 0.2s ease;
+}
+#desktopNavLinks a:hover::after {
+  width: 100%;
+}
+html[data-theme="dark"] #desktopNavLinks a {
+  color: #94a3b8 !important;
+}
+html[data-theme="dark"] #desktopNavLinks a:hover {
+  color: #38bdf8 !important;
+}
+html[data-theme="dark"] #desktopNavLinks a::after {
+  background-color: #38bdf8 !important;
+}
+
+/* Faixa de Métricas (Stats Bar) */
+html[data-theme="dark"] #secaoMetricas {
+  background-color: #0b1120 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] .stat-num {
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .stat-icon-box {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Cards de Lâminas Populares */
+.popular-slide-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[data-theme="dark"] .popular-slide-card {
+  background-color: #101014 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] .popular-slide-card:hover {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5) !important;
+}
+html[data-theme="dark"] .popular-slide-card h3 {
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .popular-slide-card p {
+  color: #94a3b8 !important;
+}
+
+/* Pilares / Recursos */
+html[data-theme="dark"] #secaoRecursosPlataforma {
+  background-color: #07090e !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] .feature-card {
+  background-color: #101014 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] .feature-card:hover {
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5) !important;
+}
+html[data-theme="dark"] .feature-card h3 {
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .feature-card p {
+  color: #94a3b8 !important;
+}
+
+/* FAQ Acordeão */
+html[data-theme="dark"] .faq-item {
+  background-color: #101014 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] .faq-item button span {
+  color: #f1f5f9 !important;
+}
+html[data-theme="dark"] .faq-item .faq-content {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  color: #94a3b8 !important;
+}
+

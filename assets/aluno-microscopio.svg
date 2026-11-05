@@ -1,0 +1,360 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="100%">
+  <defs>
+    <!-- Gradientes Oficiais Palas Atlas -->
+    <linearGradient id="palasSky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <linearGradient id="palasNavy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <linearGradient id="palasGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#d4af37"/>
+    </linearGradient>
+
+    <linearGradient id="heStainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#7e22ce"/>
+    </linearGradient>
+
+    <linearGradient id="lightBeam" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.45"/>
+      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0"/>
+    </linearGradient>
+
+    <linearGradient id="bgBlobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#f8fafc" stop-opacity="0.1"/>
+    </linearGradient>
+
+    <!-- Sombras Suaves -->
+    <filter id="softCardShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.07"/>
+    </filter>
+
+    <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0284c7" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <!-- ============================================== -->
+  <!-- 1. FUNDO ATMOSFÉRICO & GRADE ACADÊMICA         -->
+  <!-- ============================================== -->
+  <!-- Mancha / Fundo Orgânico Suave -->
+  <path d="M 110,220 C 80,100 200,40 380,35 C 550,30 680,90 700,210 C 720,340 610,440 420,450 C 240,460 140,350 110,220 Z" fill="url(#bgBlobGrad)"/>
+
+  <!-- Grade Fina de Pontos Científicos -->
+  <g fill="#94a3b8" opacity="0.32">
+    <circle cx="50" cy="60" r="2.5"/><circle cx="80" cy="60" r="2.5"/><circle cx="110" cy="60" r="2.5"/>
+    <circle cx="50" cy="90" r="2.5"/><circle cx="80" cy="90" r="2.5"/><circle cx="110" cy="90" r="2.5"/>
+    <circle cx="50" cy="120" r="2.5"/><circle cx="80" cy="120" r="2.5"/><circle cx="110" cy="120" r="2.5"/>
+
+    <circle cx="670" cy="60" r="2.5"/><circle cx="700" cy="60" r="2.5"/><circle cx="730" cy="60" r="2.5"/>
+    <circle cx="670" cy="90" r="2.5"/><circle cx="700" cy="90" r="2.5"/><circle cx="730" cy="90" r="2.5"/>
+    <circle cx="670" cy="120" r="2.5"/><circle cx="700" cy="120" r="2.5"/><circle cx="730" cy="120" r="2.5"/>
+  </g>
+
+  <!-- Partículas / Brilhos Flutuantes (Gold & Sky) -->
+  <g opacity="0.85">
+    <path d="M 75,180 Q 75,188 83,188 Q 75,188 75,196 Q 75,188 67,188 Q 75,188 75,180 Z" fill="#d4af37"/>
+    <path d="M 695,190 Q 695,197 702,197 Q 695,197 695,204 Q 695,197 688,197 Q 695,197 695,190 Z" fill="#d4af37"/>
+    <circle cx="640" cy="75" r="4.5" fill="#38bdf8" opacity="0.7"/>
+    <circle cx="240" cy="55" r="3.5" fill="#38bdf8" opacity="0.6"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- 2. BANCADA DO LABORATÓRIO                      -->
+  <!-- ============================================== -->
+  <g id="labBench">
+    <rect x="30" y="375" width="740" height="18" rx="4" fill="#ffffff" stroke="#1e293b" stroke-width="2" filter="url(#softCardShadow)"/>
+    <rect x="32" y="389" width="736" height="4" rx="2" fill="#0284c7"/>
+    <rect x="55" y="393" width="34" height="95" fill="#f1f5f9" stroke="#1e293b" stroke-width="2"/>
+    <rect x="710" y="393" width="34" height="95" fill="#f1f5f9" stroke="#1e293b" stroke-width="2"/>
+    <line x1="30" y1="488" x2="770" y2="488" stroke="#cbd5e1" stroke-width="2"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- 3. VIDRARIAS E REAGENTES (LADO ESQUERDO)       -->
+  <!-- ============================================== -->
+  <g id="glassware" transform="translate(55, 300)">
+    <path d="M 25,22 L 31,22 L 31,34 L 44,66 C 46,70 43,74 38,74 L 10,74 C 5,74 2,70 4,66 L 17,34 L 17,22 Z" fill="#ffffff" stroke="#1e293b" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 9,72 L 39,72 C 41,72 42,70 41,68 L 35,54 C 32,52 28,56 24,54 C 20,52 16,56 13,54 L 7,68 C 6,70 7,72 9,72 Z" fill="#38bdf8" opacity="0.75"/>
+    <line x1="15" y1="42" x2="12" y2="50" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+
+    <g transform="translate(55, 24)">
+      <rect x="0" y="42" width="54" height="8" rx="2" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.8"/>
+      <rect x="0" y="22" width="54" height="5" rx="1.5" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.8"/>
+      <line x1="6" y1="27" x2="6" y2="42" stroke="#1e293b" stroke-width="2"/>
+      <line x1="48" y1="27" x2="48" y2="42" stroke="#1e293b" stroke-width="2"/>
+
+      <rect x="10" y="8" width="7.5" height="36" rx="3.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.5"/>
+      <rect x="11.5" y="22" width="4.5" height="20" rx="2" fill="#f43f5e" opacity="0.85"/>
+
+      <rect x="23" y="4" width="7.5" height="40" rx="3.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.5"/>
+      <rect x="24.5" y="16" width="4.5" height="26" rx="2" fill="#7e22ce" opacity="0.85"/>
+
+      <rect x="36" y="10" width="7.5" height="34" rx="3.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.5"/>
+      <rect x="37.5" y="26" width="4.5" height="16" rx="2" fill="#0ea5e9" opacity="0.8"/>
+    </g>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- 4. BANQUETA MODERNA DO ALUNO                   -->
+  <!-- ============================================== -->
+  <g id="stool" transform="translate(465, 365)">
+    <ellipse cx="42" cy="18" rx="36" ry="9" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+    <ellipse cx="42" cy="15" rx="36" ry="7" fill="#334155"/>
+    <line x1="20" y1="22" x2="10" y2="120" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+    <line x1="42" y1="24" x2="42" y2="120" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="64" y1="22" x2="74" y2="120" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 16,85 Q 42,95 68,85" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- 5. O MICROSCÓPIO ÓPTICO PROFISSIONAL           -->
+  <!-- ============================================== -->
+  <g id="microscope" transform="translate(190, 100)">
+    
+    <!-- Feixe de Luz Transmitida Sub-platina -->
+    <polygon points="125,248 155,248 150,188 130,188" fill="url(#lightBeam)"/>
+
+    <!-- Base Sólida do Microscópio -->
+    <path d="M 40,270 C 40,248 60,242 95,242 L 185,242 C 220,242 240,248 240,270 L 250,274 C 250,277 245,280 235,280 L 45,280 C 35,280 30,277 30,274 Z" fill="#1e293b" stroke="#0f172a" stroke-width="2.5" filter="url(#softCardShadow)"/>
+    <rect x="60" y="280" width="18" height="4" rx="2" fill="#0284c7"/>
+    <rect x="200" y="280" width="18" height="4" rx="2" fill="#0284c7"/>
+
+    <!-- Fonte de Luz Embutida na Base -->
+    <rect x="125" y="238" width="30" height="9" rx="2.5" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+    <ellipse cx="140" cy="238" rx="10" ry="2.5" fill="#38bdf8"/>
+
+    <!-- Condensador Sub-platina com Diafragma Íris -->
+    <path d="M 127,214 L 153,214 L 149,228 L 131,228 Z" fill="#475569" stroke="#1e293b" stroke-width="2"/>
+    <circle cx="155" cy="220" r="2.5" fill="#d4af37"/>
+
+    <!-- Braço Curvo do Estativo -->
+    <path d="M 80,245 L 80,135 C 80,80 110,40 170,40 L 185,40" fill="none" stroke="#0f172a" stroke-width="22" stroke-linecap="round"/>
+    <path d="M 80,245 L 80,135 C 80,80 110,40 170,40 L 185,40" fill="none" stroke="#1e293b" stroke-width="16" stroke-linecap="round"/>
+    <path d="M 80,245 L 80,135 C 80,80 110,40 170,40 L 185,40" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+
+    <!-- Parafuso Coaxial Macrométrico & Micrométrico de Foco -->
+    <g transform="translate(80, 185)">
+      <circle cx="0" cy="0" r="19" fill="#334155" stroke="#1e293b" stroke-width="2.5"/>
+      <circle cx="0" cy="0" r="12" fill="#0284c7" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="0" cy="0" r="5" fill="#d4af37"/>
+    </g>
+
+    <!-- Platina Mecânica (Mesa com Charriot) -->
+    <rect x="75" y="178" width="130" height="11" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+    <rect x="78" y="180" width="124" height="3" fill="#334155"/>
+    <rect x="92" y="189" width="5" height="14" rx="1.5" fill="#64748b" stroke="#1e293b" stroke-width="1.5"/>
+
+    <!-- A LÂMINA HISTOLÓGICA SENDO ANALISADA -->
+    <g id="glassSlide">
+      <rect x="100" y="172" width="80" height="7.5" rx="1.5" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+      <rect x="128" y="170.5" width="24" height="10" rx="1" fill="#bae6fd" stroke="#0284c7" stroke-width="1" opacity="0.9"/>
+      <ellipse cx="140" cy="175.5" rx="8" ry="3" fill="url(#heStainGrad)"/>
+      <circle cx="137" cy="175" r="1.3" fill="#3b0764"/>
+      <circle cx="143" cy="176" r="1.1" fill="#3b0764"/>
+      <path d="M 98,174 L 112,170 L 124,173" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Revólver Porta-Objetivas Quádruplo -->
+    <path d="M 122,102 L 158,102 L 153,118 L 127,118 Z" fill="#334155" stroke="#1e293b" stroke-width="2"/>
+    
+    <!-- Objetiva 1 (40x com Anel Azul Palas) -->
+    <g transform="translate(133, 118)">
+      <rect x="0" y="0" width="14" height="32" rx="2" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+      <rect x="0" y="16" width="14" height="3.5" fill="#0284c7"/>
+      <rect x="0" y="21" width="14" height="1.8" fill="#d4af37"/>
+      <line x1="2" y1="32" x2="12" y2="32" stroke="#1e293b" stroke-width="2"/>
+    </g>
+
+    <!-- Objetiva 2 (Secundária: 10x com Anel Amarelo) -->
+    <g transform="translate(149, 115) rotate(28)">
+      <rect x="0" y="0" width="11" height="24" rx="2" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.8"/>
+      <rect x="0" y="11" width="11" height="3.5" fill="#facc15"/>
+    </g>
+
+    <!-- Objetiva 3 (Secundária: 100x com Anel Vermelho) -->
+    <g transform="translate(123, 115) rotate(-28)">
+      <rect x="-9" y="0" width="11" height="24" rx="2" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.8"/>
+      <rect x="-9" y="11" width="11" height="3.5" fill="#f43f5e"/>
+    </g>
+
+    <!-- Cabeçote Binocular Apontando Diretamente para o Aluno -->
+    <g id="binocularHead">
+      <path d="M 140,102 L 178,40" stroke="#0f172a" stroke-width="16" stroke-linecap="round"/>
+      <path d="M 140,102 L 178,40" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
+      
+      <rect x="168" y="23" width="36" height="26" rx="6" fill="#1e293b" stroke="#0f172a" stroke-width="2.2" transform="rotate(-22 186 36)"/>
+      <circle cx="186" cy="36" r="4" fill="#0284c7"/>
+
+      <g transform="translate(191, 26) rotate(-22)">
+        <rect x="0" y="0" width="26" height="13" rx="2.5" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+        <rect x="7" y="0" width="4" height="13" fill="#0284c7"/>
+        <path d="M 26,-2 L 34,-4 L 34,17 L 26,15 Z" fill="#1e293b"/>
+        <ellipse cx="34" cy="6.5" rx="1.8" ry="7.5" fill="#38bdf8"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- 6. O ESTUDANTE / CIENTISTA (CARTOON LIMPO)     -->
+  <!-- ============================================== -->
+  <g id="studentScientist">
+
+    <!-- Pernas Sentadas na Banqueta (Calça Navy) -->
+    <g id="legs">
+      <!-- Perna Esquerda (Traseira) -->
+      <path d="M 505,350 C 480,355 455,373 440,405 L 432,460 L 456,460 L 464,415 C 472,393 492,383 515,380 Z" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <ellipse cx="444" cy="462" rx="17" ry="6.5" fill="#0f172a"/>
+
+      <!-- Perna Direita (Frontal) -->
+      <path d="M 525,355 C 495,360 470,377 455,410 L 448,465 L 474,465 L 482,420 C 492,397 515,387 540,385 Z" fill="#1e293b" stroke="#0f172a" stroke-width="1.8"/>
+      <ellipse cx="460" cy="467" rx="18" ry="7" fill="#0f172a"/>
+    </g>
+
+    <!-- Braço Esquerdo (Traseiro - Apoiado na Bancada) -->
+    <g id="leftArm">
+      <path d="M 500,205 Q 490,270 460,320" fill="none" stroke="#1e293b" stroke-width="24" stroke-linecap="round"/>
+      <path d="M 500,205 Q 490,270 460,320" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
+      <path d="M 460,320 Q 435,355 390,370" fill="none" stroke="#1e293b" stroke-width="22" stroke-linecap="round"/>
+      <path d="M 460,320 Q 435,355 390,370" fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+      <ellipse cx="390" cy="370" rx="6" ry="10" fill="#ffffff" stroke="#1e293b" stroke-width="1.8" transform="rotate(25 390 370)"/>
+      <ellipse cx="379" cy="372" rx="9" ry="7" fill="#fed7aa" stroke="#1e293b" stroke-width="1.5"/>
+      <circle cx="373" cy="371" r="3.5" fill="#fed7aa"/>
+    </g>
+
+    <!-- Tronco com Jaleco Branco Profissional -->
+    <g id="torso">
+      <!-- Jaleco Branco -->
+      <path d="M 435,170 C 420,215 415,280 430,365 L 530,365 C 545,300 540,225 520,170 Z" fill="#ffffff" stroke="#1e293b" stroke-width="2.2"/>
+      
+      <!-- Gola e Camisa Azul Palas -->
+      <polygon points="460,165 490,165 480,205 470,205" fill="#0284c7" stroke="#1e293b" stroke-width="1.5"/>
+      
+      <!-- Lapelas do Jaleco Branco -->
+      <path d="M 450,165 L 472,240 L 472,365" fill="none" stroke="#1e293b" stroke-width="2"/>
+      <path d="M 505,165 L 484,240 L 484,365" fill="none" stroke="#1e293b" stroke-width="2"/>
+
+      <!-- Bolso do Jaleco com Detalhe Palas Gold e Caneta -->
+      <rect x="440" y="260" width="24" height="28" rx="3" fill="#f8fafc" stroke="#1e293b" stroke-width="1.8"/>
+      <line x1="442" y1="260" x2="462" y2="260" stroke="#d4af37" stroke-width="2.5"/>
+      <rect x="452" y="252" width="3.5" height="12" rx="1.5" fill="#0284c7" stroke="#1e293b" stroke-width="1"/>
+    </g>
+
+    <!-- Braço Direito (Frontal - Ajustando a Lâmina e Foco) -->
+    <g id="rightArm">
+      <!-- Braço com Contorno Escuro Sólido -->
+      <path d="M 440,190 Q 420,220 410,255" fill="none" stroke="#1e293b" stroke-width="24" stroke-linecap="round"/>
+      <path d="M 440,190 Q 420,220 410,255" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
+
+      <path d="M 410,255 Q 375,255 340,265" fill="none" stroke="#1e293b" stroke-width="22" stroke-linecap="round"/>
+      <path d="M 410,255 Q 375,255 340,265" fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+
+      <ellipse cx="340" cy="265" rx="6" ry="10" fill="#ffffff" stroke="#1e293b" stroke-width="1.8" transform="rotate(-15 340 265)"/>
+      
+      <!-- Mão em Pinça com Contorno Limpo -->
+      <circle cx="328" cy="267" r="8.5" fill="#fed7aa" stroke="#1e293b" stroke-width="1.5"/>
+      <path d="M 330,263 Q 319,264 315,269 Q 321,273 330,271" fill="#fed7aa" stroke="#1e293b" stroke-width="1.2"/>
+    </g>
+
+    <!-- Cabeça, Rosto e Expressão Alinhada aos Oculares -->
+    <g id="head" transform="translate(405, 90)">
+      <!-- Pescoço Proporcional -->
+      <path d="M 35,55 L 33,76 L 50,76 L 52,55 Z" fill="#fed7aa" stroke="#1e293b" stroke-width="1.8"/>
+
+      <!-- Cabelo - Coque Traseiro Moderno -->
+      <circle cx="76" cy="38" r="22" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+      <ellipse cx="79" cy="34" r="14" ry="18" fill="#0f172a"/>
+
+      <!-- Cabeça / Rosto Atento e Curioso -->
+      <ellipse cx="38" cy="45" rx="26" ry="28" fill="#fed7aa" stroke="#1e293b" stroke-width="2"/>
+
+      <!-- Cabelo - Franja e Volume -->
+      <path d="M 14,40 C 14,16 33,8 56,11 C 68,15 73,30 71,46 C 64,25 48,22 30,29 C 20,34 16,38 14,40 Z" fill="#1e293b"/>
+      <path d="M 64,30 C 68,38 66,50 61,56 C 59,50 61,38 64,30 Z" fill="#334155"/>
+
+      <!-- Olho Atento Alinhado com a Ocular -->
+      <path d="M 21,41 Q 28,35 34,41" fill="none" stroke="#1e293b" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="28" cy="40" r="1.3" fill="#ffffff"/>
+      <!-- Sobrancelha Calma e Focada -->
+      <path d="M 20,33 Q 28,28 35,32" fill="none" stroke="#1e293b" stroke-width="2.2" stroke-linecap="round"/>
+
+      <!-- Bochecha Corada Suave -->
+      <circle cx="23" cy="50" r="5" fill="#fca5a5" opacity="0.75"/>
+
+      <!-- Nariz Minimalista -->
+      <path d="M 14,44 Q 12,49 16,50" fill="none" stroke="#1e293b" stroke-width="1.8" stroke-linecap="round"/>
+
+      <!-- Sorriso Gentil de Descoberta Científica -->
+      <path d="M 18,57 Q 24,65 32,58" fill="none" stroke="#1e293b" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M 20,58 Q 24,62 30,59" fill="#f43f5e" opacity="0.6"/>
+    </g>
+
+  </g>
+
+  <!-- ============================================== -->
+  <!-- 7. LENTE FLUTUANTE DE AUMENTO (O QUE SE VÊ)   -->
+  <!-- Células coradas em H&E no canto superior esq.  -->
+  <!-- ============================================== -->
+  <!-- Linha Conectora Pontilhada (Lâmina -> Zoom) -->
+  <path d="M 330,270 C 265,220 220,180 170,130" fill="none" stroke="#0284c7" stroke-width="2" stroke-dasharray="4 4" opacity="0.75"/>
+  <circle cx="330" cy="270" r="3.5" fill="#0284c7"/>
+
+  <g id="histologyZoomWindow" transform="translate(80, 25)" filter="url(#softCardShadow)">
+    
+    <!-- Anel de Lente Branco com Borda Azul -->
+    <circle cx="68" cy="68" r="62" fill="#ffffff" stroke="#1e293b" stroke-width="2.2"/>
+    <circle cx="68" cy="68" r="58" fill="#fff5f7"/> <!-- Fundo Eosina Pastel -->
+    <circle cx="68" cy="68" r="58" fill="none" stroke="#0284c7" stroke-width="3"/>
+
+    <!-- Clip Path Circular -->
+    <g clip-path="url(#lensClip)">
+      <clipPath id="lensClip">
+        <circle cx="68" cy="68" r="56.5"/>
+      </clipPath>
+
+      <!-- Retículo Óptico Sutil -->
+      <line x1="12" y1="68" x2="124" y2="68" stroke="#0284c7" stroke-width="0.8" stroke-dasharray="2 4" opacity="0.4"/>
+      <line x1="68" y1="12" x2="68" y2="124" stroke="#0284c7" stroke-width="0.8" stroke-dasharray="2 4" opacity="0.4"/>
+
+      <!-- CÉLULAS HISTOLÓGICAS CARTOON H&E -->
+      <!-- Célula Central Principal -->
+      <path d="M 40,46 C 60,34 88,38 98,56 C 108,74 92,96 72,96 C 50,96 36,80 34,64 C 32,50 36,48 40,46 Z" fill="#fecdd3" stroke="#f43f5e" stroke-width="2"/>
+      <!-- Núcleo Basófilo de Hematoxilina -->
+      <ellipse cx="70" cy="68" rx="11" ry="13" fill="#6b21a8"/>
+      <circle cx="66" cy="64" r="2.8" fill="#ffffff" opacity="0.9"/>
+      <circle cx="73" cy="72" r="1.3" fill="#3b0764"/>
+
+      <!-- Célula 2 (Superior Esquerda) -->
+      <path d="M 18,22 C 34,12 52,22 49,38 C 46,52 30,56 16,50 C 5,43 7,28 18,22 Z" fill="#ffe4e6" stroke="#fb7185" stroke-width="1.6"/>
+      <ellipse cx="30" cy="34" rx="6.5" ry="7.5" fill="#7e22ce" opacity="0.85"/>
+      <circle cx="28" cy="32" r="1.6" fill="#ffffff"/>
+
+      <!-- Célula 3 (Inferior Direita) -->
+      <path d="M 88,88 C 104,78 120,88 122,104 C 124,118 106,124 94,118 C 83,112 81,96 88,88 Z" fill="#ffe4e6" stroke="#fb7185" stroke-width="1.6"/>
+      <ellipse cx="104" cy="104" rx="6.5" ry="8.5" fill="#7e22ce" opacity="0.85"/>
+
+      <!-- Célula 4 (Superior Direita) -->
+      <path d="M 78,22 C 96,16 114,24 112,42 C 110,54 93,56 80,46 C 71,38 71,26 78,22 Z" fill="#fecdd3" stroke="#f43f5e" stroke-width="1.6"/>
+      <ellipse cx="96" cy="34" rx="7.5" ry="8.5" fill="#6b21a8" opacity="0.9"/>
+      <circle cx="94" cy="32" r="1.8" fill="#ffffff"/>
+    </g>
+
+    <!-- Badge Flutuante de Identificação -->
+    <g transform="translate(12, 120)" filter="url(#badgeShadow)">
+      <rect x="0" y="0" width="112" height="23" rx="11.5" fill="#0f172a" stroke="#0284c7" stroke-width="1.4"/>
+      <circle cx="11" cy="11.5" r="3.2" fill="#d4af37"/>
+      <text x="22" y="15" font-family="'Plus Jakarta Sans', Inter, system-ui, sans-serif" font-size="10" font-weight="700" fill="#ffffff" letter-spacing="0.5">
+        Lâmina H&amp;E • 40x
+      </text>
+    </g>
+  </g>
+
+</svg>
