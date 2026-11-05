@@ -342,6 +342,14 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
       .where("status", "==", "ativa")
       .onSnapshot((snapshot) => {
         let laminasDoTopico = [];
+        const mapaLaminas = new Map();
+
+        // Incorpora lâminas estáticas base deste tópico primeiro
+        if (topico && Array.isArray(topico.laminas)) {
+          topico.laminas.forEach((lam) => {
+            mapaLaminas.set(lam.id, { ...lam });
+          });
+        }
 
         snapshot.forEach((doc) => {
           const data = doc.data();
@@ -350,9 +358,11 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           const targetTitulo = topico.titulo.toLowerCase().trim();
 
           if (topicoL === targetId || topicoL === targetTitulo || topicoL.includes(targetId) || (!data.topico && targetId === modulo.topicos[0].id)) {
-            laminasDoTopico.push({ id: doc.id, ...data });
+            mapaLaminas.set(doc.id, { id: doc.id, ...data });
           }
         });
+
+        laminasDoTopico = Array.from(mapaLaminas.values());
 
         const containerGrid = document.getElementById("gridCatalogoLaminas");
         const contadorTxt = document.getElementById("contadorLaminasBadge");

@@ -626,6 +626,32 @@
         (function() {
           const baseSlides = [
             {
+              id: 'osso_maduro_desgaste_ct_3.0',
+              title: 'Osso Maduro (Lamelar) v3.0 (40x)',
+              category: 'Histologia • Tecido Ósseo',
+              stain: 'Desgaste • 40x (Mapeamento 6x8)',
+              specimen: 'Panorama 48 Fotos • ~36.2 MP (Retangular)',
+              desc: 'Varredura panorâmica em 40x com 48 campos costurados pelo Fiji Stitching e enquadramento retangular perfeito (6430 × 5630 px, sem rebarbas), exibindo a ultraestrutura dos ósteons e canalículos.',
+              thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
+              previewImage: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
+              image: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
+              dziUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0.dzi',
+              link: 'microscopio.html?id=osso_maduro_desgaste_ct_3.0'
+            },
+            {
+              id: 'osso_maduro_desgaste_ct_2.0',
+              title: 'Osso Maduro (Lamelar) v2.0',
+              category: 'Histologia • Tecido Ósseo',
+              stain: 'Desgaste • 10x (Mapeamento 2x5)',
+              specimen: 'Varredura 10 Fotos • ~8.4 MP (Retangular)',
+              desc: 'Varredura contínua de 10 campos em 10x com grade snake e costura Fiji Stitching com recorte retangular limpo (2300 × 3670 px, sem rebarbas), revelando canais de Havers e rede canalicular.',
+              thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+              previewImage: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+              image: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+              dziUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0.dzi',
+              link: 'microscopio.html?id=osso_maduro_desgaste_ct_2.0'
+            },
+            {
               id: 'osso_maduro_desgaste_ct',
               title: 'Osso Maduro (Lamelar)',
               category: 'Histologia • Tecido Ósseo',
@@ -857,8 +883,10 @@
                 });
 
                 if (firestoreSlides.length > 0) {
-                  // O Firestore é a fonte da verdade do acervo do usuário
-                  slides = firestoreSlides;
+                  const mapaSlides = new Map();
+                  baseSlides.forEach(s => mapaSlides.set(s.id, s));
+                  firestoreSlides.forEach(s => mapaSlides.set(s.id, s));
+                  slides = Array.from(mapaSlides.values());
                   if (currentIndex >= slides.length) currentIndex = 0;
                   renderSlide(currentIndex, true);
                 }

@@ -403,6 +403,63 @@ const fallbackLaminas = {
     dziUrl: 'assets/histologia/epitelio-simples-escamoso.dzi',
     descricaoHTML: '<p>Camada única de células epiteliais pavimentosas (achatadas) com núcleos elípticos proeminentes, adaptadas para transporte passivo e difusão de solutos.</p>',
     pinos: []
+  },
+  'osso_maduro_desgaste_ct_2.0': {
+    id: 'osso_maduro_desgaste_ct_2.0',
+    aliases: ['osso_maduro_desgaste_ct_2', 'osso_2.0', 'osso-2.0', 'osso_desgaste_2', 'osso-maduro-2'],
+    nome: 'Osso Maduro (Lamelar) por Desgaste v2.0',
+    disciplina: 'histologia',
+    coloracao: 'Corte por Desgaste • 10x (Mapeamento 2x5)',
+    maxMagnification: 40,
+    objetivaCaptura: 10,
+    zoom4xRatio: 0.35,
+    mpp: 0.625,
+    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
+    defaultCenter: { x: 0.5, y: 0.5 },
+    imagemUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0.dzi',
+    previewImage: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+    thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+    dziUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0.dzi',
+    descricaoHTML: `
+      <div class="prose-atlas">
+        <h3>Tecido Ósseo Maduro — Corte Transversal por Desgaste (v2.0)</h3>
+        <p>Esta preparação histológica foi <strong>mapeada em 10x</strong> com escaneamento em grade snake (2×5 tiles, 15% de sobreposição) e costura em alta resolução via Fiji Stitching, preservando todo o campo morfológico contínuo do osso compacto.</p>
+        <p>A preparação por desgaste exibe com nitidez a matriz mineralizada rica em hidroxiapatita sem descalcificação: destacam-se os <strong>Sistemas de Havers (ósteons)</strong> centrados pelos <strong>Canais de Havers</strong>, circundados por <strong>lamelas concêntricas</strong>, <strong>lacunas osteocitárias</strong> e a densa arborização dos <strong>canalículos</strong> que intercomunicavam os osteócitos.</p>
+        <p>Entre os ósteons, evidenciam-se as <strong>lamelas intersticiais</strong> remanescentes de ciclos de remodelação óssea prévios e os <strong>Canais de Volkmann</strong> que cruzam a matriz comunicando os canais vasculares.</p>
+      </div>
+    `,
+    pinos: []
+  },
+  'osso_maduro_desgaste_ct_3.0': {
+    id: 'osso_maduro_desgaste_ct_3.0',
+    aliases: ['osso_maduro_desgaste_ct_3', 'osso_3.0', 'osso-3.0', 'osso_desgaste_3', 'osso-maduro-3'],
+    nome: 'Osso Maduro (Lamelar) por Desgaste v3.0 (40x)',
+    disciplina: 'histologia',
+    coloracao: 'Corte por Desgaste • 40x (Mapeamento 6x8 • 48 Fotos)',
+    maxMagnification: 100,
+    objetivaCaptura: 40,
+    zoom4xRatio: 0.28,
+    mpp: 0.156,
+    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
+    defaultCenter: { x: 0.5, y: 0.5 },
+    imagemUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0.dzi',
+    previewImage: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
+    thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
+    dziUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0.dzi',
+    descricaoHTML: `
+      <div class="prose-atlas">
+        <h3>Tecido Ósseo Maduro — Alta Resolução 40x (v3.0 Panorama 6×8)</h3>
+        <p>Varredura panorâmica ultradetalhada de <strong>48 fotos em objetiva de 40x</strong> montada em grade snake contínua (6 colunas × 8 linhas, 15% de sobreposição) via Fiji Stitching com recorte retangular limpo (sem rebarbas), totalizando <strong>6430 × 5630 pixels (~36.2 MP)</strong>.</p>
+        <p>A ampliação de 40x permite observar com riqueza ultraestrutural:</p>
+        <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
+          <li><strong>Canais de Havers:</strong> lúmen vascular central nítido circundado por lamelas cilíndricas concêntricas.</li>
+          <li><strong>Lacunas de Osteócitos:</strong> cavidades elípticas escuras na matriz óssea mineralizada.</li>
+          <li><strong>Rede de Canalículos:</strong> filamentos microvasculares e comunicantes que irradiam das lacunas através da matriz sólida.</li>
+          <li><strong>Linhas Cimentantes:</strong> limites externos de refringência que demarcam cada ósteon individual das lamelas intersticiais vizinhas.</li>
+        </ul>
+      </div>
+    `,
+    pinos: []
   }
 };
 

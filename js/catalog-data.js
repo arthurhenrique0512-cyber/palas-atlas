@@ -113,6 +113,34 @@ export const catalogData = {
             imageUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
             caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg",
             thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg"
+          },
+          {
+            id: "osso_maduro_desgaste_ct_2.0",
+            nome: "Osso Maduro (Lamelar) por Desgaste v2.0",
+            coloracao: "Desgaste • 10x Mapeamento 2x5",
+            disciplina: "histologia",
+            topico: "osseo",
+            maxMagnification: 40,
+            zoom4xRatio: 0.35,
+            defaultCenter: { x: 0.5, y: 0.5 },
+            dziUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
+            imageUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
+            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg",
+            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg"
+          },
+          {
+            id: "osso_maduro_desgaste_ct_3.0",
+            nome: "Osso Maduro (Lamelar) por Desgaste v3.0 (40x)",
+            coloracao: "Desgaste • 40x Mapeamento 6x8 (48 fotos)",
+            disciplina: "histologia",
+            topico: "osseo",
+            maxMagnification: 100,
+            zoom4xRatio: 0.28,
+            defaultCenter: { x: 0.5, y: 0.5 },
+            dziUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
+            imageUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
+            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg",
+            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
           }
         ]
       },

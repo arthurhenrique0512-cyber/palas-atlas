@@ -1,6 +1,6 @@
 {
-  "geradoEm": "2026-11-05T17:22:23.713Z",
-  "total": 6,
+  "geradoEm": "2026-11-05T22:42:57.665Z",
+  "total": 8,
   "assets": [
     {
       "id": "epitelio-simples-escamoso",
@@ -83,6 +83,36 @@
       "mpp": 0.156,
       "metodoCalibracao": "referencia_biologica_hemacia_7.5um",
       "preview": "assets/histologia/osso_maduro_desgaste_ct-preview.jpg"
+    },
+    {
+      "id": "osso_maduro_desgaste_ct_2.0",
+      "nome": "Osso Maduro Desgaste Ct 2.0",
+      "tipo": "dzi",
+      "formato": "Deep Zoom Image (.dzi)",
+      "caminho": "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
+      "url": "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
+      "largura": 2300,
+      "altura": 3670,
+      "tileSize": 256,
+      "maxMagnification": 40,
+      "mpp": 0.156,
+      "metodoCalibracao": "referencia_biologica_hemacia_7.5um",
+      "preview": "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg"
+    },
+    {
+      "id": "osso_maduro_desgaste_ct_3.0",
+      "nome": "Osso Maduro Desgaste Ct 3.0",
+      "tipo": "dzi",
+      "formato": "Deep Zoom Image (.dzi)",
+      "caminho": "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
+      "url": "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
+      "largura": 6430,
+      "altura": 5630,
+      "tileSize": 256,
+      "maxMagnification": 40,
+      "mpp": 0.156,
+      "metodoCalibracao": "referencia_biologica_hemacia_7.5um",
+      "preview": "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
     }
   ]
 }
