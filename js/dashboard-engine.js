@@ -1052,6 +1052,8 @@ function atualizarInterfaceListaPinos() {
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
+          <button type="button" onclick="window.App.focarPinoEditor('${p.id}')" class="text-[#d4af37] hover:text-[#e0c97f] text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Focar</button>
+          <span class="text-white/10 text-[10px]">|</span>
           <button type="button" onclick="window.App.editarRotuloPinoCms('${p.id}')" class="text-neutral-400 hover:text-[#d4af37] text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Editar</button>
           <span class="text-white/10 text-[10px]">|</span>
           <button type="button" onclick="window.App.excluirPinoCms('${p.id}')" class="text-rose-400/80 hover:text-rose-400 text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Excluir</button>
@@ -1117,6 +1119,30 @@ export function vincularTextoAoPino() {
   inicializarEventosPreviewInterativo();
 }
 
+export function focarPinoEditor(pinId) {
+  if (!viewerInstance || !viewerInstance.viewport || !window.OpenSeadragon) return;
+  const pinoData = editorPins.find((item) => String(item.id) === String(pinId));
+  if (!pinoData) return;
+
+  const targetX = (pinoData.type === "arrow" && pinoData.endX != null) ? pinoData.endX : pinoData.x;
+  const targetY = (pinoData.type === "arrow" && pinoData.endY != null) ? pinoData.endY : pinoData.y;
+  const pontoViewport = viewerInstance.viewport.imageToViewportCoordinates(
+    new window.OpenSeadragon.Point(Number(targetX) || 0, Number(targetY) || 0)
+  );
+
+  const homeZoom = viewerInstance.viewport.getHomeZoom() || 1;
+  const currentZoom = viewerInstance.viewport.getZoom();
+  let targetZoom = Math.max(currentZoom, homeZoom * 2.8);
+  if (viewerInstance.viewport.maxZoomLevel) {
+    targetZoom = Math.min(targetZoom, viewerInstance.viewport.maxZoomLevel * 0.95);
+  }
+
+  viewerInstance.viewport.panTo(pontoViewport, false);
+  viewerInstance.viewport.zoomTo(targetZoom, null, false);
+  viewerInstance.viewport.applyConstraints();
+  destacarPinoTemporariamente(pinId);
+}
+
 export function inicializarEventosPreviewInterativo() {
   const editor = document.getElementById("dashEditorTexto");
   if (!editor || editor._eventosInteracaoInjetados) return;
@@ -1128,18 +1154,21 @@ export function inicializarEventosPreviewInterativo() {
     document.execCommand("insertText", false, textoPuro);
   });
 
+  // Clique direto no hiperlink do editor
+  editor.addEventListener("click", (evento) => {
+    const alvo = evento.target.closest(".pin-link, [data-pin-id]");
+    if (!alvo) return;
+    const pinId = alvo.getAttribute("data-pin-id");
+    if (!pinId) return;
+    focarPinoEditor(pinId);
+  });
+
   editor.addEventListener("mouseover", (evento) => {
     const alvo = evento.target.closest(".pin-link, [data-pin-id]");
     if (!alvo) return;
     const pinId = alvo.getAttribute("data-pin-id");
     if (!pinId) return;
-    const pinoData = editorPins.find((item) => item.id === pinId);
-    if (!pinoData || !viewerInstance || !viewerInstance.viewport) return;
-    const targetX = (pinoData.type === "arrow" && pinoData.endX != null) ? pinoData.endX : pinoData.x;
-    const targetY = (pinoData.type === "arrow" && pinoData.endY != null) ? pinoData.endY : pinoData.y;
-    const pontoViewport = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(targetX, targetY));
-    viewerInstance.viewport.panTo(pontoViewport);
-    destacarPinoTemporariamente(pinId);
+    focarPinoEditor(pinId);
   });
   editor._eventosInteracaoInjetados = true;
 }
@@ -1529,6 +1558,7 @@ Object.assign(window.App, {
   editarRotuloPinoCms, excluirPinoCms, vincularTextoAoPino,
   inicializarEventosPreviewInterativo, osdEditorAction, publicarLaminaCms,
   ativarModoNovaQuestao, atualizarTituloQuestaoCms, excluirQuestaoCms, focarQuestaoNoEditor,
+  focarPinoEditor,
   atualizarCardAnaliseOpticaCms,
   carregarListaDeAssets, onAssetSelecionado, alternarModoCaminhoManual,
   definirModoAnotacao, onAtualizarRaioCirculo
@@ -1556,6 +1586,7 @@ window.ativarModoNovaQuestao = ativarModoNovaQuestao;
 window.atualizarTituloQuestaoCms = atualizarTituloQuestaoCms;
 window.excluirQuestaoCms = excluirQuestaoCms;
 window.focarQuestaoNoEditor = focarQuestaoNoEditor;
+window.focarPinoEditor = focarPinoEditor;
 window.atualizarCardAnaliseOpticaCms = atualizarCardAnaliseOpticaCms;
 window.carregarListaDeAssets = carregarListaDeAssets;
 window.onAssetSelecionado = onAssetSelecionado;

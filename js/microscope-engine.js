@@ -666,6 +666,8 @@ function renderizarDescricaoETextos() {
           ${listaPinosAtual.map(pin => `
             <button
               type="button"
+              id="btn-pino-${pin.id}"
+              data-btn-pin-id="${pin.id}"
               onclick="window.focarPinoNoViewer('${pin.id}')"
               class="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 hover:bg-neutral-900/70 border border-white/[0.04] hover:border-[#c8ad5f]/40 text-left transition-all group cursor-pointer"
             >
@@ -988,6 +990,28 @@ function destacarCardQuestaoNaSidebar(qId) {
     } else {
       card.classList.remove("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
       card.classList.add("border-white/[0.06]", "bg-neutral-900/40");
+    }
+  });
+}
+
+/**
+ * Aplica destaque visual e rolagem suave ao botão do pino correspondente na lista lateral.
+ *
+ * @param {string} pinId - ID do pino ativo
+ */
+function destacarPinoNaSidebar(pinId) {
+  const idBuscado = String(pinId || "").trim().toLowerCase();
+  document.querySelectorAll("[data-btn-pin-id]").forEach((btn) => {
+    const btnPinId = String(btn.getAttribute("data-btn-pin-id") || "").trim().toLowerCase();
+    const isAtivo = btnPinId === idBuscado || 
+                    btnPinId.replace(/^(pin[-_]|p)/i, "") === idBuscado.replace(/^(pin[-_]|p)/i, "");
+    if (isAtivo) {
+      btn.classList.add("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
+      btn.classList.remove("border-white/[0.04]", "bg-neutral-900/40");
+      btn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+      btn.classList.remove("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
+      btn.classList.add("border-white/[0.04]", "bg-neutral-900/40");
     }
   });
 }
@@ -1552,40 +1576,100 @@ function aplicarBloqueioObjetivas(maxMag) {
 // ---------------------------------------------------------------------------
 // 7. Delegacao global de eventos para pin-link no texto descritivo
 // ---------------------------------------------------------------------------
+let _delegacaoPinosRegistrada = false;
 function registrarDelegacaoGlobalDePinos() {
+  if (_delegacaoPinosRegistrada) return;
+  _delegacaoPinosRegistrada = true;
+
   document.addEventListener("click", (evento) => {
-    const alvo = evento.target.closest(".pin-link, [data-pin-id]");
+    const alvo = evento.target.closest(".pin-link, [data-pin-id], [data-pin]");
     if (!alvo) return;
-    const pinIdRaw = alvo.getAttribute("data-pin-id");
+    const pinIdRaw = alvo.getAttribute("data-pin-id") ||
+                     alvo.getAttribute("data-pin") ||
+                     alvo.getAttribute("data-id") ||
+                     alvo.getAttribute("href")?.replace(/^#/, "") ||
+                     alvo.textContent?.trim();
     if (!pinIdRaw) return;
     evento.preventDefault();
+    evento.stopPropagation();
+
+    // Feedback visual imediato e tátil no link clicado
+    alvo.classList.add("ring-2", "ring-[#c8ad5f]", "ring-offset-2", "ring-offset-neutral-950", "rounded");
+    setTimeout(() => {
+      alvo.classList.remove("ring-2", "ring-[#c8ad5f]", "ring-offset-2", "ring-offset-neutral-950", "rounded");
+    }, 1400);
+
     focarPinoNoViewer(pinIdRaw);
   });
 }
 
 // ---------------------------------------------------------------------------
-// 8. Foca o pino no viewer com zoom real e overlay neon
+// 8. Foca o pino no viewer com zoom real e centralização precisa
 // ---------------------------------------------------------------------------
-function focarPinoNoViewer(pinIdRaw) {
-  const pino = listaPinosAtual.find(p => String(p.id) === String(pinIdRaw));
-  if (!pino) {
-    console.warn("[Palas Atlas] Pino nao encontrado para ID:", pinIdRaw);
-    return;
-  }
+let overlayPinAtivo = null;
+
+export function focarPinoNoViewer(pinIdRaw) {
   if (!viewer || !viewer.viewport || !window.OpenSeadragon) {
-    console.warn("[Palas Atlas] Viewer nao inicializado ao tentar focar pino.");
+    console.warn("[Palas Atlas] Viewer OpenSeadragon não inicializado ao tentar focar pino.");
     return;
   }
 
-  // Converte coordenadas de pixel da imagem original → coordenadas normalizadas do viewport
-  const pontoViewport = viewer.viewport.imageToViewportCoordinates(
-    new window.OpenSeadragon.Point(Number(pino.x) || 0, Number(pino.y) || 0)
-  );
+  const idBuscado = String(pinIdRaw || "").trim().toLowerCase();
+  if (!idBuscado) return;
 
-  // Remove pin ativo anterior
+  const pool = (Array.isArray(listaPinosAtual) && listaPinosAtual.length > 0)
+    ? listaPinosAtual
+    : (Array.isArray(laminaAtualData?.pinos) ? laminaAtualData.pinos : []);
+
+  // 1. Busca pino por correspondência flexível (ID exato, sem prefixo "pin_", por rótulo ou índice)
+  let pino = pool.find(p => String(p.id || "").trim().toLowerCase() === idBuscado);
+  if (!pino) {
+    pino = pool.find(p => {
+      const pIdClean = String(p.id || "").replace(/^(pin[-_]|p)/i, "").trim().toLowerCase();
+      const rawClean = idBuscado.replace(/^(pin[-_]|p)/i, "").trim();
+      return pIdClean && pIdClean === rawClean;
+    });
+  }
+  if (!pino) {
+    pino = pool.find(p => String(p.rotulo || "").trim().toLowerCase() === idBuscado);
+  }
+  if (!pino && !isNaN(Number(idBuscado)) && pool[Number(idBuscado) - 1]) {
+    pino = pool[Number(idBuscado) - 1];
+  }
+
+  if (!pino) {
+    console.warn("[Palas Atlas] Pino não encontrado para ID/Rótulo:", pinIdRaw, "no acervo de pinos:", pool);
+    return;
+  }
+
+  const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+  const contentSize = item ? item.getContentSize() : null;
+
+  // Função auxiliar de conversão consistente de coordenadas
+  function converterPontoParaViewport(xVal, yVal) {
+    let px = Number(xVal);
+    let py = Number(yVal);
+    if (isNaN(px) || isNaN(py)) return null;
+
+    if (px > 0 && px <= 1 && py > 0 && py <= 1 && contentSize && contentSize.x > 1) {
+      return viewer.viewport.imageToViewportCoordinates(
+        new window.OpenSeadragon.Point(px * contentSize.x, py * contentSize.y)
+      );
+    }
+    return viewer.viewport.imageToViewportCoordinates(
+      new window.OpenSeadragon.Point(px, py)
+    );
+  }
+
+  // Remove pin de anotação ativo anterior
+  if (overlayPinAtivo) {
+    try { viewer.removeOverlay(overlayPinAtivo); } catch (e) {}
+    overlayPinAtivo = null;
+  }
   if (pinAtivo) {
     const anterior = document.getElementById(`viewer-pin-${pinAtivo}`);
     if (anterior) { try { viewer.removeOverlay(anterior); } catch (e) {} }
+    pinAtivo = null;
   }
 
   // Remove pin de questão ativa se houver
@@ -1595,32 +1679,44 @@ function focarPinoNoViewer(pinIdRaw) {
     questaoAtivaId = null;
   }
 
-  const pinId = String(pino.id);
+  const pinId = String(pino.id || idBuscado);
   let overlayElem = null;
+  let targetPoint = null;
 
-  // Zoom no ponto de interesse
-  const homeZoom = homeZoomRef || viewer.viewport.getHomeZoom();
-  let targetZoom = homeZoom * 3.5;
+  // Cálculo do Zoom Óptico Ideal
+  const homeZoom = homeZoomRef || viewer.viewport.getHomeZoom() || 1;
+  let targetZoom;
   if (pino.zoom && Number(pino.zoom) > 0) {
     targetZoom = Number(pino.zoom);
   } else {
-    targetZoom = Math.max(viewer.viewport.getZoom(), homeZoom * 3.2);
+    targetZoom = Math.max(viewer.viewport.getZoom(), homeZoom * 3.5);
   }
 
-  // 1. ANOTAÇÃO TIPO CÍRCULO (Delimitação Estrutural Escalável no Zoom)
+  // 1. ANOTAÇÃO TIPO CÍRCULO (Delimitação Estrutural)
   if (pino.type === "circle") {
-    const r = Number(pino.radius) || 250;
-    const imgRect = new window.OpenSeadragon.Rect(pino.x - r, pino.y - r, 2 * r, 2 * r);
+    let r = Number(pino.radius) || 250;
+    let px = Number(pino.x) || 0;
+    let py = Number(pino.y) || 0;
+    if (px > 0 && px <= 1 && py > 0 && py <= 1 && contentSize && contentSize.x > 1) {
+      px *= contentSize.x;
+      py *= contentSize.y;
+      if (r > 0 && r <= 1) r *= contentSize.x;
+    }
+
+    const imgRect = new window.OpenSeadragon.Rect(px - r, py - r, 2 * r, 2 * r);
     const vpRect = viewer.viewport.imageToViewportRectangle(imgRect);
+    targetPoint = converterPontoParaViewport(pino.x, pino.y);
 
     overlayElem = document.createElement("div");
     overlayElem.id = `viewer-pin-${pinId}`;
     overlayElem.style.cssText = "pointer-events:none; position:relative; width:100%; height:100%; z-index:40;";
     overlayElem.innerHTML = `
       <div class="animate-pulse" style="position:absolute; inset:0; border-radius:50%; border:2.5px solid #c8ad5f; box-shadow:0 0 25px rgba(200,173,95,0.7), inset 0 0 20px rgba(200,173,95,0.25); background:rgba(200,173,95,0.12);"></div>
-      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.85); color:#c8ad5f; border:1px solid rgba(200,173,95,0.5); font-family:monospace; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.8); white-space:nowrap;">
-        ${pino.rotulo || ''}
-      </div>
+      ${pino.rotulo ? `
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(10,10,10,0.9); color:#c8ad5f; border:1px solid rgba(200,173,95,0.6); font-family:monospace; font-size:11px; font-weight:bold; padding:3px 9px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.9); white-space:nowrap;">
+          ${pino.rotulo}
+        </div>
+      ` : ''}
     `;
 
     viewer.addOverlay({
@@ -1629,17 +1725,20 @@ function focarPinoNoViewer(pinIdRaw) {
     });
 
     targetZoom = homeZoom * Math.min(5.5, Math.max(2.2, 1400 / (r * 2)));
-    if (viewer.viewport.maxZoomLevel) targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
 
-    viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
-    viewer.viewport.panTo(pontoViewport, false);
-
-  // 2. ANOTAÇÃO TIPO SETA DIRECIONAL (Vetor com Alvo e Haste)
+  // 2. ANOTAÇÃO TIPO SETA DIRECIONAL (Vetor Haste -> Alvo Celular)
   } else if (pino.type === "arrow") {
-    const x1 = Number(pino.x) || 0;
-    const y1 = Number(pino.y) || 0;
-    const x2 = Number(pino.endX != null ? pino.endX : (pino.end_x != null ? pino.end_x : x1 + 100));
-    const y2 = Number(pino.endY != null ? pino.endY : (pino.end_y != null ? pino.end_y : y1 + 100));
+    let x1 = Number(pino.x) || 0;
+    let y1 = Number(pino.y) || 0;
+    let x2 = Number(pino.endX != null ? pino.endX : (pino.end_x != null ? pino.end_x : x1 + 100));
+    let y2 = Number(pino.endY != null ? pino.endY : (pino.end_y != null ? pino.end_y : y1 + 100));
+
+    if (x1 > 0 && x1 <= 1 && y1 > 0 && y1 <= 1 && contentSize && contentSize.x > 1) {
+      x1 *= contentSize.x;
+      y1 *= contentSize.y;
+      x2 *= contentSize.x;
+      y2 *= contentSize.y;
+    }
 
     const pad = Math.max(30, Math.hypot(x2 - x1, y2 - y1) * 0.08);
     const minX = Math.min(x1, x2) - pad;
@@ -1671,9 +1770,11 @@ function focarPinoNoViewer(pinIdRaw) {
         <circle cx="${svgX1}" cy="${svgY1}" r="6" fill="#c8ad5f" stroke="#ffffff" stroke-width="2" />
         <circle cx="${svgX2}" cy="${svgY2}" r="5" fill="#ffffff" class="animate-ping" />
       </svg>
-      <div style="position:absolute; left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform:translate(-50%, -130%); background:rgba(0,0,0,0.85); color:#c8ad5f; border:1px solid rgba(200,173,95,0.5); font-family:monospace; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.8);">
-        ${pino.rotulo || ''}
-      </div>
+      ${pino.rotulo ? `
+        <div style="position:absolute; left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform:translate(-50%, -130%); background:rgba(10,10,10,0.9); color:#c8ad5f; border:1px solid rgba(200,173,95,0.6); font-family:monospace; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.9);">
+          ${pino.rotulo}
+        </div>
+      ` : ''}
     `;
 
     viewer.addOverlay({
@@ -1681,52 +1782,75 @@ function focarPinoNoViewer(pinIdRaw) {
       location: vpRect
     });
 
-    const pontoAlvoViewport = viewer.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(x2, y2));
-    if (viewer.viewport.maxZoomLevel) targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
-    viewer.viewport.zoomTo(targetZoom, pontoAlvoViewport, false);
-    viewer.viewport.panTo(pontoAlvoViewport, false);
+    // Ponto de foco exato na ponta da seta (alvo celular)
+    targetPoint = converterPontoParaViewport(pino.endX != null ? pino.endX : (pino.end_x != null ? pino.end_x : x2), pino.endY != null ? pino.endY : (pino.end_y != null ? pino.end_y : y2));
 
-  // 3. ANOTAÇÃO TIPO PIN CLÁSSICO (Ponto Ancorado com Brilho Neon)
+  // 3. ANOTAÇÃO TIPO PIN CLÁSSICO
   } else {
+    targetPoint = converterPontoParaViewport(pino.x, pino.y);
+
     overlayElem = document.createElement("div");
     overlayElem.id = `viewer-pin-${pinId}`;
-    overlayElem.style.cssText = "pointer-events:none; position:relative; display:flex; align-items:center; justify-content:center; width:36px; height:36px; z-index:40;";
+    overlayElem.style.cssText = "pointer-events:none; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:36px; height:36px; z-index:40;";
     overlayElem.innerHTML = `
       <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(200,173,95,0.45);border-radius:50%;"></div>
-      <div style="position:relative;width:14px;height:14px;background:#c8ad5f;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(200,173,95,0.45),0 4px 16px rgba(0,0,0,0.8);"></div>
+      <div style="position:relative;width:14px;height:14px;background:#c8ad5f;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(200,173,95,0.45),0 4px 16px rgba(0,0,0,0.9);"></div>
+      ${pino.rotulo ? `
+        <div style="position:absolute; top:100%; left:50%; transform:translate(-50%, 6px); background:rgba(10,10,10,0.9); color:#c8ad5f; border:1px solid rgba(200,173,95,0.6); font-family:monospace; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.9); white-space:nowrap; pointer-events:none;">
+          ${pino.rotulo}
+        </div>
+      ` : ''}
     `;
 
     viewer.addOverlay({
       element: overlayElem,
-      location: pontoViewport,
+      location: targetPoint,
       placement: window.OpenSeadragon.Placement.CENTER
     });
-
-    if (viewer.viewport.maxZoomLevel) targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
-    viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
-    viewer.viewport.panTo(pontoViewport, false);
   }
 
+  overlayPinAtivo = overlayElem;
   pinAtivo = pinId;
+
+  // Limite de segurança de zoom
+  if (viewer.viewport.maxZoomLevel) {
+    targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
+  }
+  if (viewer.viewport.minZoomLevel) {
+    targetZoom = Math.max(targetZoom, viewer.viewport.minZoomLevel);
+  }
+
+  // TRANSIÇÃO PRECISA DE CENTRALIZAÇÃO E AMPLIAÇÃO
+  // No OpenSeadragon, panTo(center, false) define o novo centro do viewport e
+  // zoomTo(targetZoom, null, false) amplia em direção ao centro sem deslocá-lo.
+  if (targetPoint) {
+    viewer.viewport.panTo(targetPoint, false);
+    viewer.viewport.zoomTo(targetZoom, null, false);
+    viewer.viewport.applyConstraints();
+  }
+
+  // Destaca o card do pino na lista lateral caso esteja visível
+  destacarPinoNaSidebar(pinId);
 
   // No mobile/tablet, fecha o drawer lateral para exibir o ponto focado no microscópio
   if (isMobileOrLandscapeDrawer()) {
     aplicarEstadoSidebar(true, false);
   }
 
-  // Auto-remove o marcador após 8s
+  // Auto-remove o marcador após 9s se não houver nova interação
   setTimeout(() => {
-    if (overlayElem && viewer) {
+    if (overlayPinAtivo === overlayElem && viewer) {
       try { viewer.removeOverlay(overlayElem); } catch (e) {}
       if (pinAtivo === pinId) pinAtivo = null;
+      overlayPinAtivo = null;
     }
-  }, 8000);
+  }, 9000);
 }
 
 /**
  * Localiza e foca uma questão prática de bancada no visualizador OpenSeadragon.
  * Realiza a conversão precisa de coordenadas, insere um overlay pulsante
- * em ouro-champanhe / ciano e navega com transição suave (pan & zoom).
+ * em ouro-champanhe / ciano e navega com centralização perfeita (pan & zoom).
  *
  * @param {string|number} questaoId
  */
@@ -1761,14 +1885,13 @@ export function focarQuestaoNoViewer(questaoId) {
   let posX = Number(q.x) || 0;
   let posY = Number(q.y) || 0;
 
+  const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+  const contentSize = item ? item.getContentSize() : null;
+
   // Se coordenadas estiverem normalizadas (0 a 1), converte para pixels originais da imagem
-  if (posX > 0 && posX <= 1 && viewer.world && viewer.world.getItemAt(0)) {
-    const item = viewer.world.getItemAt(0);
-    const size = item.getContentSize();
-    if (size && size.x > 1) {
-      posX *= size.x;
-      posY *= size.y;
-    }
+  if (posX > 0 && posX <= 1 && posY > 0 && posY <= 1 && contentSize && contentSize.x > 1) {
+    posX *= contentSize.x;
+    posY *= contentSize.y;
   }
 
   // Converte coordenadas usando OpenSeadragon
@@ -1791,6 +1914,10 @@ export function focarQuestaoNoViewer(questaoId) {
   }
 
   // Remove pino comum de estrutura ativo se houver
+  if (overlayPinAtivo) {
+    try { viewer.removeOverlay(overlayPinAtivo); } catch (e) {}
+    overlayPinAtivo = null;
+  }
   if (pinAtivo) {
     const anteriorPin = document.getElementById(`viewer-pin-${pinAtivo}`);
     if (anteriorPin) {
@@ -1833,7 +1960,7 @@ export function focarQuestaoNoViewer(questaoId) {
   overlayQuestaoAtiva = pinElem;
   questaoAtivaId = idBuscado;
 
-  // Pan & Zoom suave para a localização
+  // Pan & Zoom com centralização precisa
   let targetZoom = (q.zoom && Number(q.zoom) > 0)
     ? Number(q.zoom)
     : Math.max(viewer.viewport.getZoom(), (homeZoomRef || 1) * 3.5);
@@ -1841,9 +1968,13 @@ export function focarQuestaoNoViewer(questaoId) {
   if (viewer.viewport.maxZoomLevel) {
     targetZoom = Math.min(targetZoom, viewer.viewport.maxZoomLevel * 0.95);
   }
+  if (viewer.viewport.minZoomLevel) {
+    targetZoom = Math.max(targetZoom, viewer.viewport.minZoomLevel);
+  }
 
-  viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
   viewer.viewport.panTo(pontoViewport, false);
+  viewer.viewport.zoomTo(targetZoom, null, false);
+  viewer.viewport.applyConstraints();
 }
 
 // ---------------------------------------------------------------------------
