@@ -1462,3 +1462,27 @@ html[data-theme="dark"] .faq-item .faq-content {
   color: #94a3b8 !important;
 }
 
+/* Hub Dinâmico de Métricas (Canto Superior Direito) */
+.hero-stat-pill {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[data-theme="dark"] .hero-stat-pill {
+  background-color: #101015 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html[data-theme="dark"] .hero-stat-pill:hover {
+  background-color: #16161d !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+html[data-theme="dark"] .hero-stat-pill .stat-num {
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .hero-stat-pill .text-slate-500 {
+  color: #94a3b8 !important;
+}
+html[data-theme="dark"] .hero-status-badge {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+

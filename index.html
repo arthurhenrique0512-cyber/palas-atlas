@@ -415,15 +415,64 @@
             </p>
           </div>
 
-          <!-- Canto Superior Direito: Ilustração Vetorial Aluno & Microscópio (Escala Refinada) -->
-          <div class="shrink-0 flex items-center justify-center sm:justify-end self-center relative group">
-            <div class="relative w-36 sm:w-48 md:w-56 lg:w-64 xl:w-72">
-              <img
-                src="assets/aluno-microscopio.svg"
-                alt="Aluno analisando lâmina ao microscópio"
-                class="w-full h-auto max-h-[140px] sm:max-h-[165px] object-contain select-none pointer-events-none drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
-                loading="eager"
-              />
+          <!-- Canto Superior Direito: Hub Dinâmico de Métricas do Acervo -->
+          <div class="shrink-0 flex flex-col items-start sm:items-end justify-center self-center sm:self-auto w-full sm:w-auto">
+            
+            <!-- Barra de Status Sutil -->
+            <div class="flex items-center gap-2 mb-2 sm:mb-2.5 px-1 self-start sm:self-end">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200/80 text-[10px] font-mono uppercase tracking-wider text-slate-500 font-semibold hero-status-badge">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Acervo Sincronizado
+              </span>
+            </div>
+
+            <!-- Grade 2x2 de Micro-Métricas Elegantes -->
+            <div class="grid grid-cols-2 gap-2 sm:gap-2.5 w-full sm:w-[320px] md:w-[350px]">
+              
+              <!-- Métrica 1: Lâminas -->
+              <div class="hero-stat-pill group flex items-center gap-2.5 px-3 py-2 sm:py-2.5 rounded-xl bg-slate-50/90 hover:bg-white border border-slate-200/80 hover:border-sky-500/40 transition-all duration-200 shadow-2xs hover:shadow-xs hover:-translate-y-0.5">
+                <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 border border-sky-100 flex items-center justify-center shrink-0 stat-icon-box transition-transform duration-200 group-hover:scale-105">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                </div>
+                <div class="text-left min-w-0">
+                  <div class="font-serif font-extrabold text-sm sm:text-base text-slate-900 leading-tight stat-num">+150</div>
+                  <div class="text-[10px] text-slate-500 font-sans font-medium truncate">Lâminas Digitais</div>
+                </div>
+              </div>
+
+              <!-- Métrica 2: Áreas -->
+              <div class="hero-stat-pill group flex items-center gap-2.5 px-3 py-2 sm:py-2.5 rounded-xl bg-slate-50/90 hover:bg-white border border-slate-200/80 hover:border-amber-500/40 transition-all duration-200 shadow-2xs hover:shadow-xs hover:-translate-y-0.5">
+                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0 stat-icon-box transition-transform duration-200 group-hover:scale-105">
+                  <svg class="w-4 h-4 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                </div>
+                <div class="text-left min-w-0">
+                  <div class="font-serif font-extrabold text-sm sm:text-base text-slate-900 leading-tight stat-num">4 Áreas</div>
+                  <div class="text-[10px] text-slate-500 font-sans font-medium truncate">Disciplinas</div>
+                </div>
+              </div>
+
+              <!-- Métrica 3: Acesso Aberto -->
+              <div class="hero-stat-pill group flex items-center gap-2.5 px-3 py-2 sm:py-2.5 rounded-xl bg-slate-50/90 hover:bg-white border border-slate-200/80 hover:border-emerald-500/40 transition-all duration-200 shadow-2xs hover:shadow-xs hover:-translate-y-0.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center shrink-0 stat-icon-box transition-transform duration-200 group-hover:scale-105">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <div class="text-left min-w-0">
+                  <div class="font-serif font-extrabold text-sm sm:text-base text-slate-900 leading-tight stat-num">100% Livre</div>
+                  <div class="text-[10px] text-slate-500 font-sans font-medium truncate">Acesso Aberto</div>
+                </div>
+              </div>
+
+              <!-- Métrica 4: Zoom Piramidal -->
+              <div class="hero-stat-pill group flex items-center gap-2.5 px-3 py-2 sm:py-2.5 rounded-xl bg-slate-50/90 hover:bg-white border border-slate-200/80 hover:border-violet-500/40 transition-all duration-200 shadow-2xs hover:shadow-xs hover:-translate-y-0.5">
+                <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center shrink-0 stat-icon-box transition-transform duration-200 group-hover:scale-105">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M19 12a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <div class="text-left min-w-0">
+                  <div class="font-serif font-extrabold text-sm sm:text-base text-slate-900 leading-tight stat-num">1000x</div>
+                  <div class="text-[10px] text-slate-500 font-sans font-medium truncate">Zoom Óptico</div>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -869,55 +918,6 @@
           });
         })();
       </script>
-
-      <!-- SEÇÃO 1.5: FAIXA DE MÉTRICAS & AUTORIDADE ACADÊMICA (STATS BAR) -->
-      <section id="secaoMetricas" class="w-full bg-white border-y border-slate-200/90 py-7 sm:py-8 relative z-10 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-            
-            <div class="flex items-center gap-3.5 group">
-              <div class="w-11 h-11 rounded-2xl bg-sky-50 text-sky-700 border border-sky-100 flex items-center justify-center shrink-0 stat-icon-box transition-transform duration-200 group-hover:scale-105">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-              </div>
-              <div class="text-left">
-                <div class="font-serif font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight stat-num">+150</div>
-                <div class="text-xs text-slate-500 font-sans font-medium">Lâminas Digitais</div>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-3.5 group">
-              <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center shrink-0 stat-icon-box transition-transform duration-200 group-hover:scale-105">
-                <svg class="w-5 h-5 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-              </div>
-              <div class="text-left">
-                <div class="font-serif font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight stat-num">4 Áreas</div>
-                <div class="text-xs text-slate-500 font-sans font-medium">Disciplinas Integradas</div>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-3.5 group">
-              <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center shrink-0 stat-icon-box transition-transform duration-200 group-hover:scale-105">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              </div>
-              <div class="text-left">
-                <div class="font-serif font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight stat-num">100% Livre</div>
-                <div class="text-xs text-slate-500 font-sans font-medium">Acesso Acadêmico Aberto</div>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-3.5 group">
-              <div class="w-11 h-11 rounded-2xl bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center shrink-0 stat-icon-box transition-transform duration-200 group-hover:scale-105">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M19 12a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              </div>
-              <div class="text-left">
-                <div class="font-serif font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight stat-num">1000x</div>
-                <div class="text-xs text-slate-500 font-sans font-medium">Zoom Óptico Piramidal</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
 
       <!-- SEÇÃO 2: DISCIPLINAS (HISTOLOGIA EM DESTAQUE PRINCIPAL + 3 DISCIPLINAS ABAIXO) -->
       <div id="secaoDisciplinas" class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6 relative z-10 animate-fade-in-up delay-200">
