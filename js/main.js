@@ -10,7 +10,7 @@ import { initGlobalSearch } from "./search-engine.js";
 let _dashboardEnginePromise = null;
 function carregarDashboardEngine() {
   if (!_dashboardEnginePromise) {
-    _dashboardEnginePromise = import("./dashboard-engine.js");
+    _dashboardEnginePromise = import("./dashboard-engine.js?v=20261105_v2");
   }
   return _dashboardEnginePromise;
 }
