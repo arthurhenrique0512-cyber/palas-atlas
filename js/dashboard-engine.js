@@ -828,11 +828,12 @@ export function atualizarCardAnaliseOpticaCms(item, maxMagNominal) {
   const badgeEl = document.getElementById("dashDziBadgeMag");
   const ratioInput = document.getElementById("dashZoom4xRatio");
 
+  const mppCalculado = ((40 / maxMag) * 0.156).toFixed(3);
   if (dimEl) dimEl.textContent = `${w} × ${h}`;
   if (mpEl) mpEl.textContent = `${mp} Megapixels`;
   if (geomEl) geomEl.textContent = `${ratio}:1 (${isVertical ? "Faixa Vertical" : "Mosaico Amplo"})`;
-  if (tetoEl) tetoEl.textContent = `${maxMag}x (Rígido)`;
-  if (badgeEl) badgeEl.textContent = `Captura: ${maxMag}x`;
+  if (tetoEl) tetoEl.textContent = `${maxMag}x (${mppCalculado} µm/px)`;
+  if (badgeEl) badgeEl.textContent = `Nativa: ${maxMag}x • Hemácia (7.5µm)`;
 
   // Se for nova lâmina ou campo vazio, sugere automaticamente o ratio baseado na geometria física
   if (ratioInput && (!laminaEmEdicaoId || !ratioInput.value)) {
@@ -1229,6 +1230,7 @@ export async function publicarLaminaCms() {
   const maxMagnification = maxMagEl ? Number(maxMagEl.value) || 40 : 40;
   const ratioEl = document.getElementById("dashZoom4xRatio");
   const zoom4xRatio = ratioEl ? parseFloat(ratioEl.value) || 0.28 : 0.28;
+  const mpp = (40 / maxMagnification) * 0.156;
   const laminaData = {
     nome,
     disciplina,
@@ -1240,6 +1242,9 @@ export async function publicarLaminaCms() {
     pinos,
     questoes,
     maxMagnification,
+    objetivaCaptura: maxMagnification,
+    mpp: Number(mpp.toFixed(4)),
+    metodoCalibracao: "referencia_biologica_hemacia_7.5um",
     zoom4xRatio,
     dataModificacao: new Date().toISOString()
   };

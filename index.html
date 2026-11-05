@@ -1357,8 +1357,8 @@
                   value="0.28" 
                   class="w-20 bg-neutral-900 border border-white/[0.12] focus:border-[#d4af37] text-white text-xs rounded px-2 py-1 text-center font-mono">
               </div>
-              <p class="text-[9px] text-neutral-500 italic leading-tight pt-1 border-t border-white/[0.06]">
-                Cada lâmina possui seu parâmetro próprio travado no banco de dados. Mosaicos horizontais (como Osso) usam 0.28 (margens pretas); faixas verticais longas (como Pele) usam 0.65.
+              <p class="text-[9px] text-neutral-400 italic leading-tight pt-1 border-t border-white/[0.06]">
+                Calibração óptica acoplada à referência biológica das hemácias (7.5 µm). O visualizador trava rigidamente na resolução nativa da captura (1:1), impedindo ampliação vazia além da capacidade física real da lâmina.
               </p>
             </div>
           </div>
@@ -1425,8 +1425,10 @@
                   id="dashMaxMagnification"
                   class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer appearance-none"
                   title="Resolução ótica nativa da câmera do microscópio na captura da lâmina">
-                  <option value="40" selected>40x (Padrão do Laboratório)</option>
-                  <option value="60">60x (Lente de Alta Abertura)</option>
+                  <option value="10">10x (Visão Panorâmica Geral)</option>
+                  <option value="20">20x (Média Abertura)</option>
+                  <option value="40" selected>40x (Padrão de Varredura Celular)</option>
+                  <option value="60">60x (Alta Abertura Numérica)</option>
                   <option value="100">100x (Imersão em Óleo)</option>
                 </select>
               </div>

@@ -18,6 +18,16 @@
 
 import { db } from "./firebase-config.js";
 import { removerConteudoPerigoso, sanitizarHTMLDescricao } from "./sanitizer.js";
+import {
+  OBJETIVAS_PADRAO,
+  SELOS,
+  ROTULOS_SELO,
+  emitirCertidaoOptica,
+  calcularAmpliacaoExibida,
+  calcularCampoDeVisaoUm,
+  formatarComprimento,
+  objetivaDisponivel
+} from "./optics-calibration.js";
 
 // ---------------------------------------------------------------------------
 // Estado do modulo
@@ -35,6 +45,11 @@ let nativeZoomRef            = null; // Zoom de referencia para resolucao nativa
 let _delegacaoPinosRegistrada = false;
 let abaAtivaPainel          = "descricao";
 const debounceTimersRespostas = {};
+
+// Certidão Óptica: ampliação real comprovada da lâmina (ver js/optics-calibration.js)
+let certidaoOpticaAtual     = null;
+let manifestoOpticoAtual    = null;
+let perfilOpticoAtual       = null;
 
 // Motor do Microscópio: Interatividade completa e ampliação profunda ativa
 const LAMINA_ESTATICA = false;
@@ -200,7 +215,11 @@ const fallbackLaminas = {
     aliases: ['medula-espinal-he', 'medula-espinal', 'medula'],
     nome: 'Medula Espinal (Corte Transversal)',
     disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E)',
+    coloracao: 'Hematoxilina e Eosina (H&E) • 10x',
+    maxMagnification: 10,
+    objetivaCaptura: 10,
+    mpp: 0.625,
+    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     imagemUrl: 'assets/histologia/medula-espinal-he.png',
     previewImage: 'assets/histologia/medula-espinal-he.png',
     thumbnailUrl: 'assets/histologia/medula-espinal-he.png',
@@ -214,8 +233,10 @@ const fallbackLaminas = {
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
     maxMagnification: 40,
+    objetivaCaptura: 40,
     zoom4xRatio: 0.65,
-    mpp: 0.25,
+    mpp: 0.156,
+    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     defaultCenter: { x: 0.5, y: 0.70 },
     imagemUrl: 'assets/histologia/lamina-real1.dzi',
     previewImage: 'assets/histologia/lamina-real1-preview.jpg',
@@ -292,7 +313,11 @@ const fallbackLaminas = {
     aliases: ['musculo-esqueletico', 'tecido-muscular'],
     nome: 'Tecido Muscular Estriado Esquelético',
     disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E)',
+    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
+    maxMagnification: 40,
+    objetivaCaptura: 40,
+    mpp: 0.156,
+    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     imagemUrl: 'assets/histologia/muscular-esqueletico-he.jpg',
     previewImage: 'assets/histologia/muscular-esqueletico-he.jpg',
     thumbnailUrl: 'assets/histologia/muscular-esqueletico-he.jpg',
@@ -306,8 +331,10 @@ const fallbackLaminas = {
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
     maxMagnification: 40,
+    objetivaCaptura: 40,
     zoom4xRatio: 0.28,
-    mpp: 0.25,
+    mpp: 0.156,
+    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     defaultCenter: { x: 0.65, y: 0.525 },
     imagemUrl: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
     previewImage: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
@@ -349,6 +376,10 @@ const fallbackLaminas = {
     nome: 'Osso Compacto Desgastado',
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
+    maxMagnification: 40,
+    objetivaCaptura: 40,
+    mpp: 0.156,
+    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     imagemUrl: 'assets/histologia/osso_compacto_dzi.dzi',
     previewImage: 'assets/histologia/osso-compacto-preview.jpg',
     thumbnailUrl: 'assets/histologia/osso-compacto-preview.jpg',
@@ -361,7 +392,11 @@ const fallbackLaminas = {
     aliases: ['epitelio-pavimentoso', 'epitelio-simples'],
     nome: 'Epitélio Pavimentoso Simples',
     disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E)',
+    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
+    maxMagnification: 40,
+    objetivaCaptura: 40,
+    mpp: 0.156,
+    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     imagemUrl: 'assets/histologia/epitelio-simples-escamoso.dzi',
     previewImage: 'assets/histologia/epitelio-simples-escamoso-preview.jpg',
     thumbnailUrl: 'assets/histologia/epitelio-simples-escamoso-preview.jpg',
@@ -545,8 +580,15 @@ async function carregarLaminaNoMicroscopio(laminaId) {
           if (dados.maxMagnification) {
             const isPele = (dados.nome && dados.nome.toLowerCase().includes("pele")) || idBuscado === "a3oRvXvJpMKAtU2RE85q" || idBuscado === "pele_espessa";
             laminaAtualData.maxMagnification = isPele ? 40 : (Number(dados.maxMagnification) || 40);
-            aplicarBloqueioObjetivas(laminaAtualData.maxMagnification);
           }
+          // Metadados ópticos cadastrados no CMS (objetiva, MPP, perfil, método)
+          ["objetivaCaptura", "mpp", "perfilOptico", "metodoCalibracao", "opticsUrl"].forEach((campo) => {
+            if (dados[campo] !== undefined && dados[campo] !== null && dados[campo] !== "") {
+              laminaAtualData[campo] = dados[campo];
+            }
+          });
+          recalcularCertidaoOptica();
+          aplicarLimitesOpticos();
 
           renderizarMetadadosDaLamina();
           renderizarDescricaoETextos();
@@ -630,6 +672,18 @@ function renderizarMetadadosDaLamina() {
   if (coloracaoEl)  coloracaoEl.textContent = laminaAtualData.coloracao || "Hematoxilina e Eosina (H&E)";
   if (breadcrumb)   { breadcrumb.textContent = tituloLimpo; breadcrumb.classList.remove("hidden"); }
   if (docTitle)     docTitle.textContent    = `${tituloLimpo} - Palas Atlas`;
+
+  const seloTextoEl = document.getElementById("slideSeloOpticoTexto");
+  const maxMag = Number(laminaAtualData.maxMagnification || laminaAtualData.maxMag || 40);
+  const mpp = Number(laminaAtualData.mpp) || (40 / maxMag) * 0.156;
+  if (seloTextoEl) {
+    seloTextoEl.textContent = `${maxMag}x Nativa (${mpp.toFixed(2)} µm/px)`;
+    const seloEl = document.getElementById("slideSeloOptico");
+    if (seloEl) {
+      seloEl.title = `Calibração Óptica: ${maxMag}x Nativa • ${mpp.toFixed(3)} µm/px • Referência Biológica (Hemácia 7.5 µm) • Trava física 1:1 ativa (sem ampliação vazia)`;
+      seloEl.classList.remove("hidden");
+    }
+  }
 }
 
 // Re-exporta sanitizarHTMLDescricao para retrocompatibilidade
@@ -1050,14 +1104,13 @@ function inicializarOpenSeadragon() {
   const isDzi = imagemUrl.endsWith(".dzi") || imagemUrl.includes(".dzi?");
   const tileSourcesConfig = isDzi ? imagemUrl : { type: "image", url: imagemUrl };
 
-  // MPP da lamina (microns por pixel) — usado pela scalebar
-  const mpp = Number(laminaAtualData.mpp) || 0.25;
+  // MPP da lamina (microns por pixel) — calibrado com referência biológica na Pele Espessa (48px = 7.5 µm -> 0.156 µm/px a 40x)
+  const maxMag = Number(laminaAtualData.maxMagnification || laminaAtualData.maxZoomLevel || laminaAtualData.maxMag) || 40;
+  const mpp = Number(laminaAtualData.mpp) || (40 / maxMag) * 0.156;
   const pixelsPerMeter = Math.round(1e6 / mpp);
 
-  // Limite de zoom máximo baseado na objetiva real da lâmina
-  const maxMag = Number(laminaAtualData.maxMagnification || laminaAtualData.maxZoomLevel || laminaAtualData.maxMag) || 40;
-  const maxZoomPixelRatioMap = { 40: 1.15, 60: 1.25, 100: 1.35 };
-  const maxZoomPixelRatio = maxZoomPixelRatioMap[maxMag] || 1.15;
+  // TRAVA FÍSICA RIGOROSA: maxZoomPixelRatio: 1.0 (garante resolução nativa 1:1, ZERO ampliação vazia / pixel esticado)
+  const maxZoomPixelRatio = 1.0;
 
   // Garantir dimensões explícitas no container e prevenção de interferência de gestos do navegador
   container.style.width = "100%";
@@ -1208,16 +1261,7 @@ function inicializarOpenSeadragon() {
 
       // Análise Óptica Automática e Rigorosa da Pirâmide DZI
       analisarProporcoesOpticasDzi(item, maxMag);
-
-      // Limites físicos de zoom:
-      // Mínimo: 90% do enquadramento panorâmico (4x) permitindo margens pretas confortáveis
-      // Máximo: Travamento absoluto no teto da lâmina (40x, 60x ou 100x) — impede ultrapassar para 50x
-      const zoom4x = getZoom4xRef();
-      const minOSDZoom = zoom4x * 0.90;
-      const maxOSDZoom = calcularZoomParaMagnificacao(maxMag);
-
-      viewer.viewport.minZoomLevel = minOSDZoom;
-      viewer.viewport.maxZoomLevel = maxOSDZoom;
+      aplicarLimitesOpticos();
 
       const urlParams = new URLSearchParams(window.location.search);
       const initialMagParam = urlParams.get("mag");
@@ -1323,6 +1367,77 @@ function inicializarOpenSeadragon() {
 
     updateZoomDisplay();
   });
+}
+
+// ---------------------------------------------------------------------------
+// 5.4 Calibração Óptica e Certidão por Lâmina
+// ---------------------------------------------------------------------------
+
+// Perfil de calibração padrão derivado da referência biológica (Hemácia da Pele Espessa: 48px = 7.5 µm -> 0.156 µm/px a 40x)
+export const PERFIL_OPTICO_PADRAO = {
+  id: "bancada-palas-atlas",
+  nome: "Bancada Palas Atlas (Calibração Biológica - Hemácia Humana 7.5 µm)",
+  camera: "Câmera Digital Microscópica",
+  adaptador: 0.5,
+  calibracoes: {
+    "4":   1.562,
+    "10":  0.625,
+    "20":  0.312,
+    "40":  0.156,
+    "60":  0.104,
+    "100": 0.0625
+  },
+  metodo: "referencia_biologica_hemacia_7.5um",
+  calibradoEm: "2026-11-05"
+};
+
+export function getDziDimensions() {
+  if (!viewer) return null;
+  const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+  if (item && item.source && item.source.dimensions) {
+    return { largura: item.source.dimensions.x, altura: item.source.dimensions.y };
+  }
+  if (item && typeof item.getContentSize === "function") {
+    const cs = item.getContentSize();
+    return { largura: cs.x, altura: cs.y };
+  }
+  return null;
+}
+
+export function recalcularCertidaoOptica() {
+  if (!laminaAtualData) return null;
+  const dimensoesDzi = getDziDimensions();
+
+  certidaoOpticaAtual = emitirCertidaoOptica({
+    lamina: laminaAtualData,
+    manifesto: manifestoOpticoAtual,
+    perfil: perfilOpticoAtual || PERFIL_OPTICO_PADRAO,
+    dimensoesDzi
+  });
+
+  if (certidaoOpticaAtual) {
+    laminaAtualData.maxMagnification = certidaoOpticaAtual.ampliacaoMaxima;
+    laminaAtualData.mpp = certidaoOpticaAtual.mppEfetivo;
+    laminaAtualData.certidaoOptica = certidaoOpticaAtual;
+  }
+  return certidaoOpticaAtual;
+}
+
+export function aplicarLimitesOpticos() {
+  if (!viewer || !viewer.viewport) return;
+  recalcularCertidaoOptica();
+
+  const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
+  const zoom4x = getZoom4xRef();
+  const minOSDZoom = zoom4x * 0.90;
+  const maxOSDZoom = calcularZoomParaMagnificacao(maxMag);
+
+  // Trava física absoluta no teto de ampliação real da lâmina
+  viewer.viewport.minZoomLevel = minOSDZoom;
+  viewer.viewport.maxZoomLevel = maxOSDZoom;
+
+  aplicarBloqueioObjetivas(maxMag);
+  atualizarLenteBotaoAtivo();
 }
 
 // ---------------------------------------------------------------------------
@@ -2101,6 +2216,8 @@ Object.assign(window.App, {
   getZoom4xRef,
   calcularZoomParaMagnificacao,
   analisarProporcoesOpticasDzi,
+  recalcularCertidaoOptica,
+  aplicarLimitesOpticos,
   sanitizarHTMLDescricao,
   aplicarEstadoSidebar,
   fecharSidebar: () => aplicarEstadoSidebar(true, true),
@@ -2119,6 +2236,8 @@ window.formatarMagnificacaoOtica     = formatarMagnificacaoOtica;
 window.getZoom4xRef                 = getZoom4xRef;
 window.calcularZoomParaMagnificacao = calcularZoomParaMagnificacao;
 window.analisarProporcoesOpticasDzi  = analisarProporcoesOpticasDzi;
+window.recalcularCertidaoOptica     = recalcularCertidaoOptica;
+window.aplicarLimitesOpticos        = aplicarLimitesOpticos;
 window.sanitizarHTMLDescricao       = sanitizarHTMLDescricao;
 window.aplicarEstadoSidebar         = aplicarEstadoSidebar;
 window.fecharSidebar                = () => aplicarEstadoSidebar(true, true);

@@ -42,6 +42,9 @@ function scanAssets() {
       const previewCandidate = `${baseSlug}-preview.jpg`;
       const hasPreview = fs.existsSync(path.join(ASSETS_DIR, previewCandidate));
 
+      const maxMag = baseSlug.includes("medula") ? 10 : 40;
+      const mpp = baseSlug.includes("medula") ? 0.625 : 0.156;
+
       items.push({
         id: baseSlug,
         nome: formatarNome(baseSlug),
@@ -52,6 +55,9 @@ function scanAssets() {
         largura: width,
         altura: height,
         tileSize,
+        maxMagnification: maxMag,
+        mpp: mpp,
+        metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
         preview: hasPreview ? `assets/histologia/${previewCandidate}` : null
       });
     } else if (stat.isFile() && (entry.endsWith('.jpg') || entry.endsWith('.png')) && !entry.includes('-preview')) {

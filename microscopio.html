@@ -609,9 +609,15 @@
             <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] leading-snug tracking-tight truncate sm:whitespace-normal">
               Carregando lâmina...
             </h2>
-            <p id="slideColoracao" class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-[10.5px] font-mono tracking-wide text-[#d4af37]">
-              Hematoxilina e Eosina (H&amp;E)
-            </p>
+            <div class="mt-2 flex flex-wrap items-center gap-1.5">
+              <p id="slideColoracao" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-[10.5px] font-mono tracking-wide text-[#d4af37]">
+                Hematoxilina e Eosina (H&amp;E)
+              </p>
+              <span id="slideSeloOptico" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-400" title="Resolução Óptica Nativa Travada">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span id="slideSeloOpticoTexto">40x Nativa</span>
+              </span>
+            </div>
             <span id="slideDisciplina" class="hidden">—</span>
           </div>
           <button
@@ -670,7 +676,7 @@
   </div><!-- /workspace -->
 
   <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261105_engine_fix"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261105_optics_real"></script>
 
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>
