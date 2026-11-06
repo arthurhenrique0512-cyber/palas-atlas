@@ -1429,9 +1429,22 @@ html[data-theme="dark"] .popular-slide-card h3 {
 html[data-theme="dark"] .popular-slide-card p {
   color: #94a3b8 !important;
 }
+html[data-theme="dark"] .popular-slide-card a {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+html[data-theme="dark"] .popular-slide-card a:hover {
+  background-color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+  color: #020617 !important;
+}
+html[data-theme="dark"] .popular-slide-card a:hover span {
+  color: #020617 !important;
+}
 
-/* Pilares / Recursos */
-html[data-theme="dark"] #secaoRecursosPlataforma {
+/* Guia Prático / Como Usar */
+html[data-theme="dark"] #secaoComoUsar {
   background-color: #07090e !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
@@ -1462,27 +1475,26 @@ html[data-theme="dark"] .faq-item .faq-content {
   color: #94a3b8 !important;
 }
 
-/* Hub Dinâmico de Métricas (Canto Superior Direito) */
-.hero-stat-pill {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Card de Especificações do Acervo (Canto Superior Direito) */
+.hero-spec-card {
+  background-color: rgba(248, 250, 252, 0.95);
+  border: 1px solid #e2e8f0;
 }
-html[data-theme="dark"] .hero-stat-pill {
-  background-color: #101015 !important;
+.hero-spec-card .spec-title {
+  color: #64748b;
+}
+.hero-spec-card .spec-list {
+  color: #334155;
+}
+
+html[data-theme="dark"] .hero-spec-card {
+  background-color: #101014 !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
-html[data-theme="dark"] .hero-stat-pill:hover {
-  background-color: #16161d !important;
-  border-color: rgba(56, 189, 248, 0.35) !important;
-}
-html[data-theme="dark"] .hero-stat-pill .stat-num {
-  color: #ffffff !important;
-}
-html[data-theme="dark"] .hero-stat-pill .text-slate-500 {
+html[data-theme="dark"] .hero-spec-card .spec-title {
   color: #94a3b8 !important;
 }
-html[data-theme="dark"] .hero-status-badge {
-  background-color: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: #94a3b8 !important;
+html[data-theme="dark"] .hero-spec-card .spec-list {
+  color: #cbd5e1 !important;
 }
 
