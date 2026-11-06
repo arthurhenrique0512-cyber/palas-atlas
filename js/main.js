@@ -1,5 +1,5 @@
 /**
- * Roteador e Controlador Principal do Simulador Médico V3
+ * Roteador e Controlador Principal do Palas Atlas
  * Responsável por gerenciar a navegação, transições de tela e vinculação de estado.
  */
 import { db } from "./firebase-config.js";
@@ -388,7 +388,7 @@ function navegarPara(destino) {
 }
 
 /**
- * Utilitário global inteligente para retorno de rotas utilizando o histórico do navegador.
+ * Utilitário global para retorno de rotas utilizando o histórico do navegador.
  */
 function voltarGlobal() {
   if (window.history.length > 1) {

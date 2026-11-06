@@ -1166,7 +1166,7 @@ export function inicializarEventosPreviewInterativo() {
   const editor = document.getElementById("dashEditorTexto");
   if (!editor || editor._eventosInteracaoInjetados) return;
 
-  // Intercepta colagem no editor para remover HTML poluente e spans parasitas de chats de IA
+  // Intercepta colagem no editor para colar apenas texto puro e remover formatações externas
   editor.addEventListener("paste", (evento) => {
     evento.preventDefault();
     const textoPuro = (evento.clipboardData || window.clipboardData).getData("text/plain");

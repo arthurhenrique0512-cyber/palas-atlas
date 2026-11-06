@@ -327,7 +327,7 @@
           <div class="pt-5 border-t border-slate-200/80">
             <span class="text-[10px] tracking-[0.25em] font-mono font-semibold text-slate-400 uppercase mb-3 px-3 block">Sobre Nós</span>
             <p class="font-sans text-xs text-slate-500 leading-relaxed font-normal text-justify px-3 mb-4">
-              O Palas Atlas nasce da iniciativa de estudantes de Medicina para integrar a Morfologia, a Histopatologia e a Microbiologia em uma única plataforma diagnóstica.
+              O Palas Atlas nasce da iniciativa de estudantes de Medicina para integrar a Morfologia, a Histopatologia e a Microbiologia em um acervo acadêmico aberto e acessível.
             </p>
 
             <div class="space-y-1">
@@ -854,11 +854,11 @@
                   // Ordenação consistente das lâminas oficiais
                   const ordemPrioritaria = ['cw3XGCgUwN71XdlwkUe5', 'FFGk5d9kOAct5HIDdjQ7', '96ZYqoM2SV8p4fB2QgeM', 'a3oRvXvJpMKAtU2RE85q'];
                   firestoreSlides.sort((a, b) => {
-                    const ia = ordemPrioritaria.indexOf(a.id);
-                    const ib = ordemPrioritaria.indexOf(b.id);
-                    if (ia !== -1 && ib !== -1) return ia - ib;
-                    if (ia !== -1) return -1;
-                    if (ib !== -1) return 1;
+                    const indexA = ordemPrioritaria.indexOf(a.id);
+                    const indexB = ordemPrioritaria.indexOf(b.id);
+                    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                    if (indexA !== -1) return -1;
+                    if (indexB !== -1) return 1;
                     return a.title.localeCompare(b.title);
                   });
 
@@ -1296,7 +1296,7 @@
           <div class="max-w-2xl text-left mb-12">
             <span class="text-[10px] tracking-[0.25em] font-mono font-semibold text-sky-700 uppercase block mb-1.5">Instruções Práticas</span>
             <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-[-0.02em] mb-3">
-              Como utilizar o microscópio virtual
+              Como utilizar o microscópio digital
             </h2>
             <p class="text-slate-600 text-sm leading-relaxed font-sans">
               O visualizador reproduz a rotina de bancada de um microscópio óptico real, com navegação contínua em alta resolução e objetivas pré-calibradas.
@@ -1351,7 +1351,7 @@
                   Critérios Morfológicos
                 </h3>
                 <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
-                  Clique nos pinos numerados para abrir a ficha descritiva com critérios diagnósticos, detalhes citológicos e camadas teciduais assinaladas pela equipe acadêmica.
+                  Clique nos pinos numerados para abrir a ficha descritiva com critérios morfológicos, detalhes citológicos e camadas teciduais assinaladas pela equipe acadêmica.
                 </p>
               </div>
               <div class="pt-6 mt-6 border-t border-slate-100 text-[11px] font-mono text-slate-500">
@@ -2036,7 +2036,7 @@
             </div>
 
             <div id="dashListaPinos" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-              <p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl">Nenhuma anotação marcada na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações de diagnóstico.</p>
+              <p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl">Nenhuma anotação marcada na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações anatômicas.</p>
             </div>
           </div>
 
@@ -2447,7 +2447,7 @@
               Objetivas e Tela Cheia
             </h4>
             <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
-              No microscópio virtual, selecione aumentos padronizados (<strong class="text-slate-900 font-semibold">4x, 10x, 40x e 100x</strong>) no seletor rápido do cabeçalho. Ative o modo <strong class="text-slate-900 font-semibold">Tela Cheia</strong> para sessões imersivas de estudo ou projeções em salas de aula.
+              No microscópio digital, selecione aumentos padronizados (<strong class="text-slate-900 font-semibold">4x, 10x, 40x e 100x</strong>) no seletor de objetivas. Ative o modo <strong class="text-slate-900 font-semibold">Tela Cheia</strong> para sessões imersivas de estudo ou projeções em salas de aula.
             </p>
           </div>
         </div>

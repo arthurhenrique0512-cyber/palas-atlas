@@ -39,8 +39,8 @@ export function removerConteudoPerigoso(html) {
 }
 
 /**
- * Sanitiza o HTML da descrição morfológica, removendo artefatos poluentes copiados de chats de IA
- * (como spans parasitas com inline styles de tailwind, animações, blockquotes e &nbsp;)
+ * Sanitiza o HTML da descrição morfológica, removendo artefatos poluentes
+ * (como spans com inline styles de tailwind, animações, blockquotes e &nbsp;)
  * garantindo quebra natural de linha (word-wrap) sem cortar texto à direita.
  * Preserva estritamente os links de pinos (.pin-link ou data-pin-id) e formatações legítimas.
  *
@@ -59,7 +59,7 @@ export function sanitizarHTMLDescricao(html) {
   // 2. Remove tags blockquote mantendo o conteúdo interno
   limpo = limpo.replace(/<\/?blockquote[^>]*>/gi, "");
 
-  // 3. Remove spans aninhados parasitas com inline styles (de streaming de IA como ChatGPT)
+  // 3. Remove spans aninhados residuais com inline styles
   // Preserva estritamente spans que sejam pin-link ou tenham data-pin-id
   for (let i = 0; i < 6; i++) {
     limpo = limpo.replace(/<span\s+(?![^>]*class=["'][^"']*pin-link[^"']*["'])(?![^>]*data-pin-id)[^>]*>([\s\S]*?)<\/span>/gi, "$1");
