@@ -1,26 +1,18 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palas Atlas | Atlas Morfológico Digital</title>
   <script>
-    // Inicialização instantânea do Tema (Padrão: Tema Escuro Azul-Abissal #0B1120)
+    // Inicialização instantânea do Tema (Padrão Institucional: Claro)
     (function() {
       try {
         var urlTheme = new URLSearchParams(window.location.search).get('theme');
-        var saved = (urlTheme === 'light' || urlTheme === 'dark') ? urlTheme : localStorage.getItem('palas_theme');
-        if (!saved) {
-          var legacy = localStorage.getItem('@PalasAtlas:Settings');
-          if (legacy) {
-            var parsed = JSON.parse(legacy);
-            if (parsed && (parsed.theme === 'light' || parsed.theme === 'dark')) saved = parsed.theme;
-          }
-        }
-        var theme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+        var theme = (urlTheme === 'dark') ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
       } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'dark');
+        document.documentElement.setAttribute('data-theme', 'light');
       }
     })();
 
@@ -57,12 +49,12 @@
     };
 
     window.togglePalasTheme = function() {
-      var current = document.documentElement.getAttribute('data-theme') || 'dark';
+      var current = document.documentElement.getAttribute('data-theme') || 'light';
       window.setPalasTheme(current === 'dark' ? 'light' : 'dark');
     };
 
     document.addEventListener('DOMContentLoaded', function() {
-      window.setPalasTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+      window.setPalasTheme(document.documentElement.getAttribute('data-theme') || 'light');
     });
   </script>
   <meta name="description" content="Plataforma de ensino morfológico focado em Histologia, Patologia, Parasitologia e Microbiologia para o ciclo básico." />
@@ -91,8 +83,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Folha de Estilos Tailwind Compilada + Estilos Customizados -->
-  <link rel="stylesheet" href="css/tailwind.min.css?v=18">
-  <link rel="stylesheet" href="css/styles.css?v=35">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=19">
+  <link rel="stylesheet" href="css/styles.css?v=36">
   <link rel="stylesheet" href="css/splash.css?v=1">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
@@ -212,30 +204,13 @@
         <a href="sobre.html" class="text-xs lg:text-sm font-sans font-medium text-slate-600 hover:text-sky-700 transition-colors no-underline">Sobre Nós</a>
       </nav>
 
-      <!-- Lado Direito: Alternador Sol/Lua + Botão CTA + Menu Lateral -->
+      <!-- Lado Direito: Menu Lateral Limpo & Acessível -->
       <div class="pointer-events-auto flex items-center gap-2 sm:gap-3">
-        <a href="microscopio.html" id="btnHeaderMicroscopeCTA" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-sans font-semibold tracking-wide shadow-sm hover:shadow transition-all duration-200 no-underline cursor-pointer active:scale-95">
-          <svg class="w-3.5 h-3.5 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-          <span>Microscópio</span>
-        </a>
-
-        <button id="btnThemeToggle" type="button" onclick="window.togglePalasTheme()" class="h-10 w-10 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs" aria-label="Alternar Tema" title="Alternar Tema">
-          <!-- Ícone Sol (visível no Tema Escuro para mudar para Claro) -->
-          <svg class="theme-icon-sun w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
-          </svg>
-          <!-- Ícone Lua (visível no Tema Claro para mudar para Escuro) -->
-          <svg class="theme-icon-moon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-          </svg>
-        </button>
-
-        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="h-10 px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs" aria-label="Abrir Menu Lateral" title="Menu">
+        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="h-10 px-4 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs" aria-label="Abrir Menu Lateral" title="Menu">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
-          <span class="text-xs font-sans font-semibold hidden sm:inline">Menu</span>
+          <span class="text-xs font-sans font-semibold">Menu</span>
         </button>
       </div>
 
@@ -403,39 +378,59 @@
 
       <!-- RETÂNGULO DO TÍTULO PRINCIPAL: Sangra até a esquerda toda, até a direita toda e vai até o topo absoluto -->
       <div id="heroTitleBoxBg" class="w-full bg-white border-b border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] relative z-20 transition-colors duration-300 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-8 sm:pb-10 relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-8 sm:pb-9 relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-10">
           
-          <!-- Lado Esquerdo: Título & Subtítulo -->
+          <!-- Lado Esquerdo: Tag Acadêmica, Título Nobre & Subtítulo -->
           <div class="max-w-2xl text-left">
-            <h1 class="font-serif text-3xl sm:text-4xl lg:text-[3.05rem] font-extrabold tracking-[-0.02em] text-slate-900 mb-2 sm:mb-3 text-left" style="line-height: 1.22;">
-              Atlas Integrado de <br class="hidden sm:inline" />
-              <span class="text-sky-700 font-extrabold block sm:inline mt-0.5 sm:mt-0">Ciências Morfológicas</span>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100/90 border border-slate-200 text-slate-700 text-[11px] font-mono font-semibold uppercase tracking-wider mb-3">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
+              <span>Atlas Morfológico Digital</span>
+            </div>
+            
+            <h1 class="font-serif text-2xl sm:text-3xl lg:text-[2.25rem] font-bold tracking-tight text-slate-900 mb-2.5 text-left leading-snug">
+              Atlas Integrado de <span class="text-sky-800 font-bold">Ciências Morfológicas</span>
             </h1>
+            
             <p class="text-slate-600 text-sm sm:text-base font-sans font-normal leading-relaxed max-w-xl text-left">
               Explore lâminas microscópicas reais em alta definição com navegação óptica interativa.
             </p>
           </div>
 
-          <!-- Canto Superior Direito: Especificações do Acervo -->
-          <div class="shrink-0 flex flex-col justify-center self-center sm:self-auto w-full sm:w-auto">
-            <div class="hero-spec-card p-4 sm:p-5 rounded-none max-w-sm text-left shadow-2xs">
-              <span class="text-[10px] tracking-[0.22em] font-mono font-semibold uppercase block mb-3 spec-title">Acervo Acadêmico</span>
-              <ul class="space-y-2.5 text-xs font-sans spec-list">
+          <!-- Canto Superior Direito: Card Refinado de Especificações do Acervo -->
+          <div class="shrink-0 flex flex-col justify-center w-full lg:w-auto">
+            <div class="hero-spec-card p-4 sm:p-5 rounded-2xl w-full sm:max-w-md lg:w-[380px] text-left shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] border border-slate-200/90 bg-slate-50/80 backdrop-blur-sm">
+              <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200/70">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span class="text-[10px] tracking-[0.2em] font-mono font-semibold uppercase text-slate-600">Acervo Acadêmico</span>
+                </div>
+                <span class="text-[10px] font-mono font-medium text-slate-400 uppercase tracking-wider">Acesso Aberto</span>
+              </div>
+              
+              <ul class="space-y-2.5 text-xs font-sans text-slate-700">
                 <li class="flex items-center gap-2.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>
-                  <span>Cortes histológicos em alta definição</span>
+                  <span class="w-6 h-6 rounded-lg bg-sky-100/80 text-sky-800 border border-sky-200/60 flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M19 12a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                  </span>
+                  <span class="font-medium text-slate-800">Cortes histológicos em alta definição</span>
                 </li>
                 <li class="flex items-center gap-2.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
-                  <span>Colorações H&amp;E, desgastes e técnicas especiais</span>
+                  <span class="w-6 h-6 rounded-lg bg-amber-100/80 text-amber-800 border border-amber-200/60 flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                  </span>
+                  <span class="font-medium text-slate-800">Colorações H&amp;E, desgastes e técnicas</span>
                 </li>
                 <li class="flex items-center gap-2.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                  <span>Pinos com critérios morfológicos de identificação</span>
+                  <span class="w-6 h-6 rounded-lg bg-emerald-100/80 text-emerald-800 border border-emerald-200/60 flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  </span>
+                  <span class="font-medium text-slate-800">Pinos com critérios morfológicos</span>
                 </li>
                 <li class="flex items-center gap-2.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
-                  <span>Iniciativa universitária sem fins lucrativos</span>
+                  <span class="w-6 h-6 rounded-lg bg-slate-200/80 text-slate-800 border border-slate-300/60 flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                  </span>
+                  <span class="font-medium text-slate-800">Iniciativa universitária sem fins lucrativos</span>
                 </li>
               </ul>
             </div>
