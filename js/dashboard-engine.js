@@ -495,7 +495,12 @@ export async function editarLaminaCms(id) {
   if (nomeInput) nomeInput.value = lamina.nome || "";
   if (disciplinaSelect) { disciplinaSelect.value = lamina.disciplina || "histologia"; atualizarTopicosCms(lamina.disciplina || "histologia"); }
   if (topicoSelect && lamina.topico) topicoSelect.value = lamina.topico;
-  if (coloracaoSelect && lamina.coloracao) coloracaoSelect.value = lamina.coloracao;
+  if (coloracaoSelect && lamina.coloracao) {
+    coloracaoSelect.value = lamina.coloracao;
+    if (!coloracaoSelect.value && lamina.coloracao.toLowerCase().includes("desgaste")) {
+      coloracaoSelect.value = "Desgaste";
+    }
+  }
   if (statusSelect) statusSelect.value = lamina.status || "inativa";
   // Req 1: Carrega maxMagnification e zoom4xRatio ao editar
   const maxMagSelect = document.getElementById("dashMaxMagnification");
