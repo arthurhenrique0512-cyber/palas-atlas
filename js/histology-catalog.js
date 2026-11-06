@@ -341,6 +341,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     window._currentTopicUnsubscribe = db.collection("laminas")
       .where("status", "==", "ativa")
       .onSnapshot((snapshot) => {
+        let laminasDoTopico = [];
         const docsFirestore = [];
         snapshot.forEach((doc) => {
           const data = doc.data();
