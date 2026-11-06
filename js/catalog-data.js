@@ -26,7 +26,7 @@ export const catalogData = {
         laminasEstaticas: [
           {
             id: "a3oRvXvJpMKAtU2RE85q",
-            nome: "Pele Espessa (Epiderme e Derme) HE",
+            nome: "Pele Espessa",
             coloracao: "Hematoxilina e Eosina (H&E) • 40x",
             disciplina: "histologia",
             topico: "epitelial",
@@ -76,22 +76,22 @@ export const catalogData = {
         resumo: "Tecido conjuntivo rígido e mineralizado, composto por matriz orgânica (predomínio de colágeno tipo I) impregnada por matriz inorgânica (cristais de hidroxiapatita). Suas células incluem osteoblastos (síntese do osteoide), osteócitos (manutenção da matriz em lacunas comunicadas por canalículos) e osteoclastos (células multinucleadas responsáveis pela reabsorção óssea). Apresenta-se como Óssea Compacto (organizado em Sistemas de Havers ou Ósteons, com lamelas concêntricas ao redor de canais vasculares) e Óssea Esponjoso (rede tridimensional de trabéculas ósseas que delimitam cavidades preenchidas por medula óssea).",
         laminasEstaticas: [
           {
-            id: "96ZYqoM2SV8p4fB2QgeM",
-            nome: "Osso Maduro (Lamelar) por Desgaste",
-            coloracao: "Desgaste • 40x",
+            id: "cw3XGCgUwN71XdlwkUe5",
+            nome: "Osso Maduro 40x",
+            coloracao: "Desgaste • 40x Mapeamento 6x8 (48 fotos)",
             disciplina: "histologia",
             topico: "osseo",
-            maxMagnification: 40,
+            maxMagnification: 100,
             zoom4xRatio: 0.28,
-            defaultCenter: { x: 0.65, y: 0.525 },
-            dziUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
-            imageUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
-            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg",
-            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg"
+            defaultCenter: { x: 0.5, y: 0.5 },
+            dziUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
+            imageUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
+            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg",
+            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
           },
           {
-            id: "osso_maduro_desgaste_ct_2.0",
-            nome: "Osso Maduro (Lamelar) por Desgaste v2.0",
+            id: "FFGk5d9kOAct5HIDdjQ7",
+            nome: "Osso Maduro 10x",
             coloracao: "Desgaste • 10x Mapeamento 2x5",
             disciplina: "histologia",
             topico: "osseo",
@@ -104,18 +104,18 @@ export const catalogData = {
             thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg"
           },
           {
-            id: "osso_maduro_desgaste_ct_3.0",
-            nome: "Osso Maduro (Lamelar) por Desgaste v3.0 (40x)",
-            coloracao: "Desgaste • 40x Mapeamento 6x8 (48 fotos)",
+            id: "96ZYqoM2SV8p4fB2QgeM",
+            nome: "Osso Maduro",
+            coloracao: "Desgaste • 40x",
             disciplina: "histologia",
             topico: "osseo",
-            maxMagnification: 100,
+            maxMagnification: 40,
             zoom4xRatio: 0.28,
-            defaultCenter: { x: 0.5, y: 0.5 },
-            dziUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
-            imageUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
-            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg",
-            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
+            defaultCenter: { x: 0.65, y: 0.525 },
+            dziUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
+            imageUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
+            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg",
+            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg"
           }
         ]
       },

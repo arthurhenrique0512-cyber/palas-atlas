@@ -503,7 +503,7 @@
               <img
                 id="vitrineImage"
                 src="assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
-                alt="Osso Maduro (Lamelar) v3.0 (40x)"
+                alt="Osso Maduro 40x"
                 class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out opacity-100 group-hover/showcase:scale-105"
                 onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';"
               />
@@ -530,7 +530,7 @@
                     </span>
                   </div>
                   <h3 id="vitrineTitle" class="font-serif font-bold text-xl sm:text-2xl text-white leading-snug tracking-tight drop-shadow-sm">
-                    Osso Maduro (Lamelar) v3.0 (40x)
+                    Osso Maduro 40x
                   </h3>
                   <p id="vitrineDesc" class="text-xs sm:text-sm text-white/85 line-clamp-1 leading-relaxed font-sans">
                     Varredura panorâmica em 40x com 48 campos costurados pelo Fiji Stitching e enquadramento retangular perfeito.
@@ -541,7 +541,7 @@
                 <div class="pt-3 border-t border-white/15 flex items-center justify-between gap-4">
                   <a
                     id="vitrineActionBtn"
-                    href="microscopio.html?id=osso_maduro_desgaste_ct_3.0"
+                    href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5"
                     class="inline-flex items-center gap-2 text-xs sm:text-sm font-sans font-semibold text-white hover:text-[#d4af37] transition-colors duration-150 group/link no-underline"
                   >
                     <span>Abrir no Microscópio</span>
@@ -563,7 +563,7 @@
                       </svg>
                     </button>
 
-                    <span id="vitrineCounter" class="text-[11px] tracking-wider text-white font-semibold px-2">01 / 03</span>
+                    <span id="vitrineCounter" class="text-[11px] tracking-wider text-white font-semibold px-2">01 / 04</span>
 
                     <button
                       type="button"
@@ -591,8 +591,8 @@
         (function() {
           const baseSlides = [
             {
-              id: 'osso_maduro_desgaste_ct_3.0',
-              title: 'Osso Maduro (Lamelar) v3.0 (40x)',
+              id: 'cw3XGCgUwN71XdlwkUe5',
+              title: 'Osso Maduro 40x',
               category: 'Histologia • Tecido Ósseo',
               stain: 'Desgaste • 40x (Mapeamento 6x8)',
               specimen: 'Panorama 48 Fotos • ~36.2 MP (Retangular)',
@@ -601,11 +601,11 @@
               previewImage: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
               image: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
               dziUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0.dzi',
-              link: 'microscopio.html?id=osso_maduro_desgaste_ct_3.0'
+              link: 'microscopio.html?id=cw3XGCgUwN71XdlwkUe5'
             },
             {
-              id: 'osso_maduro_desgaste_ct_2.0',
-              title: 'Osso Maduro (Lamelar) v2.0',
+              id: 'FFGk5d9kOAct5HIDdjQ7',
+              title: 'Osso Maduro 10x',
               category: 'Histologia • Tecido Ósseo',
               stain: 'Desgaste • 10x (Mapeamento 2x5)',
               specimen: 'Varredura 10 Fotos • ~8.4 MP (Retangular)',
@@ -614,11 +614,11 @@
               previewImage: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
               image: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
               dziUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0.dzi',
-              link: 'microscopio.html?id=osso_maduro_desgaste_ct_2.0'
+              link: 'microscopio.html?id=FFGk5d9kOAct5HIDdjQ7'
             },
             {
-              id: 'osso_maduro_desgaste_ct',
-              title: 'Osso Maduro (Lamelar)',
+              id: '96ZYqoM2SV8p4fB2QgeM',
+              title: 'Osso Maduro',
               category: 'Histologia • Tecido Ósseo',
               stain: 'Desgaste • 40x',
               specimen: 'Corte Transversal',
@@ -627,7 +627,7 @@
               previewImage: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
               image: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
               dziUrl: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
-              link: 'microscopio.html?id=osso_maduro_desgaste_ct'
+              link: 'microscopio.html?id=96ZYqoM2SV8p4fB2QgeM'
             },
             {
               id: 'a3oRvXvJpMKAtU2RE85q',
@@ -838,12 +838,33 @@
                 });
 
                 if (firestoreSlides.length > 0) {
-                  const mapaSlides = new Map();
-                  baseSlides.forEach(s => mapaSlides.set(s.id, s));
-                  firestoreSlides.forEach(s => mapaSlides.set(s.id, s));
-                  slides = Array.from(mapaSlides.values());
+                  // Ordenação consistente das lâminas oficiais
+                  const ordemPrioritaria = ['cw3XGCgUwN71XdlwkUe5', 'FFGk5d9kOAct5HIDdjQ7', '96ZYqoM2SV8p4fB2QgeM', 'a3oRvXvJpMKAtU2RE85q'];
+                  firestoreSlides.sort((a, b) => {
+                    const ia = ordemPrioritaria.indexOf(a.id);
+                    const ib = ordemPrioritaria.indexOf(b.id);
+                    if (ia !== -1 && ib !== -1) return ia - ib;
+                    if (ia !== -1) return -1;
+                    if (ib !== -1) return 1;
+                    return a.title.localeCompare(b.title);
+                  });
+
+                  // O CMS / Firestore é a FONTE DE VERDADE ABSOLUTA:
+                  // Substitui completamente a vitrine para refletir os nomes exatos do CMS sem duplicatas
+                  slides = firestoreSlides;
                   if (currentIndex >= slides.length) currentIndex = 0;
                   renderSlide(currentIndex, true);
+
+                  // Atualiza dinamicamente os títulos dos cards de lâminas populares na página
+                  firestoreSlides.forEach(fs => {
+                    const cards = document.querySelectorAll(`[data-slide-id="${fs.id}"]`);
+                    cards.forEach(card => {
+                      const tEl = card.querySelector('.popular-slide-title');
+                      if (tEl && fs.title) tEl.textContent = fs.title;
+                      const lEl = card.querySelector('a');
+                      if (lEl) lEl.href = `microscopio.html?id=${fs.id}`;
+                    });
+                  });
                 }
               }, err => {
                 console.warn('[Vitrine] Erro na sincronização com Firestore:', err);
@@ -1084,13 +1105,13 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          <!-- Card 1: Osso Maduro v3.0 (40x HD) -->
-          <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+          <!-- Card 1: Osso Maduro 40x -->
+          <div data-slide-id="cw3XGCgUwN71XdlwkUe5" class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
                   src="assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg" 
-                  alt="Osso Maduro v3.0 (40x)" 
+                  alt="Osso Maduro 40x" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                   loading="lazy"
                   onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';"
@@ -1107,8 +1128,8 @@
               </div>
 
               <div class="p-5">
-                <h3 class="font-serif font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors leading-snug mb-1.5">
-                  Osso Maduro v3.0
+                <h3 class="popular-slide-title font-serif font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors leading-snug mb-1.5">
+                  Osso Maduro 40x
                 </h3>
                 <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-sans mb-4">
                   Varredura panorâmica em 40x com 48 campos costurados pelo Fiji Stitching e recorte retangular limpo.
@@ -1118,7 +1139,7 @@
 
             <div class="p-5 pt-0">
               <a 
-                href="microscopio.html?id=osso_maduro_desgaste_ct_3.0" 
+                href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5" 
                 class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-none bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200/90 text-xs font-sans font-semibold tracking-wide transition-all duration-200 no-underline shadow-2xs group/btn">
                 <span>Examinar Lâmina</span>
                 <span class="text-[#d4af37] group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
@@ -1126,13 +1147,13 @@
             </div>
           </div>
 
-          <!-- Card 2: Osso Maduro v2.0 (10x) -->
-          <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+          <!-- Card 2: Osso Maduro 10x -->
+          <div data-slide-id="FFGk5d9kOAct5HIDdjQ7" class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
                   src="assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg" 
-                  alt="Osso Maduro v2.0 (10x)" 
+                  alt="Osso Maduro 10x" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                   loading="lazy"
                   onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg';"
@@ -1149,8 +1170,8 @@
               </div>
 
               <div class="p-5">
-                <h3 class="font-serif font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors leading-snug mb-1.5">
-                  Osso Maduro v2.0
+                <h3 class="popular-slide-title font-serif font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors leading-snug mb-1.5">
+                  Osso Maduro 10x
                 </h3>
                 <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-sans mb-4">
                   Mapeamento contínuo em 10x com 10 campos em grade snake e visão panorâmica da matriz lamelar.
@@ -1160,7 +1181,7 @@
 
             <div class="p-5 pt-0">
               <a 
-                href="microscopio.html?id=osso_maduro_desgaste_ct_2.0" 
+                href="microscopio.html?id=FFGk5d9kOAct5HIDdjQ7" 
                 class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-none bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200/90 text-xs font-sans font-semibold tracking-wide transition-all duration-200 no-underline shadow-2xs group/btn">
                 <span>Examinar Lâmina</span>
                 <span class="text-[#d4af37] group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
@@ -1168,8 +1189,8 @@
             </div>
           </div>
 
-          <!-- Card 3: Osso Maduro (Lamelar) Original -->
-          <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+          <!-- Card 3: Osso Maduro -->
+          <div data-slide-id="96ZYqoM2SV8p4fB2QgeM" class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
@@ -1191,8 +1212,8 @@
               </div>
 
               <div class="p-5">
-                <h3 class="font-serif font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors leading-snug mb-1.5">
-                  Osso Maduro (Lamelar)
+                <h3 class="popular-slide-title font-serif font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors leading-snug mb-1.5">
+                  Osso Maduro
                 </h3>
                 <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-sans mb-4">
                   Sistemas de Havers (ósteons), canal central vascular e intrincada rede de canalículos.
@@ -1202,7 +1223,7 @@
 
             <div class="p-5 pt-0">
               <a 
-                href="microscopio.html?id=osso_maduro_desgaste_ct" 
+                href="microscopio.html?id=96ZYqoM2SV8p4fB2QgeM" 
                 class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-none bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200/90 text-xs font-sans font-semibold tracking-wide transition-all duration-200 no-underline shadow-2xs group/btn">
                 <span>Examinar Lâmina</span>
                 <span class="text-[#d4af37] group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
@@ -1211,7 +1232,7 @@
           </div>
 
           <!-- Card 4: Pele Espessa -->
-          <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+          <div data-slide-id="a3oRvXvJpMKAtU2RE85q" class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
@@ -1233,7 +1254,7 @@
               </div>
 
               <div class="p-5">
-                <h3 class="font-serif font-bold text-lg text-slate-900 group-hover:text-rose-700 transition-colors leading-snug mb-1.5">
+                <h3 class="popular-slide-title font-serif font-bold text-lg text-slate-900 group-hover:text-rose-700 transition-colors leading-snug mb-1.5">
                   Pele Espessa
                 </h3>
                 <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-sans mb-4">

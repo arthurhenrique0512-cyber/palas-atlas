@@ -341,28 +341,24 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     window._currentTopicUnsubscribe = db.collection("laminas")
       .where("status", "==", "ativa")
       .onSnapshot((snapshot) => {
-        let laminasDoTopico = [];
-        const mapaLaminas = new Map();
-
-        // Incorpora lâminas estáticas base deste tópico primeiro
-        if (topico && Array.isArray(topico.laminas)) {
-          topico.laminas.forEach((lam) => {
-            mapaLaminas.set(lam.id, { ...lam });
-          });
-        }
-
+        const docsFirestore = [];
         snapshot.forEach((doc) => {
           const data = doc.data();
           const topicoL = (data.topico || "").toLowerCase().trim();
           const targetId = idTopico.toLowerCase().trim();
-          const targetTitulo = topico.titulo.toLowerCase().trim();
+          const targetTitulo = (topico.titulo || "").toLowerCase().trim();
 
-          if (topicoL === targetId || topicoL === targetTitulo || topicoL.includes(targetId) || (!data.topico && targetId === modulo.topicos[0].id)) {
-            mapaLaminas.set(doc.id, { id: doc.id, ...data });
+          if (topicoL === targetId || topicoL === targetTitulo || topicoL.includes(targetId) || (!data.topico && targetId === (modulo.topicos && modulo.topicos[0] ? modulo.topicos[0].id : ""))) {
+            docsFirestore.push({ id: doc.id, ...data });
           }
         });
 
-        laminasDoTopico = Array.from(mapaLaminas.values());
+        if (docsFirestore.length > 0) {
+          laminasDoTopico = docsFirestore;
+        } else {
+          const estaticas = topico.laminasEstaticas || topico.laminas || [];
+          laminasDoTopico = Array.isArray(estaticas) ? [...estaticas] : [];
+        }
 
         const containerGrid = document.getElementById("gridCatalogoLaminas");
         const contadorTxt = document.getElementById("contadorLaminasBadge");

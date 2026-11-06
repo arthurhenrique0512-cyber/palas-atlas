@@ -213,7 +213,7 @@ const fallbackLaminas = {
   'a3oRvXvJpMKAtU2RE85q': {
     id: 'a3oRvXvJpMKAtU2RE85q',
     aliases: ['lamina-real1', 'lamina-real-1', 'pele_espessa', 'pele-espessa', 'pele', 'matriz', 'teste'],
-    nome: 'Pele Espessa (Epiderme e Derme)',
+    nome: 'Pele Espessa',
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
     maxMagnification: 40,
@@ -295,7 +295,7 @@ const fallbackLaminas = {
   'osso_maduro_desgaste_ct': {
     id: 'osso_maduro_desgaste_ct',
     aliases: ['96ZYqoM2SV8p4fB2QgeM', 'osso-maduro', 'osso_maduro', 'osso-maduro-desgaste', 'osso-desgaste', 'osso_compacto_dzi', 'osso-compacto'],
-    nome: 'Osso Maduro (Lamelar) por Desgaste',
+    nome: 'Osso Maduro',
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
     maxMagnification: 40,
@@ -341,7 +341,7 @@ const fallbackLaminas = {
   'osso_maduro_desgaste_ct_2.0': {
     id: 'osso_maduro_desgaste_ct_2.0',
     aliases: ['osso_maduro_desgaste_ct_2', 'osso_2.0', 'osso-2.0', 'osso_desgaste_2', 'osso-maduro-2'],
-    nome: 'Osso Maduro (Lamelar) por Desgaste v2.0',
+    nome: 'Osso Maduro 10x',
     disciplina: 'histologia',
     coloracao: 'Corte por Desgaste • 10x (Mapeamento 2x5)',
     maxMagnification: 40,
@@ -367,7 +367,7 @@ const fallbackLaminas = {
   'osso_maduro_desgaste_ct_3.0': {
     id: 'osso_maduro_desgaste_ct_3.0',
     aliases: ['osso_maduro_desgaste_ct_3', 'osso_3.0', 'osso-3.0', 'osso_desgaste_3', 'osso-maduro-3'],
-    nome: 'Osso Maduro (Lamelar) por Desgaste v3.0 (40x)',
+    nome: 'Osso Maduro 40x',
     disciplina: 'histologia',
     coloracao: 'Corte por Desgaste • 40x (Mapeamento 6x8 • 48 Fotos)',
     maxMagnification: 100,
