@@ -502,10 +502,10 @@
               <!-- Imagem de Microscopia Full-Bleed 100% -->
               <img
                 id="vitrineImage"
-                src="assets/histologia/medula-espinal-he.png"
-                alt="Medula Espinal"
+                src="assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
+                alt="Osso Maduro (Lamelar) v3.0 (40x)"
                 class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out opacity-100 group-hover/showcase:scale-105"
-                onerror="this.onerror=null; this.src='assets/histologia/medula-espinal-he.png';"
+                onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';"
               />
 
               <!-- Gradiente Escuro Neutro na Base (Zero Tonalidade Azulada) para Leitura Nítida do Título Sobreposto -->
@@ -514,7 +514,7 @@
               <!-- Topo da Vitrine: Badge de Coloração Neutro Escurecido -->
               <div id="vitrineBadgeWrapper" class="relative z-10 flex items-center justify-start gap-2 transition-all duration-150 ease-out opacity-100">
                 <span id="vitrineStainBadge" class="bg-black/70 border border-white/15 backdrop-blur-md px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold tracking-wider text-white shadow-sm">
-                  H&amp;E &bull; 40x
+                  Desgaste &bull; 40x (Mapeamento 6x8)
                 </span>
               </div>
 
@@ -523,17 +523,17 @@
                 <div id="vitrineTextContent" class="space-y-1 text-left transition-all duration-150 ease-out opacity-100">
                   <div class="flex items-center justify-between gap-2">
                     <span id="vitrineCategory" class="text-[11px] tracking-[0.14em] uppercase text-white font-sans font-light">
-                      Histologia &bull; Sistema Nervoso
+                      Histologia &bull; Tecido Ósseo
                     </span>
                     <span id="vitrineSpecimen" class="text-xs text-white/75 font-sans font-light">
-                      Corte Transversal
+                      Panorama 48 Fotos &bull; ~36.2 MP
                     </span>
                   </div>
                   <h3 id="vitrineTitle" class="font-serif font-bold text-xl sm:text-2xl text-white leading-snug tracking-tight drop-shadow-sm">
-                    Medula Espinal
+                    Osso Maduro (Lamelar) v3.0 (40x)
                   </h3>
                   <p id="vitrineDesc" class="text-xs sm:text-sm text-white/85 line-clamp-1 leading-relaxed font-sans">
-                    Substância cinzenta central em formato de H e substância branca periférica com motoneurônios.
+                    Varredura panorâmica em 40x com 48 campos costurados pelo Fiji Stitching e enquadramento retangular perfeito.
                   </p>
                 </div>
 
@@ -541,7 +541,7 @@
                 <div class="pt-3 border-t border-white/15 flex items-center justify-between gap-4">
                   <a
                     id="vitrineActionBtn"
-                    href="microscopio.html?id=5kqs5Qv9fvWlpNSJoyPG"
+                    href="microscopio.html?id=osso_maduro_desgaste_ct_3.0"
                     class="inline-flex items-center gap-2 text-xs sm:text-sm font-sans font-semibold text-white hover:text-[#d4af37] transition-colors duration-150 group/link no-underline"
                   >
                     <span>Abrir no Microscópio</span>
@@ -630,18 +630,6 @@
               link: 'microscopio.html?id=osso_maduro_desgaste_ct'
             },
             {
-              id: '5kqs5Qv9fvWlpNSJoyPG',
-              title: 'Medula Espinal',
-              category: 'Histologia • Sistema Nervoso',
-              stain: 'H&E • 40x',
-              specimen: 'Corte Transversal',
-              desc: 'Substância cinzenta central em formato de H e substância branca periférica com motoneurônios.',
-              thumbnailUrl: 'assets/histologia/medula-espinal-he.png',
-              previewImage: 'assets/histologia/medula-espinal-he.png',
-              image: 'assets/histologia/medula-espinal-he.png',
-              link: 'microscopio.html?id=5kqs5Qv9fvWlpNSJoyPG'
-            },
-            {
               id: 'a3oRvXvJpMKAtU2RE85q',
               title: 'Pele Espessa',
               category: 'Histologia • Tecido Epitelial',
@@ -697,7 +685,7 @@
                 imgEl.alt = slide.title;
                 imgEl.onerror = function() {
                   this.onerror = null;
-                  this.src = 'assets/histologia/medula-espinal-he.png';
+                  this.src = 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';
                 };
               }
               if (titleEl) titleEl.textContent = decodificarTexto(slide.title);
@@ -801,12 +789,14 @@
                     if (!previewImg || previewImg.toLowerCase().endsWith('.dzi')) {
                       if (rawSource.toLowerCase().endsWith('.dzi')) {
                         const baseDzi = rawSource.replace(/\.dzi$/i, '');
-                        if (baseDzi.includes('lamina-real1')) {
+                        if (baseDzi.includes('lamina-real1') || baseDzi.includes('pele')) {
                           previewImg = 'assets/histologia/lamina-real1-preview.jpg';
-                        } else if (baseDzi.includes('osso_compacto') || baseDzi.includes('osso-compacto')) {
-                          previewImg = 'assets/histologia/osso-compacto-preview.jpg';
-                        } else if (baseDzi.includes('epitelio-simples') || baseDzi.includes('epitelio_simples')) {
-                          previewImg = 'assets/histologia/epitelio-simples-escamoso-preview.jpg';
+                        } else if (baseDzi.includes('osso_maduro_desgaste_ct_3.0')) {
+                          previewImg = 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';
+                        } else if (baseDzi.includes('osso_maduro_desgaste_ct_2.0')) {
+                          previewImg = 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg';
+                        } else if (baseDzi.includes('osso_maduro_desgaste_ct') || baseDzi.includes('osso_compacto')) {
+                          previewImg = 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg';
                         } else {
                           previewImg = `${baseDzi}-preview.jpg`;
                         }
@@ -1094,41 +1084,41 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          <!-- Card 1: Medula Espinal -->
+          <!-- Card 1: Osso Maduro v3.0 (40x HD) -->
           <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
-                  src="assets/histologia/medula-espinal-he.png" 
-                  alt="Medula Espinal H&E" 
+                  src="assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg" 
+                  alt="Osso Maduro v3.0 (40x)" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                   loading="lazy"
-                  onerror="this.onerror=null; this.src='assets/histologia/medula-espinal-he.png';"
+                  onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';"
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
                 <div class="absolute top-3 left-3 flex gap-1.5">
                   <span class="bg-black/75 backdrop-blur-sm text-white border border-white/10 text-[10px] font-sans font-semibold px-2.5 py-0.5 rounded-full">
-                    H&E • 40x
+                    Desgaste • 40x HD
                   </span>
                 </div>
                 <div class="absolute bottom-3 left-3 right-3 text-white">
-                  <span class="text-[10px] font-mono uppercase tracking-wider text-sky-300">Histologia • Nervoso</span>
+                  <span class="text-[10px] font-mono uppercase tracking-wider text-amber-300">Histologia • Ósseo</span>
                 </div>
               </div>
 
               <div class="p-5">
-                <h3 class="font-serif font-bold text-lg text-slate-900 group-hover:text-sky-700 transition-colors leading-snug mb-1.5">
-                  Medula Espinal
+                <h3 class="font-serif font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors leading-snug mb-1.5">
+                  Osso Maduro v3.0
                 </h3>
                 <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-sans mb-4">
-                  Substância cinzenta central em H com motoneurônios e substância branca periférica.
+                  Varredura panorâmica em 40x com 48 campos costurados pelo Fiji Stitching e recorte retangular limpo.
                 </p>
               </div>
             </div>
 
             <div class="p-5 pt-0">
               <a 
-                href="microscopio.html?id=5kqs5Qv9fvWlpNSJoyPG" 
+                href="microscopio.html?id=osso_maduro_desgaste_ct_3.0" 
                 class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-none bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200/90 text-xs font-sans font-semibold tracking-wide transition-all duration-200 no-underline shadow-2xs group/btn">
                 <span>Examinar Lâmina</span>
                 <span class="text-[#d4af37] group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
@@ -1136,7 +1126,49 @@
             </div>
           </div>
 
-          <!-- Card 2: Osso Maduro Lamelar -->
+          <!-- Card 2: Osso Maduro v2.0 (10x) -->
+          <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
+                <img 
+                  src="assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg" 
+                  alt="Osso Maduro v2.0 (10x)" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  loading="lazy"
+                  onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg';"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
+                <div class="absolute top-3 left-3 flex gap-1.5">
+                  <span class="bg-black/75 backdrop-blur-sm text-white border border-white/10 text-[10px] font-sans font-semibold px-2.5 py-0.5 rounded-full">
+                    Desgaste • 10x
+                  </span>
+                </div>
+                <div class="absolute bottom-3 left-3 right-3 text-white">
+                  <span class="text-[10px] font-mono uppercase tracking-wider text-amber-300">Histologia • Ósseo</span>
+                </div>
+              </div>
+
+              <div class="p-5">
+                <h3 class="font-serif font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors leading-snug mb-1.5">
+                  Osso Maduro v2.0
+                </h3>
+                <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-sans mb-4">
+                  Mapeamento contínuo em 10x com 10 campos em grade snake e visão panorâmica da matriz lamelar.
+                </p>
+              </div>
+            </div>
+
+            <div class="p-5 pt-0">
+              <a 
+                href="microscopio.html?id=osso_maduro_desgaste_ct_2.0" 
+                class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-none bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200/90 text-xs font-sans font-semibold tracking-wide transition-all duration-200 no-underline shadow-2xs group/btn">
+                <span>Examinar Lâmina</span>
+                <span class="text-[#d4af37] group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 3: Osso Maduro (Lamelar) Original -->
           <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
@@ -1145,7 +1177,7 @@
                   alt="Osso Maduro por Desgaste" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                   loading="lazy"
-                  onerror="this.onerror=null; this.src='assets/histologia/medula-espinal-he.png';"
+                  onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct-preview.jpg';"
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
                 <div class="absolute top-3 left-3 flex gap-1.5">
@@ -1178,7 +1210,7 @@
             </div>
           </div>
 
-          <!-- Card 3: Pele Espessa -->
+          <!-- Card 4: Pele Espessa -->
           <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
@@ -1187,7 +1219,7 @@
                   alt="Pele Espessa H&E" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                   loading="lazy"
-                  onerror="this.onerror=null; this.src='assets/histologia/medula-espinal-he.png';"
+                  onerror="this.onerror=null; this.src='assets/histologia/lamina-real1-preview.jpg';"
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
                 <div class="absolute top-3 left-3 flex gap-1.5">
@@ -1213,48 +1245,6 @@
             <div class="p-5 pt-0">
               <a 
                 href="microscopio.html?id=a3oRvXvJpMKAtU2RE85q" 
-                class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-none bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200/90 text-xs font-sans font-semibold tracking-wide transition-all duration-200 no-underline shadow-2xs group/btn">
-                <span>Examinar Lâmina</span>
-                <span class="text-[#d4af37] group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- Card 4: Músculo Estriado Esquelético -->
-          <div class="popular-slide-card group bg-white border border-slate-200/90 rounded-none overflow-hidden shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-8px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-            <div>
-              <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
-                <img 
-                  src="assets/histologia/muscular-esqueletico-he.jpg" 
-                  alt="Músculo Estriado Esquelético" 
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                  loading="lazy"
-                  onerror="this.onerror=null; this.src='assets/histologia/medula-espinal-he.png';"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none"></div>
-                <div class="absolute top-3 left-3 flex gap-1.5">
-                  <span class="bg-black/75 backdrop-blur-sm text-white border border-white/10 text-[10px] font-sans font-semibold px-2.5 py-0.5 rounded-full">
-                    H&E • 40x
-                  </span>
-                </div>
-                <div class="absolute bottom-3 left-3 right-3 text-white">
-                  <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-300">Histologia • Muscular</span>
-                </div>
-              </div>
-
-              <div class="p-5">
-                <h3 class="font-serif font-bold text-lg text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug mb-1.5">
-                  Músculo Esquelético
-                </h3>
-                <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-sans mb-4">
-                  Fibras cilíndricas multinucleadas com núcleos periféricos no sarcolema e estriações transversais.
-                </p>
-              </div>
-            </div>
-
-            <div class="p-5 pt-0">
-              <a 
-                href="microscopio.html?id=muscular_esqueletico" 
                 class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-none bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200/90 text-xs font-sans font-semibold tracking-wide transition-all duration-200 no-underline shadow-2xs group/btn">
                 <span>Examinar Lâmina</span>
                 <span class="text-[#d4af37] group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
@@ -1771,8 +1761,8 @@
                 <input 
                   type="text" 
                   id="dashImgUrl" 
-                  value="assets/histologia/muscular-esqueletico-he.jpg"
-                  placeholder="Ex: assets/histologia/osso_maduro_desgaste_ct.dzi ou https://.../lamina.dzi" 
+                  value="assets/histologia/osso_maduro_desgaste_ct_3.0.dzi"
+                  placeholder="Ex: assets/histologia/osso_maduro_desgaste_ct_3.0.dzi ou https://.../lamina.dzi" 
                   class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors font-mono">
               </div>
 

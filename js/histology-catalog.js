@@ -398,7 +398,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           const topicoNome = lamina.topico || "Módulo Geral";
 
           // CRÍTICO: sem onclick interceptor — o href navega diretamente para microscopio.html
-          const imagemUrl = lamina.imagemUrl || lamina.imageUrl || lamina.caminhoImagemBase || lamina.dziUrl || "assets/histologia/muscular-esqueletico-he.jpg";
+          const imagemUrl = lamina.imagemUrl || lamina.imageUrl || lamina.caminhoImagemBase || lamina.dziUrl || "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi";
 
           // thumbnailUrl tem prioridade máxima (campo dedicado à pré-visualização)
           // Se não existir, tenta derivar do DZI ou usar a imagemUrl diretamente
@@ -412,7 +412,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
               thumbSrcFallback = `${basePath}_files/8/0_0.jpeg`;
             } else {
               thumbSrc = imagemUrl;
-              thumbSrcFallback = "assets/histologia/muscular-esqueletico-he.jpg";
+              thumbSrcFallback = "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg";
             }
           }
 

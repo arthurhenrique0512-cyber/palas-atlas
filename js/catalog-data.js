@@ -25,31 +25,6 @@ export const catalogData = {
         resumo: "Caracterizado por células poliédricas fortemente justapostas, assentadas sobre uma lâmina basal, com escassa matriz extracelular e ausência de vascularização direta (nutrido por difusão a partir do conjuntivo adjacente). Exibe polaridade celular definida (domínios apical, lateral e basal) e especializações de membrana (microvilosidades, cílios, desmossomos e junções de oclusão). Divisões principais: epitélios de revestimento (classificados pelo número de camadas e forma celular) e epitélios glandulares (exócrinos, organizados em ductos e porções secretoras acinares ou tubulares; e endócrinos, cordonais ou foliculares, que lançam hormônios na circulação).",
         laminasEstaticas: [
           {
-            id: "rim-cortex-he-01",
-            nome: "Córtex Renal (Glomérulo e Túbulos) HE",
-            coloracao: "Hematoxilina e Eosina (HE)",
-            disciplina: "histologia",
-            topico: "epitelial",
-            dziUrl: "/assets/dzi/rim_cortex.dzi",
-            imageUrl: "/assets/histologia/rim_cortex.jpg",
-            caminhoImagemBase: "/assets/histologia/rim_cortex.jpg",
-            questoes: [
-              {
-                x: 45,
-                y: 50,
-                enunciado: "Qual estrutura epitelial escamosa simples delimita o espaço urinário esférico em observação no glomérulo renal?",
-                alternativas: [
-                  "Camada Parietal da Cápsula de Bowman",
-                  "Mácula Densa do Túbulo Contorcido Distal",
-                  "Endotélio dos Capilares Gloméricos",
-                  "Podócitos da Camada Visceral"
-                ],
-                alternativaCorreta: 0,
-                explicacao: "A camada parietal da Cápsula de Bowman é constituída por epitélio plano (escamoso) simples que reveste exteriormente o corpúsculo renal e delimita o espaço cápsula onde o filtrado é capturado."
-              }
-            ]
-          },
-          {
             id: "a3oRvXvJpMKAtU2RE85q",
             nome: "Pele Espessa (Epiderme e Derme) HE",
             coloracao: "Hematoxilina e Eosina (H&E) • 40x",
@@ -157,19 +132,7 @@ export const catalogData = {
   <p>O <strong class="text-slate-900 font-bold">Muscular Estriado Esquelético</strong> apresenta fibras cilíndricas, longas, multinucleadas com núcleos periféricos e estriações transversais organizadas em sarcômeros (contração rápida e voluntária).</p>
   <p>O <strong class="text-slate-900 font-bold">Muscular Estriado Cardíaco</strong> é constituído por células ramificadas com 1 a 2 núcleos centrais, unidas por discos intercalares com junções comunicantes e desmossomos (contração involuntária e rítmica).</p>
   <p>O <strong class="text-slate-900 font-bold">Muscular Liso</strong> apresenta células fusiformes, uninucleadas centrais e sem estriações transversais (âncora em corpos densos; contração lenta, sustentada e involuntária em vísceras e vasos).</p>
-`,
-        laminasEstaticas: [
-          {
-            id: "muscular-esqueletico-he-01",
-            nome: "Músculo Esquelético HE",
-            coloracao: "Hematoxilina e Eosina (HE)",
-            disciplina: "histologia",
-            topico: "muscular",
-            dziUrl: "",
-            imageUrl: "/assets/histologia/muscular-esqueletico-he.jpg",
-            caminhoImagemBase: "/assets/histologia/muscular-esqueletico-he.jpg",
-          }
-        ]
+`
       },
       {
         id: "circulatorio",
@@ -376,7 +339,7 @@ export function sincronizarAcervoPersonalizado() {
       if (topicoObj) {
         topicoObj.laminasEstaticas = Array.isArray(topicoObj.laminasEstaticas) ? topicoObj.laminasEstaticas : [];
         // Atualiza a lâmina original/existente do catálogo ou adiciona no topo da lista se for uma nova lâmina
-        const idxLam = topicoObj.laminasEstaticas.findIndex((l) => l.id === lam.id || (l.nome && lam.nome && l.nome.toLowerCase().trim() === lam.nome.toLowerCase().trim()) || (lam.nome && lam.nome.toLowerCase().includes("musculo") && l.id === "muscular-esqueletico-he-01"));
+        const idxLam = topicoObj.laminasEstaticas.findIndex((l) => l.id === lam.id || (l.nome && lam.nome && l.nome.toLowerCase().trim() === lam.nome.toLowerCase().trim()));
         if (idxLam !== -1) {
           topicoObj.laminasEstaticas[idxLam] = lam;
         } else {

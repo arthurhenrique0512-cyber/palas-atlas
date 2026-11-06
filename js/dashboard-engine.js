@@ -167,12 +167,10 @@ export async function carregarListaDeAssets(forcar = false) {
 
     // Lâminas essenciais garantidas sempre presentes no dropdown
     const essenciais = [
-      { id: "osso_maduro_desgaste_ct_3.0", nome: "Osso Maduro Desgaste Ct 3.0 (40x HD)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", largura: 6430, altura: 5630 },
-      { id: "osso_maduro_desgaste_ct_2.0", nome: "Osso Maduro Desgaste Ct 2.0 (10x)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi", largura: 2300, altura: 3670 },
-      { id: "osso_maduro_desgaste_ct", nome: "Osso Maduro Desgaste Ct (40x)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct.dzi", largura: 6120, altura: 4944 },
-      { id: "epitelio-simples-escamoso", nome: "Epitelio Simples Escamoso", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/epitelio-simples-escamoso.dzi", largura: 2400, altura: 2814 },
-      { id: "lamina-real1", nome: "Lamina Real1", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/lamina-real1.dzi", largura: 2536, altura: 9370 },
-      { id: "osso_compacto_dzi", nome: "Osso Compacto Dzi", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_compacto_dzi.dzi", largura: 3239, altura: 5689 }
+      { id: "cw3XGCgUwN71XdlwkUe5", nome: "Osso Maduro v3.0 (40x HD Panorama)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", largura: 6430, altura: 5630 },
+      { id: "FFGk5d9kOAct5HIDdjQ7", nome: "Osso Maduro v2.0 (10x Mapeamento)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi", largura: 2300, altura: 3670 },
+      { id: "96ZYqoM2SV8p4fB2QgeM", nome: "Osso Maduro Original (40x Desgaste)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct.dzi", largura: 6120, altura: 4944 },
+      { id: "a3oRvXvJpMKAtU2RE85q", nome: "Pele Espessa (40x H&E)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/lamina-real1.dzi", largura: 2536, altura: 9370 }
     ];
 
     essenciais.forEach(e => {
@@ -190,14 +188,10 @@ export async function carregarListaDeAssets(forcar = false) {
   } catch (err) {
     console.warn("[Palas Atlas CMS] Falha ao carregar lista dinâmica de assets:", err);
     const fallbackAssets = [
-      { id: "osso_maduro_desgaste_ct_3.0", nome: "Osso Maduro Desgaste Ct 3.0 (40x HD)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", largura: 6430, altura: 5630 },
-      { id: "osso_maduro_desgaste_ct_2.0", nome: "Osso Maduro Desgaste Ct 2.0 (10x)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi", largura: 2300, altura: 3670 },
-      { id: "osso_maduro_desgaste_ct", nome: "Osso Maduro Desgaste Ct", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct.dzi", largura: 6120, altura: 4944 },
-      { id: "epitelio-simples-escamoso", nome: "Epitelio Simples Escamoso", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/epitelio-simples-escamoso.dzi", largura: 2400, altura: 2814 },
-      { id: "lamina-real1", nome: "Lamina Real1", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/lamina-real1.dzi", largura: 2536, altura: 9370 },
-      { id: "osso_compacto_dzi", nome: "Osso Compacto Dzi", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_compacto_dzi.dzi", largura: 3239, altura: 5689 },
-      { id: "muscular-esqueletico-he", nome: "Muscular Esqueletico He", tipo: "static", formato: "JPEG Estático", caminho: "assets/histologia/muscular-esqueletico-he.jpg", largura: 899, altura: 680 },
-      { id: "medula-espinal-he", nome: "Medula Espinal He", tipo: "static", formato: "PNG Estático", caminho: "assets/histologia/medula-espinal-he.png", largura: 0, altura: 0 }
+      { id: "cw3XGCgUwN71XdlwkUe5", nome: "Osso Maduro v3.0 (40x HD Panorama)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", largura: 6430, altura: 5630 },
+      { id: "FFGk5d9kOAct5HIDdjQ7", nome: "Osso Maduro v2.0 (10x Mapeamento)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi", largura: 2300, altura: 3670 },
+      { id: "96ZYqoM2SV8p4fB2QgeM", nome: "Osso Maduro Original (40x Desgaste)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct.dzi", largura: 6120, altura: 4944 },
+      { id: "a3oRvXvJpMKAtU2RE85q", nome: "Pele Espessa (40x H&E)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/lamina-real1.dzi", largura: 2536, altura: 9370 }
     ];
     acervoAssetsCache = fallbackAssets;
     popularSeletorAssets(fallbackAssets);
@@ -364,14 +358,14 @@ export function onAtualizarRaioCirculo(val) {
 export function inicializarPainelCms() {
   atualizarTopicosCms("histologia");
   const seletorTopico = document.getElementById("dashSelectTopico");
-  if (seletorTopico) seletorTopico.value = "muscular";
+  if (seletorTopico) seletorTopico.value = "osseo";
   atualizarInterfaceListaQuestoes();
   atualizarEstadoBotaoModoQuestao();
   inicializarEventosPreviewInterativo();
   carregarListaDeAssets();
   setTimeout(() => {
     if (!viewerInstance && document.getElementById("osd-editor-viewer") && !laminaEmEdicaoId) {
-      carregarImagemNoEditor("/assets/histologia/muscular-esqueletico-he.jpg", false, true);
+      carregarImagemNoEditor("assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", true, true);
     }
   }, 200);
   if (typeof db !== "undefined" && db) {
@@ -623,9 +617,9 @@ export function resetarFormularioDashboard() {
   atualizarInterfaceListaQuestoes();
   definirModoAnotacao("pin");
   const assetSelect = document.getElementById("dashAssetSelector");
-  if (assetSelect) assetSelect.value = "/assets/histologia/muscular-esqueletico-he.jpg";
+  if (assetSelect) assetSelect.value = "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi";
   if (viewerInstance && typeof viewerInstance.clearOverlays === "function") viewerInstance.clearOverlays();
-  carregarImagemNoEditor("/assets/histologia/muscular-esqueletico-he.jpg", false, true);
+  carregarImagemNoEditor("assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", true, true);
   exibirToastDiscreto("Formulario redefinido para o modo de novo cadastro.", "emerald");
 }
 
@@ -741,9 +735,6 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
       });
     }
 
-    if (isAutoLoad && url.includes("muscular-esqueletico-he") && editorPins.length === 0 && !laminaEmEdicaoId) {
-      adicionarPinoEditor(550, 280, "Estriacoes HE", "pin_demo");
-    }
     if (editorQuestoes.length > 0) {
       editorQuestoes.forEach((q) => renderizarQuestaoNoCanvas(q));
     }

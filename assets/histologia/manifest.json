@@ -1,25 +1,10 @@
 {
-  "geradoEm": "2026-11-05T22:42:57.665Z",
-  "total": 8,
+  "geradoEm": "2026-11-06T09:42:00.000Z",
+  "total": 4,
   "assets": [
     {
-      "id": "epitelio-simples-escamoso",
-      "nome": "Epitelio Simples Escamoso",
-      "tipo": "dzi",
-      "formato": "Deep Zoom Image (.dzi)",
-      "caminho": "assets/histologia/epitelio-simples-escamoso.dzi",
-      "url": "assets/histologia/epitelio-simples-escamoso.dzi",
-      "largura": 2400,
-      "altura": 2814,
-      "tileSize": 256,
-      "maxMagnification": 40,
-      "mpp": 0.156,
-      "metodoCalibracao": "referencia_biologica_hemacia_7.5um",
-      "preview": "assets/histologia/epitelio-simples-escamoso-preview.jpg"
-    },
-    {
       "id": "lamina-real1",
-      "nome": "Lamina Real1",
+      "nome": "Pele Espessa",
       "tipo": "dzi",
       "formato": "Deep Zoom Image (.dzi)",
       "caminho": "assets/histologia/lamina-real1.dzi",
@@ -31,43 +16,6 @@
       "mpp": 0.156,
       "metodoCalibracao": "referencia_biologica_hemacia_7.5um",
       "preview": "assets/histologia/lamina-real1-preview.jpg"
-    },
-    {
-      "id": "medula-espinal-he",
-      "nome": "Medula Espinal He",
-      "tipo": "static",
-      "formato": "PNG Estático",
-      "caminho": "assets/histologia/medula-espinal-he.png",
-      "url": "assets/histologia/medula-espinal-he.png",
-      "largura": 0,
-      "altura": 0,
-      "preview": "assets/histologia/medula-espinal-he.png"
-    },
-    {
-      "id": "muscular-esqueletico-he",
-      "nome": "Muscular Esqueletico He",
-      "tipo": "static",
-      "formato": "JPEG Estático",
-      "caminho": "assets/histologia/muscular-esqueletico-he.jpg",
-      "url": "assets/histologia/muscular-esqueletico-he.jpg",
-      "largura": 0,
-      "altura": 0,
-      "preview": "assets/histologia/muscular-esqueletico-he.jpg"
-    },
-    {
-      "id": "osso_compacto_dzi",
-      "nome": "Osso Compacto Dzi",
-      "tipo": "dzi",
-      "formato": "Deep Zoom Image (.dzi)",
-      "caminho": "assets/histologia/osso_compacto_dzi.dzi",
-      "url": "assets/histologia/osso_compacto_dzi.dzi",
-      "largura": 3239,
-      "altura": 5689,
-      "tileSize": 254,
-      "maxMagnification": 40,
-      "mpp": 0.156,
-      "metodoCalibracao": "referencia_biologica_hemacia_7.5um",
-      "preview": null
     },
     {
       "id": "osso_maduro_desgaste_ct",

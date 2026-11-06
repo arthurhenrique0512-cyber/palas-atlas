@@ -210,22 +210,6 @@ function iniciarSidebarRetratil() {
 // Acervo Base Local (Fallback de Resiliência Clínica)
 // ---------------------------------------------------------------------------
 const fallbackLaminas = {
-  '5kqs5Qv9fvWlpNSJoyPG': {
-    id: '5kqs5Qv9fvWlpNSJoyPG',
-    aliases: ['medula-espinal-he', 'medula-espinal', 'medula'],
-    nome: 'Medula Espinal (Corte Transversal)',
-    disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E) • 10x',
-    maxMagnification: 10,
-    objetivaCaptura: 10,
-    mpp: 0.625,
-    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
-    imagemUrl: 'assets/histologia/medula-espinal-he.png',
-    previewImage: 'assets/histologia/medula-espinal-he.png',
-    thumbnailUrl: 'assets/histologia/medula-espinal-he.png',
-    descricaoHTML: '<p>Corte transversal de medula espinal exibindo substância cinzenta central em forma de "H" com motoneurônios no corno anterior e substância branca periférica contendo tratos mielinizados.</p>',
-    pinos: []
-  },
   'a3oRvXvJpMKAtU2RE85q': {
     id: 'a3oRvXvJpMKAtU2RE85q',
     aliases: ['lamina-real1', 'lamina-real-1', 'pele_espessa', 'pele-espessa', 'pele', 'matriz', 'teste'],
@@ -308,22 +292,6 @@ const fallbackLaminas = {
       }
     ]
   },
-  'muscular-esqueletico-he': {
-    id: 'muscular-esqueletico-he',
-    aliases: ['musculo-esqueletico', 'tecido-muscular'],
-    nome: 'Tecido Muscular Estriado Esquelético',
-    disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
-    maxMagnification: 40,
-    objetivaCaptura: 40,
-    mpp: 0.156,
-    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
-    imagemUrl: 'assets/histologia/muscular-esqueletico-he.jpg',
-    previewImage: 'assets/histologia/muscular-esqueletico-he.jpg',
-    thumbnailUrl: 'assets/histologia/muscular-esqueletico-he.jpg',
-    descricaoHTML: '<p>Corte longitudinal de músculo estriado esquelético. Fibras musculares multinucleadas com núcleos periféricos achatados e estriações transversais de actina e miosina.</p>',
-    pinos: []
-  },
   'osso_maduro_desgaste_ct': {
     id: 'osso_maduro_desgaste_ct',
     aliases: ['96ZYqoM2SV8p4fB2QgeM', 'osso-maduro', 'osso_maduro', 'osso-maduro-desgaste', 'osso-desgaste', 'osso_compacto_dzi', 'osso-compacto'],
@@ -369,40 +337,6 @@ const fallbackLaminas = {
         zoom: 3.5
       }
     ]
-  },
-  'osso_compacto_dzi': {
-    id: 'osso_compacto_dzi',
-    aliases: ['osso-compacto', 'osso-compacto-he', 'osso_compacto'],
-    nome: 'Osso Compacto Desgastado',
-    disciplina: 'histologia',
-    coloracao: 'Desgaste • 40x',
-    maxMagnification: 40,
-    objetivaCaptura: 40,
-    mpp: 0.156,
-    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
-    imagemUrl: 'assets/histologia/osso_compacto_dzi.dzi',
-    previewImage: 'assets/histologia/osso-compacto-preview.jpg',
-    thumbnailUrl: 'assets/histologia/osso-compacto-preview.jpg',
-    dziUrl: 'assets/histologia/osso_compacto_dzi.dzi',
-    descricaoHTML: '<p>Tecido ósseo compacto evidenciando sistemas de Havers (ósteons), canais centrais vasculares, lamelas concêntricas e lacunas comunicantes com canalículos de osteócitos.</p>',
-    pinos: []
-  },
-  'epitelio-simples-escamoso': {
-    id: 'epitelio-simples-escamoso',
-    aliases: ['epitelio-pavimentoso', 'epitelio-simples'],
-    nome: 'Epitélio Pavimentoso Simples',
-    disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
-    maxMagnification: 40,
-    objetivaCaptura: 40,
-    mpp: 0.156,
-    metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
-    imagemUrl: 'assets/histologia/epitelio-simples-escamoso.dzi',
-    previewImage: 'assets/histologia/epitelio-simples-escamoso-preview.jpg',
-    thumbnailUrl: 'assets/histologia/epitelio-simples-escamoso-preview.jpg',
-    dziUrl: 'assets/histologia/epitelio-simples-escamoso.dzi',
-    descricaoHTML: '<p>Camada única de células epiteliais pavimentosas (achatadas) com núcleos elípticos proeminentes, adaptadas para transporte passivo e difusão de solutos.</p>',
-    pinos: []
   },
   'osso_maduro_desgaste_ct_2.0': {
     id: 'osso_maduro_desgaste_ct_2.0',
@@ -464,10 +398,11 @@ const fallbackLaminas = {
 };
 
 // Aliases para identificadores alternativos / legados
-fallbackLaminas['pele_espessa']       = fallbackLaminas['a3oRvXvJpMKAtU2RE85q'];
-fallbackLaminas['lamina-real1']       = fallbackLaminas['a3oRvXvJpMKAtU2RE85q'];
-fallbackLaminas['medula-espinal-he']  = fallbackLaminas['5kqs5Qv9fvWlpNSJoyPG'];
-fallbackLaminas['96ZYqoM2SV8p4fB2QgeM'] = fallbackLaminas['osso_maduro_desgaste_ct'];
+fallbackLaminas['pele_espessa']         = fallbackLaminas['a3oRvXvJpMKAtU2RE85q'];
+fallbackLaminas['lamina-real1']         = fallbackLaminas['a3oRvXvJpMKAtU2RE85q'];
+fallbackLaminas['96ZYqoM2SV8p4fB2QgeM']   = fallbackLaminas['osso_maduro_desgaste_ct'];
+fallbackLaminas['FFGk5d9kOAct5HIDdjQ7'] = fallbackLaminas['osso_maduro_desgaste_ct_2.0'];
+fallbackLaminas['cw3XGCgUwN71XdlwkUe5'] = fallbackLaminas['osso_maduro_desgaste_ct_3.0'];
 
 // ---------------------------------------------------------------------------
 // 1. Disparo automatico ao carregar a pagina
