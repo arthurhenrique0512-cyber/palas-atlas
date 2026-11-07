@@ -1775,6 +1775,14 @@
             <span class="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
             <span>Lâminas &amp; Acervo</span>
           </button>
+          <button
+            type="button"
+            id="btnTopicoModulos"
+            onclick="window.App.alternarTopicoCms('modulos')"
+            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04]">
+            <span class="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
+            <span>Módulos &amp; Resumos</span>
+          </button>
         </div>
 
         <div class="flex items-center gap-2.5 font-mono">
@@ -2308,6 +2316,149 @@
 
       </div>
 
+      <!-- TÓPICO 3: GESTÃO CURRICULAR DE MÓDULOS & RESUMOS MORFOLÓGICOS (#topicoCmsModulos) -->
+      <div id="topicoCmsModulos" class="hidden w-full flex-1 overflow-y-auto p-6 md:p-8 pb-16 custom-scrollbar bg-[#060608]">
+        <div class="max-w-5xl mx-auto space-y-6">
+          
+          <!-- Cabeçalho do Gestor de Módulos -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl">
+            <div>
+              <span class="text-[10px] tracking-widest text-[#d4af37] font-mono uppercase font-semibold block mb-1">Curadoria Científica &amp; Textos Dinâmicos</span>
+              <h3 class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] tracking-tight">Gestão de Módulos &amp; Resumo Morfológico</h3>
+              <p class="text-xs text-neutral-400 mt-1 max-w-2xl leading-relaxed">Edite em tempo real os títulos, categorias, tópicos estruturados do resumo morfológico e a bibliografia recomendada de cada módulo curricular.</p>
+            </div>
+            
+            <div class="flex items-center gap-2 shrink-0">
+              <span id="cmsModuloStatusSync" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Firestore Conectado</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Seletor de Módulo -->
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+              <div>
+                <label for="cmsModuloSelect" class="text-xs font-mono uppercase tracking-wider text-neutral-300 font-semibold block">Selecionar Módulo / Tópico para Edição</label>
+                <span class="text-[11px] text-neutral-500 font-sans">Selecione qualquer módulo da grade para carregar e editar seus dados dinâmicos.</span>
+              </div>
+              <div class="w-full sm:w-80">
+                <select 
+                  id="cmsModuloSelect" 
+                  onchange="window.App.onModuloSelecionado(this.value)"
+                  class="w-full bg-[#18181d] border border-white/[0.12] text-white rounded-xl px-4 py-2.5 text-xs font-mono focus:outline-none focus:border-[#d4af37]/60 cursor-pointer shadow-inner">
+                  <option value="" disabled selected>Carregando módulos...</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Dados Básicos do Módulo (Grid 3 Colunas) -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-2">
+              <div class="md:col-span-6 space-y-1.5">
+                <label for="cmsModuloTitulo" class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Título do Módulo / Tópico</label>
+                <input 
+                  type="text" 
+                  id="cmsModuloTitulo" 
+                  placeholder="Ex: Tecido Conjuntivo Propriamente Dito" 
+                  class="w-full bg-[#18181d] border border-white/[0.1] text-white rounded-xl px-4 py-2.5 text-xs font-sans focus:outline-none focus:border-[#d4af37]/60" />
+              </div>
+              
+              <div class="md:col-span-3 space-y-1.5">
+                <label for="cmsModuloCategoria" class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Categoria / Disciplina</label>
+                <input 
+                  type="text" 
+                  id="cmsModuloCategoria" 
+                  placeholder="Ex: Histologia" 
+                  class="w-full bg-[#18181d] border border-white/[0.1] text-white rounded-xl px-4 py-2.5 text-xs font-sans focus:outline-none focus:border-[#d4af37]/60" />
+              </div>
+
+              <div class="md:col-span-3 space-y-1.5">
+                <label for="cmsModuloDocId" class="text-[11px] font-mono uppercase tracking-wider text-neutral-500">ID Canônico (Firestore Doc)</label>
+                <input 
+                  type="text" 
+                  id="cmsModuloDocId" 
+                  readonly 
+                  class="w-full bg-[#0d0d10] border border-white/[0.05] text-neutral-400 rounded-xl px-4 py-2.5 text-xs font-mono select-all cursor-not-allowed" />
+              </div>
+            </div>
+
+            <!-- Referência Bibliográfica -->
+            <div class="space-y-1.5 pt-2">
+              <label for="cmsModuloReferencia" class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Referência Bibliográfica &amp; Fonte Curada</label>
+              <input 
+                type="text" 
+                id="cmsModuloReferencia" 
+                placeholder="Ex: Junqueira &amp; Carneiro — Histologia Básica" 
+                class="w-full bg-[#18181d] border border-white/[0.1] text-white rounded-xl px-4 py-2.5 text-xs font-sans focus:outline-none focus:border-[#d4af37]/60" />
+            </div>
+          </div>
+
+          <!-- REPEATER: Editor Dinâmico de Tópicos do Resumo Morfológico -->
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-[#d4af37]"></span>
+                  <h4 class="text-sm font-mono uppercase tracking-wider text-neutral-200 font-bold">Resumo Morfológico — Tópicos Estruturados</h4>
+                </div>
+                <p class="text-xs text-neutral-400 mt-1">Cada tópico representa um critério essencial exibido no card acadêmico do aluno.</p>
+              </div>
+              <button 
+                type="button" 
+                onclick="window.App.adicionarPontoResumoCms()" 
+                class="px-3.5 py-2 bg-[#d4af37]/15 hover:bg-[#d4af37]/25 text-[#e5c158] border border-[#d4af37]/40 rounded-xl text-xs font-mono uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0">
+                <span>+ Adicionar Tópico</span>
+              </button>
+            </div>
+
+            <!-- Lista de Tópicos (Repeater Container) -->
+            <div id="cmsSummaryPointsList" class="space-y-4">
+              <div class="p-8 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/[0.08] rounded-xl">
+                Selecione um módulo acima para carregar seus tópicos morfológicos.
+              </div>
+            </div>
+          </div>
+
+          <!-- Lâminas de Microscopia Vinculadas ao Módulo -->
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-4">
+              <div>
+                <h4 class="text-sm font-mono uppercase tracking-wider text-neutral-200 font-bold">Lâminas de Microscopia Vinculadas</h4>
+                <p class="text-xs text-neutral-400 mt-1">Lâminas ativas do acervo associadas a este módulo.</p>
+              </div>
+              <span id="cmsTotalLaminasVinculadasBadge" class="px-2.5 py-1 rounded-full text-[10px] font-mono bg-white/[0.06] text-neutral-300 border border-white/[0.08]">
+                0 vinculadas
+              </span>
+            </div>
+            <div id="cmsListaLaminasAssociadas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+              <p class="text-xs text-neutral-500 font-mono col-span-full py-4 text-center">Nenhuma lâmina vinculada encontrada para este tópico.</p>
+            </div>
+          </div>
+
+          <!-- BARRA DE AÇÃO: Salvar Alterações -->
+          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 z-20">
+            <div class="flex items-center gap-2 text-xs text-neutral-400 font-sans">
+              <svg class="w-4 h-4 text-[#d4af37] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>As alterações salvas são sincronizadas em tempo real via Cloud Firestore para todos os alunos conectados.</span>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <button 
+                type="button" 
+                id="btnSalvarModuloCms" 
+                onclick="window.App.salvarModuloFirestore()" 
+                class="w-full sm:w-auto px-6 py-3 bg-[#d4af37] hover:bg-[#e5c158] text-[#09090b] font-sans font-bold border border-[#d4af37] rounded-xl text-xs tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-[0_10px_28px_-6px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2">
+                <span id="txtBtnSalvarModulo">Salvar Alterações no Firestore</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </section>
 
   </main>
@@ -2559,6 +2710,9 @@
     });
   </script>
   
+  <!-- Container de Toasts do CMS -->
+  <div id="cmsToastContainer" class="fixed bottom-6 right-6 z-[10000] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full"></div>
+
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>
 

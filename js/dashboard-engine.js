@@ -30,6 +30,10 @@ let raioCirculoAtual = 250;
 let setaPontoOrigem = null;
 let filtroStatusAtual = "todos";
 let _unsubDashboardAcervo = null;
+let moduloEmEdicaoId = null;
+let moduloEmEdicaoDisciplina = null;
+let summaryPointsEmEdicao = [];
+let laminasDoModuloCache = [];
 
 const topicosCurriculares = {
   anatomia: [
@@ -86,20 +90,31 @@ export function toggleDashboard() {
 export function alternarTopicoCms(topico) {
   const contEditor = document.getElementById("topicoCmsEditor");
   const contAcervo = document.getElementById("topicoCmsAcervo");
+  const contModulos = document.getElementById("topicoCmsModulos");
 
-  if (topico === "acervo" && viewerInstance && typeof viewerInstance.destroy === "function") {
+  if (topico !== "editor" && viewerInstance && typeof viewerInstance.destroy === "function") {
     try { viewerInstance.destroy(); } catch(e) {}
     viewerInstance = null;
   }
   
   const btnEditor = document.getElementById("btnTopicoEditor");
   const btnAcervo = document.getElementById("btnTopicoAcervo");
+  const btnModulos = document.getElementById("btnTopicoModulos");
   
   const clsAtivo = "px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer bg-white/[0.06] text-white border border-white/[0.08] shadow-sm";
   const clsInativo = "px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.03]";
   
   if (contEditor) contEditor.classList.add("hidden");
   if (contAcervo) contAcervo.classList.add("hidden");
+  if (contModulos) contModulos.classList.add("hidden");
+
+  [btnEditor, btnAcervo, btnModulos].forEach(btn => {
+    if (btn) {
+      btn.className = clsInativo;
+      const dot = btn.querySelector("span");
+      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-neutral-600";
+    }
+  });
 
   if (topico === "acervo" || topico === "laminas") {
     if (contAcervo) contAcervo.classList.remove("hidden");
@@ -108,23 +123,28 @@ export function alternarTopicoCms(topico) {
       const dot = btnAcervo.querySelector("span");
       if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37]";
     }
-    if (btnEditor) {
-      btnEditor.className = clsInativo;
-      const dot = btnEditor.querySelector("span");
-      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-neutral-600";
-    }
     renderizarTabelaAcervo();
+  } else if (topico === "modulos" || topico === "resumo") {
+    if (contModulos) contModulos.classList.remove("hidden");
+    if (btnModulos) {
+      btnModulos.className = clsAtivo;
+      const dot = btnModulos.querySelector("span");
+      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37]";
+    }
+    popularSelectModulosCms();
+    const select = document.getElementById("cmsModuloSelect");
+    if (select && select.value && !moduloEmEdicaoId) {
+      onModuloSelecionado(select.value);
+    } else if (select && !select.value) {
+      select.value = "conjuntivo";
+      onModuloSelecionado("conjuntivo");
+    }
   } else {
     if (contEditor) contEditor.classList.remove("hidden");
     if (btnEditor) {
       btnEditor.className = clsAtivo;
       const dot = btnEditor.querySelector("span");
       if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37]";
-    }
-    if (btnAcervo) {
-      btnAcervo.className = clsInativo;
-      const dot = btnAcervo.querySelector("span");
-      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-neutral-600";
     }
   }
 }
@@ -357,6 +377,7 @@ export function onAtualizarRaioCirculo(val) {
 
 export function inicializarPainelCms() {
   atualizarTopicosCms("histologia");
+  popularSelectModulosCms();
   const seletorTopico = document.getElementById("dashSelectTopico");
   if (seletorTopico) seletorTopico.value = "osseo";
   atualizarInterfaceListaQuestoes();
@@ -1551,6 +1572,518 @@ function escaparHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
+/* ============================================================================
+ * GESTÃO DINÂMICA DE MÓDULOS & RESUMOS MORFOLÓGICOS (CMS CURRICULAR)
+ * ============================================================================ */
+
+const sinteseCuradaPadrao = {
+  osseo: [
+    {
+      label: "Definição",
+      text: "Tecido conjuntivo especializado e mineralizado, principal constituinte do esqueleto adulto. Fornece suporte mecânico aos tecidos moles, alavanca para locomoção, proteção a órgãos vitais e atua como a principal reserva corporal de íons cálcio e fosfato."
+    },
+    {
+      label: "Componentes da Matriz",
+      text: "Matriz óssea calcificada composta por porção orgânica (cerca de 95% de colágeno tipo I associado a proteoglicanos e glicoproteínas como osteonectina e osteocalcina) e porção inorgânica (cristais de hidroxiapatita de fosfato de cálcio depositados ordenadamente sobre as fibrilas colágenas)."
+    },
+    {
+      label: "Células Principais",
+      text: "Osteoblastos (células jovens da superfície responsáveis pela síntese e mineralização do osteoide), osteócitos (células maduras residentes em lacunas, conectadas por canalículos para trocas metabólicas) e osteoclastos (células gigantes multinucleadas especializadas na reabsorção óssea enzimática)."
+    },
+    {
+      label: "Subtipos e Classificação",
+      text: "Ósseo Compacto (cortical densa sem cavidades visíveis, organizada em Sistemas de Havers ou ósteons concêntricos e canais vasculares de Volkmann) e Ósseo Esponjoso (rede tridimensional de trabéculas ósseas que delimitam cavidades intercomunicantes preenchidas por medula óssea hematopoiética ou adiposa)."
+    }
+  ],
+  conjuntivo: [
+    {
+      label: "Definição",
+      text: "Tecido de origem mesodérmica amplamente distribuído pelo organismo, responsável pela sustentação estrutural, conexão entre diferentes tecidos, preenchimento de espaços, isolamento de órgãos, via de trânsito vascular e defesa imunológica contra patógenos."
+    },
+    {
+      label: "Componentes da Matriz",
+      text: "Abundante matriz extracelular (MEC) constituída por Substância Fundamental Amorfa (gel aquoso viscoso rico em ácido hialurônico, glicosaminoglicanos sulfatados e proteoglicanos) e Fibras Estruturais (fibras colágenas tipo I e III de alta resistência à tração, fibras elásticas flexíveis e fibras reticulares de sustentação estromal)."
+    },
+    {
+      label: "Células Principais",
+      text: "Células residentes (fibroblastos ativamente secretores de matriz, fibrócitos fusiformes quiescentes, macrófagos fagocitários residentes e mastócitos granulosos ricos em histamina e heparina) e células transitórias de defesa (plasmócitos produtores de anticorpos, linfócitos, neutrófilos e eosinófilos)."
+    },
+    {
+      label: "Subtipos e Classificação",
+      text: "Conjuntivo Frouxo (distribuição equilibrada e delicada entre células, fibras finas e substância amorfa; altamente flexível e vascularizado, suporta epitélios e envolve vasos) e Conjuntivo Denso (predomínio expressivo de feixes espessos de colágeno tipo I; divide-se em Denso Não Modelado, com feixes entrelaçados na derme profunda e cápsulas de órgãos, e Denso Modelado, com feixes rigorosamente paralelos em tendões e ligamentos)."
+    }
+  ],
+  epitelial: [
+    {
+      label: "Definição",
+      text: "Tecido avascular composto por células contíguas intimamente unidas por complexos juncionais, com escassa substância intercelular. Recobre superfícies externas (pele), reveste cavidades corpóreas internas (mucosas e serosas) e forma o parênquima das glândulas secretoras."
+    },
+    {
+      label: "Componentes da Matriz",
+      text: "Praticamente ausente no espaço intercelular. O epitélio repousa invariavelmente sobre uma lâmina basal acelular (rede de colágeno tipo IV, laminina, entactina e perlecan) que o ancora ao conjuntivo subjacente e através da qual difusamente chegam gases e nutrientes."
+    },
+    {
+      label: "Células Principais",
+      text: "Células poliédricas com evidente polaridade morfológica e funcional: polo apical (voltado para a luz ou superfície, frequentemente dotado de microvilosidades ou cílios), polos laterais (unidos por zônulas de oclusão, zônulas de adesão e desmossomos) e polo basal (ancorado por hemidesmossomos)."
+    },
+    {
+      label: "Subtipos e Classificação",
+      text: "Epitélios de Revestimento (simples pavimentoso, simples cúbico, simples prismático, estratificado pavimentoso queratinizado ou não queratinizado, pseudoestratificado colunar ciliado e de transição/urotélio) e Epitélios Glandulares (exócrinos acinares, tubulares ou alveolares dotados de ductos; e endócrinos cordonais ou vesiculares desprovidos de ductos com secreção hematogênica)."
+    }
+  ],
+  adiposo: [
+    {
+      label: "Definição",
+      text: "Variedade especializada de tecido conjuntivo no qual predominam células adiposas (adipócitos). Constitui o principal reservatório energético do corpo na forma de triglicerídeos neutros, além de atuar no isolamento térmico, proteção mecânica e como órgão endócrino ativo (produtor de leptina e adipocinas)."
+    },
+    {
+      label: "Componentes da Matriz",
+      text: "Matriz escassa envolvida por uma delicada trama de fibras reticulares (colágeno tipo III) que contorna individualmente cada célula, acompanhada por uma densa malha de capilares contínuos que supre as elevadas demandas metabólicas de lipólise e lipogênese."
+    },
+    {
+      label: "Células Principais",
+      text: "Adipócitos uniloculares (células esféricas grandes com gota lipídica única que ocupa quase todo o citoplasma e desloca o núcleo para a periferia) e adipócitos multiloculares (células menores, poligonais, com núcleo central esférico e numerosas gotículas lipídicas associadas a mitocôndrias ricas em citocromos)."
+    },
+    {
+      label: "Subtipos e Classificação",
+      text: "Tecido Adiposo Unilocular / Branco (mais abundante, responsável pela estocagem de lipídios em adultos, modelagem corporal e secreção de adiponectina) e Tecido Adiposo Multilocular / Marrom (presente sobretudo no feto e recém-nascido, especializado na termogênese sem tremor via proteína desacopladora UCP-1 / termogenina)."
+    }
+  ],
+  cartilaginoso: [
+    {
+      label: "Definição",
+      text: "Forma especializada de tecido conjuntivo de suporte com consistência rígida e firme, dotada de notável elasticidade mecânica. É avascular, desprovido de vasos linfáticos e nervos, dependendo integralmente da difusão de nutrientes a partir do tecido conjuntivo vascularizado adjacente (pericôndrio)."
+    },
+    {
+      label: "Componentes da Matriz",
+      text: "Matriz extracelular altamente hidratada (cerca de 75% de água ligada a proteoglicanos com cadeias de condroitim-sulfato e queratam-sulfato associadas a ácido hialurônico / agrecano) entremeada por fibras de colágeno tipo II ou fibras elásticas que suportam forças intensas de compressão."
+    },
+    {
+      label: "Células Principais",
+      text: "Condroblastos (células basofílicas jovens da camada condrogênica do pericôndrio, com intensa atividade de secreção de matriz) e condrócitos (células arredondadas maduras alojadas em cavidades da matriz denominadas lacunas, isoladas ou dispostas em grupos isógenos coronários ou axiais)."
+    },
+    {
+      label: "Subtipos e Classificação",
+      text: "Cartilagem Hialina (mais comum, matriz vítrea com colágeno tipo II; fossas nasais, laringe, anéis traqueais e superfícies articulares), Cartilagem Elástica (semelhante à hialina, porém acrescida de densa rede de fibras elásticas; epiglote e pavilhão auditivo) e Fibrocartilagem (sem pericôndrio, com feixes densos de colágeno tipo I; discos intervertebrais, meniscos e sínfise púbica)."
+    }
+  ],
+  muscular: [
+    {
+      label: "Definição",
+      text: "Tecido composto por células alongadas de origem mesodérmica (fibras musculares ou miócitos) especializadas na contratilidade ativa e na geração de força de tração através da transformação de energia química (ATP) em movimento mecânico corporal ou visceral."
+    },
+    {
+      label: "Componentes da Matriz",
+      text: "Bainhas conjuntas organizadas em camadas concêntricas que transmitem a contração aos tendões e osso: Endomísio (fina lâmina de fibras reticulares contornando cada miócito individual), Perimísio (feixes colágenos que agrupam fascículos musculares) e Epimísio (cápsula externa de conjuntivo denso que recobre o músculo inteiro)."
+    },
+    {
+      label: "Células Principais",
+      text: "Miócitos cujo citoplasma (sarcoplasma) é preenchido longitudinalmente por miofilamentos finos de actina associada a troponina e tropomiosina, e filamentos grossos de miosina, regulados por ciclos intracelulares de liberação e recaptação de cálcio pelo retículo sarcoplasmático."
+    },
+    {
+      label: "Subtipos e Classificação",
+      text: "Estriado Esquelético (fibras cilíndricas muito longas, multinucleadas com núcleos estritamente periféricos; controle voluntário e contração rápida), Estriado Cardíaco (células ramificadas mononucleadas com núcleos centrais, unidas transversalmente por discos intercalares com desmossomos e junções comunicantes; contração involuntária e vigorosa) e Muscular Liso (células fusiformes uninucleadas centrais sem sarcômeros transversais; contração lenta, sustentada e involuntária em vísceras e vasos sanguíneos)."
+    }
+  ],
+  nervoso: [
+    {
+      label: "Definição",
+      text: "Tecido com altíssima especialização funcional voltado para a percepção de estímulos do meio externo e interno, integração e processamento de informações neurais e deflagração de impulsos elétricos para efetores musculares ou glandulares."
+    },
+    {
+      label: "Componentes da Matriz",
+      text: "Praticamente destituído de matriz extracelular conjuntiva clássica (salvo em meninges e bainhas periféricas); a sustentação física, isolamento elétrico e regulação iônica e nutricional são executados pelo neurópilo (trama interdigitada contínua de axônios, dendritos e processos citoplasmáticos da neuroglia)."
+    },
+    {
+      label: "Células Principais",
+      text: "Neurônios (unidades funcionais excitáveis formadas por corpo celular/soma rico em corpúsculos de Nissl, dendritos ramificados receptores de estímulos e um único axônio condutor de potenciais de ação) e Células da Glia (astrócitos de suporte e barreira hematoencefálica, oligodendrócitos mielinizantes centrais, micróglia de fagocitose imunológica e células ependimárias de revestimento ventricular)."
+    },
+    {
+      label: "Subtipos e Classificação",
+      text: "Sistema Nervoso Central / SNC (estruturado em Substância Cinzenta, onde residem os corpos neuronais, sinapses e neurópilo, e Substância Branca, formada por tratos de fibras axonais mielinizadas) e Sistema Nervoso Periférico / SNP (nervos periféricos revestidos por endoneuro, perineuro e epineuro, gânglios sensitivos e motores com células satélites, e células de Schwann mielinizantes)."
+    }
+  ],
+  circulatorio: [
+    {
+      label: "Definição",
+      text: "Circuito tubular fechado e contínuo responsável por impulsionar e conduzir sangue e linfa por todos os tecidos do corpo humano, viabilizando o transporte de gases respiratórios (oxigênio e gás carbônico), nutrientes, hormônios, mediadores químicos e elementos celulares de defesa."
+    },
+    {
+      label: "Componentes da Matriz",
+      text: "Lâmina basal subendotelial contínua ou descontínua associada a lâminas elásticas concêntricas (interna e externa) e estroma conjuntivo perivascular (túnica adventícia rica em colágeno tipo I, fibras elásticas, fibroblastos e vasa vasorum)."
+    },
+    {
+      label: "Células Principais",
+      text: "Células endoteliais poligonais pavimentosas (monocamada com permeabilidade seletiva que sintetiza óxido nítrico, endotelina, prostaciclina e expressa moléculas de adesão leucocitária), pericitos (células contráteis pericapilares com potencial regenerativo) e células musculares lisas da túnica média reguladoras do diâmetro luminal e resistência vascular periférica."
+    },
+    {
+      label: "Subtipos e Classificação",
+      text: "Artérias (elásticas de condução com paredes amortecedoras de pulso e musculares de distribuição), Microcirculação (arteríolas reguladoras de resistência pré-capilar; capilares contínuos sem fenestras, fenestrados com poros filtrantes e sinusoides de trajeto tortuoso com amplas fendas; e vênulas pós-capilares) e Veias (vasos de capacitância dotados de túnica adventícia espessa e válvulas intraluminais que impedem o refluxo centrífugo)."
+    }
+  ]
+};
+
+export function popularSelectModulosCms() {
+  const select = document.getElementById("cmsModuloSelect");
+  if (!select) return;
+
+  const valorAtual = select.value;
+  select.innerHTML = "";
+
+  const labelsDisciplina = {
+    histologia: "Histologia Básica & Especial",
+    patologia: "Patologia Geral & Especial",
+    parasitologia: "Parasitologia Médica",
+    microbiologia: "Microbiologia Clínica",
+    anatomia: "Anatomia Humana"
+  };
+
+  Object.keys(topicosCurriculares).forEach((discKey) => {
+    const topicos = topicosCurriculares[discKey];
+    if (!topicos || topicos.length === 0) return;
+
+    const group = document.createElement("optgroup");
+    group.label = labelsDisciplina[discKey] || discKey.toUpperCase();
+
+    topicos.forEach((topico) => {
+      const opt = document.createElement("option");
+      opt.value = topico.id;
+      opt.textContent = `${topico.nome}`;
+      opt.dataset.disciplina = discKey;
+      group.appendChild(opt);
+    });
+
+    select.appendChild(group);
+  });
+
+  if (valorAtual) {
+    select.value = valorAtual;
+  }
+}
+
+export function onModuloSelecionado(topicoId) {
+  if (!topicoId) return;
+  const select = document.getElementById("cmsModuloSelect");
+  const selectedOpt = select ? select.selectedOptions[0] : null;
+  const disciplina = selectedOpt ? selectedOpt.dataset.disciplina : "histologia";
+  carregarModuloParaEdicao(topicoId, disciplina);
+}
+
+export async function carregarModuloParaEdicao(topicoId, disc = "histologia") {
+  if (!topicoId) return;
+  moduloEmEdicaoId = topicoId;
+  moduloEmEdicaoDisciplina = disc;
+
+  const docIdInput = document.getElementById("cmsModuloDocId");
+  const tituloInput = document.getElementById("cmsModuloTitulo");
+  const catInput = document.getElementById("cmsModuloCategoria");
+  const refInput = document.getElementById("cmsModuloReferencia");
+  const select = document.getElementById("cmsModuloSelect");
+
+  if (select && select.value !== topicoId) {
+    select.value = topicoId;
+  }
+  if (docIdInput) docIdInput.value = topicoId;
+
+  let nomeCurricular = topicoId;
+  Object.keys(topicosCurriculares).forEach(d => {
+    const achado = (topicosCurriculares[d] || []).find(t => t.id === topicoId);
+    if (achado) {
+      nomeCurricular = achado.nome;
+      if (!disc) moduloEmEdicaoDisciplina = d;
+    }
+  });
+
+  const catPadrao = (moduloEmEdicaoDisciplina || "histologia").charAt(0).toUpperCase() + (moduloEmEdicaoDisciplina || "histologia").slice(1);
+  const refPadrao = "Junqueira & Carneiro — Histologia Básica";
+
+  let pontosPadrao = sinteseCuradaPadrao[topicoId] ? [...sinteseCuradaPadrao[topicoId]] : [
+    { label: "Definição", text: `Aspectos gerais e delimitação morfológica de ${nomeCurricular}.` },
+    { label: "Componentes Estruturais", text: "Organização celular, elementos estromais e matriz de sustentação." },
+    { label: "Critérios Diagnósticos", text: "Critérios ópticos de identificação ao microscópio de luz e colorações específicas." },
+    { label: "Classificação Funcional", text: "Subdivisão tecidual e correlação com a fisiologia e patologia médica." }
+  ];
+
+  let docData = null;
+  if (typeof db !== "undefined" && db) {
+    try {
+      const snap = await db.collection("modulos").doc(topicoId).get();
+      if (snap.exists) {
+        docData = snap.data();
+      }
+    } catch (e) {
+      console.warn("[CMS] Aviso ao buscar dados do módulo no Firestore:", e);
+    }
+  }
+
+  if (docData) {
+    if (tituloInput) tituloInput.value = docData.title || nomeCurricular;
+    if (catInput) catInput.value = docData.category || catPadrao;
+    if (refInput) refInput.value = docData.bibliographicReference || refPadrao;
+
+    if (Array.isArray(docData.summaryPoints) && docData.summaryPoints.length > 0) {
+      summaryPointsEmEdicao = docData.summaryPoints.map(p => ({
+        label: p.label || "Tópico",
+        text: p.text || p.desc || ""
+      }));
+    } else {
+      summaryPointsEmEdicao = pontosPadrao.map(p => ({ label: p.label, text: p.text || p.desc }));
+    }
+  } else {
+    if (tituloInput) tituloInput.value = nomeCurricular;
+    if (catInput) catInput.value = catPadrao;
+    if (refInput) refInput.value = refPadrao;
+    summaryPointsEmEdicao = pontosPadrao.map(p => ({ label: p.label, text: p.text || p.desc }));
+  }
+
+  renderizarRepeaterSummaryPoints();
+  carregarLaminasAssociadasModulo(topicoId);
+}
+
+export async function carregarLaminasAssociadasModulo(topicoId) {
+  const container = document.getElementById("cmsListaLaminasAssociadas");
+  const badge = document.getElementById("cmsTotalLaminasVinculadasBadge");
+  laminasDoModuloCache = [];
+
+  if (!container) return;
+
+  let laminas = acervoFirestoreCache.filter(l => {
+    const t = (l.topico || "").toLowerCase().trim();
+    return t === topicoId.toLowerCase().trim() || t.includes(topicoId.toLowerCase().trim());
+  });
+
+  if (laminas.length === 0 && typeof db !== "undefined" && db) {
+    try {
+      const snap = await db.collection("laminas").where("topico", "==", topicoId).get();
+      snap.forEach(d => laminas.push({ id: d.id, ...d.data() }));
+    } catch (e) {}
+  }
+
+  laminasDoModuloCache = laminas;
+
+  if (badge) {
+    badge.textContent = `${laminas.length} ${laminas.length === 1 ? 'vinculada' : 'vinculadas'}`;
+  }
+
+  if (laminas.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full py-4 px-4 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/[0.08] rounded-xl">
+        Nenhuma lâmina vinculada a este tópico no acervo. Você pode cadastrar uma lâmina para este módulo na aba 'Editor &amp; Cadastro'.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = laminas.map(lam => `
+    <div class="bg-[#18181d] border border-white/[0.08] rounded-xl p-3 flex items-center justify-between gap-2.5">
+      <div class="min-w-0">
+        <span class="text-xs font-serif font-bold text-white truncate block">${escaparHtml(lam.nome || "Lâmina")}</span>
+        <span class="text-[10px] font-mono text-neutral-400 block">${escaparHtml(lam.coloracao || "Coloração")}</span>
+      </div>
+      <span class="px-2 py-0.5 rounded-full text-[9px] font-mono shrink-0 ${lam.status === 'ativa' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+        ${lam.status || 'ativa'}
+      </span>
+    </div>
+  `).join("");
+}
+
+export function renderizarRepeaterSummaryPoints() {
+  const container = document.getElementById("cmsSummaryPointsList");
+  if (!container) return;
+
+  if (!summaryPointsEmEdicao || summaryPointsEmEdicao.length === 0) {
+    container.innerHTML = `
+      <div class="p-8 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/[0.08] rounded-xl">
+        Nenhum tópico adicionado. Clique no botão '+ Adicionar Tópico' acima para incluir marcadores no Resumo Morfológico.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = summaryPointsEmEdicao.map((ponto, idx) => `
+    <div class="bg-[#16161b] border border-white/[0.08] rounded-xl p-4 sm:p-5 space-y-3 group hover:border-[#d4af37]/40 transition-all duration-200">
+      <div class="flex items-center justify-between gap-3 border-b border-white/[0.05] pb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-lg bg-white/[0.05] border border-white/[0.08] text-[#d4af37] text-[11px] font-mono font-bold flex items-center justify-center">
+            ${idx + 1}
+          </span>
+          <span class="text-xs font-mono uppercase tracking-wider text-neutral-300 font-semibold">Tópico ${idx + 1}</span>
+        </div>
+        <button 
+          type="button" 
+          onclick="window.App.removerPontoResumoCms(${idx})" 
+          class="text-neutral-500 hover:text-rose-400 p-1 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer text-xs font-mono flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span>Remover</span>
+        </button>
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Rótulo / Título do Tópico (Label)</label>
+        <input 
+          type="text" 
+          value="${escaparHtml(ponto.label || '')}" 
+          placeholder="Ex: Matriz Extracelular, Células Principais, Definição..." 
+          oninput="window.App.atualizarPontoResumoLabel(${idx}, this.value)"
+          class="w-full bg-[#1c1c22] border border-white/[0.08] focus:border-[#d4af37]/60 text-white rounded-lg px-3.5 py-2 text-xs font-sans focus:outline-none" />
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Texto Descritivo e Detalhamento Morfológico</label>
+        <textarea 
+          rows="3" 
+          placeholder="Descreva minuciosamente os critérios histológicos, composição química, populações celulares ou relevância diagnóstica..." 
+          oninput="window.App.atualizarPontoResumoText(${idx}, this.value)"
+          class="w-full bg-[#1c1c22] border border-white/[0.08] focus:border-[#d4af37]/60 text-neutral-200 rounded-lg px-3.5 py-2.5 text-xs font-sans focus:outline-none custom-scrollbar leading-relaxed">${escaparHtml(ponto.text || '')}</textarea>
+      </div>
+    </div>
+  `).join("");
+}
+
+export function atualizarPontoResumoLabel(idx, val) {
+  if (summaryPointsEmEdicao[idx]) {
+    summaryPointsEmEdicao[idx].label = val;
+  }
+}
+
+export function atualizarPontoResumoText(idx, val) {
+  if (summaryPointsEmEdicao[idx]) {
+    summaryPointsEmEdicao[idx].text = val;
+  }
+}
+
+export function adicionarPontoResumoCms() {
+  summaryPointsEmEdicao.push({
+    label: "Novo Critério Morfológico",
+    text: ""
+  });
+  renderizarRepeaterSummaryPoints();
+  const inputs = document.querySelectorAll("#cmsSummaryPointsList input");
+  if (inputs.length > 0) {
+    const ultimo = inputs[inputs.length - 1];
+    ultimo.focus();
+    ultimo.select();
+  }
+}
+
+export function removerPontoResumoCms(idx) {
+  if (idx >= 0 && idx < summaryPointsEmEdicao.length) {
+    summaryPointsEmEdicao.splice(idx, 1);
+    renderizarRepeaterSummaryPoints();
+  }
+}
+
+export async function salvarModuloFirestore() {
+  if (!moduloEmEdicaoId) {
+    mostrarToastCms("Selecione um módulo antes de salvar.", "erro");
+    return;
+  }
+
+  const btn = document.getElementById("btnSalvarModuloCms");
+  const txtBtn = document.getElementById("txtBtnSalvarModulo");
+  const titulo = (document.getElementById("cmsModuloTitulo")?.value || "").trim();
+  const categoria = (document.getElementById("cmsModuloCategoria")?.value || "").trim();
+  const referencia = (document.getElementById("cmsModuloReferencia")?.value || "").trim();
+
+  if (!titulo) {
+    mostrarToastCms("O título do módulo é obrigatório.", "erro");
+    return;
+  }
+
+  const pontosValidos = summaryPointsEmEdicao
+    .map(p => ({
+      label: (p.label || "").trim(),
+      text: (p.text || "").trim()
+    }))
+    .filter(p => p.label.length > 0 || p.text.length > 0);
+
+  if (pontosValidos.length === 0) {
+    mostrarToastCms("Adicione pelo menos um tópico ao Resumo Morfológico.", "erro");
+    return;
+  }
+
+  if (btn) btn.disabled = true;
+  if (txtBtn) txtBtn.textContent = "Salvando no Firestore...";
+
+  try {
+    const payload = {
+      id: moduloEmEdicaoId,
+      title: titulo,
+      category: categoria || "Histologia",
+      bibliographicReference: referencia || "Junqueira & Carneiro — Histologia Básica",
+      summaryPoints: pontosValidos,
+      associatedSlides: laminasDoModuloCache.map(l => l.id),
+      updatedAtISO: new Date().toISOString()
+    };
+
+    if (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue) {
+      payload.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    }
+
+    if (typeof db !== "undefined" && db) {
+      await db.collection("modulos").doc(moduloEmEdicaoId).set(payload, { merge: true });
+      mostrarToastCms(`Módulo "${titulo}" salvo e sincronizado em tempo real!`, "sucesso");
+    } else {
+      throw new Error("Conexão com Firestore indisponível.");
+    }
+  } catch (erro) {
+    console.error("[CMS] Erro ao salvar módulo no Firestore:", erro);
+    mostrarToastCms(`Erro ao salvar: ${erro.message || erro}`, "erro");
+  } finally {
+    if (btn) btn.disabled = false;
+    if (txtBtn) txtBtn.textContent = "Salvar Alterações no Firestore";
+  }
+}
+
+export function mostrarToastCms(mensagem, tipo = "sucesso") {
+  const container = document.getElementById("cmsToastContainer");
+  if (!container) return;
+
+  const toast = document.createElement("div");
+  const isSucesso = tipo === "sucesso";
+
+  toast.className = `pointer-events-auto transform transition-all duration-300 ease-out translate-y-4 opacity-0 flex items-start gap-3 p-4 rounded-2xl shadow-2xl border backdrop-blur-xl ${
+    isSucesso 
+      ? 'bg-[#0f1715]/95 border-emerald-500/40 text-emerald-100 shadow-[0_12px_40px_rgba(16,185,129,0.2)]'
+      : 'bg-[#1c0f13]/95 border-rose-500/40 text-rose-100 shadow-[0_12px_40px_rgba(244,63,94,0.2)]'
+  }`;
+
+  const iconeHtml = isSucesso
+    ? `<div class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 text-emerald-400">
+         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+       </div>`
+    : `<div class="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center shrink-0 text-rose-400">
+         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+       </div>`;
+
+  toast.innerHTML = `
+    ${iconeHtml}
+    <div class="flex-1 min-w-0 pt-0.5">
+      <h5 class="text-xs font-mono font-bold uppercase tracking-wider ${isSucesso ? 'text-emerald-300' : 'text-rose-300'}">
+        ${isSucesso ? 'Sincronização Cloud Firestore' : 'Atenção no Salvamento'}
+      </h5>
+      <p class="text-xs font-sans text-neutral-200 mt-0.5 leading-snug">${escaparHtml(mensagem)}</p>
+    </div>
+    <button type="button" class="text-neutral-400 hover:text-white shrink-0 p-1 cursor-pointer" onclick="this.parentElement.remove()">
+      &times;
+    </button>
+  `;
+
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.remove("translate-y-4", "opacity-0");
+    toast.classList.add("translate-y-0", "opacity-100");
+  });
+
+  setTimeout(() => {
+    toast.classList.add("translate-y-2", "opacity-0");
+    setTimeout(() => toast.remove(), 300);
+  }, 4500);
+}
+
 /* =========================================================
    ========================================================= */
 
@@ -1584,7 +2117,10 @@ Object.assign(window.App, {
   focarPinoEditor,
   atualizarCardAnaliseOpticaCms,
   carregarListaDeAssets, onAssetSelecionado, alternarModoCaminhoManual,
-  definirModoAnotacao, onAtualizarRaioCirculo
+  definirModoAnotacao, onAtualizarRaioCirculo,
+  popularSelectModulosCms, onModuloSelecionado, carregarModuloParaEdicao,
+  renderizarRepeaterSummaryPoints, atualizarPontoResumoLabel, atualizarPontoResumoText,
+  adicionarPontoResumoCms, removerPontoResumoCms, salvarModuloFirestore, mostrarToastCms
 });
 window.inicializarPainelCms = inicializarPainelCms;
 window.encerrarPainelCms = encerrarPainelCms;
@@ -1616,3 +2152,13 @@ window.onAssetSelecionado = onAssetSelecionado;
 window.alternarModoCaminhoManual = alternarModoCaminhoManual;
 window.definirModoAnotacao = definirModoAnotacao;
 window.onAtualizarRaioCirculo = onAtualizarRaioCirculo;
+window.popularSelectModulosCms = popularSelectModulosCms;
+window.onModuloSelecionado = onModuloSelecionado;
+window.carregarModuloParaEdicao = carregarModuloParaEdicao;
+window.renderizarRepeaterSummaryPoints = renderizarRepeaterSummaryPoints;
+window.atualizarPontoResumoLabel = atualizarPontoResumoLabel;
+window.atualizarPontoResumoText = atualizarPontoResumoText;
+window.adicionarPontoResumoCms = adicionarPontoResumoCms;
+window.removerPontoResumoCms = removerPontoResumoCms;
+window.salvarModuloFirestore = salvarModuloFirestore;
+window.mostrarToastCms = mostrarToastCms;

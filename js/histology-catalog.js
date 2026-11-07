@@ -424,7 +424,12 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     };
 
     let pontos = [];
-    if (topicoItem.pontosChave && Array.isArray(topicoItem.pontosChave)) {
+    if (topicoItem.summaryPoints && Array.isArray(topicoItem.summaryPoints) && topicoItem.summaryPoints.length > 0) {
+      pontos = topicoItem.summaryPoints.map(p => ({
+        label: p.label || "Critério",
+        desc: p.text || p.desc || ""
+      }));
+    } else if (topicoItem.pontosChave && Array.isArray(topicoItem.pontosChave) && topicoItem.pontosChave.length > 0) {
       pontos = topicoItem.pontosChave;
     } else if (sinteseCurada[topicoItem.id]) {
       pontos = sinteseCurada[topicoItem.id];
@@ -472,6 +477,8 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
       </li>
     `).join("");
 
+    const refBib = moduloItem.bibliografia || moduloItem.bibliographicReference || "Junqueira & Carneiro — Histologia Básica";
+
     return `
       <div class="bg-white dark:bg-[#0c0c0f] border border-slate-200/90 dark:border-white/10 rounded-2xl p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-8">
         <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100 dark:border-white/5">
@@ -482,7 +489,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           ${itensHtml}
         </ul>
         <div class="mt-5 pt-3.5 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs text-slate-400 dark:text-zinc-500">
-          <span class="italic font-sans text-[11px] text-slate-500 dark:text-zinc-400">Baseado em ${moduloItem.bibliografia || "Junqueira & Carneiro — Histologia Básica"}</span>
+          <span class="italic font-sans text-[11px] text-slate-500 dark:text-zinc-400">Baseado em ${refBib}</span>
           <span class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-zinc-600">Referência Acadêmica</span>
         </div>
       </div>
@@ -601,18 +608,20 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
         <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-500 dark:text-zinc-400 mb-6 flex-wrap">
           <a href="#" onclick="window.App.goHome(); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">Início</a>
           <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-          <a href="#" onclick="window.App.voltarParaDisciplinaHome('${disc}'); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">${modulo.tituloDisciplina}</a>
+          <a href="#" onclick="window.App.voltarParaDisciplinaHome('${disc}'); return false;" id="breadcrumbDisciplina" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">${modulo.tituloDisciplina}</a>
           <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-          <span class="text-slate-900 dark:text-white font-medium pointer-events-none">${topico.titulo}</span>
+          <span id="breadcrumbTopico" class="text-slate-900 dark:text-white font-medium pointer-events-none">${topico.titulo}</span>
         </nav>
 
         <!-- TÍTULO DO TÓPICO -->
-        <h1 class="text-2xl lg:text-3xl font-bold text-slate-950 dark:text-white tracking-tight mb-4">
+        <h1 id="tituloTopicoH1" class="text-2xl lg:text-3xl font-bold text-slate-950 dark:text-white tracking-tight mb-4">
           ${topico.titulo}
         </h1>
 
-        <!-- CARD DE RESUMO MORFOLÓGICO -->
-        ${gerarCardResumoMorfológico(topico, modulo)}
+        <!-- CARD DE RESUMO MORFOLÓGICO DINÂMICO -->
+        <div id="cardResumoMorfologicoContainer">
+          ${gerarCardResumoMorfológico(topico, modulo)}
+        </div>
 
         <!-- SEÇÃO DE LÂMINAS DE MICROSCOPIA ASSOCIADAS -->
         <div class="mt-8 mb-4">
@@ -627,6 +636,62 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
       </div>
     </div>
   `;
+
+  // Listener em Tempo Real (onSnapshot) na coleção 'modulos' para sincronizar títulos e resumos morfológicos
+  if (typeof db !== "undefined" && db) {
+    if (window._currentModuleDocUnsubscribe && typeof window._currentModuleDocUnsubscribe === "function") {
+      try { window._currentModuleDocUnsubscribe(); } catch (e) {}
+      window._currentModuleDocUnsubscribe = null;
+    }
+
+    try {
+      window._currentModuleDocUnsubscribe = db.collection("modulos").doc(idTopico)
+        .onSnapshot((docSnapshot) => {
+          if (!docSnapshot.exists) return;
+          const moduloDoc = docSnapshot.data();
+          if (!moduloDoc) return;
+
+          // Atualizar Título em Tempo Real
+          if (moduloDoc.title) {
+            const h1 = document.getElementById("tituloTopicoH1");
+            if (h1) h1.textContent = moduloDoc.title;
+            const bcTopico = document.getElementById("breadcrumbTopico");
+            if (bcTopico) bcTopico.textContent = moduloDoc.title;
+          }
+
+          // Atualizar Categoria em Tempo Real
+          if (moduloDoc.category) {
+            const bcDisc = document.getElementById("breadcrumbDisciplina");
+            if (bcDisc) bcDisc.textContent = moduloDoc.category;
+          }
+
+          // Atualizar Card de Resumo Morfológico em Tempo Real
+          const cardContainer = document.getElementById("cardResumoMorfologicoContainer");
+          if (cardContainer) {
+            const topicoAtualizado = {
+              ...topico,
+              id: idTopico,
+              titulo: moduloDoc.title || topico.titulo,
+              summaryPoints: moduloDoc.summaryPoints,
+              pontosChave: Array.isArray(moduloDoc.summaryPoints) ? moduloDoc.summaryPoints.map(p => ({
+                label: p.label || "Critério",
+                desc: p.text || p.desc || ""
+              })) : null
+            };
+            const moduloAtualizado = {
+              ...modulo,
+              bibliografia: moduloDoc.bibliographicReference || modulo.bibliografia,
+              tituloDisciplina: moduloDoc.category || modulo.tituloDisciplina
+            };
+            cardContainer.innerHTML = gerarCardResumoMorfológico(topicoAtualizado, moduloAtualizado);
+          }
+        }, (errMod) => {
+          console.warn("[Palas Atlas] Aviso no listener de módulo do Firestore:", errMod);
+        });
+    } catch (eMod) {
+      console.warn("[Palas Atlas] Falha ao conectar listener do módulo:", eMod);
+    }
+  }
 
   // Listener em Tempo Real (onSnapshot) na coleção 'laminas' apenas com status == 'ativa'
   if (typeof db !== "undefined" && db) {
@@ -947,6 +1012,14 @@ function abrirDisciplinaHome(disciplina = 'histologia') {
 }
 
 function voltarParaDisciplinaHome(disciplina = 'histologia') {
+  if (window._currentModuleDocUnsubscribe && typeof window._currentModuleDocUnsubscribe === "function") {
+    try { window._currentModuleDocUnsubscribe(); } catch (e) {}
+    window._currentModuleDocUnsubscribe = null;
+  }
+  if (window._currentTopicUnsubscribe && typeof window._currentTopicUnsubscribe === "function") {
+    try { window._currentTopicUnsubscribe(); } catch (e) {}
+    window._currentTopicUnsubscribe = null;
+  }
   abrirDisciplinaHome(disciplina);
 }
 
