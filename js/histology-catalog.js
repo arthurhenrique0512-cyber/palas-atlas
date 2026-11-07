@@ -24,7 +24,7 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
         htmlItens += `
           <button
             type="button"
-            class="bg-slate-100 text-slate-900 dark:bg-white/[0.08] dark:text-white font-semibold px-3 py-2 rounded-none w-full text-left leading-snug break-words text-xs border-l-2 border-slate-900 dark:border-[#d4af37] transition-colors"
+            class="bg-teal-50 text-teal-950 dark:bg-teal-950/40 dark:text-teal-200 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left leading-snug break-words text-xs block transition-colors"
             title="${topico.titulo}">
             ${topico.titulo}
           </button>`;
@@ -33,7 +33,7 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
           <button
             type="button"
             onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
-            class="text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/[0.04] px-3 py-2 rounded-none transition-colors w-full text-left leading-snug break-words text-xs cursor-pointer border-l-2 border-transparent"
+            class="text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/[0.04] py-1.5 px-3 block transition-colors w-full text-left leading-snug break-words cursor-pointer border-l-2 border-transparent"
             title="${topico.titulo}">
             ${topico.titulo}
           </button>`;
@@ -44,8 +44,8 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   const navItem = (id, label, dotClass) => {
     const isAtivo = disciplinaAtual === id;
     const btnClass = isAtivo
-      ? "bg-slate-100 text-slate-900 dark:bg-white/[0.08] dark:text-white font-semibold px-3 py-2 rounded-none w-full text-left flex items-center gap-2.5 border-l-2 border-slate-900 dark:border-[#d4af37] transition-colors"
-      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/[0.04] px-3 py-2 rounded-none transition-colors w-full text-left flex items-center gap-2.5 border-l-2 border-transparent cursor-pointer";
+      ? "bg-teal-50 text-teal-950 dark:bg-teal-950/40 dark:text-teal-200 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left flex items-center gap-2.5 transition-colors"
+      : "text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/[0.04] py-1.5 px-3 block transition-colors w-full text-left flex items-center gap-2.5 border-l-2 border-transparent cursor-pointer";
     return `
       <button type="button" onclick="window.App.selecionarFrente('${id}')" class="${btnClass}">
         <span class="w-2 h-2 rounded-full ${dotClass} shrink-0"></span>
@@ -271,24 +271,209 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     console.warn("Aviso ao limpar cache local de lâminas:", errLimpeza);
   }
 
-  // Parser Simples para Parágrafos
-  const formatarResumoAcademico = (texto) => {
-    if (!texto) return "<p>Sem conteúdo disponível.</p>";
-    if (texto.includes("<p>") || texto.includes("<strong>") || texto.includes("<div")) return texto;
-    const sentencas = texto.split(/(?<=\.)\s+/).filter(s => s.trim().length > 0);
-    if (sentencas.length === 0) return `<p>${texto}</p>`;
-    
-    let html = "";
-    for (let i = 0; i < sentencas.length; i++) {
-      const s = sentencas[i].trim();
-      if (s) {
-        html += `<p>${s}${s.endsWith('.') ? '' : '.'}</p>`;
+  /**
+   * Constrói o Card de Resumo Morfológico Acadêmico
+   * Estrutura pontos-chave (Matriz, Células, Organização Estrutural) em tópicos curtos e objetivos.
+   */
+  const gerarCardResumoMorfológico = (topicoItem, moduloItem) => {
+    const sinteseCurada = {
+      osseo: [
+        { label: "Matriz Extracelular", desc: "Mineralizada e rígida. Fração orgânica rica em colágeno tipo I; fração inorgânica composta por cristais de hidroxiapatita (armazenamento e homeostase de cálcio e fosfato)." },
+        { label: "Células Principais", desc: "Osteoblastos (síntese do osteoide), osteócitos (manutenção da matriz alojados em lacunas e intercomunicados por canalículos) e osteoclastos (reabsorção e remodelação óssea contínua)." },
+        { label: "Organização Estrutural", desc: "Ósseo Compacto (Sistemas de Havers / ósteons concêntricos e canais vasculares de Volkmann) e Ósseo Esponjoso (rede de trabéculas delimitando cavidades preenchidas por medula óssea)." }
+      ],
+      epitelial: [
+        { label: "Matriz e Lâmina Basal", desc: "Escassa matriz extracelular; células intimamente justapostas assentadas sobre lâmina basal; tecido avascular nutrido por difusão a partir do conjuntivo subjacente." },
+        { label: "Células e Especializações", desc: "Polaridade celular marcante (domínios apical, lateral e basal), desmossomos, junções de oclusão, microvilosidades e cílios funcionais." },
+        { label: "Organização Estrutural", desc: "Epitélios de Revestimento (classificados pelo número de camadas e forma celular) e Glandulares (exócrinos acinares/tubulares ou endócrinos cordonais/foliculares)." }
+      ],
+      conjuntivo: [
+        { label: "Matriz Extracelular", desc: "Abundante matriz extracelular formada por substância fundamental amorfa (GAGs, proteoglicanos, glicoproteínas) e fibras colágenas, elásticas e reticulares." },
+        { label: "População Celular", desc: "Fibroblastos e fibrócitos (síntese de MEC), macrófagos e mastócitos (vigilância imune e reparo), além de plasmócitos e leucócitos transitórios." },
+        { label: "Organização Estrutural", desc: "Conjuntivo Frouxo (flexível, abundante em substância fundamental, suporta epitélios) e Conjuntivo Denso (predomínio de feixes colágenos resistentes à tração, modelado ou não modelado)." }
+      ],
+      adiposo: [
+        { label: "Matriz e Vascularização", desc: "Estroma conjuntivo fino e rica trama capilar para suporte metabólico rápido e mobilização contínua de ácidos graxos." },
+        { label: "Células (Adipócitos)", desc: "Adipócitos uniloculares (gotícula lipídica única e volumosa que comprime o núcleo contra a periferia) e multiloculares (múltiplas gotículas, núcleo central e abundantes mitocôndrias)." },
+        { label: "Organização Estrutural", desc: "Gordura Branca/Unilocular (reserva energética em triglicerídeos e isolamento térmico) e Gordura Castanha/Multilocular (termogênese sem tremor via proteína UCP-1 / termogenina)." }
+      ],
+      cartilaginoso: [
+        { label: "Matriz Extracelular", desc: "Gel hidratado com consistência firme e elástica, rico em proteoglicanos (agrecano) e colágeno; tecido avascular e anervado, nutrido por difusão via pericôndrio adjacente." },
+        { label: "Células", desc: "Condroblastos (periféricos, síntese ativa) e condrócitos maduros (alojados em lacunas da matriz, isolados ou reunidos em grupos isógenos coronários ou axiais)." },
+        { label: "Organização Estrutural", desc: "Cartilagem Hialina (matriz homogênea com colágeno tipo II), Elástica (densa rede de fibras elásticas) e Fibrocartilagem (feixes espessos de colágeno tipo I, desprovida de pericôndrio)." }
+      ],
+      muscular: [
+        { label: "Miofilamentos", desc: "Aparelho contrátil baseado no deslizamento interdigitado de miofilamentos finos de actina e filamentos grossos de miosina com consumo dependente de ATP e íons cálcio." },
+        { label: "Células e Envoltórios", desc: "Miócitos envolvidos por bainhas de tecido conjuntivo para transmissão de força mecânica aos tendões: endomísio, perimísio e epimísio." },
+        { label: "Organização Estrutural", desc: "Estriado Esquelético (fibras cilíndricas multinucleadas periféricas), Estriado Cardíaco (células ramificadas com discos intercalares) e Liso (células fusiformes uninucleadas viscerais)." }
+      ],
+      nervoso: [
+        { label: "Matriz e Neurópilo", desc: "Sustentação provida pelo neurópilo (emaranhado de axônios, dendritos e prolongamentos gliais) e lâmina basal vascular, sem estroma colágeno denso." },
+        { label: "Células Principais", desc: "Neurônios (corpo celular/pericário com corpúsculos de Nissl, axônio mielinizado e dendritos) condutores do impulso eletroquímico." },
+        { label: "Neuroglia de Suporte", desc: "SNC (substância cinzenta e branca com astrócitos, oligodendrócitos, micróglia e epêndima) e SNP (nervos e gânglios com células de Schwann e células satélites)." }
+      ],
+      circulatorio: [
+        { label: "Arquitetura Parietal", desc: "Estrutura vascular disposta em três túnicas: Íntima (endotélio e subendotélio), Média (músculo liso e lâminas elásticas) e Adventícia (tecido conjuntivo com vasa vasorum)." },
+        { label: "Células Endoteliais", desc: "Monocamada epitelial plana especializada no controle da hemostasia, tônus vascular e permeabilidade seletiva." },
+        { label: "Microcirculação e Capilares", desc: "Capilares Contínuos (sem poros, barreira hematoencefálica), Fenestrados (poros com diafragma em rins e intestinos) e Sinusoides (amplas fendas no fígado e baço)." }
+      ]
+    };
+
+    let pontos = [];
+    if (topicoItem.pontosChave && Array.isArray(topicoItem.pontosChave)) {
+      pontos = topicoItem.pontosChave;
+    } else if (sinteseCurada[topicoItem.id]) {
+      pontos = sinteseCurada[topicoItem.id];
+    } else {
+      // Parser automático de contingência para novos tópicos ou outras disciplinas
+      const texto = (topicoItem.resumo || "").replace(/<[^>]*>/g, " ").trim();
+      if (texto) {
+        const frases = texto.split(/(?<=\.)\s+/).filter(f => f.trim().length > 15);
+        if (frases.length >= 3) {
+          pontos = [
+            { label: "Matriz & Características Gerais", desc: frases[0] },
+            { label: "Componentes Celulares", desc: frases[1] },
+            { label: "Organização Estrutural", desc: frases.slice(2).join(" ") }
+          ];
+        } else if (frases.length > 0) {
+          pontos = frases.map((f, i) => ({
+            label: i === 0 ? "Características Principais" : (i === 1 ? "Componentes Celulares" : "Organização Estrutural"),
+            desc: f
+          }));
+        }
       }
     }
-    return html;
+
+    if (pontos.length === 0) {
+      pontos = [
+        { label: "Descrição Morfológica", desc: "Consulte as lâminas de microscopia abaixo para análise das camadas e estruturas diagnósticas deste corte histológico." }
+      ];
+    }
+
+    const itensHtml = pontos.map(p => `
+      <li class="flex items-start gap-3 leading-relaxed">
+        <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400 shrink-0"></span>
+        <div class="text-xs sm:text-sm">
+          <strong class="font-semibold text-slate-950 dark:text-white">${p.label}:</strong>
+          <span class="text-slate-600 dark:text-zinc-300 ml-1">${p.desc}</span>
+        </div>
+      </li>
+    `).join("");
+
+    return `
+      <div class="bg-white dark:bg-[#0c0c0f] border border-slate-200/90 dark:border-white/10 rounded-2xl p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-8">
+        <div class="flex items-center justify-between gap-3 pb-3 mb-4 border-b border-slate-100 dark:border-white/5">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-4 rounded-full bg-teal-700"></span>
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Resumo Morfológico</h2>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400 dark:text-zinc-500">${moduloItem.bibliografia || "Referência Acadêmica"}</span>
+        </div>
+        <ul class="space-y-3">
+          ${itensHtml}
+        </ul>
+      </div>
+    `;
   };
 
-  // Renderização 2 Colunas Limpas (Índice + Texto) alinhada ao max-w-7xl
+  /**
+   * Constrói o Card de Lâmina no formato de galeria acadêmica de espécimes
+   */
+  const gerarCardLaminaAcademico = (lamina) => {
+    const disciplinaNome = lamina.disciplina || disciplinaAtual || "Histologia";
+    const coloracaoNome = lamina.coloracao || "Coloração de Rotina";
+    const nomeLamina = lamina.nome || lamina.title || "Peça Morfológica";
+    const topicoNome = lamina.topico || "Corte Histológico";
+
+    // Extração concisa do aumento para a tag no canto superior esquerdo
+    let badgeAumento = "40x";
+    if (lamina.maxMagnification) {
+      badgeAumento = `${lamina.maxMagnification}x`;
+    } else if (coloracaoNome.toLowerCase().includes("100x")) {
+      badgeAumento = "100x";
+    } else if (coloracaoNome.toLowerCase().includes("40x")) {
+      badgeAumento = "40x";
+    } else if (coloracaoNome.toLowerCase().includes("20x")) {
+      badgeAumento = "20x";
+    } else if (coloracaoNome.toLowerCase().includes("10x")) {
+      badgeAumento = "10x";
+    }
+
+    const imagemUrl = lamina.imagemUrl || lamina.imageUrl || lamina.caminhoImagemBase || lamina.dziUrl || "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi";
+
+    let thumbSrc = lamina.thumbnailUrl || "";
+    let thumbSrcFallback = "";
+
+    if (!thumbSrc) {
+      if (imagemUrl.toLowerCase().endsWith(".dzi")) {
+        const basePath = imagemUrl.substring(0, imagemUrl.lastIndexOf(".dzi"));
+        thumbSrc = `${basePath}_files/8/0_0.jpg`;
+        thumbSrcFallback = `${basePath}_files/8/0_0.jpeg`;
+      } else {
+        thumbSrc = imagemUrl;
+        thumbSrcFallback = "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg";
+      }
+    }
+
+    return `
+      <div class="group bg-white dark:bg-[#0c0c0f] border border-slate-200/80 dark:border-white/10 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between">
+        <div>
+          <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
+            <!-- Placeholder exibido quando a imagem falha -->
+            <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden bg-[#060608]">
+              <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M12 3v1.5M6.75 4.5l.75 1.3M17.25 4.5l-.75 1.3"/>
+              </svg>
+              <span class="text-xs text-slate-300 font-serif">Sem pré-visualização</span>
+            </div>
+
+            <img
+              src="${thumbSrc}"
+              alt="${nomeLamina}"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+              onerror="var fb='${thumbSrcFallback}'; if(fb && this.src!==fb){this.src=fb;}else{this.style.display='none';var ph=this.parentElement.querySelector('.thumb-placeholder');if(ph){ph.classList.remove('hidden');ph.classList.add('flex');}}"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent pointer-events-none"></div>
+
+            <!-- Badge de aumento no canto superior esquerdo -->
+            <div class="absolute top-3 left-3 flex gap-1.5">
+              <span class="bg-black/75 backdrop-blur-sm text-white border border-white/10 text-[10px] font-sans font-semibold px-2.5 py-0.5 rounded-full">
+                ${badgeAumento}
+              </span>
+            </div>
+
+            <!-- Rodapé do preview com disciplina e tópico -->
+            <div class="absolute bottom-3 left-3 right-3 text-white">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-teal-300 font-semibold">${disciplinaNome.toUpperCase()} • ${topicoNome.toUpperCase()}</span>
+            </div>
+          </div>
+
+          <!-- Título anatômico em destaque e coloração -->
+          <div class="p-5">
+            <h3 class="font-serif font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-teal-900 dark:group-hover:text-teal-300 transition-colors leading-snug mb-1">
+              ${nomeLamina}
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed font-sans">
+              ${coloracaoNome}
+            </p>
+          </div>
+        </div>
+
+        <!-- Botão de acesso direto -->
+        <div class="p-5 pt-0 mt-auto">
+          <a
+            href="microscopio.html?id=${lamina.id}"
+            class="w-full py-2.5 text-xs font-semibold text-slate-700 dark:text-zinc-200 bg-slate-50 dark:bg-white/5 hover:bg-teal-900 hover:text-white dark:hover:bg-teal-700 dark:hover:text-white border border-slate-200 dark:border-white/10 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline">
+            <span>Examinar Lâmina</span>
+            <span class="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    `;
+  };
+
+  // Renderização 2 Colunas Limpas (Índice + Conteúdo) alinhada ao max-w-7xl
   c2.innerHTML = `
     <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-5 md:pt-8 pb-16 grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6 md:gap-10">
       ${gerarIndiceLateral(modulo, topico.id, true)}
@@ -299,31 +484,41 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           ${gerarBarraDisciplinasTopo()}
         </div>
       
-        <!-- BREADCRUMBS -->
-        <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-400 dark:text-zinc-500 mb-2.5 flex-wrap">
-          <a href="#" onclick="window.App.goHome(); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-[#d4af37] transition-colors no-underline">Início</a>
-          <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-          <a href="#" onclick="window.App.voltarParaDisciplinaHome('${disc}'); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-[#d4af37] transition-colors no-underline">${modulo.tituloDisciplina}</a>
-          <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-          <span class="text-slate-900 dark:text-white font-semibold pointer-events-none">${topico.titulo}</span>
-        </nav>
+        <!-- MIGALHAS DE PÃO (BREADCRUMBS) E NAVEGAÇÃO SUPERIOR -->
+        <div class="flex items-center justify-between gap-3 mb-6 flex-wrap">
+          <div class="flex items-center gap-3 flex-wrap">
+            <button
+              type="button"
+              onclick="window.App.voltarParaDisciplinaHome('${disc}'); return false;"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-all dark:bg-zinc-900 dark:border-white/10 dark:text-zinc-300 dark:hover:text-white cursor-pointer"
+              title="Voltar para ${modulo.tituloDisciplina}">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              <span>Voltar</span>
+            </button>
+            <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-500 dark:text-zinc-400">
+              <a href="#" onclick="window.App.goHome(); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">Início</a>
+              <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
+              <a href="#" onclick="window.App.voltarParaDisciplinaHome('${disc}'); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">${modulo.tituloDisciplina}</a>
+              <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
+              <span class="text-slate-900 dark:text-white font-medium pointer-events-none">${topico.titulo}</span>
+            </nav>
+          </div>
+        </div>
 
-        <!-- TÍTULO DO TECIDO -->
-        <h1 class="font-serif text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
+        <!-- TÍTULO DO TÓPICO -->
+        <h1 class="text-2xl lg:text-3xl font-bold text-slate-950 dark:text-white tracking-tight mb-4">
           ${topico.titulo}
         </h1>
 
-        <!-- CAIXA DE TEXTO PRINCIPAL (LIMPA, SEM DETALHES OU ENFEITES) -->
-        <div class="bg-white dark:bg-[#0c0c0f] border border-slate-200/90 dark:border-white/10 p-5 sm:p-6 mb-8 text-slate-600 dark:text-zinc-300 text-sm md:text-base leading-relaxed space-y-3 break-words [&_strong]:font-semibold [&_strong]:text-slate-900 dark:[&_strong]:text-white [&_b]:font-semibold [&_b]:text-slate-900 dark:[&_b]:text-white">
-          ${formatarResumoAcademico(topico.resumo)}
-        </div>
+        <!-- CARD DE RESUMO MORFOLÓGICO -->
+        ${gerarCardResumoMorfológico(topico, modulo)}
 
         <!-- SEÇÃO DE LÂMINAS DE MICROSCOPIA ASSOCIADAS -->
         <div class="mt-8 mb-4">
-          <h2 class="text-xl font-serif font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200/80 dark:border-white/10 pb-3">
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">
             Lâminas de Microscopia Associadas
           </h2>
-          <div id="gridCatalogoLaminas" class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+          <div id="gridCatalogoLaminas" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
             <p class="text-sm text-slate-500 font-mono col-span-full">Aguardando lâminas...</p>
           </div>
         </div>
@@ -372,14 +567,14 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
         if (laminasDoTopico.length === 0) {
           containerGrid.innerHTML = `
-            <div class="col-span-full bg-white border border-dashed border-slate-300 rounded-2xl p-10 text-center text-slate-500 shadow-sm">
-              <span class="text-xs font-mono text-sky-700 font-semibold block uppercase tracking-wider mb-2">Sem Lâminas Ativas no Tópico</span>
-              <h4 class="text-lg font-semibold text-slate-900 font-serif">Nenhuma lâmina matriz publicada para ${topico.titulo} no momento.</h4>
-              <p class="text-xs text-slate-500 font-sans mt-2 max-w-lg mx-auto">Lâminas com status inativo não são listadas aqui. Acesse o Painel do Desenvolvedor para publicar peças neste módulo.</p>
+            <div class="col-span-full bg-white dark:bg-[#0c0c0f] border border-dashed border-slate-300 dark:border-white/10 rounded-2xl p-10 text-center text-slate-500 shadow-sm">
+              <span class="text-xs font-mono text-teal-700 dark:text-teal-400 font-semibold block uppercase tracking-wider mb-2">Sem Lâminas Ativas no Tópico</span>
+              <h4 class="text-lg font-semibold text-slate-900 dark:text-white font-serif">Nenhuma lâmina matriz publicada para ${topico.titulo} no momento.</h4>
+              <p class="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-2 max-w-lg mx-auto">Lâminas com status inativo não são listadas aqui. Acesse o Painel do Desenvolvedor para publicar peças neste módulo.</p>
               <button 
                 type="button"
                 onclick="window.App.selecionarFrente('dashboard')"
-                class="mt-6 inline-block px-5 py-2.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-sans font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-sm">
+                class="mt-6 inline-block px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-sans font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-sm">
                 Abrir Painel do Desenvolvedor &rarr;
               </button>
             </div>
@@ -387,78 +582,26 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           return;
         }
 
-        let cardsLaminasHtml = "";
-        laminasDoTopico.forEach((lamina) => {
-          const disciplinaNome = lamina.disciplina || "Histologia";
-          const coloracaoNome = lamina.coloracao || "Rotina Padrão";
-          const nomeLamina = lamina.nome || "Peça Morfológica";
-          const topicoNome = lamina.topico || "Módulo Geral";
-
-          // CRÍTICO: sem onclick interceptor — o href navega diretamente para microscopio.html
-          const imagemUrl = lamina.imagemUrl || lamina.imageUrl || lamina.caminhoImagemBase || lamina.dziUrl || "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi";
-
-          // thumbnailUrl tem prioridade máxima (campo dedicado à pré-visualização)
-          // Se não existir, tenta derivar do DZI ou usar a imagemUrl diretamente
-          let thumbSrc = lamina.thumbnailUrl || "";
-          let thumbSrcFallback = "";
-
-          if (!thumbSrc) {
-            if (imagemUrl.toLowerCase().endsWith(".dzi")) {
-              const basePath = imagemUrl.substring(0, imagemUrl.lastIndexOf(".dzi"));
-              thumbSrc = `${basePath}_files/8/0_0.jpg`;
-              thumbSrcFallback = `${basePath}_files/8/0_0.jpeg`;
-            } else {
-              thumbSrc = imagemUrl;
-              thumbSrcFallback = "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg";
-            }
-          }
-
-          cardsLaminasHtml += `
-            <a href="microscopio.html?id=${lamina.id}" class="relative h-72 sm:h-80 rounded-none overflow-hidden border border-slate-200/90 dark:border-white/10 shadow-[0_14px_34px_-8px_rgba(0,0,0,0.12)] hover:shadow-[0_24px_50px_-8px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 group cursor-pointer flex flex-col justify-between p-5 sm:p-6 bg-[#060608] no-underline">
-              <!-- Placeholder exibido quando a imagem falha -->
-              <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden bg-[#060608]">
-                <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M12 3v1.5M6.75 4.5l.75 1.3M17.25 4.5l-.75 1.3"/>
-                </svg>
-                <span class="text-xs text-slate-300 font-serif">Sem pré-visualização</span>
-                <span class="text-[10px] text-slate-400 font-mono">Abra a lâmina para ver</span>
-              </div>
-              <!-- Imagem Full-Bleed 100% -->
-              <img
-                src="${thumbSrc}"
-                alt="${nomeLamina}"
-                class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                onerror="var fb='${thumbSrcFallback}'; if(fb && this.src!==fb){this.src=fb;}else{this.style.display='none';var ph=this.parentElement.querySelector('.thumb-placeholder');if(ph){ph.classList.remove('hidden');ph.classList.add('flex');}}"
-              >
-              <!-- Gradiente Escuro Neutro na Base (Zero Tonalidade Azulada) -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none"></div>
-
-              <!-- Topo: Badge de Coloração -->
-              <div class="relative z-10 flex items-center justify-between">
-                <span class="bg-black/70 border border-white/15 text-white text-[11px] px-3.5 py-1 rounded-full backdrop-blur-md font-sans font-semibold tracking-wider shadow-sm">
-                  ${coloracaoNome} &bull; 40x
-                </span>
-              </div>
-
-              <!-- Base: Título e Seta Sobrepostos -->
-              <div class="relative z-10 flex items-end justify-between gap-3">
-                <h3 class="text-lg sm:text-xl font-serif font-bold text-white group-hover:text-[#d4af37] transition-colors leading-tight drop-shadow-sm">${nomeLamina}</h3>
-                <span class="shrink-0 w-9 h-9 rounded-none bg-white/15 backdrop-blur-md border border-white/25 group-hover:bg-[#d4af37] group-hover:text-black group-hover:border-[#d4af37] flex items-center justify-center text-white transition-all duration-300">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </span>
-              </div>
-            </a>
-          `;
-        });
-
-        containerGrid.innerHTML = cardsLaminasHtml;
+        containerGrid.innerHTML = laminasDoTopico.map(gerarCardLaminaAcademico).join("");
       }, (erroDeConsulta) => {
         console.error("Erro no listener onSnapshot ao buscar lâminas no Firestore:", erroDeConsulta);
+        const containerGrid = document.getElementById("gridCatalogoLaminas");
+        if (containerGrid) {
+          const estaticas = topico.laminasEstaticas || topico.laminas || [];
+          if (estaticas.length > 0) {
+            containerGrid.innerHTML = estaticas.map(gerarCardLaminaAcademico).join("");
+          }
+        }
       });
   } else {
     const containerGrid = document.getElementById("gridCatalogoLaminas");
     if (containerGrid) {
-      containerGrid.innerHTML = `<div class="col-span-full py-8 text-center text-xs font-mono text-red-500 font-semibold bg-red-50 border border-dashed border-red-200 rounded-xl">Falha na conexão com o Cloud Firestore. Verifique o SDK na página.</div>`;
+      const estaticas = topico.laminasEstaticas || topico.laminas || [];
+      if (estaticas.length > 0) {
+        containerGrid.innerHTML = estaticas.map(gerarCardLaminaAcademico).join("");
+      } else {
+        containerGrid.innerHTML = `<div class="col-span-full py-8 text-center text-xs font-mono text-slate-400 font-semibold bg-slate-50 border border-dashed border-slate-200 rounded-xl">Nenhuma lâmina cadastrada para este módulo no catálogo estático.</div>`;
+      }
     }
   }
 }
