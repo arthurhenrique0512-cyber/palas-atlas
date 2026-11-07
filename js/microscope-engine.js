@@ -500,6 +500,52 @@ function iniciarMicroscopio() {
     exibirErroMicroscopio("Nenhuma lâmina selecionada. Acesse pelo Catálogo de Tópicos.");
   }
   registrarDelegacaoGlobalDePinos();
+  registrarControleAjudaMicroscopio();
+}
+
+/**
+ * Alterna a exibição do popover discreto de atalhos e ajuda do microscópio.
+ * @param {boolean} [forcar]
+ */
+export function toggleAjudaMicroscopio(forcar) {
+  const popover = document.getElementById("popoverAjudaMicroscopio");
+  if (!popover) return;
+  if (typeof forcar === "boolean") {
+    if (forcar) {
+      popover.classList.remove("hidden");
+    } else {
+      popover.classList.add("hidden");
+    }
+  } else {
+    popover.classList.toggle("hidden");
+  }
+}
+
+/**
+ * Registra listeners para fechar o popover de ajuda ao clicar fora ou ao pressionar Esc.
+ */
+let _controleAjudaRegistrado = false;
+function registrarControleAjudaMicroscopio() {
+  if (_controleAjudaRegistrado) return;
+  _controleAjudaRegistrado = true;
+
+  document.addEventListener("click", (e) => {
+    const container = document.getElementById("containerAjudaMicroscopio");
+    const popover = document.getElementById("popoverAjudaMicroscopio");
+    if (!container || !popover || popover.classList.contains("hidden")) return;
+    if (!container.contains(e.target)) {
+      popover.classList.add("hidden");
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const popover = document.getElementById("popoverAjudaMicroscopio");
+      if (popover && !popover.classList.contains("hidden")) {
+        popover.classList.add("hidden");
+      }
+    }
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -713,13 +759,13 @@ function renderizarDescricaoETextos() {
               id="btn-pino-${pin.id}"
               data-btn-pin-id="${pin.id}"
               onclick="window.focarPinoNoViewer('${pin.id}')"
-              class="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 hover:bg-neutral-900/70 border border-white/[0.04] hover:border-[#c8ad5f]/40 text-left transition-all group cursor-pointer"
+              class="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 hover:bg-neutral-900/70 border border-white/[0.04] hover:border-teal-700/50 text-left transition-all group cursor-pointer"
             >
               <div class="flex items-center gap-2.5 truncate pr-2">
-                <span class="w-2 h-2 rounded-full bg-[#c8ad5f] shrink-0 animate-pulse"></span>
-                <span class="text-sm font-medium text-neutral-200 truncate">${pin.rotulo || "Estrutura"}</span>
+                <span class="w-2 h-2 rounded-full bg-teal-400 shrink-0"></span>
+                <span class="text-sm font-medium text-neutral-200 truncate group-hover:text-teal-200 transition-colors">${pin.rotulo || "Estrutura"}</span>
               </div>
-              <span class="text-xs text-neutral-500 group-hover:text-[#c8ad5f] shrink-0 transition-colors">Focar &rarr;</span>
+              <span class="text-xs text-neutral-500 group-hover:text-teal-400 shrink-0 transition-colors">Focar &rarr;</span>
             </button>
           `).join('')}
         </div>
@@ -728,25 +774,25 @@ function renderizarDescricaoETextos() {
   }
 
   container.innerHTML = `
-    <div class="prose-atlas text-neutral-300 text-sm font-sans leading-loose space-y-4">
+    <div class="prose-atlas text-neutral-300 text-sm font-sans leading-[1.75] space-y-4">
       ${html}
     </div>
     ${secaoPinos}
     <a
       href="mailto:contato@palasatlas.com?subject=Correção sugerida na peça: ${encodeURIComponent(tituloPeca)}"
-      class="text-xs text-neutral-500 hover:text-[#c8ad5f] transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-white/[0.06] pt-4 w-fit"
+      class="text-xs text-neutral-500 hover:text-teal-400 transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-white/[0.06] pt-4 w-fit"
     >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
       </svg>
-      Reportar Erro nesta Lamina
+      Reportar Erro nesta Lâmina
     </a>
   `;
 
-  // Estiliza pin-links inline injetados pelo CMS no descricaoHTML
+  // Estiliza pin-links inline injetados pelo CMS no descricaoHTML com tipografia acadêmica sóbria (sem caixas azuis)
   container.querySelectorAll('.pin-link, [data-pin-id]').forEach(el => {
-    el.className = "pin-link text-[#c8ad5f] hover:text-[#e0c97f] underline underline-offset-2 font-medium cursor-pointer transition-colors px-0.5";
+    el.className = "pin-link font-semibold text-teal-300 hover:text-teal-200 underline underline-offset-4 decoration-teal-400/40 hover:decoration-teal-300 cursor-pointer transition-all bg-transparent border-0 p-0 inline";
   });
 }
 
@@ -769,8 +815,8 @@ export function alternarAbaPainel(aba) {
   const abaAlvo = (aba === "questoes") ? "questoes" : "descricao";
   abaAtivaPainel = abaAlvo;
 
-  const estiloAtivo   = "min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-white/[0.08] text-white border border-white/[0.1] shadow-sm touch-manipulation flex items-center justify-center";
-  const estiloInativo = "min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] border border-transparent touch-manipulation flex items-center justify-center";
+  const estiloAtivo   = "tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-950/70 text-teal-200 border border-teal-700/50 shadow-sm touch-manipulation flex items-center justify-center";
+  const estiloInativo = "tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] border border-transparent touch-manipulation flex items-center justify-center";
 
   if (abaAlvo === "descricao") {
     if (containerDesc) containerDesc.classList.remove("hidden");
@@ -789,7 +835,7 @@ export function alternarAbaPainel(aba) {
 
 /**
  * Atualiza o badge contador da aba de questões.
- * Destaque sutil com cor ouro-champanhe se houver questões, ou neutro/apagado se 0.
+ * Destaque sutil com cor petróleo se houver questões, ou neutro se 0.
  */
 function atualizarBadgeContadorQuestoes() {
   const badge = document.getElementById("badgeContadorQuestoes");
@@ -799,7 +845,7 @@ function atualizarBadgeContadorQuestoes() {
   badge.textContent = String(total);
 
   if (total > 0) {
-    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-[#c8ad5f]/20 text-[#c8ad5f] border border-[#c8ad5f]/30 font-mono font-medium";
+    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-teal-500/15 text-teal-300 border border-teal-500/30 font-mono font-medium";
   } else {
     badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.06] text-neutral-400 font-mono border border-transparent";
   }
@@ -1695,9 +1741,9 @@ function registrarDelegacaoGlobalDePinos() {
     evento.preventDefault();
 
     // Feedback visual imediato e tátil no link clicado
-    alvo.classList.add("ring-2", "ring-[#c8ad5f]", "ring-offset-2", "ring-offset-neutral-950", "rounded");
+    alvo.classList.add("ring-2", "ring-teal-400/60", "ring-offset-2", "ring-offset-neutral-950", "rounded-sm");
     setTimeout(() => {
-      alvo.classList.remove("ring-2", "ring-[#c8ad5f]", "ring-offset-2", "ring-offset-neutral-950", "rounded");
+      alvo.classList.remove("ring-2", "ring-teal-400/60", "ring-offset-2", "ring-offset-neutral-950", "rounded-sm");
     }, 1400);
 
     focarPinoNoViewer(pinIdRaw);
@@ -2213,7 +2259,8 @@ Object.assign(window.App, {
   sanitizarHTMLDescricao,
   aplicarEstadoSidebar,
   fecharSidebar: () => aplicarEstadoSidebar(true, true),
-  abrirSidebar:  () => aplicarEstadoSidebar(false, true)
+  abrirSidebar:  () => aplicarEstadoSidebar(false, true),
+  toggleAjudaMicroscopio
 });
 window.osdViewerAction              = osdViewerAction;
 window.focarPinoNoViewer            = focarPinoNoViewer;
@@ -2236,10 +2283,12 @@ window.fecharSidebar                = () => aplicarEstadoSidebar(true, true);
 window.abrirSidebar                 = () => aplicarEstadoSidebar(false, true);
 window.getViewer                    = () => viewer;
 window.getLaminaAtualData           = () => laminaAtualData;
+window.toggleAjudaMicroscopio       = toggleAjudaMicroscopio;
 
 export {
   carregarLaminaNoMicroscopio as carregarLaminaPorId,
-  aplicarEstadoSidebar
+  aplicarEstadoSidebar,
+  toggleAjudaMicroscopio
 };
 
 // ---------------------------------------------------------------------------

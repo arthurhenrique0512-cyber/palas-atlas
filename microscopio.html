@@ -108,34 +108,42 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Prose do texto descritivo lateral (off-white + detalhes em dourado clássico #d4af37) */
+    /* Prose do texto descritivo lateral (estilo editorial acadêmico sóbrio) */
     .prose-atlas {
       overflow-wrap: break-word;
       word-break: break-word;
     }
-    .prose-atlas h3       { color:#f4f2ed; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
-    .prose-atlas p        { color:#d4d4d8; line-height:1.8; margin-bottom:1rem; }
-    .prose-atlas strong   { color:#ffffff; font-weight:600; }
+    .prose-atlas h3       { color:#f4f2ed; font-weight:700; font-size:1rem; margin-bottom:.75rem; }
+    .prose-atlas p        { color:#d4d4d8; line-height:1.75; font-size:0.875rem; margin-bottom:1rem; }
+    .prose-atlas strong,
+    .prose-atlas b        { color:#f4f4f5; font-weight:600; background: transparent !important; }
     .prose-atlas blockquote { border: none !important; margin: 0 !important; padding: 0 !important; }
     .prose-atlas .pin-link {
-      color: #e5c158;
-      background-color: rgba(212, 175, 55, 0.10);
-      border: 1px solid rgba(212, 175, 55, 0.28);
-      text-decoration: none;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 1px 7px;
-      border-radius: 6px;
-      transition: all .15s ease;
+      color: #5eead4 !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      text-decoration: underline !important;
+      text-underline-offset: 4px !important;
+      text-decoration-color: rgba(94, 234, 212, 0.4) !important;
+      text-decoration-thickness: 1.5px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: color 0.15s ease, text-decoration-color 0.15s ease !important;
+      display: inline !important;
       white-space: normal;
       touch-action: manipulation;
     }
     .prose-atlas .pin-link:hover {
-      color: #09090b;
-      background-color: #d4af37;
-      border-color: #d4af37;
+      color: #99f6e4 !important;
+      text-decoration-color: #2dd4bf !important;
+      background: transparent !important;
     }
-    .prose-atlas .pin-link:active { background-color: #e5c158; color: #09090b; }
+    .prose-atlas .pin-link:active {
+      color: #ccfbf1 !important;
+      background: transparent !important;
+    }
 
     /* Botão de recolher painel: preenchimento do painel indica estado aberto */
     .viewer-sidebar-toggle .sidebar-icon-fill { opacity: .35; transition: opacity .3s ease; }
@@ -277,11 +285,30 @@
       color: #0369a1 !important;
     }
 
-    html[data-theme="light"] #viewerHint {
-      background-color: rgba(255, 255, 255, 0.92) !important;
+    html[data-theme="light"] #btnAjudaMicroscopio {
+      background-color: rgba(255, 255, 255, 0.9) !important;
+      color: #334155 !important;
       border-color: #cbd5e1 !important;
-      color: #475569 !important;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
+    }
+    html[data-theme="light"] #btnAjudaMicroscopio:hover {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #94a3b8 !important;
+    }
+    html[data-theme="light"] #popoverAjudaMicroscopio {
+      background-color: rgba(255, 255, 255, 0.98) !important;
+      border-color: #e2e8f0 !important;
+      color: #334155 !important;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12) !important;
+    }
+    html[data-theme="light"] #popoverAjudaMicroscopio span.text-teal-400 {
+      color: #0f766e !important;
+    }
+    html[data-theme="light"] #popoverAjudaMicroscopio kbd {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+      border-color: #e2e8f0 !important;
     }
 
     html[data-theme="light"] #viewerSidebar {
@@ -307,34 +334,47 @@
     }
 
     html[data-theme="light"] #slideColoracao {
-      background-color: #f0f9ff !important;
-      border-color: #bae6fd !important;
-      color: #0369a1 !important;
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+      color: #475569 !important;
+    }
+
+    html[data-theme="light"] #slideSeloOptico {
+      background-color: #f0fdfa !important;
+      border-color: #ccfbf1 !important;
+      color: #0f766e !important;
     }
 
     html[data-theme="light"] #viewerSidebar > div > div:nth-child(2) {
-      background-color: #f1f5f9 !important;
+      background-color: #f8fafc !important;
       border-bottom-color: #e2e8f0 !important;
     }
 
-    html[data-theme="light"] #btnTabDescricao.bg-white\/\[0\.08\],
-    html[data-theme="light"] #btnTabQuestoes.bg-white\/\[0\.08\],
-    html[data-theme="light"] #btnTabDescricao.bg-\[\#d4af37\]\/15 {
-      background-color: #ffffff !important;
-      color: #0369a1 !important;
-      border-color: #cbd5e1 !important;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06) !important;
+    html[data-theme="light"] #btnTabDescricao.tab-btn-ativo,
+    html[data-theme="light"] #btnTabQuestoes.tab-btn-ativo {
+      background-color: #0f766e !important;
+      color: #ffffff !important;
+      border-color: #0d9488 !important;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
     }
 
-    html[data-theme="light"] #btnTabDescricao:not(.bg-white\/\[0\.08\]):not(.bg-\[\#d4af37\]\/15),
-    html[data-theme="light"] #btnTabQuestoes:not(.bg-white\/\[0\.08\]) {
+    html[data-theme="light"] #btnTabDescricao.tab-btn-inativo,
+    html[data-theme="light"] #btnTabQuestoes.tab-btn-inativo {
+      background-color: transparent !important;
       color: #64748b !important;
+      border-color: transparent !important;
+    }
+
+    html[data-theme="light"] #btnTabDescricao.tab-btn-inativo:hover,
+    html[data-theme="light"] #btnTabQuestoes.tab-btn-inativo:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
     }
 
     html[data-theme="light"] #badgeContadorQuestoes {
-      background-color: #e0f2fe !important;
-      color: #0369a1 !important;
-      border-color: #bae6fd !important;
+      background-color: #f0fdfa !important;
+      color: #0f766e !important;
+      border-color: #ccfbf1 !important;
     }
 
     html[data-theme="light"] #slideDescriptionContainer,
@@ -344,17 +384,32 @@
 
     html[data-theme="light"] .prose-atlas h3     { color: #0f172a !important; }
     html[data-theme="light"] .prose-atlas p,
-    html[data-theme="light"] .prose-atlas li     { color: #334155 !important; }
-    html[data-theme="light"] .prose-atlas strong { color: #0f172a !important; }
+    html[data-theme="light"] .prose-atlas li     { color: #334155 !important; line-height: 1.75 !important; font-size: 0.875rem !important; }
+    html[data-theme="light"] .prose-atlas strong,
+    html[data-theme="light"] .prose-atlas b      { color: #0f172a !important; font-weight: 600 !important; background: transparent !important; }
     html[data-theme="light"] .prose-atlas .pin-link {
-      color: #0369a1 !important;
-      background-color: rgba(2, 132, 199, 0.08) !important;
-      border-color: rgba(2, 132, 199, 0.28) !important;
+      color: #0f766e !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      text-decoration: underline !important;
+      text-underline-offset: 4px !important;
+      text-decoration-color: rgba(15, 118, 110, 0.35) !important;
+      text-decoration-thickness: 1.5px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: color 0.15s ease, text-decoration-color 0.15s ease !important;
+      display: inline !important;
     }
     html[data-theme="light"] .prose-atlas .pin-link:hover {
-      color: #ffffff !important;
-      background-color: #0284c7 !important;
-      border-color: #0284c7 !important;
+      color: #115e59 !important;
+      text-decoration-color: #0f766e !important;
+      background: transparent !important;
+    }
+    html[data-theme="light"] .prose-atlas .pin-link:active {
+      color: #042f2e !important;
+      background: transparent !important;
     }
 
     html[data-theme="light"] #slideDescriptionContainer button {
@@ -580,9 +635,55 @@
         </div>
       </div>
 
-      <!-- Dica operacional -->
-      <div id="viewerHint" class="absolute top-4 right-4 pointer-events-none text-[10px] text-neutral-400 font-mono tracking-wider uppercase whitespace-nowrap z-10 hidden xl:block bg-[#0d0d11]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/[0.08] shadow-lg">
-        Scroll &rarr; Zoom &bull; Arrastar &rarr; Pan &bull; Clique duplo &rarr; Ampliar
+      <!-- Botão Discreto de Ajuda / Atalhos de Navegação -->
+      <div class="absolute top-4 right-4 z-20" id="containerAjudaMicroscopio">
+        <button
+          type="button"
+          id="btnAjudaMicroscopio"
+          onclick="window.toggleAjudaMicroscopio()"
+          class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold bg-[#0d0d11]/75 hover:bg-[#18181f] text-neutral-300 hover:text-white border border-white/[0.12] hover:border-white/25 shadow-lg backdrop-blur-md transition-all cursor-pointer select-none"
+          aria-label="Atalhos e instruções do microscópio"
+          title="Atalhos de navegação"
+        >
+          ?
+        </button>
+        <!-- Popover com Guia Rápido de Gestos -->
+        <div
+          id="popoverAjudaMicroscopio"
+          class="hidden absolute right-0 top-10 w-64 p-3.5 rounded-2xl bg-[#0e0e12]/95 backdrop-blur-xl border border-white/[0.12] shadow-2xl text-xs text-neutral-300 z-30 transition-all select-none"
+        >
+          <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-white/[0.08]">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-teal-400 font-semibold">Navegação no Espécime</span>
+            <button
+              type="button"
+              onclick="window.toggleAjudaMicroscopio(false)"
+              class="text-neutral-400 hover:text-white text-base leading-none p-1 rounded transition-colors"
+              aria-label="Fechar ajuda"
+            >&times;</button>
+          </div>
+          <ul class="space-y-2 text-[11px] font-sans">
+            <li class="flex items-center justify-between">
+              <span class="text-neutral-400">Zoom contínuo</span>
+              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">Scroll / Pinça</kbd>
+            </li>
+            <li class="flex items-center justify-between">
+              <span class="text-neutral-400">Mover lâmina</span>
+              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">Arrastar / Pan</kbd>
+            </li>
+            <li class="flex items-center justify-between">
+              <span class="text-neutral-400">Ampliar área</span>
+              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">Duplo clique</kbd>
+            </li>
+            <li class="flex items-center justify-between">
+              <span class="text-neutral-400">Objetivas ópticas</span>
+              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">4x &bull; 10x &bull; 40x</kbd>
+            </li>
+            <li class="flex items-center justify-between">
+              <span class="text-neutral-400">Redefinir campo</span>
+              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">1:1</kbd>
+            </li>
+          </ul>
+        </div>
       </div>
 
     </main>
@@ -609,12 +710,12 @@
             <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] leading-snug tracking-tight truncate sm:whitespace-normal">
               Carregando lâmina...
             </h2>
-            <div class="mt-2 flex flex-wrap items-center gap-1.5">
-              <p id="slideColoracao" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-[10.5px] font-mono tracking-wide text-[#d4af37]">
+            <div class="mt-2.5 flex flex-wrap items-center gap-2">
+              <p id="slideColoracao" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-[11px] font-sans font-medium text-neutral-300">
                 Hematoxilina e Eosina (H&amp;E)
               </p>
-              <span id="slideSeloOptico" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-400" title="Resolução Óptica Nativa Travada">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span id="slideSeloOptico" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-950/40 border border-teal-800/40 text-[11px] font-sans font-medium text-teal-300" title="Resolução Óptica Nativa Travada">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
                 <span id="slideSeloOpticoTexto">40x Nativa</span>
               </span>
             </div>
@@ -636,7 +737,7 @@
             id="btnTabDescricao"
             type="button"
             onclick="window.alternarAbaPainel('descricao')"
-            class="min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer bg-[#d4af37]/15 text-[#e5c158] border border-[#d4af37]/35 font-semibold shadow-sm touch-manipulation flex items-center justify-center"
+            class="tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-950/70 text-teal-200 border border-teal-700/50 shadow-sm touch-manipulation flex items-center justify-center"
           >
             Descrição
           </button>
@@ -644,10 +745,10 @@
             id="btnTabQuestoes"
             type="button"
             onclick="window.alternarAbaPainel('questoes')"
-            class="min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04] flex items-center gap-1.5 touch-manipulation justify-center"
+            class="tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] border border-transparent flex items-center gap-1.5 touch-manipulation justify-center"
           >
             <span>Questões</span>
-            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.08] text-[#d4af37] font-mono font-semibold">0</span>
+            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.06] text-neutral-400 font-mono font-medium">0</span>
           </button>
         </div>
 
