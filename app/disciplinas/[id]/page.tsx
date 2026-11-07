@@ -385,9 +385,18 @@ export default function DisciplinaDetalhePage() {
     <div className="min-h-screen bg-[#fafaf9] dark:bg-[#060608] text-slate-800 dark:text-zinc-200 antialiased font-sans">
       {/* Header Institucional Superior */}
       <header className="w-full bg-white dark:bg-[#0c0c0f] border-b border-slate-200/80 dark:border-white/10 sticky top-0 z-30 shadow-sm backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group no-underline">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* Lado Esquerdo: Voltar + Divisor Vertical + Logotipo Oficial Agrupados */}
+          <div className="flex items-center gap-4 shrink-0">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-xl transition-all no-underline shrink-0"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Voltar ao Atlas</span>
+            </Link>
+            <span className="h-5 w-px bg-slate-200 dark:bg-white/10 shrink-0"></span>
+            <Link href="/" className="flex items-center gap-2 group no-underline shrink-0">
               <span className="text-lg font-serif font-bold text-slate-950 dark:text-[#f4f2ed] tracking-[0.16em]">
                 PALAS
               </span>
@@ -395,26 +404,33 @@ export default function DisciplinaDetalhePage() {
                 ATLAS
               </span>
             </Link>
-            <span className="hidden sm:inline-block w-px h-5 bg-slate-300 dark:bg-white/10 mx-2"></span>
-            <span className="hidden sm:inline-block text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-              Atlas Universitário de Morfologia
-            </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Lado Direito: Links Desktop Alinhados à Direita sem Colisão */}
+          <div className="flex items-center gap-6 shrink-0">
             {isLiveSync && (
               <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Firestore Live Sync
               </span>
             )}
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 px-3.5 py-1.5 rounded-xl transition-all no-underline"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Voltar ao Atlas</span>
-            </Link>
+            <nav className="hidden lg:flex items-center gap-6 shrink-0">
+              <Link href="/#secaoDisciplinas" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+                Disciplinas
+              </Link>
+              <Link href="/#secaoLaminasPopulares" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+                Lâminas
+              </Link>
+              <Link href="/#secaoComoUsar" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+                Como Usar
+              </Link>
+              <Link href="/#secaoFAQ" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+                Dúvidas
+              </Link>
+              <Link href="/sobre" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+                Sobre Nós
+              </Link>
+            </nav>
           </div>
         </div>
       </header>

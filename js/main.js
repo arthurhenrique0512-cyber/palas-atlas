@@ -161,6 +161,7 @@ function renderView(state) {
   const brandLogo = document.querySelector("#palasMinimalHeader brand-logo");
   const btnOpenDrawer = document.getElementById("btnOpenDrawer");
   const btnVoltarGlobal = document.getElementById("btnVoltarGlobal");
+  const headerVoltarDivider = document.getElementById("headerVoltarDivider");
   
   const isHomePage = !state.frenteAtiva;
   const isDashboard = state.frenteAtiva === 'dashboard';
@@ -205,15 +206,18 @@ function renderView(state) {
       brandLogo.setAttribute("size", "lg");
     }
     if (logoLink) {
-      logoLink.className = "group inline-flex items-center gap-3 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline";
+      logoLink.className = "group inline-flex items-center gap-2.5 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline shrink-0";
     }
     if (btnOpenDrawer) btnOpenDrawer.className = "lg:hidden h-9 px-2.5 sm:px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs shrink-0";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.add("hidden");
       btnVoltarGlobal.classList.remove("flex");
     }
+    if (headerVoltarDivider) {
+      headerVoltarDivider.classList.add("hidden");
+    }
   } else {
-    // SUBPÁGINAS DO ACERVO: Barra Superior com PALAS ATLAS centralizado e Botão Voltar à esquerda
+    // SUBPÁGINAS DO ACERVO: Barra Superior com Botão Voltar + Divisor + Logotipo agrupados à esquerda
     if (headerMin) {
       headerMin.classList.remove("hidden");
       headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/90 transition-all duration-300 pointer-events-auto shadow-xs";
@@ -224,13 +228,16 @@ function renderView(state) {
       brandLogo.setAttribute("size", "sm");
     }
     if (logoLink) {
-      logoLink.className = "group absolute left-1/2 -translate-x-1/2 inline-flex items-center gap-2.5 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline z-10";
+      logoLink.className = "group inline-flex items-center gap-2.5 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline shrink-0";
     }
     if (btnOpenDrawer) btnOpenDrawer.className = "h-10 px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs";
     if (btnVoltarGlobal) {
-      btnVoltarGlobal.className = "min-h-[38px] text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 border border-slate-200/90 rounded-xl transition-all text-xs font-sans font-semibold flex items-center justify-center gap-2 px-3.5 py-1.5 cursor-pointer active:scale-95";
+      btnVoltarGlobal.className = "min-h-[38px] text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 border border-slate-200/90 rounded-xl transition-all text-xs font-sans font-semibold flex items-center justify-center gap-1.5 px-3 py-1.5 cursor-pointer active:scale-95 shrink-0";
       btnVoltarGlobal.classList.remove("hidden");
       btnVoltarGlobal.classList.add("flex");
+    }
+    if (headerVoltarDivider) {
+      headerVoltarDivider.classList.remove("hidden");
     }
   }
 

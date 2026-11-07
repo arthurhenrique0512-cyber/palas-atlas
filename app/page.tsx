@@ -219,13 +219,13 @@ export default function HomePage() {
         {/* Filete Superior de Identidade Azul-Petróleo/Teal */}
         <div className="h-[2px] w-full bg-gradient-to-r from-slate-900 via-teal-600 to-slate-900" />
 
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-[68px] flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
           {/* Lado Esquerdo: Logotipo PALAS ATLAS */}
-          <div className="flex items-center gap-3 pointer-events-auto shrink-0">
+          <div className="flex items-center gap-4 shrink-0">
             <Link
               href="/"
-              className="group inline-flex items-center gap-2.5 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline text-slate-900"
+              className="group inline-flex items-center gap-2.5 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline text-slate-900 shrink-0"
               aria-label="Palas Atlas - Início"
             >
               <span className="font-serif font-bold text-xl sm:text-2xl tracking-[0.2em] leading-none text-slate-900">
@@ -244,7 +244,7 @@ export default function HomePage() {
           </div>
 
           {/* Centro/Direita: Links Desktop Alinhados à Direita */}
-          <nav id="desktopNavLinks" className="hidden lg:flex items-center justify-end gap-7 xl:gap-9 flex-1">
+          <nav id="desktopNavLinks" className="hidden lg:flex items-center gap-6 shrink-0">
             <a
               href="#secaoDisciplinas"
               className="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline"
