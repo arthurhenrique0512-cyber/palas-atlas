@@ -788,7 +788,84 @@ export default function HomePage() {
         </section>
 
         {/* ============================================================
-             5. GUIA EDITORIAL DO MICROSCÓPIO (COMO USAR)
+             5. LÂMINAS POPULARES (GALERIA ACADÊMICA)
+        ============================================================ */}
+        <section
+          id="secaoLaminasPopulares"
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 relative z-10"
+        >
+          <div className="mb-8 pb-4 border-b border-slate-200/80 text-left">
+            <h2 className="text-2xl lg:text-3xl font-bold text-slate-950 tracking-tight">
+              Lâminas Populares
+            </h2>
+            <p className="text-sm text-slate-600 mt-1">
+              Cortes histológicos de referência para estudo prático.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {SLIDES_ACERVO.map((slide) => (
+              <div
+                key={slide.id}
+                className="group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
+                    <img
+                      src={slide.thumbnailUrl}
+                      alt={slide.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent pointer-events-none" />
+                    
+                    {slide.stain && (
+                      <div className="absolute top-3 left-3 flex gap-1.5">
+                        <span className="bg-black/75 backdrop-blur-sm text-white border border-white/10 text-[10px] font-sans font-semibold px-2.5 py-0.5 rounded-full">
+                          {slide.stain}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="absolute bottom-3 left-3 right-3 text-white">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-teal-300 font-semibold">
+                        {slide.category}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-5">
+                    <h3 className="font-serif font-bold text-base sm:text-lg text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1">
+                      {slide.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                      {slide.stain?.includes('Desgaste')
+                        ? 'Técnica de descalcificação e desgaste'
+                        : slide.stain?.includes('H&E')
+                        ? 'Coloração H&E de rotina'
+                        : 'Espécime microscópico catalogado'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-5 pt-0 mt-auto">
+                  <Link
+                    href={slide.link}
+                    className="w-full py-2.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-teal-900 hover:text-white border border-slate-200 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline"
+                  >
+                    <span>Examinar Lâmina</span>
+                    <span className="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">
+                      &rarr;
+                    </span>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ============================================================
+             6. GUIA EDITORIAL DO MICROSCÓPIO (COMO USAR)
         ============================================================ */}
         <section
           id="secaoComoUsar"
