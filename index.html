@@ -195,8 +195,8 @@
         </a>
       </div>
 
-      <!-- Centro do Topo: Navegação Desktop Estilo Portal -->
-      <nav id="desktopNavLinks" class="hidden lg:flex items-center justify-center gap-7 xl:gap-9 flex-1">
+      <!-- Centro/Direita do Topo: Navegação Desktop Estilo Portal Alinhada à Direita -->
+      <nav id="desktopNavLinks" class="hidden lg:flex items-center justify-end gap-7 xl:gap-9 flex-1">
         <a href="#secaoDisciplinas" class="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline">Disciplinas</a>
         <a href="#secaoLaminasPopulares" class="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline">Lâminas</a>
         <a href="#secaoComoUsar" class="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline">Como Usar</a>
@@ -204,13 +204,13 @@
         <a href="sobre.html" class="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline">Sobre Nós</a>
       </nav>
 
-      <!-- Lado Direito: Controle Discreto de Menu -->
-      <div class="pointer-events-auto flex items-center gap-2 sm:gap-3 shrink-0">
-        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="h-9 px-3 sm:px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs" aria-label="Abrir Menu" title="Menu">
+      <!-- Lado Direito: Controle Discreto de Menu (Apenas Mobile/Tablet) -->
+      <div class="pointer-events-auto flex items-center gap-2 sm:gap-3 shrink-0 lg:hidden">
+        <button id="btnOpenDrawer" onclick="window.App.abrirMenuLateral()" class="lg:hidden h-9 px-2.5 sm:px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs shrink-0" aria-label="Abrir Menu" title="Menu">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
-          <span class="text-xs font-sans font-semibold">Menu</span>
+          <span class="hidden sm:inline text-xs font-sans font-semibold">Menu</span>
         </button>
       </div>
 
@@ -372,101 +372,39 @@
 
   <!-- Conteúdo Principal / Roteador -->
   <main id="mainRouterContainer" class="flex-1 w-full flex flex-col justify-center transition-all duration-300">
-    
-    <!-- HUB DE ENTRADA (#pgHome) - BRANCO FRIO & AZUL-PETRÓLEO COM DETALHES DE FUNDO -->
-    <section id="pgHome" class="w-full h-full flex-1 text-slate-900 pb-20 relative overflow-x-hidden bg-[#f8fafc]">
+    <!-- HUB DE ENTRADA (#pgHome) - ESTÉTICA ACADÊMICA LIMPA E INTEGRADA -->
+    <section id="pgHome" class="w-full h-full flex-1 text-slate-900 pb-16 lg:pb-24 relative overflow-x-hidden bg-[#f8fafc]">
 
-      <!-- RETÂNGULO DO TÍTULO PRINCIPAL: Sangra até a esquerda toda, até a direita toda (Bloco Superior) -->
-      <div id="heroTitleBoxBg" class="w-full bg-white border-b border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(15,23,42,0.06)] relative z-20 py-14 lg:py-20 transition-colors duration-300 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12">
-          
-          <!-- Lado Esquerdo: Tag Acadêmica, Título do Atlas & Subtítulo -->
-          <div class="max-w-2xl text-left">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-slate-700 text-[11px] font-mono font-semibold uppercase tracking-wider mb-3.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
-              <span>Atlas Morfológico Digital</span>
-            </div>
-
-            <h1 class="font-serif text-2xl sm:text-4xl lg:text-[2.65rem] font-bold tracking-tight text-slate-900 mb-3 text-left leading-[1.18]">
-              Atlas Integrado de <br class="hidden sm:inline" />
-              <span class="text-sky-800 font-bold">Ciências Morfológicas</span>
-            </h1>
-
-            <p class="text-slate-600 text-sm sm:text-base font-sans font-normal leading-relaxed max-w-xl text-left">
-              Explore lâminas microscópicas reais em alta definição com navegação óptica interativa.
-            </p>
-          </div>
-
-          <!-- Canto Superior Direito: Especificações do Acervo Acadêmico -->
-          <div class="shrink-0 flex flex-col justify-center w-full lg:w-auto">
-            <div class="hero-spec-card p-5 sm:p-6 rounded-2xl w-full sm:max-w-md lg:w-[410px] text-left shadow-sm border border-slate-200/80 bg-slate-50/90 backdrop-blur-md">
-              <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200/80">
-                <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span class="text-[11px] tracking-[0.2em] font-mono font-semibold uppercase text-slate-700">Acervo Acadêmico</span>
-                </div>
-                <span class="text-[10px] font-mono font-semibold text-sky-800 uppercase tracking-wider bg-sky-100/70 text-sky-800 px-2.5 py-0.5 rounded-full border border-sky-200/70">Acesso Aberto</span>
-              </div>
-
-              <ul class="space-y-3 text-xs font-sans text-slate-700">
-                <li class="flex items-center gap-3">
-                  <span class="w-6 h-6 rounded-lg bg-sky-100/90 text-sky-800 border border-sky-200/60 flex items-center justify-center shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M19 12a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                  </span>
-                  <span class="font-medium text-slate-800">Cortes histológicos em alta definição</span>
-                </li>
-
-                <li class="flex items-center gap-3">
-                  <span class="w-6 h-6 rounded-lg bg-amber-100/90 text-amber-800 border border-amber-200/60 flex items-center justify-center shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                  </span>
-                  <span class="font-medium text-slate-800">Colorações H&amp;E, desgastes e técnicas especiais</span>
-                </li>
-
-                <li class="flex items-center gap-3">
-                  <span class="w-6 h-6 rounded-lg bg-emerald-100/90 text-emerald-800 border border-emerald-200/60 flex items-center justify-center shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                  </span>
-                  <span class="font-medium text-slate-800">Pinos com critérios morfológicos de identificação</span>
-                </li>
-
-                <li class="flex items-center gap-3">
-                  <span class="w-6 h-6 rounded-lg bg-slate-200/90 text-slate-800 border border-slate-300/60 flex items-center justify-center shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                  </span>
-                  <span class="font-medium text-slate-800">Iniciativa universitária sem fins lucrativos</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- CAMADA DE DETALHE DE FUNDO SUTIL: Malha Arquitetônica Limpa -->
+      <!-- CAMADA DE DETALHE DE FUNDO SUTIL: Malha Arquitetônica Limpa Contínua -->
       <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
         <div id="homeBgGrid" class="absolute inset-0" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.035) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%);"></div>
         <div id="homeBgGlow" class="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(3,105,161,0.06)_0%,_transparent_70%)]"></div>
       </div>
 
-      <!-- SEÇÃO 1: HERO WORKSPACE (BUSCA + AÇÕES + VITRINE) -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 relative z-10 animate-fade-in-up">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <!-- HERO SECTION INTEGRADA: 2 Colunas Equilibradas (py-12 lg:py-20) -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           
-          <!-- COLUNA ESQUERDA: Busca & Ações Rápidas (lg:col-span-6) -->
-          <div class="lg:col-span-6 flex flex-col items-start text-left justify-center space-y-5">
+          <!-- COLUNA ESQUERDA: Título Principal + Subtítulo + Busca + CTAs (lg:col-span-6) -->
+          <div class="lg:col-span-6 flex flex-col items-start text-left justify-center">
 
-            <div class="space-y-1">
-              <span class="text-[11px] font-mono uppercase tracking-[0.2em] font-semibold text-sky-800">Localizador de Peças</span>
-              <h2 class="text-base sm:text-lg font-serif font-bold text-slate-900">Pesquise no Acervo Morfológico</h2>
-            </div>
+            <!-- Título Principal com Tipografia Acadêmica Sóbria e Forte -->
+            <h1 class="font-serif text-2xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-slate-900 leading-[1.2] text-left">
+              Atlas Integrado de <br />
+              <span class="text-sky-800 font-bold">Ciências Morfológicas</span>
+            </h1>
 
-            <!-- Barra de Busca Rápida -->
-            <div class="w-full max-w-xl relative z-30 group" id="global-search-container">
-              <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-sky-700 transition-colors z-10">
+            <!-- Subtítulo Enxuto -->
+            <p class="text-slate-600 text-base sm:text-lg font-sans font-normal leading-relaxed max-w-xl text-left mt-4">
+              Acervo universitário de lâminas microscópicas em alta definição com navegação óptica interativa.
+            </p>
+
+            <!-- Barra de Busca Integrada (mt-8) -->
+            <div class="w-full max-w-xl relative z-30 group mt-8" id="global-search-container">
+              <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-sky-700 transition-colors z-20">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
               </div>
-              <input type="text" id="global-search-input" name="palas_atlas_search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-white border border-slate-200/90 focus:border-sky-600 rounded-xl py-4 pl-12 pr-12 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all relative z-10 shadow-sm focus:shadow-[0_14px_32px_-6px_rgba(3,105,161,0.15)]" placeholder="Buscar tecidos, órgãos ou lâminas em H&E...">
+              <input type="text" id="global-search-input" name="palas_atlas_search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-white border border-slate-200/90 focus:border-sky-600 rounded-xl py-4 pl-12 pr-12 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all relative z-10 shadow-sm focus:shadow-[0_14px_32px_-6px_rgba(3,105,161,0.15)]" placeholder="Buscar tecidos, órgãos ou lâminas...">
               
               <!-- Botão de limpar -->
               <button type="button" id="global-search-clear" class="absolute inset-y-0 right-4 hidden items-center text-slate-400 hover:text-slate-800 transition-colors cursor-pointer z-20">
@@ -486,8 +424,8 @@
               </div>
             </div>
 
-            <!-- Botões de Ação -->
-            <div class="relative z-10 flex flex-wrap gap-3.5 items-center justify-start w-full">
+            <!-- Botões de Ação (mt-5) -->
+            <div class="relative z-10 flex flex-wrap gap-3.5 items-center justify-start w-full mt-5">
               <button id="btnHeroPrimary" type="button" onclick="window.App.abrirAccordionHero('histologia')" class="bg-slate-900 hover:bg-black text-white rounded-xl px-6 py-3.5 transition-all duration-200 flex items-center justify-center gap-2.5 group cursor-pointer text-xs font-sans font-semibold tracking-wide shadow-sm hover:shadow active:scale-95">
                 <span>Explorar Lâminas</span>
                 <svg class="w-4 h-4 text-[#d4af37] group-hover:translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
@@ -498,7 +436,7 @@
             </div>
 
             <!-- Atalhos de Disciplina Rápidos -->
-            <div class="pt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500 font-sans">
+            <div class="pt-4 flex flex-wrap items-center gap-2 text-xs text-slate-500 font-sans">
               <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Atalhos:</span>
               <button type="button" onclick="window.App.selecionarFrente('histologia')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-700 border border-slate-200/90 transition-colors text-xs font-medium cursor-pointer shadow-2xs">Histologia</button>
               <button type="button" onclick="window.App.selecionarFrente('patologia')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200/90 transition-colors text-xs font-medium cursor-pointer shadow-2xs">Patologia</button>
@@ -508,56 +446,44 @@
 
           </div>
 
-          <!-- COLUNA DIREITA: Vitrine de Lâminas (lg:col-span-6) -->
+          <!-- COLUNA DIREITA: Vitrine de Lâminas Alinhada ao Topo (lg:col-span-6) -->
           <div class="lg:col-span-6 w-full">
-            <div id="heroSlideShowcase" class="group/showcase relative z-20 w-full aspect-[4/3] sm:aspect-[16/10] rounded-2xl overflow-hidden bg-[#060608] border border-slate-200/90 shadow-[0_22px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col justify-between p-5 sm:p-7 select-none">
+            <div id="heroSlideShowcase" class="group/showcase relative z-20 w-full aspect-[4/3] sm:aspect-[16/10] rounded-2xl overflow-hidden bg-[#060608] border border-slate-200/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.22)] flex flex-col justify-between p-5 sm:p-7 select-none">
               
-              <!-- Imagem de Microscopia Full-Bleed -->
-              <img
-                id="vitrineImage"
-                src="assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
-                alt="Osso Maduro 40x"
-                class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out opacity-100 group-hover/showcase:scale-105"
-                onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';"
-              />
+              <!-- Container de Imagens de Microscopia com Suave Crossfade & Efeito de Zoom Contínuo 6s -->
+              <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <img
+                  id="vitrineImage"
+                  src="assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
+                  alt="Osso Maduro 40x"
+                  class="w-full h-full object-cover will-change-transform"
+                  onerror="this.onerror=null; this.src='assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';"
+                />
+              </div>
 
-              <!-- Gradiente Escuro Neutro na Base para Leitura Nítida do Título Sobreposto -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none"></div>
+              <!-- Degradê Escuro Suave Apenas na Base para Leitura Nítida -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none"></div>
 
-              <!-- Topo da Vitrine: Tag superior discreta da coloração/técnica -->
-              <div id="vitrineBadgeWrapper" class="relative z-10 flex items-center justify-start gap-2 transition-all duration-150 ease-out opacity-100">
-                <span id="vitrineStainBadge" class="bg-black/70 border border-white/15 backdrop-blur-md px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold tracking-wider text-white shadow-sm">
+              <!-- Topo da Vitrine: Tag superior discreta da coloração/técnica (Oculta se genérica) -->
+              <div id="vitrineBadgeWrapper" class="relative z-10 flex items-center justify-start gap-2 transition-opacity duration-300">
+                <span id="vitrineStainBadge" class="bg-black/60 border border-white/15 backdrop-blur-md px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold tracking-wider text-white shadow-sm">
                   Desgaste • 40x
                 </span>
               </div>
 
-              <!-- Base da Vitrine: Categoria, Título, Estruturas e Controles -->
+              <!-- Base da Vitrine: Apenas Classificação Limpa, Título e Controles (Zero Textos Redundantes) -->
               <div class="relative z-10 flex flex-col gap-2.5 mt-auto">
-                <div id="vitrineTextContent" class="space-y-1 text-left transition-all duration-150 ease-out opacity-100">
-                  <div class="flex items-center justify-between gap-2">
-                    <span id="vitrineCategory" class="text-[11px] tracking-[0.14em] uppercase text-white font-sans font-medium">
-                      Histologia • Ósseo
-                    </span>
-                    <span id="vitrineSpecimen" class="text-xs text-white/75 font-sans font-light">
-                      Panorama 48 Fotos • ~36.2 MP
-                    </span>
-                  </div>
+                <div id="vitrineTextContent" class="space-y-1 text-left transition-opacity duration-300">
+                  <span id="vitrineCategory" class="text-[11px] tracking-[0.16em] uppercase text-white/90 font-sans font-semibold">
+                    HISTOLOGIA • ÓSSEO
+                  </span>
                   
                   <h3 id="vitrineTitle" class="font-serif font-bold text-xl sm:text-2xl text-white leading-snug tracking-tight drop-shadow-sm">
                     Osso Maduro 40x
                   </h3>
-
-                  <!-- Estruturas identificáveis separadas por bullet point limpo (sem textos colados) -->
-                  <div id="vitrineStructures" class="text-xs text-white/90 font-sans font-medium flex items-center gap-1.5 flex-wrap">
-                    <span>Canalículos</span>
-                    <span class="text-white/40">•</span>
-                    <span>Ósteon (Sistema de Havers)</span>
-                    <span class="text-white/40">•</span>
-                    <span>Lamelas Concêntricas</span>
-                  </div>
                 </div>
 
-                <!-- Rodapé da Vitrine Sobreposto: Link CTA e Paginação -->
+                <!-- Rodapé da Vitrine: Link Direto e Paginação Discreta -->
                 <div class="pt-2.5 border-t border-white/15 flex items-center justify-between gap-4">
                   <a
                     id="vitrineActionBtn"
@@ -606,33 +532,15 @@
         </div>
       </div>
 
-      <!-- Script da Vitrine Interativa de Lâminas (Sóbrio, Sem Efeitos Clichês de IA) -->
+      <!-- Script da Vitrine de Lâminas (Crossfade & Zoom Contínuo 6s) -->
       <script>
         (function() {
-          const fallbackDataMap = {
-            'cw3XGCgUwN71XdlwkUe5': {
-              structures: ['Canalículos', 'Ósteon (Sistema de Havers)', 'Lamelas Concêntricas']
-            },
-            'FFGk5d9kOAct5HIDdjQ7': {
-              structures: ['Canais Centrais', 'Matriz Óssea Lamelar', 'Lamelas Ósseas']
-            },
-            '96ZYqoM2SV8p4fB2QgeM': {
-              structures: ['Ósteon Completo', 'Lacunas Osteocitárias', 'Lamelas Concêntricas']
-            },
-            'a3oRvXvJpMKAtU2RE85q': {
-              structures: ['Estrato Córneo', 'Papilas Dérmicas', 'Camada Basal']
-            }
-          };
-
           const baseSlides = [
             {
               id: 'cw3XGCgUwN71XdlwkUe5',
               title: 'Osso Maduro 40x',
               category: 'Histologia • Ósseo',
               stain: 'Desgaste • 40x',
-              specimen: 'Panorama 48 Fotos • ~36.2 MP',
-              desc: 'Varredura panorâmica em 40x com 48 campos costurados pelo Fiji Stitching e enquadramento retangular perfeito.',
-              structures: fallbackDataMap['cw3XGCgUwN71XdlwkUe5'].structures,
               thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
               previewImage: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
               image: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
@@ -644,9 +552,6 @@
               title: 'Osso Maduro 10x',
               category: 'Histologia • Ósseo',
               stain: 'Desgaste • 10x',
-              specimen: 'Varredura 10 Fotos • ~8.4 MP',
-              desc: 'Varredura contínua de 10 campos em 10x com grade snake e costura Fiji Stitching, revelando canais centrais e matriz.',
-              structures: fallbackDataMap['FFGk5d9kOAct5HIDdjQ7'].structures,
               thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
               previewImage: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
               image: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
@@ -658,9 +563,6 @@
               title: 'Osso Maduro',
               category: 'Histologia • Ósseo',
               stain: 'Desgaste • 40x',
-              specimen: 'Corte Transversal',
-              desc: 'Sistemas de Havers (ósteons), canais vasculares centrais, lamelas concêntricas e intrincada rede de canalículos.',
-              structures: fallbackDataMap['96ZYqoM2SV8p4fB2QgeM'].structures,
               thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
               previewImage: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
               image: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
@@ -672,9 +574,6 @@
               title: 'Pele Espessa',
               category: 'Histologia • Epitelial',
               stain: 'H&E • 40x',
-              specimen: 'Epiderme e Derme',
-              desc: 'Epitélio estratificado pavimentoso queratinizado com exuberante estrato córneo e papilas dérmicas.',
-              structures: fallbackDataMap['a3oRvXvJpMKAtU2RE85q'].structures,
               thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
               previewImage: 'assets/histologia/lamina-real1-preview.jpg',
               image: 'assets/histologia/lamina-real1-preview.jpg',
@@ -690,6 +589,17 @@
           let isTransitioning = false;
           const AUTO_SLIDE_INTERVAL = 8000;
 
+          function triggerZoomAnimation(imgEl) {
+            if (!imgEl) return;
+            imgEl.style.transition = 'none';
+            imgEl.style.transform = 'scale(1)';
+            imgEl.style.opacity = '0';
+            void imgEl.offsetWidth; // força reflow
+            imgEl.style.transition = 'opacity 0.6s ease-out, transform 6s cubic-bezier(0.25, 1, 0.5, 1)';
+            imgEl.style.opacity = '1';
+            imgEl.style.transform = 'scale(1.05)';
+          }
+
           function renderSlide(idx, forceImmediate = false) {
             if (!slides.length) return;
             if (isTransitioning && !forceImmediate) return;
@@ -703,11 +613,8 @@
             const titleEl = document.getElementById('vitrineTitle');
             const catEl = document.getElementById('vitrineCategory');
             const stainEl = document.getElementById('vitrineStainBadge');
-            const specEl = document.getElementById('vitrineSpecimen');
-            const descEl = document.getElementById('vitrineDesc');
             const actionEl = document.getElementById('vitrineActionBtn');
             const counterEl = document.getElementById('vitrineCounter');
-            const structEl = document.getElementById('vitrineStructures');
 
             const decodificarTexto = (t) => {
               if (!t) return '';
@@ -727,34 +634,36 @@
                 };
               }
               if (titleEl) titleEl.textContent = decodificarTexto(slide.title);
-              if (catEl) catEl.textContent = decodificarTexto(slide.category);
-              if (stainEl) stainEl.textContent = decodificarTexto(slide.stain);
-              if (specEl) specEl.textContent = decodificarTexto(slide.specimen);
-              if (descEl) descEl.textContent = decodificarTexto(slide.desc);
+              if (catEl) {
+                const rawCat = decodificarTexto(slide.category || 'Histologia');
+                catEl.textContent = rawCat.toUpperCase();
+              }
+              
+              // Remove a tag superior se o valor for genérico como "Outra", "Geral", "Campo Microscópico" ou vazio
+              if (stainEl && badgeWrapperEl) {
+                const rawStain = decodificarTexto(slide.stain || '').trim();
+                const isGeneric = !rawStain || ['outra', 'outro', 'outras', 'geral', 'campo microscópico', 'campo microscopico'].includes(rawStain.toLowerCase());
+                if (isGeneric) {
+                  badgeWrapperEl.classList.add('hidden');
+                } else {
+                  badgeWrapperEl.classList.remove('hidden');
+                  stainEl.textContent = rawStain;
+                }
+              }
+
               if (actionEl) actionEl.href = slide.link;
               if (counterEl) {
                 const cur = String(currentIndex + 1).padStart(2, '0');
                 const tot = String(slides.length).padStart(2, '0');
                 counterEl.textContent = cur + ' / ' + tot;
               }
-              if (structEl) {
-                const list = slide.structures || [];
-                if (list.length > 0) {
-                  structEl.innerHTML = list.map(st => 
-                    `<span>${decodificarTexto(st)}</span>`
-                  ).join('<span class="text-white/40">•</span>');
-                  structEl.classList.remove('hidden');
-                } else {
-                  structEl.innerHTML = '';
-                  structEl.classList.add('hidden');
-                }
-              }
             };
 
-            const elementsToFade = [imgEl, textContentEl, badgeWrapperEl].filter(Boolean);
+            const elementsToFade = [textContentEl, badgeWrapperEl].filter(Boolean);
 
             if (forceImmediate) {
               applyContent();
+              if (imgEl) triggerZoomAnimation(imgEl);
               elementsToFade.forEach(el => {
                 el.classList.remove('opacity-0');
                 el.classList.add('opacity-100');
@@ -764,6 +673,7 @@
             }
 
             isTransitioning = true;
+            if (imgEl) imgEl.style.opacity = '0';
             elementsToFade.forEach(el => {
               el.classList.remove('opacity-100');
               el.classList.add('opacity-0');
@@ -772,6 +682,7 @@
 
             setTimeout(() => {
               applyContent();
+              if (imgEl) triggerZoomAnimation(imgEl);
 
               requestAnimationFrame(() => {
                 elementsToFade.forEach(el => {
@@ -782,9 +693,9 @@
 
                 setTimeout(() => {
                   isTransitioning = false;
-                }, 120);
+                }, 150);
               });
-            }, 60);
+            }, 180);
           }
 
           window.__selectVitrineSlide = function(idx) {
@@ -858,26 +769,11 @@
                       ? data.topico.charAt(0).toUpperCase() + data.topico.slice(1) 
                       : 'Geral';
 
-                    let descTexto = data.resumo || data.descricao || '';
-                    if (!descTexto && data.descricaoHTML) {
-                      descTexto = data.descricaoHTML.replace(/<[^>]*>/g, '').trim();
-                    }
-                    if (descTexto.length > 130) {
-                      descTexto = descTexto.slice(0, 130) + '...';
-                    }
-
-                    const extra = fallbackDataMap[doc.id] || {
-                      structures: ['Corte Microscópico', 'Morfologia Tecidual']
-                    };
-
                     firestoreSlides.push({
                       id: doc.id,
                       title: nome,
                       category: `${disciplina} • ${topico}`,
-                      stain: data.coloracao || 'H&E • 40x',
-                      specimen: data.especime || data.corte || 'Campo Microscópico',
-                      desc: descTexto || 'Lâmina digitalizada em alta resolução para estudo morfológico.',
-                      structures: extra.structures,
+                      stain: data.coloracao || '',
                       thumbnailUrl: previewImg,
                       previewImage: previewImg,
                       image: previewImg,
@@ -969,7 +865,7 @@
       </script>
 
       <!-- SEÇÃO 2: DISCIPLINAS (HISTOLOGIA EM DESTAQUE PRINCIPAL + 3 DISCIPLINAS ABAIXO) -->
-      <div id="secaoDisciplinas" class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6 relative z-10 animate-fade-in-up delay-200">
+      <div id="secaoDisciplinas" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 relative z-10 transition-all duration-500 ease-out">
         
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6 pb-4 border-b border-slate-200/80">
           <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-[-0.02em]">Disciplinas</h2>

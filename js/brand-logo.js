@@ -140,12 +140,12 @@ class BrandLogo extends HTMLElement {
         subtitleMt:    'mt-1',
       },
       lg: {
-        owlClass:      'w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10',
-        textClass:     'text-lg sm:text-2xl md:text-[26px]',
-        trackingPalas: 'tracking-[0.14em] sm:tracking-[0.2em]',
-        trackingAtlas: 'tracking-[0.14em] sm:tracking-[0.2em]',
+        owlClass:      'w-6 h-6 sm:w-9 sm:h-9 md:w-10 md:h-10',
+        textClass:     'text-base sm:text-2xl md:text-[26px]',
+        trackingPalas: 'tracking-[0.12em] sm:tracking-[0.2em]',
+        trackingAtlas: 'tracking-[0.12em] sm:tracking-[0.2em]',
         subtitleClass: 'text-[9.5px] sm:text-[10.5px] tracking-[0.24em]',
-        gap:           'gap-2 sm:gap-3',
+        gap:           'gap-1.5 sm:gap-3',
         subtitleMt:    'mt-1',
       },
     };
