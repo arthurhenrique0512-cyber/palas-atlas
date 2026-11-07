@@ -14,6 +14,42 @@ export function initGlobalSearch() {
 
   if (!searchInput) return;
 
+  // Placeholder Dinâmico e Atalhos de Teclado
+  const placeholders = [
+    "Buscar tecidos, órgãos ou lâminas em H&E...",
+    "Buscar 'Osso Maduro em desgaste'...",
+    "Buscar 'Epitélio estratificado pavimentoso'...",
+    "Buscar 'Pele Espessa H&E'...",
+    "Buscar 'Sistemas de Havers e Ósteons'...",
+    "Buscar 'Colorações e técnicas especiais'..."
+  ];
+  let placeholderIndex = 0;
+  let isInputFocused = false;
+
+  const rotatePlaceholder = () => {
+    if (isInputFocused || (searchInput && searchInput.value.trim().length > 0)) return;
+    placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+    searchInput.placeholder = placeholders[placeholderIndex];
+  };
+
+  const placeholderTimer = setInterval(rotatePlaceholder, 3600);
+
+  // Atalho global ⌘K / Ctrl+K e barra "/"
+  document.addEventListener("keydown", (e) => {
+    const isEditing = ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName);
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+      return;
+    }
+    if (e.key === "/" && !isEditing) {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+  });
+
   // Carrega o cache das lâminas ativas ao focar no input pela primeira vez
   const loadCache = async () => {
     if (isCacheLoaded || !db) return;
@@ -26,7 +62,18 @@ export function initGlobalSearch() {
     }
   };
 
-  searchInput.addEventListener("focus", loadCache);
+  searchInput.addEventListener("focus", () => {
+    isInputFocused = true;
+    searchInput.placeholder = "Buscar tecidos, órgãos ou lâminas...";
+    loadCache();
+  });
+
+  searchInput.addEventListener("blur", () => {
+    isInputFocused = false;
+    if (!searchInput.value.trim()) {
+      searchInput.placeholder = placeholders[placeholderIndex];
+    }
+  });
 
   searchInput.addEventListener("input", (e) => {
     const term = e.target.value.trim();
