@@ -787,6 +787,70 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ============================================================
+             5. GUIA EDITORIAL DO MICROSCÓPIO (COMO USAR)
+        ============================================================ */}
+        <section
+          id="secaoComoUsar"
+          className="w-full bg-slate-50/60 border-t border-slate-200/80 py-16 lg:py-24 relative z-10 transition-colors duration-300"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+              
+              {/* Coluna Esquerda (lg:col-span-4 — Fixa/Editorial) */}
+              <div className="lg:col-span-4 flex flex-col items-start text-left">
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight">
+                  Navegação no Microscópio
+                </h2>
+                <p className="mt-3 text-slate-600 text-base leading-relaxed">
+                  As lâminas são digitalizadas integralmente para permitir o estudo progressivo do corte — da arquitetura geral do órgão ao detalhe celular.
+                </p>
+                <div className="mt-6 pt-5 border-t border-slate-200/80 text-xs text-slate-500 leading-relaxed">
+                  Dica de estudo: inicie sempre pelo menor aumento para reconhecer as camadas teciduais antes de aproximar o campo.
+                </div>
+              </div>
+
+              {/* Coluna Direita (lg:col-span-8 — Grade Editorial Contínua) */}
+              <div className="lg:col-span-8 w-full">
+                <div className="bg-white rounded-2xl border border-slate-200/90 divide-y divide-slate-200/80 shadow-[0_4px_20px_rgb(15,23,42,0.03)]">
+                  
+                  {/* Faixa 1: Varredura da Lâmina */}
+                  <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+                    <h3 className="sm:w-1/3 font-semibold text-slate-900 text-base">
+                      Varredura da Lâmina
+                    </h3>
+                    <p className="sm:w-2/3 text-sm text-slate-600 leading-relaxed">
+                      Percorra toda a extensão da peça arrastando o campo com o mouse ou com o toque. A aproximação é contínua pelo scroll ou gesto de pinça, sem perda de definição entre os campos.
+                    </p>
+                  </div>
+
+                  {/* Faixa 2: Escala de Aumentos */}
+                  <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+                    <h3 className="sm:w-1/3 font-semibold text-slate-900 text-base">
+                      Escala de Aumentos
+                    </h3>
+                    <p className="sm:w-2/3 text-sm text-slate-600 leading-relaxed">
+                      Alterne rapidamente entre as referências de 4× (visão panorâmica e topografia), 10×, 40× e 100× pelo seletor no canto inferior da tela, seguindo a mesma progressão do microscópio óptico.
+                    </p>
+                  </div>
+
+                  {/* Faixa 3: Marcações e Critérios */}
+                  <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+                    <h3 className="sm:w-1/3 font-semibold text-slate-900 text-base">
+                      Marcações e Critérios
+                    </h3>
+                    <p className="sm:w-2/3 text-sm text-slate-600 leading-relaxed">
+                      Acione os pinos sobre o corte para abrir a descrição morfológica de cada estrutura, revisar as relações entre os tecidos ou ocultar as marcações durante a revisão prática.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
       </main>
 
       {/* Rodapé Institucional Minimalista */}
