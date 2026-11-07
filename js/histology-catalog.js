@@ -536,7 +536,7 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     }
 
     return `
-      <div class="group bg-white dark:bg-[#0c0c0f] border border-slate-200/80 dark:border-white/10 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between">
+      <div onclick="window.location.href='microscopio.html?id=${lamina.id}'" class="group bg-white dark:bg-[#0c0c0f] border border-slate-200/80 dark:border-white/10 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
         <div>
           <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
             <!-- Placeholder exibido quando a imagem falha -->

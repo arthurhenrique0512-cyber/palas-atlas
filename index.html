@@ -317,12 +317,12 @@
 
               <button
                 type="button"
-                onclick="window.App.selecionarFrente('histologia'); window.App.fecharMenuLateral();"
+                onclick="window.App.navegarPara('pgHome'); window.App.fecharMenuLateral(); setTimeout(() => { document.getElementById('secaoLaminasPopulares')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 120);"
                 class="flex items-center gap-3 group text-slate-600 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
-                <span>Catálogo de Lâminas</span>
+                <span>Lâminas Populares</span>
               </button>
             </div>
           </div>
@@ -994,7 +994,8 @@
       </script>
 
       <!-- SEÇÃO 2: DISCIPLINAS (HISTOLOGIA EM DESTAQUE PRINCIPAL + 3 DISCIPLINAS ABAIXO) -->
-      <div id="secaoDisciplinas" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 relative z-10 transition-all duration-500 ease-out">
+      <div id="disciplinas" class="scroll-mt-24"></div>
+      <div id="secaoDisciplinas" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 relative z-10 transition-all duration-500 ease-out scroll-mt-24">
         
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-8 pb-4 border-b border-slate-200/80">
           <div>
@@ -1185,7 +1186,8 @@
       </div>
 
       <!-- SEÇÃO 2.5: LÂMINAS POPULARES (GALERIA ACADÊMICA) -->
-      <section id="secaoLaminasPopulares" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 relative z-10">
+      <div id="laminas" class="scroll-mt-24"></div>
+      <section id="secaoLaminasPopulares" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 relative z-10 scroll-mt-24">
         
         <div class="mb-8 pb-4 border-b border-slate-200/80 text-left">
           <h2 class="text-2xl lg:text-3xl font-bold text-slate-950 tracking-tight">
@@ -1199,7 +1201,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           
           <!-- Card 1: Osso Maduro 40x -->
-          <div data-slide-id="cw3XGCgUwN71XdlwkUe5" class="popular-slide-card group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between">
+          <div data-slide-id="cw3XGCgUwN71XdlwkUe5" onclick="window.location.href='microscopio.html?id=cw3XGCgUwN71XdlwkUe5'" class="popular-slide-card group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
@@ -1241,7 +1243,7 @@
           </div>
 
           <!-- Card 2: Osso Maduro 10x -->
-          <div data-slide-id="FFGk5d9kOAct5HIDdjQ7" class="popular-slide-card group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between">
+          <div data-slide-id="FFGk5d9kOAct5HIDdjQ7" onclick="window.location.href='microscopio.html?id=FFGk5d9kOAct5HIDdjQ7'" class="popular-slide-card group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
@@ -1283,7 +1285,7 @@
           </div>
 
           <!-- Card 3: Osso Compacto -->
-          <div data-slide-id="96ZYqoM2SV8p4fB2QgeM" class="popular-slide-card group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between">
+          <div data-slide-id="96ZYqoM2SV8p4fB2QgeM" onclick="window.location.href='microscopio.html?id=96ZYqoM2SV8p4fB2QgeM'" class="popular-slide-card group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
@@ -1325,7 +1327,7 @@
           </div>
 
           <!-- Card 4: Pele Espessa -->
-          <div data-slide-id="a3oRvXvJpMKAtU2RE85q" class="popular-slide-card group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between">
+          <div data-slide-id="a3oRvXvJpMKAtU2RE85q" onclick="window.location.href='microscopio.html?id=a3oRvXvJpMKAtU2RE85q'" class="popular-slide-card group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
             <div>
               <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
                 <img 
@@ -1370,7 +1372,8 @@
       </section>
 
       <!-- SEÇÃO 2.6: GUIA EDITORIAL DO MICROSCÓPIO (COMO USAR) -->
-      <section id="secaoComoUsar" class="w-full bg-slate-50/60 border-t border-slate-200/80 py-16 lg:py-24 relative z-10 transition-colors duration-300">
+      <div id="como-usar" class="scroll-mt-24"></div>
+      <section id="secaoComoUsar" class="w-full bg-slate-50/60 border-t border-slate-200/80 py-16 lg:py-24 relative z-10 transition-colors duration-300 scroll-mt-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
@@ -1431,7 +1434,8 @@
       </section>
 
       <!-- SEÇÃO 2.7: PERGUNTAS FREQUENTES (FAQ ACADÊMICO) -->
-      <section id="secaoFAQ" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+      <div id="duvidas" class="scroll-mt-24"></div>
+      <section id="secaoFAQ" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 scroll-mt-24">
         
         <div class="text-center">
           <h2 class="text-2xl lg:text-3xl font-bold text-slate-950 tracking-tight text-center">

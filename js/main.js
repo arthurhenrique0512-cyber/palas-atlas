@@ -446,6 +446,26 @@ window.addEventListener("popstate", (event) => {
   }
 });
 
+// Navegação suave entre âncoras da página inicial a partir de qualquer subpágina
+document.addEventListener("click", (e) => {
+  const link = e.target.closest('a[href^="#"]');
+  if (!link) return;
+  const href = link.getAttribute("href");
+  if (!href || href === "#") return;
+
+  const pgHome = document.getElementById("pgHome");
+  if (pgHome && pgHome.classList.contains("hidden")) {
+    e.preventDefault();
+    goHome();
+    setTimeout(() => {
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 120);
+  }
+});
+
 // Exposição controlada para o objeto global da janela (acessível pelo HTML e outros módulos)
 window.App = window.App || {};
 Object.assign(window.App, {

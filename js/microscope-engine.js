@@ -507,7 +507,7 @@ function iniciarMicroscopio() {
  * Alterna a exibição do popover discreto de atalhos e ajuda do microscópio.
  * @param {boolean} [forcar]
  */
-export function toggleAjudaMicroscopio(forcar) {
+function toggleAjudaMicroscopio(forcar) {
   const popover = document.getElementById("popoverAjudaMicroscopio");
   if (!popover) return;
   if (typeof forcar === "boolean") {
