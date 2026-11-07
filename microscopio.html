@@ -112,21 +112,23 @@
     .prose-atlas {
       overflow-wrap: break-word;
       word-break: break-word;
+      color: #334155;
     }
-    .prose-atlas h3       { color:#f4f2ed; font-weight:700; font-size:1rem; margin-bottom:.75rem; }
-    .prose-atlas p        { color:#d4d4d8; line-height:1.75; font-size:0.875rem; margin-bottom:1rem; }
+    .prose-atlas h3         { color:#0f172a; font-weight:700; font-size:1rem; margin-bottom:.75rem; }
+    .prose-atlas p          { color:#334155; line-height:1.75; font-size:0.875rem; margin-bottom:1rem; }
+    .prose-atlas li         { color:#334155; line-height:1.75; font-size:0.875rem; }
     .prose-atlas strong,
-    .prose-atlas b        { color:#f4f4f5; font-weight:600; background: transparent !important; }
+    .prose-atlas b          { color:#0f172a; font-weight:600; background: transparent !important; }
     .prose-atlas blockquote { border: none !important; margin: 0 !important; padding: 0 !important; }
     .prose-atlas .pin-link {
-      color: #5eead4 !important;
+      color: #0f766e !important;
       background: transparent !important;
       border: none !important;
       padding: 0 !important;
       border-radius: 0 !important;
       text-decoration: underline !important;
       text-underline-offset: 4px !important;
-      text-decoration-color: rgba(94, 234, 212, 0.4) !important;
+      text-decoration-color: rgba(15, 118, 110, 0.4) !important;
       text-decoration-thickness: 1.5px !important;
       font-weight: 600 !important;
       cursor: pointer !important;
@@ -136,13 +138,43 @@
       touch-action: manipulation;
     }
     .prose-atlas .pin-link:hover {
-      color: #99f6e4 !important;
-      text-decoration-color: #2dd4bf !important;
+      color: #115e59 !important;
+      text-decoration-color: #0f766e !important;
       background: transparent !important;
     }
     .prose-atlas .pin-link:active {
-      color: #ccfbf1 !important;
+      color: #042f2e !important;
       background: transparent !important;
+    }
+
+    /* Variação em modo escuro para .prose-atlas */
+    html.dark .prose-atlas,
+    html[data-theme="dark"] .prose-atlas {
+      color: #cbd5e1;
+    }
+    html.dark .prose-atlas h3,
+    html[data-theme="dark"] .prose-atlas h3       { color:#f4f2ed !important; }
+    html.dark .prose-atlas p,
+    html[data-theme="dark"] .prose-atlas p,
+    html.dark .prose-atlas li,
+    html[data-theme="dark"] .prose-atlas li       { color:#cbd5e1 !important; }
+    html.dark .prose-atlas strong,
+    html[data-theme="dark"] .prose-atlas strong,
+    html.dark .prose-atlas b,
+    html[data-theme="dark"] .prose-atlas b        { color:#f4f4f5 !important; }
+    html.dark .prose-atlas .pin-link,
+    html[data-theme="dark"] .prose-atlas .pin-link {
+      color: #5eead4 !important;
+      text-decoration-color: rgba(94, 234, 212, 0.4) !important;
+    }
+    html.dark .prose-atlas .pin-link:hover,
+    html[data-theme="dark"] .prose-atlas .pin-link:hover {
+      color: #99f6e4 !important;
+      text-decoration-color: #2dd4bf !important;
+    }
+    html.dark .prose-atlas .pin-link:active,
+    html[data-theme="dark"] .prose-atlas .pin-link:active {
+      color: #ccfbf1 !important;
     }
 
     /* Botão de recolher painel: preenchimento do painel indica estado aberto */
@@ -699,24 +731,24 @@
     <!-- Direita — Painel de Informações (retrátil) -->
     <aside
       id="viewerSidebar"
-      class="h-full bg-[#0c0c0f]/95 lg:bg-[#0c0c0f] backdrop-blur-md lg:backdrop-blur-none border-l border-white/[0.09] text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
+      class="h-full bg-white dark:bg-[#0c0c0f] border-l border-slate-200 dark:border-white/[0.09] text-slate-700 dark:text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
       aria-hidden="false"
     >
       <div class="w-[85vw] sm:w-[380px] max-w-[380px] h-full flex flex-col">
 
         <!-- Cabeçalho do Painel: Título e Coloração (Bloco Elevado) -->
-        <div class="px-5 sm:px-7 pt-5 sm:pt-6 pb-4 sm:pb-5 bg-[#111115] border-b border-white/[0.08] shrink-0 flex items-start justify-between gap-3">
+        <div class="px-5 sm:px-7 pt-5 sm:pt-6 pb-4 sm:pb-5 bg-slate-50 dark:bg-[#111115] border-b border-slate-200 dark:border-white/[0.08] shrink-0 flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <span class="inline-block text-[9.5px] font-mono uppercase tracking-[0.2em] text-neutral-500 mb-1">Análise Morfológica</span>
-            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] leading-snug tracking-tight truncate sm:whitespace-normal">
+            <span class="inline-block text-[9.5px] font-mono uppercase tracking-[0.2em] text-slate-500 dark:text-neutral-500 mb-1">Análise Morfológica</span>
+            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-slate-900 dark:text-[#f4f2ed] leading-snug tracking-tight truncate sm:whitespace-normal">
               Carregando lâmina...
             </h2>
             <div class="mt-2.5 flex flex-wrap items-center gap-2">
-              <p id="slideColoracao" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-[11px] font-sans font-medium text-neutral-300">
+              <p id="slideColoracao" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-[11px] font-sans font-medium text-slate-700 dark:text-neutral-300">
                 Hematoxilina e Eosina (H&amp;E)
               </p>
-              <span id="slideSeloOptico" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-950/40 border border-teal-800/40 text-[11px] font-sans font-medium text-teal-300" title="Resolução Óptica Nativa Travada">
-                <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+              <span id="slideSeloOptico" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/40 text-[11px] font-sans font-medium text-teal-800 dark:text-teal-300" title="Resolução Óptica Nativa Travada">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400"></span>
                 <span id="slideSeloOpticoTexto">40x Nativa</span>
               </span>
             </div>
@@ -725,7 +757,7 @@
           <button
             type="button"
             id="btnCloseSidebarMobile"
-            class="lg:hidden w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-white active:bg-white/10 rounded-xl transition-colors shrink-0 touch-manipulation cursor-pointer -mr-1 -mt-0.5"
+            class="lg:hidden w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-800 dark:text-neutral-400 dark:hover:text-white active:bg-slate-100 dark:active:bg-white/10 rounded-xl transition-colors shrink-0 touch-manipulation cursor-pointer -mr-1 -mt-0.5"
             aria-label="Fechar painel"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -733,12 +765,12 @@
         </div>
 
         <!-- Abas de Navegação do Painel Lateral -->
-        <div class="px-5 sm:px-7 py-3 flex items-center gap-2 border-b border-white/[0.07] bg-[#0e0e12] shrink-0">
+        <div class="px-5 sm:px-7 py-3 flex items-center gap-2 border-b border-slate-200 dark:border-white/[0.07] bg-slate-100/70 dark:bg-[#0e0e12] shrink-0">
           <button
             id="btnTabDescricao"
             type="button"
             onclick="window.alternarAbaPainel('descricao')"
-            class="tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-950/70 text-teal-200 border border-teal-700/50 shadow-sm touch-manipulation flex items-center justify-center"
+            class="tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-800 text-white dark:bg-teal-950/70 dark:text-teal-200 border border-teal-700 dark:border-teal-700/50 shadow-sm touch-manipulation flex items-center justify-center"
           >
             Descrição
           </button>
@@ -746,27 +778,27 @@
             id="btnTabQuestoes"
             type="button"
             onclick="window.alternarAbaPainel('questoes')"
-            class="tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] border border-transparent flex items-center gap-1.5 touch-manipulation justify-center"
+            class="tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-200 hover:bg-slate-200/60 dark:hover:bg-white/[0.04] border border-transparent flex items-center gap-1.5 touch-manipulation justify-center"
           >
             <span>Questões</span>
-            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.06] text-neutral-400 font-mono font-medium">0</span>
+            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-200 dark:bg-white/[0.06] text-slate-700 dark:text-neutral-400 font-mono font-medium">0</span>
           </button>
         </div>
 
         <!-- Descrição completa com hiperlinks de pinos -->
         <div
           id="slideDescriptionContainer"
-          class="px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-[#0c0c0f]"
+          class="px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-white dark:bg-[#0c0c0f] text-slate-700 dark:text-neutral-300"
           style="-webkit-overflow-scrolling:touch;"
         >
-          <div class="text-sm text-neutral-500 font-sans italic">
+          <div class="text-sm text-slate-500 dark:text-neutral-500 font-sans italic">
             As informações desta lâmina serão renderizadas aqui.
           </div>
         </div>
 
         <div
           id="slideQuestionsContainer"
-          class="hidden px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-[#0c0c0f] space-y-4"
+          class="hidden px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-white dark:bg-[#0c0c0f] space-y-4 text-slate-700 dark:text-neutral-300"
           style="-webkit-overflow-scrolling:touch;"
         >
           <!-- Questões renderizadas dinamicamente aqui -->

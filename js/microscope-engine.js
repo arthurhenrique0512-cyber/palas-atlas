@@ -17,7 +17,7 @@
  */
 
 import { db } from "./firebase-config.js";
-import { removerConteudoPerigoso, sanitizarHTMLDescricao } from "./sanitizer.js";
+import { removerConteudoPerigoso, sanitizarHTMLDescricao, formatarDescricaoMorfolgica } from "./sanitizer.js";
 import {
   OBJETIVAS_PADRAO,
   SELOS,
@@ -724,8 +724,8 @@ function renderizarMetadadosDaLamina() {
   }
 }
 
-// Re-exporta sanitizarHTMLDescricao para retrocompatibilidade
-export { sanitizarHTMLDescricao };
+// Re-exporta sanitizadores para retrocompatibilidade
+export { sanitizarHTMLDescricao, formatarDescricaoMorfolgica };
 
 function renderizarDescricaoETextos() {
   if (!laminaAtualData) return;
@@ -737,10 +737,10 @@ function renderizarDescricaoETextos() {
 
   const tituloPeca = document.getElementById("slideTitle")?.textContent || "Lamina Histologica";
   const rawHtml = laminaAtualData.descricaoHTML || laminaAtualData.descricao || "";
-  const html = sanitizarHTMLDescricao(rawHtml);
+  const html = formatarDescricaoMorfolgica(rawHtml);
 
   if (!html) {
-    container.innerHTML = `<p class="text-neutral-500 italic text-sm font-sans">Nenhum texto descritivo cadastrado para esta lamina.</p>`;
+    container.innerHTML = `<p class="text-slate-500 dark:text-neutral-500 italic text-sm font-sans">Nenhum texto descritivo cadastrado para esta lamina.</p>`;
     return;
   }
 
@@ -748,8 +748,8 @@ function renderizarDescricaoETextos() {
   let secaoPinos = "";
   if (listaPinosAtual.length > 0) {
     secaoPinos = `
-      <div class="mt-8 border-t border-white/[0.06] pt-6">
-        <h4 class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-4 font-mono">
+      <div class="mt-8 border-t border-slate-200 dark:border-white/[0.06] pt-6">
+        <h4 class="text-[10px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-widest mb-4 font-mono">
           Pontos de Interesse
         </h4>
         <div class="flex flex-col gap-2">
@@ -759,13 +759,13 @@ function renderizarDescricaoETextos() {
               id="btn-pino-${pin.id}"
               data-btn-pin-id="${pin.id}"
               onclick="window.focarPinoNoViewer('${pin.id}')"
-              class="w-full flex items-center justify-between p-3 rounded-xl bg-neutral-900/40 hover:bg-neutral-900/70 border border-white/[0.04] hover:border-teal-700/50 text-left transition-all group cursor-pointer"
+              class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-neutral-900/40 dark:hover:bg-neutral-900/70 border border-slate-200/80 dark:border-white/[0.04] hover:border-teal-600/50 dark:hover:border-teal-700/50 text-left transition-all group cursor-pointer"
             >
               <div class="flex items-center gap-2.5 truncate pr-2">
-                <span class="w-2 h-2 rounded-full bg-teal-400 shrink-0"></span>
-                <span class="text-sm font-medium text-neutral-200 truncate group-hover:text-teal-200 transition-colors">${pin.rotulo || "Estrutura"}</span>
+                <span class="w-2 h-2 rounded-full bg-teal-600 dark:bg-teal-400 shrink-0"></span>
+                <span class="text-sm font-medium text-slate-800 dark:text-neutral-200 truncate group-hover:text-teal-700 dark:group-hover:text-teal-200 transition-colors">${pin.rotulo || "Estrutura"}</span>
               </div>
-              <span class="text-xs text-neutral-500 group-hover:text-teal-400 shrink-0 transition-colors">Focar &rarr;</span>
+              <span class="text-xs text-slate-500 dark:text-neutral-500 group-hover:text-teal-700 dark:group-hover:text-teal-400 shrink-0 transition-colors">Focar &rarr;</span>
             </button>
           `).join('')}
         </div>
@@ -774,13 +774,13 @@ function renderizarDescricaoETextos() {
   }
 
   container.innerHTML = `
-    <div class="prose-atlas text-neutral-300 text-sm font-sans leading-[1.75] space-y-4">
+    <div class="prose-atlas text-slate-700 dark:text-slate-300 text-sm font-sans leading-relaxed">
       ${html}
     </div>
     ${secaoPinos}
     <a
       href="mailto:contato@palasatlas.com?subject=Correção sugerida na peça: ${encodeURIComponent(tituloPeca)}"
-      class="text-xs text-neutral-500 hover:text-teal-400 transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-white/[0.06] pt-4 w-fit"
+      class="text-xs text-slate-500 hover:text-teal-700 dark:text-neutral-500 dark:hover:text-teal-400 transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-slate-200 dark:border-white/[0.06] pt-4 w-fit"
     >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -790,9 +790,9 @@ function renderizarDescricaoETextos() {
     </a>
   `;
 
-  // Estiliza pin-links inline injetados pelo CMS no descricaoHTML com tipografia acadêmica sóbria (sem caixas azuis)
+  // Estiliza pin-links inline com tipografia acadêmica sóbria e alto contraste (sem caixas azuis)
   container.querySelectorAll('.pin-link, [data-pin-id]').forEach(el => {
-    el.className = "pin-link font-semibold text-teal-300 hover:text-teal-200 underline underline-offset-4 decoration-teal-400/40 hover:decoration-teal-300 cursor-pointer transition-all bg-transparent border-0 p-0 inline";
+    el.className = "pin-link font-semibold text-teal-700 dark:text-teal-300 hover:text-teal-900 dark:hover:text-teal-200 underline underline-offset-4 decoration-teal-600/40 hover:decoration-teal-700 dark:decoration-teal-400/40 cursor-pointer transition-all bg-transparent border-0 p-0 inline";
   });
 }
 
@@ -815,8 +815,8 @@ export function alternarAbaPainel(aba) {
   const abaAlvo = (aba === "questoes") ? "questoes" : "descricao";
   abaAtivaPainel = abaAlvo;
 
-  const estiloAtivo   = "tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-950/70 text-teal-200 border border-teal-700/50 shadow-sm touch-manipulation flex items-center justify-center";
-  const estiloInativo = "tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] border border-transparent touch-manipulation flex items-center justify-center";
+  const estiloAtivo   = "tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-800 text-white dark:bg-teal-950/70 dark:text-teal-200 border border-teal-700 dark:border-teal-700/50 shadow-sm touch-manipulation flex items-center justify-center";
+  const estiloInativo = "tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-200 hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-transparent touch-manipulation flex items-center justify-center";
 
   if (abaAlvo === "descricao") {
     if (containerDesc) containerDesc.classList.remove("hidden");
@@ -970,7 +970,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
       <div
         id="card-questao-${qId}"
         data-questao-id="${qId}"
-        class="card-questao rounded-xl border border-white/[0.06] bg-neutral-900/40 p-4 transition-all duration-200 hover:border-white/[0.12] space-y-3"
+        class="card-questao rounded-xl border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-neutral-900/40 p-4 transition-all duration-200 hover:border-slate-300 dark:hover:border-white/[0.12] space-y-3"
       >
         <!-- Cabeçalho Clicável da Questão -->
         <button
@@ -984,13 +984,13 @@ export function renderizarQuestoesNaSidebar(questoes) {
               Q${numeroQ}
             </span>
             <div class="min-w-0">
-              <h4 class="text-xs font-semibold text-neutral-200 tracking-wide font-sans group-hover:text-[#c8ad5f] transition-colors leading-snug">
+              <h4 class="text-xs font-semibold text-slate-800 dark:text-neutral-200 tracking-wide font-sans group-hover:text-teal-700 dark:group-hover:text-[#c8ad5f] transition-colors leading-snug">
                 ${escaparHTML(tituloQ)}
               </h4>
             </div>
           </div>
           ${temCoordenadas ? `
-            <div class="flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-neutral-400 group-hover:text-[#c8ad5f] shrink-0 transition-colors pt-0.5">
+            <div class="flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 group-hover:text-teal-700 dark:group-hover:text-[#c8ad5f] shrink-0 transition-colors pt-0.5">
               <span>Focar</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -1001,7 +1001,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
 
         <!-- Enunciado e Orientação Diagnóstica -->
         ${enunciadoQ ? `
-          <div class="text-xs text-neutral-300 font-sans leading-relaxed border-l-2 border-white/[0.08] ml-1 pl-2.5">
+          <div class="text-xs text-slate-700 dark:text-neutral-300 font-sans leading-relaxed border-l-2 border-slate-300 dark:border-white/[0.08] ml-1 pl-2.5">
             ${escaparHTML(enunciadoQ)}
           </div>
         ` : ''}
@@ -1009,8 +1009,8 @@ export function renderizarQuestoesNaSidebar(questoes) {
         <!-- Área de Anotação / Resposta do Estudante (sem gabarito) -->
         <div class="space-y-1.5 pt-1">
           <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">
-            <span class="text-neutral-400">Resposta / Diagnóstico</span>
-            <span id="statusSalvo-${qId}" class="text-neutral-500 transition-colors">
+            <span class="text-slate-500 dark:text-neutral-400">Resposta / Diagnóstico</span>
+            <span id="statusSalvo-${qId}" class="text-slate-500 dark:text-neutral-500 transition-colors">
               ${respostaSalva ? "Salvo localmente" : ""}
             </span>
           </div>
@@ -1020,7 +1020,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
             rows="3"
             placeholder="Sua anotação / resposta diagnóstica..."
             style="resize:vertical; min-height:72px;"
-            class="w-full bg-neutral-950/80 border border-white/[0.08] focus:border-[#c8ad5f]/60 focus:ring-1 focus:ring-[#c8ad5f]/40 rounded-lg p-2.5 text-xs text-neutral-200 placeholder-neutral-500 font-sans leading-relaxed outline-none transition-all"
+            class="w-full bg-white dark:bg-neutral-950/80 border border-slate-300 dark:border-white/[0.08] focus:border-teal-600 dark:focus:border-[#c8ad5f]/60 focus:ring-1 focus:ring-teal-600/30 dark:focus:ring-[#c8ad5f]/40 rounded-lg p-2.5 text-xs text-slate-800 dark:text-neutral-200 placeholder-slate-400 dark:placeholder-neutral-500 font-sans leading-relaxed outline-none transition-all"
           >${escaparHTML(respostaSalva)}</textarea>
         </div>
       </div>
