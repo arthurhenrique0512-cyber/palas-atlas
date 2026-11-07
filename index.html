@@ -1685,18 +1685,18 @@
     </section>
 
     <!-- CONTAINER 3: Dashboard / CMS de Acervo & Pinos (#pgDashboard) -->
-    <section id="pgDashboard" class="hidden h-screen pt-16 sm:pt-[68px] w-full bg-[#060608] text-slate-100 overflow-hidden flex flex-col">
+    <section id="pgDashboard" class="hidden h-screen w-full bg-slate-50 text-slate-900 overflow-hidden flex flex-col">
 
       <!-- ── MODAL DE LOGIN DO ADMINISTRADOR ─────────────────────────────── -->
       <!-- Exibido quando o usuário não está autenticado. Sobrepõe o CMS. -->
-      <div id="dashLoginOverlay" class="absolute inset-0 z-50 bg-[#060608]/88 backdrop-blur-xl flex items-center justify-center p-4 hidden">
-        <div class="w-full max-w-md mx-auto bg-[#101014] border border-[#d4af37]/30 rounded-2xl shadow-[0_25px_70px_rgba(0,0,0,0.9)] p-6 sm:p-8 flex flex-col gap-5 sm:gap-6 relative">
+      <div id="dashLoginOverlay" class="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md mx-auto bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col gap-5 sm:gap-6 relative">
 
           <!-- Botão Fechar Modal de Login / Voltar ao Início -->
           <button
             type="button"
             onclick="window.App.navegarPara('pgHome')"
-            class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/[0.08] transition-all duration-200 cursor-pointer active:scale-95"
+            class="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer"
             aria-label="Fechar e voltar ao início"
             title="Voltar ao início">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
@@ -1706,149 +1706,164 @@
 
           <!-- Cabeçalho do Modal -->
           <div class="flex flex-col items-center gap-2 text-center">
-            <div class="w-12 h-12 rounded-2xl bg-[#d4af37]/10 border border-[#d4af37]/30 flex items-center justify-center mb-1">
-              <svg class="w-5 h-5 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200/80 flex items-center justify-center mb-1">
+              <svg class="w-5 h-5 text-teal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
               </svg>
             </div>
-            <h2 class="font-serif font-extrabold text-[#f4f2ed] text-2xl tracking-tight">Acesso Restrito</h2>
-            <p class="text-neutral-400 text-xs leading-relaxed">Painel de Curadoria e Administração do Palas Atlas.<br>Exclusivo para editores credenciados.</p>
+            <h2 class="font-bold text-slate-900 text-xl tracking-tight">Acesso ao Painel CMS</h2>
+            <p class="text-slate-500 text-xs leading-relaxed">Painel de Curadoria e Administração do Palas Atlas.<br>Exclusivo para editores credenciados.</p>
           </div>
 
           <!-- Formulário -->
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-3.5">
             <div>
-              <label class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono mb-1.5 block" for="dashLoginEmail">E-mail Institucional</label>
+              <label class="text-[11px] font-medium text-slate-600 mb-1 block" for="dashLoginEmail">E-mail Institucional</label>
               <input
                 id="dashLoginEmail"
                 type="email"
                 autocomplete="email"
                 placeholder="admin@palasatlas.com"
-                class="w-full bg-[#09090c] border border-white/[0.1] rounded-xl px-4 py-3 min-h-[44px] text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37] transition-colors"
+                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 outline-none focus:bg-white focus:border-teal-700 transition-colors"
               />
             </div>
             <div>
-              <label class="text-[10px] tracking-widest text-neutral-400 uppercase font-mono mb-1.5 block" for="dashLoginPassword">Senha</label>
+              <label class="text-[11px] font-medium text-slate-600 mb-1 block" for="dashLoginPassword">Senha</label>
               <input
                 id="dashLoginPassword"
                 type="password"
                 autocomplete="current-password"
                 placeholder="••••••••"
-                class="w-full bg-[#09090c] border border-white/[0.1] rounded-xl px-4 py-3 min-h-[44px] text-xs text-white placeholder-neutral-600 outline-none focus:border-[#d4af37] transition-colors"
+                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 outline-none focus:bg-white focus:border-teal-700 transition-colors"
               />
             </div>
           </div>
 
           <!-- Mensagem de erro -->
-          <p id="dashLoginError" class="hidden text-xs text-rose-400 bg-rose-950/30 border border-rose-900/40 rounded-xl px-3.5 py-2.5 text-center font-mono"></p>
+          <p id="dashLoginError" class="hidden text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3.5 py-2.5 text-center font-mono"></p>
 
           <!-- Botão de entrar -->
           <button
             id="btnDashLogin"
             type="button"
             onclick="window.App.dashboardLogin()"
-            class="w-full min-h-[44px] bg-[#d4af37] hover:bg-[#e5c158] text-[#09090b] font-sans font-bold tracking-wide uppercase text-xs rounded-xl py-3.5 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-[0_10px_28px_-6px_rgba(212,175,55,0.3)] active:scale-[0.99]"
+            class="w-full min-h-[42px] bg-teal-800 hover:bg-teal-900 text-white font-semibold text-xs rounded-lg py-2.5 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
           >
             <span id="dashLoginBtnText">Entrar no Painel</span>
-            <span id="dashLoginSpinner" class="hidden w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+            <span id="dashLoginSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
           </button>
 
-          <p class="text-center text-[10px] text-neutral-500 font-mono tracking-wider uppercase">Palas Atlas &mdash; Curadoria Digital</p>
+          <p class="text-center text-[11px] text-slate-400 font-medium">Palas Atlas &bull; Curadoria Científica</p>
         </div>
       </div>
       <!-- ── FIM DO MODAL DE LOGIN ────────────────────────────────────────── -->
 
 
-      <!-- NAVEGAÇÃO INTERNA DO PAINEL DEV (TÓPICOS DO CMS) -->
-      <div class="flex items-center justify-between px-4 sm:px-6 py-2.5 shrink-0 w-full border-b border-white/[0.08] bg-[#09090c] z-10">
-        <!-- Cápsula de Abas Minimalista -->
-        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#121216] border border-white/[0.08]">
+      <!-- ── TOPBAR EXCLUSIVA DO CMS (UNIFICADA) ────────────────────────── -->
+      <header id="cmsUnifiedHeader" class="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40 shrink-0 select-none">
+        <!-- Esquerda: Voltar ao Site + Divisor + Logo com Badge CMS -->
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            onclick="window.App.navegarPara('pgHome')"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-2xs">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+            </svg>
+            <span>Voltar ao Site</span>
+          </button>
+          <div class="h-4 w-px bg-slate-200 hidden sm:block"></div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm font-serif font-bold text-slate-900 tracking-[0.16em]">PALAS</span>
+            <span class="text-sm font-serif font-bold text-teal-800 tracking-[0.16em]">ATLAS</span>
+            <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200/80">CMS</span>
+          </div>
+        </div>
+
+        <!-- Centro: Seletor Segmentado de Abas -->
+        <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200/80">
           <button
             type="button"
             id="btnTopicoEditor"
             onclick="window.App.alternarTopicoCms('editor')"
-            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer bg-[#d4af37]/15 text-[#e5c158] border border-[#d4af37]/35 font-semibold shadow-sm">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37]"></span>
-            <span>Editor &amp; Cadastro</span>
+            class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-white text-slate-900 shadow-sm">
+            Editor &amp; Cadastro
           </button>
           <button
             type="button"
             id="btnTopicoAcervo"
             onclick="window.App.alternarTopicoCms('acervo')"
-            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04]">
-            <span class="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
-            <span>Lâminas &amp; Acervo</span>
+            class="px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-slate-600 hover:text-slate-900">
+            Lâminas &amp; Acervo
           </button>
           <button
             type="button"
             id="btnTopicoModulos"
             onclick="window.App.alternarTopicoCms('modulos')"
-            class="px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.04]">
-            <span class="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
-            <span>Módulos &amp; Resumos</span>
+            class="px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-slate-600 hover:text-slate-900">
+            Módulos &amp; Resumos
           </button>
         </div>
 
-        <div class="flex items-center gap-2.5 font-mono">
-          <span class="hidden sm:inline-flex bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-[10px] px-3 py-1 rounded-full items-center gap-1.5 shadow-sm font-mono tracking-wider uppercase">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Firestore Sync
+        <!-- Direita: Status Firestore + Botão Sair -->
+        <div class="flex items-center gap-3">
+          <span class="hidden md:inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-3 py-1 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Firestore Conectado
           </span>
           <button
             type="button"
             onclick="window.App.navegarPara('pgHome')"
-            class="px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-neutral-300 hover:text-white text-xs font-sans font-semibold transition-all cursor-pointer">
-            &larr; Sair do Painel
+            class="text-xs font-medium text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+            Sair do Painel
           </button>
         </div>
-      </div>
+      </header>
 
-      <!-- TÓPICO 1: EDITOR DO ACERVO & MAPEAMENTO OPTICO (#topicoCmsEditor) -->
-      <div id="topicoCmsEditor" class="w-full flex-1 grid grid-cols-1 md:grid-cols-[430px_1fr] overflow-hidden bg-[#060608]">
+      <!-- TÓPICO 1: EDITOR DO ACERVO & MAPEAMENTO ÓPTICO (#topicoCmsEditor) -->
+      <div id="topicoCmsEditor" class="w-full flex-1 flex flex-col lg:flex-row overflow-hidden bg-slate-100">
         
         <!-- COLUNA DA ESQUERDA - FORMULÁRIO E EDITOR (Scroll Independente) -->
-        <div class="h-full overflow-y-auto p-5 sm:p-6 space-y-5 border-r border-white/[0.08] bg-[#09090c] custom-scrollbar pb-16">
+        <div class="w-full lg:w-[420px] shrink-0 border-r border-slate-200 bg-white overflow-y-auto p-5 sm:p-6 space-y-5 pb-20 custom-scrollbar h-full">
           
-          <!-- Cabeçalho Institucional do Editor CMS -->
-          <div class="pb-4 border-b border-white/[0.08] flex flex-col gap-2 shrink-0">
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-[10px] font-mono tracking-widest uppercase text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/30 px-2.5 py-0.5 rounded-full font-semibold">CMS Palas Atlas</span>
-                <h2 class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] tracking-tight mt-2">Editor de Acervo &amp; Pinos</h2>
-              </div>
-              <button 
-                type="button" 
-                onclick="window.App.carregarImagemNoEditor()" 
-                class="bg-white/[0.04] hover:bg-[#d4af37]/15 text-neutral-300 hover:text-[#e5c158] border border-white/[0.1] hover:border-[#d4af37]/40 px-3.5 py-1.5 rounded-xl text-xs font-mono tracking-wider uppercase transition-all duration-200 shadow-sm cursor-pointer">
-                Recarregar
-              </button>
+          <!-- Cabeçalho do Editor CMS -->
+          <div class="pb-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div>
+              <span class="text-[10px] font-mono tracking-widest uppercase text-teal-800 bg-teal-50 border border-teal-200/60 px-2 py-0.5 rounded font-semibold">CMS Curadoria</span>
+              <h2 class="text-base font-bold text-slate-900 tracking-tight mt-1">Editor de Acervo &amp; Pinos</h2>
             </div>
+            <button 
+              type="button" 
+              onclick="window.App.carregarImagemNoEditor()" 
+              class="bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer shadow-2xs">
+              Recarregar
+            </button>
           </div>
 
-          <!-- BLOCO A: FONTE DA IMAGEM E DZI -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
-            <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">A. Fonte da Imagem e Leitor</h3>
+          <!-- SEÇÃO A: FONTE DA IMAGEM E DZI -->
+          <div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-xs space-y-3.5 shrink-0">
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">A. Fonte da Imagem e Leitor</h3>
             
-            <div class="flex flex-wrap items-center gap-6 bg-neutral-950/40 p-3 rounded-xl border border-white/[0.06]">
-              <label class="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-300 font-mono select-none">
-                <input type="radio" name="dashImgType" value="dzi" class="w-4 h-4 text-[#d4af37] bg-neutral-900 border-white/20 focus:ring-0 focus:ring-offset-0 accent-[#d4af37]">
-                <span>Arquivo Piramidal (.dzi)</span>
+            <div class="flex flex-wrap items-center gap-4 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-700 font-medium select-none">
+                <input type="radio" name="dashImgType" value="dzi" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-0 accent-teal-700">
+                <span>Piramidal (.dzi)</span>
               </label>
-              <label class="flex items-center gap-2.5 cursor-pointer text-xs text-neutral-300 font-mono select-none">
-                <input type="radio" name="dashImgType" value="static" checked class="w-4 h-4 text-[#d4af37] bg-neutral-900 border-white/20 focus:ring-0 focus:ring-offset-0 accent-[#d4af37]">
-                <span>Imagem Estática (.jpg / .png)</span>
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-700 font-medium select-none">
+                <input type="radio" name="dashImgType" value="static" checked class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-0 accent-teal-700">
+                <span>Estática (.jpg / .png)</span>
               </label>
             </div>
 
             <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <label for="dashAssetSelector" class="block text-[10px] tracking-widest text-neutral-400 uppercase font-mono">Arquivo da Lâmina (Seletor Dinâmico)</label>
+              <div class="flex items-center justify-between mb-1">
+                <label for="dashAssetSelector" class="block text-[11px] font-medium text-slate-600">Arquivo da Lâmina</label>
                 <button 
                   type="button" 
                   onclick="window.App.alternarModoCaminhoManual()" 
                   id="btnToggleModoCaminho"
-                  class="text-[10px] font-mono text-[#d4af37] hover:underline cursor-pointer">
-                  Digitar URL manual
+                  class="text-[11px] text-teal-700 hover:text-teal-900 hover:underline cursor-pointer">
+                  URL manual
                 </button>
               </div>
 
@@ -1857,10 +1872,10 @@
                 <select 
                   id="dashAssetSelector" 
                   onchange="window.App.onAssetSelecionado(this.value)"
-                  class="w-full bg-neutral-950/70 border border-white/[0.12] focus:border-[#d4af37] text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-all cursor-pointer font-mono appearance-none">
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-3 py-2 outline-none transition-all cursor-pointer font-sans appearance-none">
                   <option value="">Carregando acervo de lâminas...</option>
                 </select>
-                <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400 text-xs">
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-xs">
                   ▼
                 </div>
               </div>
@@ -1872,19 +1887,19 @@
                   id="dashImgUrl" 
                   value="assets/histologia/osso_maduro_desgaste_ct_3.0.dzi"
                   placeholder="Ex: assets/histologia/osso_maduro_desgaste_ct_3.0.dzi ou https://.../lamina.dzi" 
-                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors font-mono">
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-3 py-2 outline-none transition-colors font-mono">
               </div>
 
-              <div class="flex items-center justify-between mt-2 pt-1">
-                <span id="dashAssetInfoBadge" class="text-[10px] text-neutral-500 font-mono">
+              <div class="flex items-center justify-between mt-1.5">
+                <span id="dashAssetInfoBadge" class="text-[10px] text-slate-500 font-mono">
                   Selecione uma lâmina para abrir no canvas
                 </span>
                 <button 
                   type="button" 
                   onclick="window.App.carregarListaDeAssets(true)" 
-                  class="text-[10px] font-mono text-neutral-400 hover:text-[#d4af37] flex items-center gap-1 cursor-pointer transition-colors"
+                  class="text-[10px] font-medium text-slate-500 hover:text-teal-700 flex items-center gap-1 cursor-pointer transition-colors"
                   title="Atualizar lista de assets do disco">
-                  <span>↻</span><span>Atualizar lista</span>
+                  <span>Atualizar lista</span>
                 </button>
               </div>
             </div>
@@ -1892,64 +1907,44 @@
             <button 
               type="button" 
               onclick="window.App.carregarImagemNoEditor()" 
-              class="w-full bg-white/[0.04] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 rounded-xl py-3 px-4 text-xs font-mono tracking-widest uppercase transition-all duration-300 shadow-lg flex items-center justify-center gap-2 cursor-pointer group">
+              class="w-full bg-teal-800 hover:bg-teal-900 text-white rounded-lg py-2.5 px-4 text-xs font-semibold uppercase tracking-wider transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer">
               <span>Recarregar no Canvas</span>
-              <span class="group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
+              <span>&rarr;</span>
             </button>
 
-            <!-- PAINEL DE CALIBRAÇÃO ÓPTICA AUTOMÁTICA DZI -->
-            <div id="dashDziOpticalCard" class="hidden p-3.5 bg-neutral-950/80 border border-[#d4af37]/30 rounded-xl text-xs font-mono space-y-2.5">
-              <div class="flex items-center justify-between text-[#d4af37] font-semibold text-[11px]">
-                <span class="flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  <span>Calibração Óptica DZI Detectada</span>
-                </span>
-                <span id="dashDziBadgeMag" class="px-2 py-0.5 bg-[#d4af37]/10 border border-[#d4af37]/30 rounded text-[10px]">Captura: 40x</span>
-              </div>
-              <div class="grid grid-cols-2 gap-2 text-[10px] text-neutral-400">
-                <div>Dimensões: <span id="dashDziDimensions" class="text-white font-medium">-</span></div>
-                <div>Resolução: <span id="dashDziMegapixels" class="text-white font-medium">-</span></div>
-                <div>Geometria: <span id="dashDziGeometria" class="text-white font-medium">-</span></div>
-                <div>Teto Travado: <span id="dashDziTeto" class="text-[#d4af37] font-bold">40x (Rígido)</span></div>
-              </div>
-              <div class="hidden pt-2 border-t border-white/[0.06] flex items-center justify-between gap-3" title="Obsoleto: a escala agora é calculada automaticamente pelo DZI (objetiva de captura = 1:1)">
-                <label for="dashZoom4xRatio" class="text-[10px] text-neutral-300 font-mono">Parâmetro 4x (zoom4xRatio):</label>
-                <input 
-                  type="number" 
-                  id="dashZoom4xRatio" 
-                  step="0.01" 
-                  min="0.10" 
-                  max="1.00" 
-                  value="0.28" 
-                  class="w-20 bg-neutral-900 border border-white/[0.12] focus:border-[#d4af37] text-white text-xs rounded px-2 py-1 text-center font-mono">
-              </div>
-              <p class="text-[9px] text-neutral-400 italic leading-tight pt-1 border-t border-white/[0.06]">
-                Calibração óptica acoplada à referência biológica das hemácias (7.5 µm). O visualizador trava rigidamente na resolução nativa da captura (1:1), impedindo ampliação vazia além da capacidade física real da lâmina.
-              </p>
+            <!-- METADADOS TÉCNICOS DA LÂMINA DZI (COMPACTO) -->
+            <div id="dashDziOpticalCard" class="hidden text-xs text-slate-600 font-mono bg-slate-50 p-2.5 rounded-lg border border-slate-200/80 flex items-center justify-between">
+              <span id="dashDziLineSummary">6430 × 5630 px • 40x (0.156 µm/px)</span>
+              <span id="dashDziBadgeMag" class="px-2 py-0.5 bg-teal-50 border border-teal-200 text-teal-800 rounded text-[10px] font-semibold">40x Nativa</span>
+              <span id="dashDziDimensions" class="hidden"></span>
+              <span id="dashDziMegapixels" class="hidden"></span>
+              <span id="dashDziGeometria" class="hidden"></span>
+              <span id="dashDziTeto" class="hidden"></span>
+              <input type="hidden" id="dashZoom4xRatio" value="0.28">
             </div>
           </div>
 
-          <!-- BLOCO B: METADADOS CLÍNICOS E ACADÊMICOS -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
-            <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">B. Metadados Clínicos e Acadêmicos</h3>
+          <!-- SEÇÃO B: METADADOS CLÍNICOS E ACADÊMICOS -->
+          <div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-xs space-y-3.5 shrink-0">
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">B. Metadados Clínicos e Acadêmicos</h3>
             
             <div>
-              <label for="dashNomeLamina" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Nome da Peça / Lâmina</label>
+              <label for="dashNomeLamina" class="block text-[11px] font-medium text-slate-600 mb-1">Nome da Peça / Lâmina</label>
               <input 
                 type="text" 
                 id="dashNomeLamina" 
                 value="Músculo Estriado Esquelético HE"
-                placeholder="Ex: Músculo Estriado Esquelético HE ou Rim Córtex Renal" 
-                class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+                placeholder="Ex: Músculo Estriado Esquelético HE" 
+                class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-3 py-2 outline-none transition-colors">
             </div>
 
-            <div class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label for="dashSelectDisciplina" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Disciplina</label>
+                <label for="dashSelectDisciplina" class="block text-[11px] font-medium text-slate-600 mb-1">Disciplina</label>
                 <select 
                   id="dashSelectDisciplina" 
                   onchange="window.App.atualizarTopicosCms(this.value)" 
-                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer appearance-none">
                   <option value="histologia" selected>Histologia</option>
                   <option value="patologia">Patologia</option>
                   <option value="parasitologia">Parasitologia</option>
@@ -1958,51 +1953,50 @@
               </div>
 
               <div>
-                <label for="dashSelectTopico" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Tópico</label>
+                <label for="dashSelectTopico" class="block text-[11px] font-medium text-slate-600 mb-1">Tópico</label>
                 <select 
                   id="dashSelectTopico" 
-                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
-                  <option value="muscular" selected>Tecido Muscular Estriado Esquelético, Cardíaco e Liso</option>
-                  <option value="epitelial">Tecido Epitelial de Revestimento e Glandular</option>
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer appearance-none">
+                  <option value="muscular" selected>Tecido Muscular</option>
+                  <option value="epitelial">Tecido Epitelial</option>
                 </select>
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label for="dashSelectColoracao" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Coloração / Técnica</label>
+                <label for="dashSelectColoracao" class="block text-[11px] font-medium text-slate-600 mb-1">Coloração / Técnica</label>
                 <select 
                   id="dashSelectColoracao" 
-                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
-                  <option value="H&E" selected>H&amp;E (Hematoxilina e Eosina)</option>
-                  <option value="Desgaste">Desgaste (Corte por Desgaste)</option>
-                  <option value="PAS">PAS (Ácido Periódico-Schiff)</option>
-                  <option value="Gram">Gram (Coloração Diferencial)</option>
-                  <option value="Ziehl-Neelsen">Ziehl-Neelsen (BAAR)</option>
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-2.5 py-2 outline-none transition-colors cursor-pointer appearance-none">
+                  <option value="H&E" selected>H&amp;E</option>
+                  <option value="Desgaste">Desgaste</option>
+                  <option value="PAS">PAS</option>
+                  <option value="Gram">Gram</option>
+                  <option value="Ziehl-Neelsen">Ziehl-Neelsen</option>
                   <option value="Giemsa">Giemsa</option>
-                  <option value="Impregnação Argêntica">Impregnação Argêntica</option>
-                  <option value="Peça Macroscópica">Peça Macroscópica a Fresco</option>
-                  <option value="Outra">Outra Técnica Especial</option>
+                  <option value="Impregnação Argêntica">Impregnação</option>
+                  <option value="Peça Macroscópica">Macroscópica</option>
+                  <option value="Outra">Outra</option>
                 </select>
               </div>
 
               <div>
-                <label for="dashMaxMagnification" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Objetiva de Captura (Resolução)</label>
+                <label for="dashMaxMagnification" class="block text-[11px] font-medium text-slate-600 mb-1">Objetiva Captura</label>
                 <select
                   id="dashMaxMagnification"
-                  class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer appearance-none"
-                  title="Resolução ótica nativa da câmera do microscópio na captura da lâmina">
-                  <option value="10">10x (Visão Panorâmica Geral)</option>
-                  <option value="20">20x (Média Abertura)</option>
-                  <option value="40" selected>40x (Padrão de Varredura Celular)</option>
-                  <option value="60">60x (Alta Abertura Numérica)</option>
-                  <option value="100">100x (Imersão em Óleo)</option>
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-2.5 py-2 outline-none transition-colors cursor-pointer appearance-none">
+                  <option value="10">10x</option>
+                  <option value="20">20x</option>
+                  <option value="40" selected>40x</option>
+                  <option value="60">60x</option>
+                  <option value="100">100x</option>
                 </select>
               </div>
 
-              <div class="flex flex-col justify-end">
-                <label for="statusLamina" class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Status da Lâmina</label>
-                <select id="statusLamina" class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer appearance-none">
+              <div>
+                <label for="statusLamina" class="block text-[11px] font-medium text-slate-600 mb-1">Status</label>
+                <select id="statusLamina" class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-2.5 py-2 outline-none transition-colors cursor-pointer appearance-none">
                   <option value="inativa">Inativa (Rascunho)</option>
                   <option value="ativa">Ativa (Publicada)</option>
                 </select>
@@ -2010,24 +2004,24 @@
             </div>
           </div>
 
-          <!-- BLOCO C: EDITOR DE TEXTO DESCRITIVO COM VÍNCULO DE PINOS -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">C. Descrição Histopatológica</h3>
-              <span class="text-[10px] font-mono text-neutral-500">Interativo: passe o cursor</span>
+          <!-- SEÇÃO C: DESCRIÇÃO HISTOPATOLÓGICA COM VÍNCULO DE PINOS -->
+          <div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-xs space-y-3.5 shrink-0">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">C. Descrição Histopatológica</h3>
+              <span class="text-[10px] text-slate-400 font-mono">Texto &amp; Pinos</span>
             </div>
 
             <!-- BARRA DE FERRAMENTAS TEXTO-PINO -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div class="flex items-center gap-2">
               <select 
                 id="dashSelectPinoVinculo" 
-                class="w-full bg-neutral-950/50 border border-white/[0.08] focus:border-[#d4af37]/40 text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors cursor-pointer flex-1 appearance-none font-mono">
+                class="w-full bg-slate-50 border border-slate-200 focus:border-teal-700 focus:bg-white text-xs text-slate-800 rounded-lg px-3 py-2 outline-none transition-colors cursor-pointer flex-1 appearance-none font-mono">
                 <option value="">Selecione um pino no canvas ao lado...</option>
               </select>
               <button 
                 type="button" 
                 onclick="window.App.vincularTextoAoPino()" 
-                class="bg-white/[0.04] hover:bg-[#d4af37]/10 text-neutral-300 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 px-3.5 py-2.5 rounded-xl text-xs font-mono tracking-wider uppercase transition-all duration-200 cursor-pointer shrink-0">
+                class="bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shrink-0">
                 Vincular
               </button>
             </div>
@@ -2036,55 +2030,55 @@
             <div 
               id="dashEditorTexto" 
               contenteditable="true" 
-              class="w-full min-h-[160px] max-h-[280px] overflow-y-auto bg-neutral-950/40 border border-white/[0.08] rounded-xl p-4 text-xs text-neutral-300 focus:outline-none focus:border-white/20 leading-relaxed shadow-inner">
-              Corte longitudinal de parênquima de <span class="pin-link inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-white/[0.06] border border-white/[0.1] text-neutral-200 hover:text-white transition-colors cursor-pointer font-medium" data-pin-id="pin_demo" contenteditable="false" title="Clique ou deslize para inspecionar no canvas"><span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] shrink-0"></span><span>Músculo Estriado Esquelético</span></span> sob coloração H&E demonstrando fibras musculares cilíndricas, longas e multinucleadas, com núcleos periféricos basófilos situados na borda do sarcolema e estriações transversais resultantes da organização dos sarcômeros. Entre os feixes de contratação voluntária, observa-se o endomísio e perimísio intersticiais.
+              class="w-full min-h-[140px] max-h-[240px] overflow-y-auto bg-slate-50 border border-slate-200 rounded-lg p-3.5 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-teal-700 leading-relaxed shadow-xs">
+              Corte longitudinal de parênquima de <span class="pin-link inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-200/80 border border-slate-300 text-slate-900 font-medium cursor-pointer" data-pin-id="pin_demo" contenteditable="false" title="Clique para inspecionar no canvas"><span class="w-1.5 h-1.5 rounded-full bg-teal-600 shrink-0"></span><span>Músculo Estriado Esquelético</span></span> sob coloração H&E demonstrando fibras musculares cilíndricas, longas e multinucleadas, com núcleos periféricos basófilos situados na borda do sarcolema e estriações transversais resultantes da organização dos sarcômeros. Entre os feixes de contratação voluntária, observa-se o endomísio e perimísio intersticiais.
             </div>
-            <p class="text-[10px] text-neutral-500 font-mono">Selecione uma palavra no texto acima e clique em "Vincular" para apontar o pino.</p>
+            <p class="text-[10px] text-slate-400 font-mono">Selecione uma palavra no texto acima e clique em "Vincular" para apontar o pino.</p>
           </div>
 
-          <!-- BLOCO D: FERRAMENTAS DE MARCAÇÃO E ESTRUTURAS -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
+          <!-- SEÇÃO D: FERRAMENTAS DE MARCAÇÃO E ESTRUTURAS -->
+          <div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-xs space-y-3.5 shrink-0">
             <div class="flex items-center justify-between">
-              <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">D. Ferramentas &amp; Lista de Anotações</h3>
-              <span id="dashTotalPinosBadge" class="bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Anotações</span>
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">D. Ferramentas &amp; Anotações</h3>
+              <span id="dashTotalPinosBadge" class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Anotações</span>
             </div>
 
             <!-- SELETOR DE MODO DE MARCAÇÃO -->
             <div>
-              <label class="block text-[10px] tracking-widest text-neutral-400 uppercase mb-1.5 font-mono">Tipo de Marcação ao Clicar no Canvas</label>
-              <div class="grid grid-cols-3 gap-1.5 bg-neutral-950/60 p-1 rounded-xl border border-white/[0.08]">
+              <label class="block text-[11px] font-medium text-slate-600 mb-1.5">Tipo de Marcação ao Clicar no Canvas</label>
+              <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200/80">
                 <button 
                   type="button" 
                   id="dashBtnModoPin"
                   onclick="window.App.definirModoAnotacao('pin')"
-                  class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer">
+                  class="py-1.5 px-2 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-all bg-white text-slate-900 shadow-sm cursor-pointer">
                   <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8c0 7-7.5 13-7.5 13S4.5 15 4.5 8a7.5 7.5 0 1115 0z"/></svg>
-                  <span class="font-medium">Ponto</span>
+                  <span>Ponto</span>
                 </button>
                 <button 
                   type="button" 
                   id="dashBtnModoCircle"
                   onclick="window.App.definirModoAnotacao('circle')"
-                  class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer">
+                  class="py-1.5 px-2 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-all text-slate-600 hover:text-slate-900 cursor-pointer">
                   <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
-                  <span class="font-medium">Círculo</span>
+                  <span>Círculo</span>
                 </button>
                 <button 
                   type="button" 
                   id="dashBtnModoArrow"
                   onclick="window.App.definirModoAnotacao('arrow')"
-                  class="py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer">
+                  class="py-1.5 px-2 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-all text-slate-600 hover:text-slate-900 cursor-pointer">
                   <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H8M17 7v9"/></svg>
-                  <span class="font-medium">Seta</span>
+                  <span>Seta</span>
                 </button>
               </div>
             </div>
 
-            <!-- CONFIGURAÇÃO ESPECÍFICA DE CÍRCULO (Delimitação de Estrutura como Ósteon) -->
-            <div id="dashConfigCirculo" class="hidden p-3 bg-neutral-950/80 border border-[#d4af37]/30 rounded-xl space-y-2">
+            <!-- CONFIGURAÇÃO DE CÍRCULO -->
+            <div id="dashConfigCirculo" class="hidden p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] uppercase font-mono tracking-wider text-[#d4af37]">Raio do Círculo na Imagem:</span>
-                <span id="dashCircleRadiusLabel" class="text-xs font-mono text-white font-bold">250 px</span>
+                <span class="text-[10px] uppercase font-mono tracking-wider text-slate-600">Raio do Círculo:</span>
+                <span id="dashCircleRadiusLabel" class="text-xs font-mono text-slate-900 font-bold">250 px</span>
               </div>
               <input 
                 type="range" 
@@ -2094,58 +2088,56 @@
                 step="25" 
                 value="250"
                 oninput="window.App.onAtualizarRaioCirculo(this.value)"
-                class="w-full accent-[#d4af37] bg-neutral-800 h-1.5 rounded-lg appearance-none cursor-pointer">
-              <div class="flex items-center justify-between text-[9px] font-mono text-neutral-500">
-                <span>Pequeno (célula)</span>
-                <span>Médio (vaso/nervo)</span>
-                <span>Grande (ósteon)</span>
+                class="w-full accent-teal-700 bg-slate-200 h-1.5 rounded-lg appearance-none cursor-pointer">
+              <div class="flex items-center justify-between text-[9px] font-mono text-slate-400">
+                <span>Pequeno</span>
+                <span>Médio</span>
+                <span>Grande</span>
               </div>
             </div>
 
             <!-- DICA DO MODO SETA -->
-            <div id="dashConfigSeta" class="hidden p-3 bg-neutral-950/80 border border-[#d4af37]/30 rounded-xl text-[10px] font-mono text-neutral-300">
-              <div class="text-[#d4af37] font-semibold mb-1">Modo Seta Direcional:</div>
-              <p id="dashArrowStatusText" class="text-neutral-400 leading-tight">
-                Clique 1: Ponto de início da haste. Clique 2: Ponta da seta sobre a estrutura celular.
+            <div id="dashConfigSeta" class="hidden p-3 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-mono text-slate-600">
+              <div class="text-teal-800 font-semibold mb-1">Modo Seta Direcional:</div>
+              <p id="dashArrowStatusText" class="text-slate-500 leading-tight">
+                Clique 1: Início da haste. Clique 2: Ponta da seta.
               </p>
             </div>
 
             <div id="dashListaPinos" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-              <p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl">Nenhuma anotação marcada na imagem. Carregue uma lâmina e clique no canvas à direita para adicionar marcações anatômicas.</p>
+              <p class="text-slate-400 text-xs py-6 text-center border border-dashed border-slate-200 rounded-xl">Nenhuma anotação marcada na imagem. Carregue uma lâmina e clique no canvas ao lado.</p>
             </div>
           </div>
 
-          <!-- BLOCO E: QUESTÕES PRÁTICAS / SIMULADO DE BANCADA -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4 shrink-0">
+          <!-- SEÇÃO E: QUESTÕES PRÁTICAS / SIMULADO -->
+          <div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-xs space-y-3.5 shrink-0">
             <div class="flex items-center justify-between">
-              <h3 class="text-[10.5px] tracking-widest text-[#d4af37] uppercase font-mono font-semibold">E. Questões Práticas / Simulado</h3>
-              <span id="dashTotalQuestoesBadge" class="bg-amber-400/10 text-amber-300 border border-amber-400/30 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Questões</span>
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">E. Questões Práticas / Simulado</h3>
+              <span id="dashTotalQuestoesBadge" class="bg-amber-50 text-amber-800 border border-amber-200 text-[10px] px-2.5 py-0.5 rounded-full font-mono">0 Questões</span>
             </div>
 
-            <!-- Botão para Ativar Modo de Nova Questão -->
             <button 
               type="button" 
               id="btnAtivarModoQuestao" 
               onclick="window.App.ativarModoNovaQuestao()" 
-              class="w-full bg-white/[0.04] hover:bg-amber-400/10 text-neutral-300 hover:text-amber-300 border border-white/[0.08] hover:border-amber-400/40 rounded-xl py-2.5 px-4 text-xs font-mono tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm group">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-400/80 group-hover:scale-125 transition-transform shrink-0"></span>
+              class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg py-2 px-3 text-xs font-semibold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
               <span id="txtBtnAtivarModoQuestao">+ Nova Questão na Lâmina</span>
             </button>
 
-            <!-- Container da Lista de Questões -->
             <div id="dashListaQuestoes" class="space-y-3 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
-              <p class="text-neutral-500 text-xs py-6 px-4 text-center border border-dashed border-white/[0.08] rounded-xl font-mono leading-relaxed">Nenhuma questão cadastrada para esta lâmina. Clique em '+ Nova Questão na Lâmina' e marque o ponto no canvas à direita.</p>
+              <p class="text-slate-400 text-xs py-6 px-4 text-center border border-dashed border-slate-200 rounded-xl font-sans leading-relaxed">Nenhuma questão cadastrada para esta lâmina.</p>
             </div>
           </div>
 
-          <!-- BLOCO F: AÇÕES DE PUBLICAÇÃO -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shrink-0 shadow-xl mb-6">
-            <div class="flex flex-col sm:flex-row items-center gap-3">
+          <!-- SEÇÃO F: AÇÕES DE PUBLICAÇÃO -->
+          <div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shrink-0 shadow-xs mb-6 space-y-3">
+            <div class="flex flex-col sm:flex-row items-center gap-2">
               <button 
                 type="button" 
                 id="btnPublicarCms"
                 onclick="window.App.publicarLaminaCms()" 
-                class="flex-1 w-full bg-[#d4af37] hover:bg-[#e5c158] text-[#09090b] font-sans font-bold border border-[#d4af37] rounded-xl py-3.5 px-4 text-xs tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-[0_10px_28px_-6px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2">
+                class="flex-1 w-full bg-teal-800 hover:bg-teal-900 text-white font-semibold rounded-lg py-2.5 px-4 text-xs tracking-wider uppercase transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2">
                 <span id="txtBtnPublicar">Cadastrar Lâmina</span>
               </button>
               
@@ -2153,33 +2145,33 @@
                 type="button" 
                 id="btnCancelarEdicao" 
                 onclick="window.App.resetarFormularioDashboard()" 
-                class="hidden px-4 py-3 bg-white/[0.03] hover:bg-white/[0.08] text-neutral-400 hover:text-white border border-white/[0.08] rounded-xl text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer w-full sm:w-auto">
+                class="hidden px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer w-full sm:w-auto">
                 Cancelar
               </button>
             </div>
             
-            <div id="dashCmsStatus" class="hidden p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-xs font-mono text-center space-y-3 mt-3 shadow-lg"></div>
+            <div id="dashCmsStatus" class="hidden p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono text-center"></div>
           </div>
 
         </div>
 
-        <!-- COLUNA DA DIREITA - CANVAS INTERATIVO OPENSEADRAGON (Área Limpa, 100% Imersiva) -->
-        <div class="h-full w-full relative bg-[#0a0a0a] overflow-hidden flex flex-col border-none">
+        <!-- COLUNA DA DIREITA - CANVAS INTERATIVO OPENSEADRAGON -->
+        <div class="flex-1 h-full relative bg-slate-950 overflow-hidden flex flex-col">
           
-          <!-- CONTROLES FLUTUANTES SOBRE O CANVAS (Ultra-sutil & Borderless) -->
-          <div class="absolute top-5 right-5 z-20 flex items-center gap-2 bg-neutral-950/70 backdrop-blur-xl border border-white/[0.08] p-1.5 rounded-xl shadow-2xl pointer-events-auto">
-            <span class="text-neutral-400 font-mono text-[10px] uppercase flex items-center gap-1.5 px-2 py-1 select-none">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] inline-block animate-pulse"></span>
+          <!-- CONTROLES FLUTUANTES SOBRE O CANVAS -->
+          <div class="absolute top-4 right-4 z-20 flex items-center gap-2 bg-slate-900/85 backdrop-blur-md border border-slate-700/80 p-1.5 rounded-xl shadow-lg pointer-events-auto">
+            <span class="text-slate-300 font-mono text-[10px] uppercase flex items-center gap-1.5 px-2 py-0.5 select-none">
+              <span class="w-1.5 h-1.5 rounded-full bg-teal-400 inline-block animate-pulse"></span>
               Inspeção
             </span>
-            <div class="h-4 w-px bg-white/10"></div>
-            <!-- SELETOR RÁPIDO DE FERRAMENTA SOBRE O CANVAS -->
-            <div class="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/[0.06]">
+            <div class="h-3.5 w-px bg-slate-700"></div>
+            <!-- SELETOR RÁPIDO DE FERRAMENTA -->
+            <div class="flex items-center gap-1 bg-slate-950/60 p-0.5 rounded-lg border border-slate-800">
               <button 
                 type="button" 
                 id="dashQuickBtnPin" 
                 onclick="window.App.definirModoAnotacao('pin')" 
-                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer"
+                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all bg-teal-800 text-white shadow-xs cursor-pointer"
                 title="Ponto (Pin Clássico)">
                 <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8c0 7-7.5 13-7.5 13S4.5 15 4.5 8a7.5 7.5 0 1115 0z"/></svg>
                 <span class="hidden sm:inline">Ponto</span>
@@ -2188,8 +2180,8 @@
                 type="button" 
                 id="dashQuickBtnCircle" 
                 onclick="window.App.definirModoAnotacao('circle')" 
-                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer"
-                title="Círculo (Delimitar Estrutura/Ósteon)">
+                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-slate-400 hover:text-white cursor-pointer"
+                title="Círculo (Delimitar Estrutura)">
                 <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
                 <span class="hidden sm:inline">Círculo</span>
               </button>
@@ -2197,100 +2189,106 @@
                 type="button" 
                 id="dashQuickBtnArrow" 
                 onclick="window.App.definirModoAnotacao('arrow')" 
-                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer"
+                class="px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-slate-400 hover:text-white cursor-pointer"
                 title="Seta Direcional">
                 <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H8M17 7v9"/></svg>
                 <span class="hidden sm:inline">Seta</span>
               </button>
             </div>
-            <div class="h-4 w-px bg-white/10"></div>
+            <div class="h-3.5 w-px bg-slate-700"></div>
             <button 
               type="button" 
               onclick="window.App.osdEditorAction('zoomIn')" 
-              class="w-7 h-7 flex items-center justify-center bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-[#d4af37] border border-white/[0.06] hover:border-[#d4af37]/30 rounded-lg text-xs font-mono transition-all cursor-pointer" 
+              class="w-6 h-6 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-md text-xs font-mono transition-all cursor-pointer" 
               title="Zoom In">&plus;</button>
             <button 
               type="button" 
               onclick="window.App.osdEditorAction('zoomOut')" 
-              class="w-7 h-7 flex items-center justify-center bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-[#d4af37] border border-white/[0.06] hover:border-[#d4af37]/30 rounded-lg text-xs font-mono transition-all cursor-pointer" 
+              class="w-6 h-6 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-md text-xs font-mono transition-all cursor-pointer" 
               title="Zoom Out">&minus;</button>
             <button 
               type="button" 
               onclick="window.App.osdEditorAction('reset')" 
-              class="px-2 h-7 flex items-center justify-center bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-[#d4af37] border border-white/[0.06] hover:border-[#d4af37]/30 rounded-lg text-[10px] font-mono transition-all cursor-pointer" 
-              title="Resetar para Visão Original 100%">100%</button>
+              class="px-1.5 h-6 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-md text-[10px] font-mono transition-all cursor-pointer" 
+              title="Resetar para Visão Original">100%</button>
             <button 
               type="button" 
               onclick="window.App.osdEditorAction('center')" 
-              class="px-2.5 h-7 flex items-center justify-center bg-white/[0.03] hover:bg-[#d4af37]/10 text-neutral-300 hover:text-[#d4af37] border border-white/[0.06] hover:border-[#d4af37]/30 rounded-lg text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer" 
-              title="Centralizar Peça no Canvas">Centralizar</button>
+              class="px-2 h-6 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-md text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer" 
+              title="Centralizar">Centralizar</button>
           </div>
 
-          <!-- CONTAINER DO LEITOR OPENSEADRAGON (Preenchimento Total) -->
-          <div id="osd-editor-viewer" class="w-full h-full flex-1 bg-[#0a0a0a] relative overflow-hidden cursor-crosshair"></div>
+          <!-- CONTAINER DO LEITOR OPENSEADRAGON -->
+          <div id="osd-editor-viewer" class="w-full h-full flex-1 bg-slate-950 relative overflow-hidden cursor-crosshair"></div>
         </div>
 
       </div>
 
       <!-- TÓPICO 2: LÂMINAS & STATUS DO ACERVO (#topicoCmsAcervo) -->
-      <div id="topicoCmsAcervo" class="hidden w-full flex-1 overflow-y-auto p-6 md:p-8 pb-16 custom-scrollbar bg-[#060608]">
+      <div id="topicoCmsAcervo" class="hidden w-full flex-1 overflow-y-auto p-6 md:p-8 pb-24 custom-scrollbar bg-slate-50 min-h-[calc(100vh-64px)]">
         
-        <!-- PAINEL DE ESTATÍSTICAS E RESUMO CLÍNICO -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div class="p-5 rounded-2xl bg-[#111115] border border-white/[0.08] border-l-4 border-l-[#d4af37] shadow-xl flex items-center justify-between">
+        <!-- CARDS DE ESTATÍSTICAS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs flex items-center justify-between">
             <div>
-              <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Total de Lâminas</span>
-              <span id="statTotalLaminas" class="text-2xl font-mono font-bold text-[#f4f2ed]">0</span>
+              <span class="text-xs font-medium text-slate-500 block">Total de Lâminas</span>
+              <span id="statTotalLaminas" class="text-2xl font-bold text-slate-900 mt-1 block">0</span>
             </div>
-            <div class="px-2.5 py-1 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-[10px] font-mono text-[#d4af37] uppercase tracking-wider">Geral</div>
+            <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            </div>
           </div>
 
-          <div class="p-5 rounded-2xl bg-[#111115] border border-white/[0.08] border-l-4 border-l-emerald-500 shadow-xl flex items-center justify-between">
+          <div class="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs flex items-center justify-between">
             <div>
-              <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Lâminas Ativas</span>
-              <span id="statAtivas" class="text-2xl font-mono font-bold text-emerald-400">0</span>
+              <span class="text-xs font-medium text-slate-500 block">Lâminas Ativas</span>
+              <span id="statAtivas" class="text-2xl font-bold text-emerald-700 mt-1 block">0</span>
             </div>
-            <div class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400 uppercase tracking-wider">Publicadas</div>
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
           </div>
 
-          <div class="p-5 rounded-2xl bg-[#111115] border border-white/[0.08] border-l-4 border-l-rose-500 shadow-xl flex items-center justify-between">
+          <div class="p-5 rounded-xl bg-white border border-slate-200/80 shadow-2xs flex items-center justify-between">
             <div>
-              <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400 block mb-1">Lâminas Inativas</span>
-              <span id="statInativas" class="text-2xl font-mono font-bold text-rose-400">0</span>
+              <span class="text-xs font-medium text-slate-500 block">Lâminas Inativas</span>
+              <span id="statInativas" class="text-2xl font-bold text-slate-600 mt-1 block">0</span>
             </div>
-            <div class="px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-[10px] font-mono text-rose-400 uppercase tracking-wider">Rascunho</div>
+            <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+            </div>
           </div>
         </div>
 
         <!-- TABELA / LISTA DO ACERVO COM CLASSIFICAÇÃO ATIVA/INATIVA -->
-        <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl relative">
-          <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-white/[0.08] pb-5 mb-5 gap-4">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs relative">
+          <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-5 mb-5 gap-4">
             <div>
-              <span class="text-[10px] tracking-widest text-[#d4af37] font-mono uppercase font-semibold block mb-1">Gestão de Peças e Lâminas</span>
-              <h3 class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] tracking-tight">Acervo Cadastrado e Controle de Publicação</h3>
+              <span class="text-[11px] font-medium text-teal-800 uppercase tracking-wider block mb-0.5">Gestão de Peças e Lâminas</span>
+              <h3 class="text-lg font-bold text-slate-900 tracking-tight">Acervo Cadastrado e Controle de Publicação</h3>
             </div>
             
             <!-- FILTROS DE VISUALIZAÇÃO -->
-            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono">
+            <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200/80 text-xs font-medium">
               <button
                 type="button"
                 id="btnFiltroTodos"
                 onclick="window.App.filtroAcervoCms('todos')"
-                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 bg-[#d4af37]/15 text-[#e5c158] border border-[#d4af37]/35 font-semibold cursor-pointer shadow-sm tracking-wider uppercase text-[10px]">
+                class="px-3 py-1 rounded-lg transition-all bg-white text-slate-900 shadow-sm font-semibold cursor-pointer">
                 Todas
               </button>
               <button
                 type="button"
                 id="btnFiltroAtivas"
                 onclick="window.App.filtroAcervoCms('ativa')"
-                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.04] cursor-pointer tracking-wider uppercase text-[10px]">
+                class="px-3 py-1 rounded-lg transition-all text-slate-600 hover:text-slate-900 cursor-pointer">
                 Ativas
               </button>
               <button
                 type="button"
                 id="btnFiltroInativas"
                 onclick="window.App.filtroAcervoCms('inativa')"
-                class="px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.04] cursor-pointer tracking-wider uppercase text-[10px]">
+                class="px-3 py-1 rounded-lg transition-all text-slate-600 hover:text-slate-900 cursor-pointer">
                 Inativas
               </button>
             </div>
@@ -2299,7 +2297,7 @@
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="text-[10px] font-mono uppercase text-neutral-400 border-b border-white/[0.08]">
+                <tr class="text-[11px] font-semibold uppercase text-slate-500 border-b border-slate-200 tracking-wider">
                   <th class="py-3 px-4 font-semibold tracking-widest">Peça / Lâmina</th>
                   <th class="py-3 px-4 font-semibold tracking-widest">Disciplina</th>
                   <th class="py-3 px-4 font-semibold tracking-widest">Tópico</th>
@@ -2309,9 +2307,9 @@
                   <th class="py-3 px-4 font-semibold tracking-widest text-right">Ações</th>
                 </tr>
               </thead>
-              <tbody id="tabelaAcervoCms" class="divide-y divide-white/[0.05] text-xs text-neutral-300">
+              <tbody id="tabelaAcervoCms" class="divide-y divide-slate-100 text-xs text-slate-700">
                 <tr>
-                  <td colspan="7" class="py-8 text-center text-xs font-mono text-neutral-500">Conectando ao Google Cloud Firestore e sincronizando lâminas...</td>
+                  <td colspan="7" class="py-8 text-center text-xs font-mono text-slate-400">Conectando ao Google Cloud Firestore e sincronizando lâminas...</td>
                 </tr>
               </tbody>
             </table>
@@ -2321,129 +2319,129 @@
       </div>
 
       <!-- TÓPICO 3: GESTÃO CURRICULAR DE MÓDULOS & RESUMOS MORFOLÓGICOS (#topicoCmsModulos) -->
-      <div id="topicoCmsModulos" class="hidden w-full flex-1 overflow-y-auto p-6 md:p-8 pb-16 custom-scrollbar bg-[#060608]">
+      <div id="topicoCmsModulos" class="hidden w-full flex-1 overflow-y-auto p-6 md:p-8 pb-36 custom-scrollbar bg-slate-50 min-h-[calc(100vh-64px)]">
         <div class="max-w-5xl mx-auto space-y-6">
           
           <!-- Cabeçalho do Gestor de Módulos -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs">
             <div>
-              <span class="text-[10px] tracking-widest text-[#d4af37] font-mono uppercase font-semibold block mb-1">Curadoria Científica &amp; Textos Dinâmicos</span>
-              <h3 class="text-lg sm:text-xl font-serif font-extrabold text-[#f4f2ed] tracking-tight">Gestão de Módulos &amp; Resumo Morfológico</h3>
-              <p class="text-xs text-neutral-400 mt-1 max-w-2xl leading-relaxed">Edite em tempo real os títulos, categorias, tópicos estruturados do resumo morfológico e a bibliografia recomendada de cada módulo curricular.</p>
+              <span class="text-[11px] font-medium text-teal-800 uppercase tracking-wider block mb-1">Curadoria Científica &amp; Textos Dinâmicos</span>
+              <h3 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">Gestão de Módulos &amp; Resumo Morfológico</h3>
+              <p class="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">Edite em tempo real os títulos, categorias, tópicos estruturados do resumo morfológico e a bibliografia recomendada de cada módulo curricular.</p>
             </div>
             
             <div class="flex items-center gap-2 shrink-0">
-              <span id="cmsModuloStatusSync" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="cmsModuloStatusSync" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>Firestore Conectado</span>
               </span>
             </div>
           </div>
 
           <!-- Seletor de Módulo -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+          <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
-                <label for="cmsModuloSelect" class="text-xs font-mono uppercase tracking-wider text-neutral-300 font-semibold block">Selecionar Módulo / Tópico para Edição</label>
-                <span class="text-[11px] text-neutral-500 font-sans">Selecione qualquer módulo da grade para carregar e editar seus dados dinâmicos.</span>
+                <label for="cmsModuloSelect" class="text-xs font-bold uppercase tracking-wider text-slate-800 block">Selecionar Módulo / Tópico para Edição</label>
+                <span class="text-xs text-slate-500">Selecione qualquer módulo da grade para carregar e editar seus dados dinâmicos.</span>
               </div>
               <div class="w-full sm:w-80">
                 <select 
                   id="cmsModuloSelect" 
                   onchange="window.App.onModuloSelecionado(this.value)"
-                  class="w-full bg-[#18181d] border border-white/[0.12] text-white rounded-xl px-4 py-2.5 text-xs font-mono focus:outline-none focus:border-[#d4af37]/60 cursor-pointer shadow-inner">
+                  class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-lg px-3.5 py-2 text-xs focus:bg-white focus:border-teal-700 focus:outline-none cursor-pointer">
                   <option value="" disabled selected>Carregando módulos...</option>
                 </select>
               </div>
             </div>
 
             <!-- Dados Básicos do Módulo (Grid 3 Colunas) -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-2">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
               <div class="md:col-span-6 space-y-1.5">
-                <label for="cmsModuloTitulo" class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Título do Módulo / Tópico</label>
+                <label for="cmsModuloTitulo" class="text-xs font-medium text-slate-600 block">Título do Módulo / Tópico</label>
                 <input 
                   type="text" 
                   id="cmsModuloTitulo" 
                   placeholder="Ex: Tecido Conjuntivo Propriamente Dito" 
-                  class="w-full bg-[#18181d] border border-white/[0.1] text-white rounded-xl px-4 py-2.5 text-xs font-sans focus:outline-none focus:border-[#d4af37]/60" />
+                  class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg px-3.5 py-2 text-xs focus:bg-white focus:border-teal-700 focus:outline-none" />
               </div>
               
               <div class="md:col-span-3 space-y-1.5">
-                <label for="cmsModuloCategoria" class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Categoria / Disciplina</label>
+                <label for="cmsModuloCategoria" class="text-xs font-medium text-slate-600 block">Categoria / Disciplina</label>
                 <input 
                   type="text" 
                   id="cmsModuloCategoria" 
                   placeholder="Ex: Histologia" 
-                  class="w-full bg-[#18181d] border border-white/[0.1] text-white rounded-xl px-4 py-2.5 text-xs font-sans focus:outline-none focus:border-[#d4af37]/60" />
+                  class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg px-3.5 py-2 text-xs focus:bg-white focus:border-teal-700 focus:outline-none" />
               </div>
 
               <div class="md:col-span-3 space-y-1.5">
-                <label for="cmsModuloDocId" class="text-[11px] font-mono uppercase tracking-wider text-neutral-500">ID Canônico (Firestore Doc)</label>
+                <label for="cmsModuloDocId" class="text-xs font-medium text-slate-400 block">ID Canônico (Firestore Doc)</label>
                 <input 
                   type="text" 
                   id="cmsModuloDocId" 
                   readonly 
-                  class="w-full bg-[#0d0d10] border border-white/[0.05] text-neutral-400 rounded-xl px-4 py-2.5 text-xs font-mono select-all cursor-not-allowed" />
+                  class="w-full bg-slate-100 border border-slate-200 text-slate-500 rounded-lg px-3.5 py-2 text-xs font-mono select-all cursor-not-allowed" />
               </div>
             </div>
 
             <!-- Referência Bibliográfica -->
-            <div class="space-y-1.5 pt-2">
-              <label for="cmsModuloReferencia" class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Referência Bibliográfica &amp; Fonte Curada</label>
+            <div class="space-y-1.5">
+              <label for="cmsModuloReferencia" class="text-xs font-medium text-slate-600 block">Referência Bibliográfica &amp; Fonte Curada</label>
               <input 
                 type="text" 
                 id="cmsModuloReferencia" 
                 placeholder="Ex: Junqueira &amp; Carneiro — Histologia Básica" 
-                class="w-full bg-[#18181d] border border-white/[0.1] text-white rounded-xl px-4 py-2.5 text-xs font-sans focus:outline-none focus:border-[#d4af37]/60" />
+                class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg px-3.5 py-2 text-xs focus:bg-white focus:border-teal-700 focus:outline-none" />
             </div>
           </div>
 
           <!-- REPEATER: Editor Dinâmico de Tópicos do Resumo Morfológico -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl space-y-5">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+          <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-[#d4af37]"></span>
-                  <h4 class="text-sm font-mono uppercase tracking-wider text-neutral-200 font-bold">Resumo Morfológico — Tópicos Estruturados</h4>
+                  <span class="w-2 h-2 rounded-full bg-teal-700"></span>
+                  <h4 class="text-sm font-bold text-slate-900">Resumo Morfológico — Tópicos Estruturados</h4>
                 </div>
-                <p class="text-xs text-neutral-400 mt-1">Cada tópico representa um critério essencial exibido no card acadêmico do aluno.</p>
+                <p class="text-xs text-slate-500 mt-1">Cada tópico representa um critério essencial exibido no card acadêmico do aluno.</p>
               </div>
               <button 
                 type="button" 
                 onclick="window.App.adicionarPontoResumoCms()" 
-                class="px-3.5 py-2 bg-[#d4af37]/15 hover:bg-[#d4af37]/25 text-[#e5c158] border border-[#d4af37]/40 rounded-xl text-xs font-mono uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0">
+                class="px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200/80 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0">
                 <span>+ Adicionar Tópico</span>
               </button>
             </div>
 
             <!-- Lista de Tópicos (Repeater Container) -->
-            <div id="cmsSummaryPointsList" class="space-y-4">
-              <div class="p-8 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/[0.08] rounded-xl">
+            <div id="cmsSummaryPointsList" class="space-y-3">
+              <div class="p-8 text-center text-xs font-mono text-slate-400 border border-dashed border-slate-200 rounded-xl">
                 Selecione um módulo acima para carregar seus tópicos morfológicos.
               </div>
             </div>
           </div>
 
           <!-- Lâminas de Microscopia Vinculadas ao Módulo -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-6 shadow-xl space-y-4">
-            <div class="flex items-center justify-between border-b border-white/[0.08] pb-4">
+          <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h4 class="text-sm font-mono uppercase tracking-wider text-neutral-200 font-bold">Lâminas de Microscopia Vinculadas</h4>
-                <p class="text-xs text-neutral-400 mt-1">Lâminas ativas do acervo associadas a este módulo.</p>
+                <h4 class="text-sm font-bold text-slate-900">Lâminas de Microscopia Vinculadas</h4>
+                <p class="text-xs text-slate-500 mt-1">Lâminas ativas do acervo associadas a este módulo.</p>
               </div>
-              <span id="cmsTotalLaminasVinculadasBadge" class="px-2.5 py-1 rounded-full text-[10px] font-mono bg-white/[0.06] text-neutral-300 border border-white/[0.08]">
+              <span id="cmsTotalLaminasVinculadasBadge" class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                 0 vinculadas
               </span>
             </div>
             <div id="cmsListaLaminasAssociadas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
-              <p class="text-xs text-neutral-500 font-mono col-span-full py-4 text-center">Nenhuma lâmina vinculada encontrada para este tópico.</p>
+              <p class="text-xs text-slate-400 font-mono col-span-full py-4 text-center">Nenhuma lâmina vinculada encontrada para este tópico.</p>
             </div>
           </div>
 
           <!-- BARRA DE AÇÃO: Salvar Alterações -->
-          <div class="bg-[#111115] border border-white/[0.08] rounded-2xl p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 z-20">
-            <div class="flex items-center gap-2 text-xs text-neutral-400 font-sans">
-              <svg class="w-4 h-4 text-[#d4af37] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+            <div class="flex items-center gap-2 text-xs text-slate-500">
+              <svg class="w-4 h-4 text-teal-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>As alterações salvas são sincronizadas em tempo real via Cloud Firestore para todos os alunos conectados.</span>
@@ -2454,7 +2452,7 @@
                 type="button" 
                 id="btnSalvarModuloCms" 
                 onclick="window.App.salvarModuloFirestore()" 
-                class="w-full sm:w-auto px-6 py-3 bg-[#d4af37] hover:bg-[#e5c158] text-[#09090b] font-sans font-bold border border-[#d4af37] rounded-xl text-xs tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-[0_10px_28px_-6px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2">
+                class="w-full sm:w-auto px-6 py-2.5 bg-teal-800 hover:bg-teal-900 text-white font-semibold rounded-lg text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2">
                 <span id="txtBtnSalvarModulo">Salvar Alterações no Firestore</span>
               </button>
             </div>

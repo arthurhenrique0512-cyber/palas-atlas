@@ -101,36 +101,24 @@ export function alternarTopicoCms(topico) {
   const btnAcervo = document.getElementById("btnTopicoAcervo");
   const btnModulos = document.getElementById("btnTopicoModulos");
   
-  const clsAtivo = "px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer bg-white/[0.06] text-white border border-white/[0.08] shadow-sm";
-  const clsInativo = "px-3.5 py-1.5 text-xs font-mono tracking-wider uppercase flex items-center gap-2 rounded-lg transition-all duration-200 cursor-pointer text-neutral-400 hover:text-white hover:bg-white/[0.03]";
+  const clsAtivo = "px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-white text-slate-900 shadow-sm";
+  const clsInativo = "px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-slate-600 hover:text-slate-900";
   
   if (contEditor) contEditor.classList.add("hidden");
   if (contAcervo) contAcervo.classList.add("hidden");
   if (contModulos) contModulos.classList.add("hidden");
 
   [btnEditor, btnAcervo, btnModulos].forEach(btn => {
-    if (btn) {
-      btn.className = clsInativo;
-      const dot = btn.querySelector("span");
-      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-neutral-600";
-    }
+    if (btn) btn.className = clsInativo;
   });
 
   if (topico === "acervo" || topico === "laminas") {
     if (contAcervo) contAcervo.classList.remove("hidden");
-    if (btnAcervo) {
-      btnAcervo.className = clsAtivo;
-      const dot = btnAcervo.querySelector("span");
-      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37]";
-    }
+    if (btnAcervo) btnAcervo.className = clsAtivo;
     renderizarTabelaAcervo();
   } else if (topico === "modulos" || topico === "resumo") {
     if (contModulos) contModulos.classList.remove("hidden");
-    if (btnModulos) {
-      btnModulos.className = clsAtivo;
-      const dot = btnModulos.querySelector("span");
-      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37]";
-    }
+    if (btnModulos) btnModulos.className = clsAtivo;
     popularSelectModulosCms();
     const select = document.getElementById("cmsModuloSelect");
     if (select && select.value && !moduloEmEdicaoId) {
@@ -141,11 +129,7 @@ export function alternarTopicoCms(topico) {
     }
   } else {
     if (contEditor) contEditor.classList.remove("hidden");
-    if (btnEditor) {
-      btnEditor.className = clsAtivo;
-      const dot = btnEditor.querySelector("span");
-      if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37]";
-    }
+    if (btnEditor) btnEditor.className = clsAtivo;
   }
 }
 
@@ -154,11 +138,12 @@ export function filtroAcervoCms(filtro) {
   const btnTodos = document.getElementById("btnFiltroTodos");
   const btnAtivas = document.getElementById("btnFiltroAtivas");
   const btnInativas = document.getElementById("btnFiltroInativas");
-  const clsAtivo = "px-3.5 py-1.5 rounded-lg transition-all duration-200 bg-white/[0.06] text-white border border-white/[0.08] cursor-pointer shadow-sm tracking-wider uppercase text-[10px]";
-  const clsInativo = "px-3.5 py-1.5 rounded-lg transition-all duration-200 text-neutral-400 hover:text-white hover:bg-white/[0.03] cursor-pointer tracking-wider uppercase text-[10px]";
+  const clsAtivo = "px-3 py-1 rounded-lg transition-all bg-white text-slate-900 shadow-sm font-semibold cursor-pointer";
+  const clsInativo = "px-3 py-1 rounded-lg transition-all text-slate-600 hover:text-slate-900 cursor-pointer";
   if (btnTodos) btnTodos.className = filtroStatusAtual === "todos" ? clsAtivo : clsInativo;
   if (btnAtivas) btnAtivas.className = filtroStatusAtual === "ativa" ? clsAtivo : clsInativo;
   if (btnInativas) btnInativas.className = filtroStatusAtual === "inativa" ? clsAtivo : clsInativo;
+  renderizarTabelaAcervo();
 }
 
 /* ============================================================================
@@ -413,6 +398,38 @@ export function inicializarPainelCms() {
   }
 }
 
+function formatarNomeTopico(topico) {
+  if (!topico) return "Geral";
+  const mapa = {
+    osseo: "Ósseo",
+    epitelial: "Epitelial",
+    conjuntivo: "Conjuntivo",
+    muscular: "Muscular",
+    nervoso: "Nervoso",
+    cartilaginoso: "Cartilaginoso",
+    adiposo: "Adiposo",
+    circulatorio: "Circulatório",
+    macro_sistemas: "Macroscopia Geral",
+    neuroanatomia: "Neuroanatomia",
+    cardiovascular: "Cardiovascular",
+    locomotor: "Locomotor",
+    esplanchnologia: "Esplanchnologia",
+    lesao_celular: "Lesão Celular",
+    inflamacao: "Inflamação",
+    reparo_tecidual: "Reparo Tecidual",
+    hemodinamicos: "Hemodinâmicos",
+    neoplasias: "Neoplasias",
+    protozoologia: "Protozoologia",
+    helmintologia: "Helmintologia",
+    ectoparasitos: "Ectoparasitos",
+    bacteriologia: "Bacteriologia",
+    micobaterias: "Micobactérias",
+    micologia: "Micologia",
+    virologia: "Virologia"
+  };
+  return mapa[topico] || (topico.charAt(0).toUpperCase() + topico.slice(1));
+}
+
 export function renderizarTabelaAcervo() {
   const tbody = document.getElementById("tabelaAcervoCms");
   const statTotal = document.getElementById("statTotalLaminas");
@@ -429,7 +446,7 @@ export function renderizarTabelaAcervo() {
   if (statInativas) statInativas.textContent = String(contInativas);
   if (!tbody) return;
   if (acervoFirestoreCache.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-xs font-mono text-neutral-500 italic">Nenhum registro encontrado no Cloud Firestore. Cadastre sua primeira lamina no Topico 1 (Editor &amp; Cadastro).</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-xs font-mono text-slate-400 italic">Nenhum registro encontrado no Cloud Firestore. Cadastre sua primeira lâmina na Aba 1 (Editor &amp; Cadastro).</td></tr>`;
     return;
   }
   const listaFiltrada = acervoFirestoreCache.filter((lamina) => {
@@ -438,32 +455,34 @@ export function renderizarTabelaAcervo() {
     return true;
   });
   if (listaFiltrada.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-xs font-mono text-neutral-500 italic">Nenhuma lamina corresponde ao filtro selecionado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-xs font-mono text-slate-400 italic">Nenhuma lâmina corresponde ao filtro selecionado.</td></tr>`;
     return;
   }
   let rowsHtml = "";
   listaFiltrada.forEach((lamina) => {
     const totalPinos = (lamina.pinos || []).length;
-    const nomeSeguro = (lamina.nome || "Peca sem titulo").replace(/'/g, "\\'");
+    const nomeSeguro = (lamina.nome || "Peça sem título").replace(/'/g, "\\'");
     const isAtiva = lamina.status === "ativa";
     const badgeStatus = isAtiva
-      ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Ativa</span>`
-      : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-mono uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Inativa</span>`;
+      ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[11px] font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Ativa</span>`
+      : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-medium"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inativa</span>`;
     const botaoAlternar = isAtiva
-      ? `<button type="button" class="text-neutral-400 hover:text-neutral-200 px-2.5 py-1 rounded-lg hover:bg-white/[0.04] transition-all text-xs font-mono tracking-wider uppercase cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Ocultar</button>`
-      : `<button type="button" class="text-emerald-400 hover:text-emerald-300 px-2.5 py-1 rounded-lg hover:bg-emerald-500/10 transition-all text-xs font-mono tracking-wider uppercase cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Publicar</button>`;
+      ? `<button type="button" class="text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-100 border border-slate-200/60 transition-all text-xs font-medium cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Inativar</button>`
+      : `<button type="button" class="text-emerald-700 hover:text-emerald-800 px-2 py-1.5 rounded-lg hover:bg-emerald-50 border border-emerald-200/60 transition-all text-xs font-medium cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Ativar</button>`;
     rowsHtml += `
-      <tr class="hover:bg-white/[0.02] transition-colors border-b border-white/[0.04] group">
-        <td class="py-3.5 px-4"><div class="flex flex-col"><span class="text-xs text-neutral-200 font-sans">${lamina.nome || "Peça Morfológica"}</span><span class="text-[10px] text-neutral-500 font-mono mt-0.5">${lamina.id}</span></div></td>
-        <td class="py-3.5 px-4 text-[10px] text-neutral-400 uppercase font-mono tracking-wider">${lamina.disciplina || "histologia"}</td>
-        <td class="py-3.5 px-4 text-xs text-neutral-400 font-sans">${lamina.topico || "geral"}</td>
-        <td class="py-3.5 px-4 text-[10px] text-neutral-400 font-mono">${lamina.coloracao || "Padrão"}</td>
-        <td class="py-3.5 px-4 text-center whitespace-nowrap">${badgeStatus}</td>
-        <td class="py-3.5 px-4 text-center flex justify-center"><span class="flex items-center justify-center w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.08] text-neutral-300 text-[10px] font-mono font-medium">${totalPinos}</span></td>
-        <td class="py-3.5 px-4 text-right whitespace-nowrap space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button type="button" class="text-neutral-400 hover:text-[#d4af37] px-2.5 py-1 rounded-lg hover:bg-white/[0.04] transition-all text-xs font-mono tracking-wider uppercase cursor-pointer" data-id="${lamina.id}" onclick="window.App.editarLaminaCms('${lamina.id}')">Editar</button>
+      <tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100">
+        <td class="py-3 px-4"><div class="flex flex-col"><span class="text-xs font-semibold text-slate-900">${lamina.nome || "Peça Morfológica"}</span><span class="font-mono text-[11px] text-slate-400 mt-0.5">${lamina.id}</span></div></td>
+        <td class="py-3 px-4 text-xs text-slate-600 capitalize font-medium">${lamina.disciplina || "histologia"}</td>
+        <td class="py-3 px-4 text-xs text-slate-600">${formatarNomeTopico(lamina.topico)}</td>
+        <td class="py-3 px-4 text-xs text-slate-600">${lamina.coloracao || "Padrão"}</td>
+        <td class="py-3 px-4 text-center whitespace-nowrap">${badgeStatus}</td>
+        <td class="py-3 px-4 text-center"><div class="flex justify-center"><span class="flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium">${totalPinos}</span></div></td>
+        <td class="py-3 px-4 text-right whitespace-nowrap space-x-1.5">
+          <button type="button" class="text-teal-700 hover:text-teal-800 hover:bg-teal-50 px-2.5 py-1.5 rounded-lg border border-teal-200/60 transition-all text-xs font-medium cursor-pointer" data-id="${lamina.id}" onclick="window.App.editarLaminaCms('${lamina.id}')">Editar no Canvas</button>
           ${botaoAlternar}
-          <button type="button" class="text-rose-400/80 hover:text-rose-400 px-2.5 py-1 rounded-lg hover:bg-rose-500/10 transition-all text-xs font-mono tracking-wider uppercase cursor-pointer ml-1" data-id="${lamina.id}" onclick="window.App.excluirLaminaCms('${lamina.id}', '${nomeSeguro}')">Excluir</button>
+          <button type="button" class="text-slate-400 hover:text-rose-600 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-all text-xs font-medium cursor-pointer" data-id="${lamina.id}" onclick="window.App.excluirLaminaCms('${lamina.id}', '${nomeSeguro}')" title="Excluir Lâmina">
+            <svg class="w-4 h-4 inline-block -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
         </td>
       </tr>
     `;
@@ -868,11 +887,13 @@ export function atualizarCardAnaliseOpticaCms(item, maxMagNominal) {
   const ratioInput = document.getElementById("dashZoom4xRatio");
 
   const mppCalculado = ((40 / maxMag) * 0.156).toFixed(3);
+  const summaryEl = document.getElementById("dashDziLineSummary");
+  if (summaryEl) summaryEl.textContent = `${w} × ${h} px • ${maxMag}x (${mppCalculado} µm/px)`;
   if (dimEl) dimEl.textContent = `${w} × ${h}`;
   if (mpEl) mpEl.textContent = `${mp} Megapixels`;
   if (geomEl) geomEl.textContent = `${ratio}:1 (${isVertical ? "Faixa Vertical" : "Mosaico Amplo"})`;
   if (tetoEl) tetoEl.textContent = `${maxMag}x (${mppCalculado} µm/px)`;
-  if (badgeEl) badgeEl.textContent = `Nativa: ${maxMag}x • Hemácia (7.5µm)`;
+  if (badgeEl) badgeEl.textContent = `Nativa: ${maxMag}x`;
 
   // Se for nova lâmina ou campo vazio, sugere automaticamente o ratio baseado na geometria física
   if (ratioInput && (!laminaEmEdicaoId || !ratioInput.value)) {
@@ -1867,7 +1888,7 @@ export async function carregarLaminasAssociadasModulo(topicoId) {
 
   if (laminas.length === 0) {
     container.innerHTML = `
-      <div class="col-span-full py-4 px-4 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/[0.08] rounded-xl">
+      <div class="col-span-full py-4 px-4 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
         Nenhuma lâmina vinculada a este tópico no acervo. Você pode cadastrar uma lâmina para este módulo na aba 'Editor &amp; Cadastro'.
       </div>
     `;
@@ -1875,12 +1896,12 @@ export async function carregarLaminasAssociadasModulo(topicoId) {
   }
 
   container.innerHTML = laminas.map(lam => `
-    <div class="bg-[#18181d] border border-white/[0.08] rounded-xl p-3 flex items-center justify-between gap-2.5">
+    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 flex items-center justify-between gap-2.5 hover:bg-white hover:border-slate-300 transition-all">
       <div class="min-w-0">
-        <span class="text-xs font-serif font-bold text-white truncate block">${escaparHtml(lam.nome || "Lâmina")}</span>
-        <span class="text-[10px] font-mono text-neutral-400 block">${escaparHtml(lam.coloracao || "Coloração")}</span>
+        <span class="text-xs font-bold text-slate-900 truncate block">${escaparHtml(lam.nome || "Lâmina")}</span>
+        <span class="text-[10px] font-mono text-slate-500 block">${escaparHtml(lam.coloracao || "Coloração")}</span>
       </div>
-      <span class="px-2 py-0.5 rounded-full text-[9px] font-mono shrink-0 ${lam.status === 'ativa' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+      <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-medium shrink-0 ${lam.status === 'ativa' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-rose-50 text-rose-700 border border-rose-200/60'}">
         ${lam.status || 'ativa'}
       </span>
     </div>
@@ -1893,7 +1914,7 @@ export function renderizarRepeaterSummaryPoints() {
 
   if (!summaryPointsEmEdicao || summaryPointsEmEdicao.length === 0) {
     container.innerHTML = `
-      <div class="p-8 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/[0.08] rounded-xl">
+      <div class="p-8 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
         Nenhum tópico adicionado. Clique no botão '+ Adicionar Tópico' acima para incluir marcadores no Resumo Morfológico.
       </div>
     `;
@@ -1901,18 +1922,18 @@ export function renderizarRepeaterSummaryPoints() {
   }
 
   container.innerHTML = summaryPointsEmEdicao.map((ponto, idx) => `
-    <div class="bg-[#16161b] border border-white/[0.08] rounded-xl p-4 sm:p-5 space-y-3 group hover:border-[#d4af37]/40 transition-all duration-200">
-      <div class="flex items-center justify-between gap-3 border-b border-white/[0.05] pb-2.5">
+    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 sm:p-5 space-y-3 group hover:border-slate-300 transition-all duration-200">
+      <div class="flex items-center justify-between gap-3 border-b border-slate-200/60 pb-2.5">
         <div class="flex items-center gap-2">
-          <span class="w-6 h-6 rounded-lg bg-white/[0.05] border border-white/[0.08] text-[#d4af37] text-[11px] font-mono font-bold flex items-center justify-center">
+          <span class="w-6 h-6 rounded-lg bg-teal-50 border border-teal-200/60 text-teal-800 text-[11px] font-mono font-bold flex items-center justify-center">
             ${idx + 1}
           </span>
-          <span class="text-xs font-mono uppercase tracking-wider text-neutral-300 font-semibold">Tópico ${idx + 1}</span>
+          <span class="text-xs font-semibold text-slate-800">Tópico ${idx + 1}</span>
         </div>
         <button 
           type="button" 
           onclick="window.App.removerPontoResumoCms(${idx})" 
-          class="text-neutral-500 hover:text-rose-400 p-1 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer text-xs font-mono flex items-center gap-1">
+          class="text-slate-400 hover:text-rose-600 p-1 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer text-xs font-medium flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
@@ -1921,22 +1942,22 @@ export function renderizarRepeaterSummaryPoints() {
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Rótulo / Título do Tópico (Label)</label>
+        <label class="text-[11px] font-medium text-slate-600 block">Rótulo / Título do Tópico (Label)</label>
         <input 
           type="text" 
           value="${escaparHtml(ponto.label || '')}" 
           placeholder="Ex: Matriz Extracelular, Células Principais, Definição..." 
           oninput="window.App.atualizarPontoResumoLabel(${idx}, this.value)"
-          class="w-full bg-[#1c1c22] border border-white/[0.08] focus:border-[#d4af37]/60 text-white rounded-lg px-3.5 py-2 text-xs font-sans focus:outline-none" />
+          class="w-full bg-white border border-slate-200 focus:border-teal-700 text-slate-900 rounded-lg px-3.5 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-teal-700 shadow-2xs transition-all" />
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Texto Descritivo e Detalhamento Morfológico</label>
+        <label class="text-[11px] font-medium text-slate-600 block">Texto Descritivo e Detalhamento Morfológico</label>
         <textarea 
           rows="3" 
           placeholder="Descreva minuciosamente os critérios histológicos, composição química, populações celulares ou relevância diagnóstica..." 
           oninput="window.App.atualizarPontoResumoText(${idx}, this.value)"
-          class="w-full bg-[#1c1c22] border border-white/[0.08] focus:border-[#d4af37]/60 text-neutral-200 rounded-lg px-3.5 py-2.5 text-xs font-sans focus:outline-none custom-scrollbar leading-relaxed">${escaparHtml(ponto.text || '')}</textarea>
+          class="w-full bg-white border border-slate-200 focus:border-teal-700 text-slate-900 rounded-lg px-3.5 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-teal-700 custom-scrollbar leading-relaxed shadow-2xs transition-all">${escaparHtml(ponto.text || '')}</textarea>
       </div>
     </div>
   `).join("");

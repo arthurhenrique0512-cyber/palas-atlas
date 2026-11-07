@@ -188,9 +188,15 @@ function renderView(state) {
     }
   }
 
-  if (isHomePage) {
+  if (isDashboard) {
+    // CMS / PAINEL DO DESENVOLVEDOR: Oculta a navegação pública para dar lugar à barra superior exclusiva do CMS
+    if (headerMin) {
+      headerMin.classList.add("hidden");
+    }
+  } else if (isHomePage) {
     // HOME: Barra Superior Arquitetônica com Logo Grande (size="lg") à Esquerda e Glassmorphism
     if (headerMin) {
+      headerMin.classList.remove("hidden");
       headerMin.className = "sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] transition-all duration-300 pointer-events-auto";
     }
     if (brandLogo) {
@@ -207,8 +213,11 @@ function renderView(state) {
       btnVoltarGlobal.classList.remove("flex");
     }
   } else {
-    // SUBPÁGINAS (ACERVO & DASHBOARD CMS): Barra Superior com PALAS ATLAS centralizado e Botão Voltar à esquerda
-    if (headerMin) headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/90 transition-all duration-300 pointer-events-auto shadow-xs";
+    // SUBPÁGINAS DO ACERVO: Barra Superior com PALAS ATLAS centralizado e Botão Voltar à esquerda
+    if (headerMin) {
+      headerMin.classList.remove("hidden");
+      headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/90 transition-all duration-300 pointer-events-auto shadow-xs";
+    }
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");
       brandLogo.setAttribute("theme", "light-bg");
