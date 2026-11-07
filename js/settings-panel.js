@@ -11,7 +11,7 @@ class SettingsPanel extends HTMLElement {
     
     // Definições padrão
     this.settings = {
-      theme: 'dark', // 'dark' ou 'light'
+      theme: 'light', // 'light' (padrão institucional) ou 'dark'
       typography: 'medium', // 'small', 'medium', 'large'
       density: 'comfortable', // 'compact', 'comfortable'
       reduceMotion: false // boolean

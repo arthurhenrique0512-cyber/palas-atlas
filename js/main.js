@@ -181,7 +181,7 @@ function renderView(state) {
 
   const mainContainer = document.getElementById("mainRouterContainer");
   if (mainContainer) {
-    if (isDashboard) {
+    if (isDashboard || isHomePage) {
       mainContainer.className = "flex-1 w-full flex flex-col transition-all duration-300 pt-0";
     } else {
       mainContainer.className = "flex-1 w-full flex flex-col transition-all duration-300 pt-16 sm:pt-[70px]";
@@ -189,9 +189,9 @@ function renderView(state) {
   }
 
   if (isHomePage) {
-    // HOME: Barra Superior Arquitetônica com Logo Grande (size="lg") à Esquerda
+    // HOME: Barra Superior Arquitetônica com Logo Grande (size="lg") à Esquerda e Glassmorphism
     if (headerMin) {
-      headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/90 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)] transition-all duration-300 pointer-events-auto";
+      headerMin.className = "sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] transition-all duration-300 pointer-events-auto";
     }
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "true");
@@ -201,7 +201,7 @@ function renderView(state) {
     if (logoLink) {
       logoLink.className = "group inline-flex items-center gap-3 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline";
     }
-    if (btnOpenDrawer) btnOpenDrawer.className = "h-10 px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs";
+    if (btnOpenDrawer) btnOpenDrawer.className = "lg:hidden h-9 px-3 sm:px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.add("hidden");
       btnVoltarGlobal.classList.remove("flex");
