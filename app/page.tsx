@@ -453,12 +453,19 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Pílula Divisória Centralizada sobre a Linha Divisória (100% visível, fora de overflow-hidden) */}
+        <div className="relative z-20 -my-3.5 flex justify-center pointer-events-none">
+          <span className="pointer-events-auto bg-white border border-slate-200/90 shadow-sm text-[11px] font-medium text-slate-500 px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 select-none">
+            <span>↓</span> Role para pesquisar e explorar as lâminas
+          </span>
+        </div>
+
         {/* ============================================================
-             2. TRANSIÇÃO E SEGUNDA FAIXA: BUSCA E VITRINE (CONSOLE INTEGRADO)
+             2. SEGUNDA FAIXA: BUSCA E VITRINE (CONSOLE INTEGRADO)
         ============================================================ */}
         <section
           id="secaoBuscaVitrine"
-          className="py-12 lg:py-16 border-b border-slate-200/60 relative overflow-hidden bg-[#f8fafc]"
+          className="pt-8 pb-12 lg:pt-10 lg:pb-16 border-b border-slate-200/60 relative bg-[#f8fafc]"
         >
           {/* Malha Arquitetônica Limpa Contínua no Fundo da Segunda Faixa */}
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
@@ -477,13 +484,6 @@ export default function HomePage() {
           </div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            
-            {/* Pílula centralizada sobre a divisória */}
-            <div className="-mt-16 sm:-mt-20 lg:-mt-22 mb-8 sm:mb-10 flex justify-center relative z-20">
-              <span className="bg-white border border-slate-200/90 shadow-sm text-[11px] font-medium text-slate-500 px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 select-none">
-                <span>↓</span> Role para pesquisar e explorar as lâminas
-              </span>
-            </div>
 
             {/* Console Integrado: Container estruturado que envolve Busca + Vitrine */}
             <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_12px_40px_rgb(15,23,42,0.04)] p-6 sm:p-8 lg:p-10">
