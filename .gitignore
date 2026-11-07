@@ -8,7 +8,7 @@ tmp/
 *.tmp
 
 # Local binaries / apps
-app/
+*.app/
 
 # OS metadata
 Thumbs.db

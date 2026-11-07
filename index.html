@@ -375,32 +375,109 @@
     <!-- HUB DE ENTRADA (#pgHome) - ESTÉTICA ACADÊMICA LIMPA E INTEGRADA -->
     <section id="pgHome" class="w-full h-full flex-1 text-slate-900 pb-16 lg:pb-24 relative overflow-x-hidden bg-[#f8fafc]">
 
-      <!-- CAMADA DE DETALHE DE FUNDO SUTIL: Malha Arquitetônica Limpa Contínua -->
-      <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-        <div id="homeBgGrid" class="absolute inset-0" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.035) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%);"></div>
-        <div id="homeBgGlow" class="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(3,105,161,0.06)_0%,_transparent_70%)]"></div>
-      </div>
-
-      <!-- HERO SECTION INTEGRADA: 2 Colunas Equilibradas (py-12 lg:py-20) -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+      <!-- ============================================================
+           PRIMEIRA FAIXA: APRESENTAÇÃO INSTITUCIONAL (TOPO, FUNDO BRANCO PURO)
+      ============================================================ -->
+      <section id="secaoInstitucionalTopo" class="bg-white py-16 lg:py-24 border-b border-slate-200/80 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          <!-- COLUNA ESQUERDA: Título Principal + Subtítulo + Busca + CTAs (lg:col-span-6) -->
-          <div class="lg:col-span-6 flex flex-col items-start text-left justify-center">
+          <!-- Coluna Esquerda (lg:col-span-7): Selo, Título e Subtítulo -->
+          <div class="lg:col-span-7 flex flex-col items-start text-left justify-center">
+            
+            <!-- a) Selo discreto em pílula -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-[11px] font-semibold tracking-wider uppercase text-slate-700 mb-5">
+              <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
+              <span>Atlas Morfológico Digital</span>
+            </div>
 
-            <!-- Título Principal com Tipografia Acadêmica Sóbria e Forte -->
-            <h1 class="font-serif text-2xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-slate-900 leading-[1.2] text-left">
+            <!-- b) Título Principal com destaque em tom petróleo -->
+            <h1 class="font-serif text-3xl sm:text-4xl lg:text-[2.85rem] font-bold tracking-tight text-slate-900 leading-[1.2] text-left">
               Atlas Integrado de <br />
-              <span class="text-sky-800 font-bold">Ciências Morfológicas</span>
+              <span class="text-teal-800 font-bold">Ciências Morfológicas</span>
             </h1>
 
-            <!-- Subtítulo Enxuto -->
+            <!-- c) Subtítulo Limpo -->
             <p class="text-slate-600 text-base sm:text-lg font-sans font-normal leading-relaxed max-w-xl text-left mt-4">
-              Acervo universitário de lâminas microscópicas em alta definição com navegação óptica interativa.
+              Explore lâminas microscópicas reais em alta definição com navegação óptica interativa.
             </p>
+          </div>
 
-            <!-- Barra de Busca Integrada (mt-8) -->
-            <div class="w-full max-w-xl relative z-30 group mt-8" id="global-search-container">
+          <!-- Coluna Direita (lg:col-span-5): Card Institucional Sóbrio e Acadêmico -->
+          <div class="lg:col-span-5 w-full">
+            <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-[0_4px_24px_rgb(0,0,0,0.03)]">
+              
+              <!-- Cabeçalho do Card -->
+              <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+                <div class="text-xs font-semibold tracking-wider uppercase text-slate-700 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-teal-600"></span>
+                  <span>Acervo Acadêmico</span>
+                </div>
+                <span class="bg-teal-50 text-teal-800 border border-teal-200/60 text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                  Acesso Aberto
+                </span>
+              </div>
+
+              <!-- 4 Pilares Acadêmicos com Ícones Minimalistas Discretos em text-teal-700 -->
+              <div class="space-y-3.5 text-sm text-slate-700 font-medium">
+                <div class="flex items-center gap-3">
+                  <svg class="w-4 h-4 text-teal-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
+                  <span>Cortes histológicos em alta definição</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <svg class="w-4 h-4 text-teal-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                  </svg>
+                  <span>Colorações H&E, desgastes e técnicas especiais</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <svg class="w-4 h-4 text-teal-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+                  </svg>
+                  <span>Pinos com critérios morfológicos de identificação</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <svg class="w-4 h-4 text-teal-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5"/>
+                  </svg>
+                  <span>Iniciativa universitária sem fins lucrativos</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SEGUNDA FAIXA: BUSCA E VITRINE DE LÂMINAS (COM FUNDO DE GRID SUTIL)
+      ============================================================ -->
+      <section id="secaoBuscaVitrine" class="py-14 lg:py-20 border-b border-slate-200/60 relative overflow-hidden bg-[#f8fafc]">
+        
+        <!-- Malha Arquitetônica Limpa Contínua no Fundo da Segunda Faixa -->
+        <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+          <div id="homeBgGrid" class="absolute inset-0" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.035) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse 90% 75% at 50% 30%, #000 45%, transparent 100%);"></div>
+          <div id="homeBgGlow" class="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(3,105,161,0.06)_0%,_transparent_70%)]"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center relative z-10">
+          
+          <!-- Coluna Esquerda (lg:col-span-6 — Localizador): Título Sóbrio + Busca + CTAs + Atalhos -->
+          <div class="lg:col-span-6 flex flex-col items-start text-left justify-center">
+
+            <!-- a) Título sóbrio sem etiquetas em caixa alta acima -->
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight mb-4">
+              Pesquise no Acervo Morfológico
+            </h2>
+
+            <!-- b) Barra de Busca Integrada -->
+            <div class="w-full max-w-xl relative z-30 group" id="global-search-container">
               <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-sky-700 transition-colors z-20">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
               </div>
@@ -424,7 +501,7 @@
               </div>
             </div>
 
-            <!-- Botões de Ação (mt-5) -->
+            <!-- Botões de Ação -->
             <div class="relative z-10 flex flex-wrap gap-3.5 items-center justify-start w-full mt-5">
               <button id="btnHeroPrimary" type="button" onclick="window.App.abrirAccordionHero('histologia')" class="bg-slate-900 hover:bg-black text-white rounded-xl px-6 py-3.5 transition-all duration-200 flex items-center justify-center gap-2.5 group cursor-pointer text-xs font-sans font-semibold tracking-wide shadow-sm hover:shadow active:scale-95">
                 <span>Explorar Lâminas</span>
@@ -446,7 +523,7 @@
 
           </div>
 
-          <!-- COLUNA DIREITA: Vitrine de Lâminas Alinhada ao Topo (lg:col-span-6) -->
+          <!-- Coluna Direita (lg:col-span-6 — Card da Lâmina): Vitrine de Lâminas -->
           <div class="lg:col-span-6 w-full">
             <div id="heroSlideShowcase" class="group/showcase relative z-20 w-full aspect-[4/3] sm:aspect-[16/10] rounded-2xl overflow-hidden bg-[#060608] border border-slate-200/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.22)] flex flex-col justify-between p-5 sm:p-7 select-none">
               
@@ -530,7 +607,7 @@
           </div>
 
         </div>
-      </div>
+      </section>
 
       <!-- Script da Vitrine de Lâminas (Crossfade & Zoom Contínuo 6s) -->
       <script>
