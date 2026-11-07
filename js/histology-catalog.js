@@ -273,49 +273,153 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
   /**
    * Constrói o Card de Resumo Morfológico Acadêmico
-   * Estrutura pontos-chave (Matriz, Células, Organização Estrutural) em tópicos curtos e objetivos.
+   * Estrutura clássica de ensino histológico: Definição, Componentes da Matriz, Células Principais e Subtipos/Classificação Funcional.
    */
   const gerarCardResumoMorfológico = (topicoItem, moduloItem) => {
     const sinteseCurada = {
       osseo: [
-        { label: "Matriz Extracelular", desc: "Mineralizada e rígida. Fração orgânica rica em colágeno tipo I; fração inorgânica composta por cristais de hidroxiapatita (armazenamento e homeostase de cálcio e fosfato)." },
-        { label: "Células Principais", desc: "Osteoblastos (síntese do osteoide), osteócitos (manutenção da matriz alojados em lacunas e intercomunicados por canalículos) e osteoclastos (reabsorção e remodelação óssea contínua)." },
-        { label: "Organização Estrutural", desc: "Ósseo Compacto (Sistemas de Havers / ósteons concêntricos e canais vasculares de Volkmann) e Ósseo Esponjoso (rede de trabéculas delimitando cavidades preenchidas por medula óssea)." }
-      ],
-      epitelial: [
-        { label: "Matriz e Lâmina Basal", desc: "Escassa matriz extracelular; células intimamente justapostas assentadas sobre lâmina basal; tecido avascular nutrido por difusão a partir do conjuntivo subjacente." },
-        { label: "Células e Especializações", desc: "Polaridade celular marcante (domínios apical, lateral e basal), desmossomos, junções de oclusão, microvilosidades e cílios funcionais." },
-        { label: "Organização Estrutural", desc: "Epitélios de Revestimento (classificados pelo número de camadas e forma celular) e Glandulares (exócrinos acinares/tubulares ou endócrinos cordonais/foliculares)." }
+        {
+          label: "Definição",
+          desc: "Tecido conjuntivo especializado e mineralizado, principal constituinte do esqueleto adulto. Fornece suporte mecânico aos tecidos moles, alavanca para locomoção, proteção a órgãos vitais e atua como a principal reserva corporal de íons cálcio e fosfato."
+        },
+        {
+          label: "Componentes da Matriz",
+          desc: "Matriz óssea calcificada composta por porção orgânica (cerca de 95% de colágeno tipo I associado a proteoglicanos e glicoproteínas como osteonectina e osteocalcina) e porção inorgânica (cristais de hidroxiapatita de fosfato de cálcio depositados ordenadamente sobre as fibrilas colágenas)."
+        },
+        {
+          label: "Células Principais",
+          desc: "Osteoblastos (células jovens da superfície responsáveis pela síntese e mineralização do osteoide), osteócitos (células maduras residentes em lacunas, conectadas por canalículos para trocas metabólicas) e osteoclastos (células gigantes multinucleadas especializadas na reabsorção óssea enzimática)."
+        },
+        {
+          label: "Subtipos e Classificação",
+          desc: "Ósseo Compacto (cortical densa sem cavidades visíveis, organizada em Sistemas de Havers ou ósteons concêntricos e canais vasculares de Volkmann) e Ósseo Esponjoso (rede tridimensional de trabéculas ósseas que delimitam cavidades intercomunicantes preenchidas por medula óssea hematopoiética ou adiposa)."
+        }
       ],
       conjuntivo: [
-        { label: "Matriz Extracelular", desc: "Abundante matriz extracelular formada por substância fundamental amorfa (GAGs, proteoglicanos, glicoproteínas) e fibras colágenas, elásticas e reticulares." },
-        { label: "População Celular", desc: "Fibroblastos e fibrócitos (síntese de MEC), macrófagos e mastócitos (vigilância imune e reparo), além de plasmócitos e leucócitos transitórios." },
-        { label: "Organização Estrutural", desc: "Conjuntivo Frouxo (flexível, abundante em substância fundamental, suporta epitélios) e Conjuntivo Denso (predomínio de feixes colágenos resistentes à tração, modelado ou não modelado)." }
+        {
+          label: "Definição",
+          desc: "Tecido de origem mesodérmica amplamente distribuído pelo organismo, responsável pela sustentação estrutural, conexão entre diferentes tecidos, preenchimento de espaços, isolamento de órgãos, via de trânsito vascular e defesa imunológica contra patógenos."
+        },
+        {
+          label: "Componentes da Matriz",
+          desc: "Abundante matriz extracelular (MEC) constituída por Substância Fundamental Amorfa (gel aquoso viscoso rico em ácido hialurônico, glicosaminoglicanos sulfatados e proteoglicanos) e Fibras Estruturais (fibras colágenas tipo I e III de alta resistência à tração, fibras elásticas flexíveis e fibras reticulares de sustentação estromal)."
+        },
+        {
+          label: "Células Principais",
+          desc: "Células residentes (fibroblastos ativamente secretores de matriz, fibrócitos fusiformes quiescentes, macrófagos fagocitários residentes e mastócitos granulosos ricos em histamina e heparina) e células transitórias de defesa (plasmócitos produtores de anticorpos, linfócitos, neutrófilos e eosinófilos)."
+        },
+        {
+          label: "Subtipos e Classificação",
+          desc: "Conjuntivo Frouxo (distribuição equilibrada e delicada entre células, fibras finas e substância amorfa; altamente flexível e vascularizado, suporta epitélios e envolve vasos) e Conjuntivo Denso (predomínio expressivo de feixes espessos de colágeno tipo I; divide-se em Denso Não Modelado, com feixes entrelaçados na derme profunda e cápsulas de órgãos, e Denso Modelado, com feixes rigorosamente paralelos em tendões e ligamentos)."
+        }
+      ],
+      epitelial: [
+        {
+          label: "Definição",
+          desc: "Tecido avascular composto por células contíguas intimamente unidas por complexos juncionais, com escassa substância intercelular. Recobre superfícies externas (pele), reveste cavidades corpóreas internas (mucosas e serosas) e forma o parênquima das glândulas secretoras."
+        },
+        {
+          label: "Componentes da Matriz",
+          desc: "Praticamente ausente no espaço intercelular. O epitélio repousa invariavelmente sobre uma lâmina basal acelular (rede de colágeno tipo IV, laminina, entactina e perlecan) que o ancora ao conjuntivo subjacente e através da qual difusamente chegam gases e nutrientes."
+        },
+        {
+          label: "Células Principais",
+          desc: "Células poliédricas com evidente polaridade morfológica e funcional: polo apical (voltado para a luz ou superfície, frequentemente dotado de microvilosidades ou cílios), polos laterais (unidos por zônulas de oclusão, zônulas de adesão e desmossomos) e polo basal (ancorado por hemidesmossomos)."
+        },
+        {
+          label: "Subtipos e Classificação",
+          desc: "Epitélios de Revestimento (simples pavimentoso, simples cúbico, simples prismático, estratificado pavimentoso queratinizado ou não queratinizado, pseudoestratificado colunar ciliado e de transição/urotélio) e Epitélios Glandulares (exócrinos acinares, tubulares ou alveolares dotados de ductos; e endócrinos cordonais ou vesiculares desprovidos de ductos com secreção hematogênica)."
+        }
       ],
       adiposo: [
-        { label: "Matriz e Vascularização", desc: "Estroma conjuntivo fino e rica trama capilar para suporte metabólico rápido e mobilização contínua de ácidos graxos." },
-        { label: "Células (Adipócitos)", desc: "Adipócitos uniloculares (gotícula lipídica única e volumosa que comprime o núcleo contra a periferia) e multiloculares (múltiplas gotículas, núcleo central e abundantes mitocôndrias)." },
-        { label: "Organização Estrutural", desc: "Gordura Branca/Unilocular (reserva energética em triglicerídeos e isolamento térmico) e Gordura Castanha/Multilocular (termogênese sem tremor via proteína UCP-1 / termogenina)." }
+        {
+          label: "Definição",
+          desc: "Variedade especializada de tecido conjuntivo no qual predominam células adiposas (adipócitos). Constitui o principal reservatório energético do corpo na forma de triglicerídeos neutros, além de atuar no isolamento térmico, proteção mecânica e como órgão endócrino ativo (produtor de leptina e adipocinas)."
+        },
+        {
+          label: "Componentes da Matriz",
+          desc: "Matriz escassa envolvida por uma delicada trama de fibras reticulares (colágeno tipo III) que contorna individualmente cada célula, acompanhada por uma densa malha de capilares contínuos que supre as elevadas demandas metabólicas de lipólise e lipogênese."
+        },
+        {
+          label: "Células Principais",
+          desc: "Adipócitos uniloculares (células esféricas grandes com gota lipídica única que ocupa quase todo o citoplasma e desloca o núcleo para a periferia) e adipócitos multiloculares (células menores, poligonais, com núcleo central esférico e numerosas gotículas lipídicas associadas a mitocôndrias ricas em citocromos)."
+        },
+        {
+          label: "Subtipos e Classificação",
+          desc: "Tecido Adiposo Unilocular / Branco (mais abundante, responsável pela estocagem de lipídios em adultos, modelagem corporal e secreção de adiponectina) e Tecido Adiposo Multilocular / Marrom (presente sobretudo no feto e recém-nascido, especializado na termogênese sem tremor via proteína desacopladora UCP-1 / termogenina)."
+        }
       ],
       cartilaginoso: [
-        { label: "Matriz Extracelular", desc: "Gel hidratado com consistência firme e elástica, rico em proteoglicanos (agrecano) e colágeno; tecido avascular e anervado, nutrido por difusão via pericôndrio adjacente." },
-        { label: "Células", desc: "Condroblastos (periféricos, síntese ativa) e condrócitos maduros (alojados em lacunas da matriz, isolados ou reunidos em grupos isógenos coronários ou axiais)." },
-        { label: "Organização Estrutural", desc: "Cartilagem Hialina (matriz homogênea com colágeno tipo II), Elástica (densa rede de fibras elásticas) e Fibrocartilagem (feixes espessos de colágeno tipo I, desprovida de pericôndrio)." }
+        {
+          label: "Definição",
+          desc: "Forma especializada de tecido conjuntivo de suporte com consistência rígida e firme, dotada de notável elasticidade mecânica. É avascular, desprovido de vasos linfáticos e nervos, dependendo integralmente da difusão de nutrientes a partir do tecido conjuntivo vascularizado adjacente (pericôndrio)."
+        },
+        {
+          label: "Componentes da Matriz",
+          desc: "Matriz extracelular altamente hidratada (cerca de 75% de água ligada a proteoglicanos com cadeias de condroitim-sulfato e queratam-sulfato associadas a ácido hialurônico / agrecano) entremeada por fibras de colágeno tipo II ou fibras elásticas que suportam forças intensas de compressão."
+        },
+        {
+          label: "Células Principais",
+          desc: "Condroblastos (células basofílicas jovens da camada condrogênica do pericôndrio, com intensa atividade de secreção de matriz) e condrócitos (células arredondadas maduras alojadas em cavidades da matriz denominadas lacunas, isoladas ou dispostas em grupos isógenos coronários ou axiais)."
+        },
+        {
+          label: "Subtipos e Classificação",
+          desc: "Cartilagem Hialina (mais comum, matriz vítrea com colágeno tipo II; fossas nasais, laringe, anéis traqueais e superfícies articulares), Cartilagem Elástica (semelhante à hialina, porém acrescida de densa rede de fibras elásticas; epiglote e pavilhão auditivo) e Fibrocartilagem (sem pericôndrio, com feixes densos de colágeno tipo I; discos intervertebrais, meniscos e sínfise púbica)."
+        }
       ],
       muscular: [
-        { label: "Miofilamentos", desc: "Aparelho contrátil baseado no deslizamento interdigitado de miofilamentos finos de actina e filamentos grossos de miosina com consumo dependente de ATP e íons cálcio." },
-        { label: "Células e Envoltórios", desc: "Miócitos envolvidos por bainhas de tecido conjuntivo para transmissão de força mecânica aos tendões: endomísio, perimísio e epimísio." },
-        { label: "Organização Estrutural", desc: "Estriado Esquelético (fibras cilíndricas multinucleadas periféricas), Estriado Cardíaco (células ramificadas com discos intercalares) e Liso (células fusiformes uninucleadas viscerais)." }
+        {
+          label: "Definição",
+          desc: "Tecido composto por células alongadas de origem mesodérmica (fibras musculares ou miócitos) especializadas na contratilidade ativa e na geração de força de tração através da transformação de energia química (ATP) em movimento mecânico corporal ou visceral."
+        },
+        {
+          label: "Componentes da Matriz",
+          desc: "Bainhas conjuntas organizadas em camadas concêntricas que transmitem a contração aos tendões e osso: Endomísio (fina lâmina de fibras reticulares contornando cada miócito individual), Perimísio (feixes colágenos que agrupam fascículos musculares) e Epimísio (cápsula externa de conjuntivo denso que recobre o músculo inteiro)."
+        },
+        {
+          label: "Células Principais",
+          desc: "Miócitos cujo citoplasma (sarcoplasma) é preenchido longitudinalmente por miofilamentos finos de actina associada a troponina e tropomiosina, e filamentos grossos de miosina, regulados por ciclos intracelulares de liberação e recaptação de cálcio pelo retículo sarcoplasmático."
+        },
+        {
+          label: "Subtipos e Classificação",
+          desc: "Estriado Esquelético (fibras cilíndricas muito longas, multinucleadas com núcleos estritamente periféricos; controle voluntário e contração rápida), Estriado Cardíaco (células ramificadas mononucleadas com núcleos centrais, unidas transversalmente por discos intercalares com desmossomos e junções comunicantes; contração involuntária e vigorosa) e Muscular Liso (células fusiformes uninucleadas centrais sem sarcômeros transversais; contração lenta, sustentada e involuntária em vísceras e vasos sanguíneos)."
+        }
       ],
       nervoso: [
-        { label: "Matriz e Neurópilo", desc: "Sustentação provida pelo neurópilo (emaranhado de axônios, dendritos e prolongamentos gliais) e lâmina basal vascular, sem estroma colágeno denso." },
-        { label: "Células Principais", desc: "Neurônios (corpo celular/pericário com corpúsculos de Nissl, axônio mielinizado e dendritos) condutores do impulso eletroquímico." },
-        { label: "Neuroglia de Suporte", desc: "SNC (substância cinzenta e branca com astrócitos, oligodendrócitos, micróglia e epêndima) e SNP (nervos e gânglios com células de Schwann e células satélites)." }
+        {
+          label: "Definição",
+          desc: "Tecido com altíssima especialização funcional voltado para a percepção de estímulos do meio externo e interno, integração e processamento de informações neurais e deflagração de impulsos elétricos para efetores musculares ou glandulares."
+        },
+        {
+          label: "Componentes da Matriz",
+          desc: "Praticamente destituído de matriz extracelular conjuntiva clássica (salvo em meninges e bainhas periféricas); a sustentação física, isolamento elétrico e regulação iônica e nutricional são executados pelo neurópilo (trama interdigitada contínua de axônios, dendritos e processos citoplasmáticos da neuroglia)."
+        },
+        {
+          label: "Células Principais",
+          desc: "Neurônios (unidades funcionais excitáveis formadas por corpo celular/soma rico em corpúsculos de Nissl, dendritos ramificados receptores de estímulos e um único axônio condutor de potenciais de ação) e Células da Glia (astrócitos de suporte e barreira hematoencefálica, oligodendrócitos mielinizantes centrais, micróglia de fagocitose imunológica e células ependimárias de revestimento ventricular)."
+        },
+        {
+          label: "Subtipos e Classificação",
+          desc: "Sistema Nervoso Central / SNC (estruturado em Substância Cinzenta, onde residem os corpos neuronais, sinapses e neurópilo, e Substância Branca, formada por tratos de fibras axonais mielinizadas) e Sistema Nervoso Periférico / SNP (nervos periféricos revestidos por endoneuro, perineuro e epineuro, gânglios sensitivos e motores com células satélites, e células de Schwann mielinizantes)."
+        }
       ],
       circulatorio: [
-        { label: "Arquitetura Parietal", desc: "Estrutura vascular disposta em três túnicas: Íntima (endotélio e subendotélio), Média (músculo liso e lâminas elásticas) e Adventícia (tecido conjuntivo com vasa vasorum)." },
-        { label: "Células Endoteliais", desc: "Monocamada epitelial plana especializada no controle da hemostasia, tônus vascular e permeabilidade seletiva." },
-        { label: "Microcirculação e Capilares", desc: "Capilares Contínuos (sem poros, barreira hematoencefálica), Fenestrados (poros com diafragma em rins e intestinos) e Sinusoides (amplas fendas no fígado e baço)." }
+        {
+          label: "Definição",
+          desc: "Circuito tubular fechado e contínuo responsável por impulsionar e conduzir sangue e linfa por todos os tecidos do corpo humano, viabilizando o transporte de gases respiratórios (oxigênio e gás carbônico), nutrientes, hormônios, mediadores químicos e elementos celulares de defesa."
+        },
+        {
+          label: "Componentes da Matriz",
+          desc: "Lâmina basal subendotelial contínua ou descontínua associada a lâminas elásticas concêntricas (interna e externa) e estroma conjuntivo perivascular (túnica adventícia rica em colágeno tipo I, fibras elásticas, fibroblastos e vasa vasorum)."
+        },
+        {
+          label: "Células Principais",
+          desc: "Células endoteliais poligonais pavimentosas (monocamada com permeabilidade seletiva que sintetiza óxido nítrico, endotelina, prostaciclina e expressa moléculas de adesão leucocitária), pericitos (células contráteis pericapilares com potencial regenerativo) e células musculares lisas da túnica média reguladoras do diâmetro luminal e resistência vascular periférica."
+        },
+        {
+          label: "Subtipos e Classificação",
+          desc: "Artérias (elásticas de condução com paredes amortecedoras de pulso e musculares de distribuição), Microcirculação (arteríolas reguladoras de resistência pré-capilar; capilares contínuos sem fenestras, fenestrados com poros filtrantes e sinusoides de trajeto tortuoso com amplas fendas; e vênulas pós-capilares) e Veias (vasos de capacitância dotados de túnica adventícia espessa e válvulas intraluminais que impedem o refluxo centrífugo)."
+        }
       ]
     };
 
@@ -325,19 +429,26 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     } else if (sinteseCurada[topicoItem.id]) {
       pontos = sinteseCurada[topicoItem.id];
     } else {
-      // Parser automático de contingência para novos tópicos ou outras disciplinas
+      // Parser automático de contingência estruturado em 4 pontos para tópicos dinâmicos
       const texto = (topicoItem.resumo || "").replace(/<[^>]*>/g, " ").trim();
       if (texto) {
         const frases = texto.split(/(?<=\.)\s+/).filter(f => f.trim().length > 15);
-        if (frases.length >= 3) {
+        if (frases.length >= 4) {
           pontos = [
-            { label: "Matriz & Características Gerais", desc: frases[0] },
-            { label: "Componentes Celulares", desc: frases[1] },
-            { label: "Organização Estrutural", desc: frases.slice(2).join(" ") }
+            { label: "Definição", desc: frases[0] },
+            { label: "Componentes da Matriz", desc: frases[1] },
+            { label: "Células Principais", desc: frases[2] },
+            { label: "Subtipos e Classificação", desc: frases.slice(3).join(" ") }
+          ];
+        } else if (frases.length >= 3) {
+          pontos = [
+            { label: "Definição", desc: frases[0] },
+            { label: "Componentes da Matriz", desc: frases[1] },
+            { label: "Células e Classificação", desc: frases.slice(2).join(" ") }
           ];
         } else if (frases.length > 0) {
           pontos = frases.map((f, i) => ({
-            label: i === 0 ? "Características Principais" : (i === 1 ? "Componentes Celulares" : "Organização Estrutural"),
+            label: i === 0 ? "Definição" : (i === 1 ? "Componentes Principais" : "Classificação Funcional"),
             desc: f
           }));
         }
@@ -346,7 +457,8 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
     if (pontos.length === 0) {
       pontos = [
-        { label: "Descrição Morfológica", desc: "Consulte as lâminas de microscopia abaixo para análise das camadas e estruturas diagnósticas deste corte histológico." }
+        { label: "Definição", desc: "Corte histológico preparado para análise microscópica em alta resolução." },
+        { label: "Critérios Morfológicos", desc: "Consulte as lâminas de microscopia abaixo para identificação detalhada das estruturas diagnósticas deste corte." }
       ];
     }
 
@@ -362,16 +474,17 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
     return `
       <div class="bg-white dark:bg-[#0c0c0f] border border-slate-200/90 dark:border-white/10 rounded-2xl p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-8">
-        <div class="flex items-center justify-between gap-3 pb-3 mb-4 border-b border-slate-100 dark:border-white/5">
-          <div class="flex items-center gap-2">
-            <span class="w-1.5 h-4 rounded-full bg-teal-700"></span>
-            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Resumo Morfológico</h2>
-          </div>
-          <span class="text-[11px] font-mono text-slate-400 dark:text-zinc-500">${moduloItem.bibliografia || "Referência Acadêmica"}</span>
+        <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100 dark:border-white/5">
+          <span class="w-1.5 h-4 rounded-full bg-teal-700"></span>
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Resumo Morfológico</h2>
         </div>
-        <ul class="space-y-3">
+        <ul class="space-y-3.5">
           ${itensHtml}
         </ul>
+        <div class="mt-5 pt-3.5 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs text-slate-400 dark:text-zinc-500">
+          <span class="italic font-sans text-[11px] text-slate-500 dark:text-zinc-400">Baseado em ${moduloItem.bibliografia || "Junqueira & Carneiro — Histologia Básica"}</span>
+          <span class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-zinc-600">Referência Acadêmica</span>
+        </div>
       </div>
     `;
   };
@@ -484,26 +597,14 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           ${gerarBarraDisciplinasTopo()}
         </div>
       
-        <!-- MIGALHAS DE PÃO (BREADCRUMBS) E NAVEGAÇÃO SUPERIOR -->
-        <div class="flex items-center justify-between gap-3 mb-6 flex-wrap">
-          <div class="flex items-center gap-3 flex-wrap">
-            <button
-              type="button"
-              onclick="window.App.voltarParaDisciplinaHome('${disc}'); return false;"
-              class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-all dark:bg-zinc-900 dark:border-white/10 dark:text-zinc-300 dark:hover:text-white cursor-pointer"
-              title="Voltar para ${modulo.tituloDisciplina}">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-              <span>Voltar</span>
-            </button>
-            <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-500 dark:text-zinc-400">
-              <a href="#" onclick="window.App.goHome(); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">Início</a>
-              <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-              <a href="#" onclick="window.App.voltarParaDisciplinaHome('${disc}'); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">${modulo.tituloDisciplina}</a>
-              <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-              <span class="text-slate-900 dark:text-white font-medium pointer-events-none">${topico.titulo}</span>
-            </nav>
-          </div>
-        </div>
+        <!-- MIGALHAS DE PÃO (BREADCRUMBS) -->
+        <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-500 dark:text-zinc-400 mb-6 flex-wrap">
+          <a href="#" onclick="window.App.goHome(); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">Início</a>
+          <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
+          <a href="#" onclick="window.App.voltarParaDisciplinaHome('${disc}'); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">${modulo.tituloDisciplina}</a>
+          <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
+          <span class="text-slate-900 dark:text-white font-medium pointer-events-none">${topico.titulo}</span>
+        </nav>
 
         <!-- TÍTULO DO TÓPICO -->
         <h1 class="text-2xl lg:text-3xl font-bold text-slate-950 dark:text-white tracking-tight mb-4">
@@ -567,16 +668,10 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
         if (laminasDoTopico.length === 0) {
           containerGrid.innerHTML = `
-            <div class="col-span-full bg-white dark:bg-[#0c0c0f] border border-dashed border-slate-300 dark:border-white/10 rounded-2xl p-10 text-center text-slate-500 shadow-sm">
-              <span class="text-xs font-mono text-teal-700 dark:text-teal-400 font-semibold block uppercase tracking-wider mb-2">Sem Lâminas Ativas no Tópico</span>
-              <h4 class="text-lg font-semibold text-slate-900 dark:text-white font-serif">Nenhuma lâmina matriz publicada para ${topico.titulo} no momento.</h4>
-              <p class="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-2 max-w-lg mx-auto">Lâminas com status inativo não são listadas aqui. Acesse o Painel do Desenvolvedor para publicar peças neste módulo.</p>
-              <button 
-                type="button"
-                onclick="window.App.selecionarFrente('dashboard')"
-                class="mt-6 inline-block px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-sans font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-sm">
-                Abrir Painel do Desenvolvedor &rarr;
-              </button>
+            <div class="col-span-full bg-white dark:bg-[#0c0c0f] border border-dashed border-slate-200 dark:border-white/10 rounded-2xl p-8 sm:p-10 text-center text-slate-500">
+              <span class="text-xs font-mono text-slate-400 dark:text-zinc-500 font-semibold block uppercase tracking-wider mb-1.5">Acervo em Digitalização</span>
+              <h4 class="text-base sm:text-lg font-semibold text-slate-900 dark:text-white font-serif">Espécimes para ${topico.titulo} em fase de captura e catalogação.</h4>
+              <p class="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-2 max-w-md mx-auto leading-relaxed">Novas lâminas de alta resolução para este módulo estão sendo preparadas pelo laboratório de microscopia digital.</p>
             </div>
           `;
           return;
@@ -600,7 +695,13 @@ async function abrirTopico(idTopico, disciplina, skipHistory = false) {
       if (estaticas.length > 0) {
         containerGrid.innerHTML = estaticas.map(gerarCardLaminaAcademico).join("");
       } else {
-        containerGrid.innerHTML = `<div class="col-span-full py-8 text-center text-xs font-mono text-slate-400 font-semibold bg-slate-50 border border-dashed border-slate-200 rounded-xl">Nenhuma lâmina cadastrada para este módulo no catálogo estático.</div>`;
+        containerGrid.innerHTML = `
+          <div class="col-span-full bg-white dark:bg-[#0c0c0f] border border-dashed border-slate-200 dark:border-white/10 rounded-2xl p-8 sm:p-10 text-center text-slate-500">
+            <span class="text-xs font-mono text-slate-400 dark:text-zinc-500 font-semibold block uppercase tracking-wider mb-1.5">Acervo em Digitalização</span>
+            <h4 class="text-base sm:text-lg font-semibold text-slate-900 dark:text-white font-serif">Espécimes para ${topico.titulo} em fase de captura e catalogação.</h4>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-2 max-w-md mx-auto leading-relaxed">Novas lâminas de alta resolução para este módulo estão sendo preparadas pelo laboratório de microscopia digital.</p>
+          </div>
+        `;
       }
     }
   }

@@ -391,6 +391,13 @@ function navegarPara(destino) {
  * Utilitário global para retorno de rotas utilizando o histórico do navegador.
  */
 function voltarGlobal() {
+  const subCatalog = document.getElementById("histoSubCatalog");
+  const isTopicOpen = subCatalog && !subCatalog.classList.contains("hidden");
+  if (isTopicOpen && window.App && typeof window.App.voltarParaDisciplinaHome === "function") {
+    const estado = typeof getState === "function" ? getState() : null;
+    window.App.voltarParaDisciplinaHome(estado && estado.frenteAtiva ? estado.frenteAtiva : "histologia");
+    return;
+  }
   if (window.history.length > 1) {
     history.back();
   } else {
