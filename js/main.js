@@ -201,7 +201,7 @@ function renderView(state) {
     if (logoLink) {
       logoLink.className = "group inline-flex items-center gap-3 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline";
     }
-    if (btnOpenDrawer) btnOpenDrawer.className = "lg:hidden h-9 px-3 sm:px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs";
+    if (btnOpenDrawer) btnOpenDrawer.className = "h-9 px-3 sm:px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs";
     if (btnVoltarGlobal) {
       btnVoltarGlobal.classList.add("hidden");
       btnVoltarGlobal.classList.remove("flex");
