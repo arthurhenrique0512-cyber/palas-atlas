@@ -12,6 +12,7 @@ import {
   GraduationCap,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   X,
   Menu,
   Info,
@@ -118,6 +119,34 @@ const DISCIPLINAS: DisciplinaItem[] = [
   },
 ];
 
+const FAQ_ITEMS = [
+  {
+    question: 'O acesso ao acervo é gratuito?',
+    answer:
+      'Sim. O Palas Atlas é um projeto universitário de acesso aberto, mantido para apoio ao ensino prático e monitorias de saúde. Todo o acervo e ferramentas estão disponíveis sem mensalidades ou cadastros obrigatórios.',
+  },
+  {
+    question: 'O microscópio funciona em dispositivos móveis?',
+    answer:
+      'Sim. A interface do microscópio se adapta automaticamente a celulares, tablets e notebooks, com suporte nativo a gestos de toque (arraste pelo corte e gesto de pinça para aproximação).',
+  },
+  {
+    question: 'As lâminas do acervo são de espécimes reais?',
+    answer:
+      'Sim. 100% das lâminas foram digitalizadas a partir de preparações reais sob colorações clássicas de rotina (como Hematoxilina & Eosina, impregnação argêntica e desgastes) utilizadas em laboratórios de patologia e histologia humana.',
+  },
+  {
+    question: 'Posso utilizar as capturas em aulas, seminários ou relatórios?',
+    answer:
+      'Sim. O uso didático e científico é incentivado para estudantes e docentes. Ao incluir capturas de tela em apresentações ou trabalhos acadêmicos, solicitamos apenas a citação do Palas Atlas como fonte de consulta.',
+  },
+  {
+    question: 'Como relatar uma correção ou sugerir novas lâminas?',
+    answer:
+      'Caso observe qualquer divergência anatômica ou queira propor novos cortes para digitalização, consulte as informações de contato na página Sobre Nós ou envie sua observação para a equipe de monitoria.',
+  },
+];
+
 export default function HomePage() {
   // Estados interativos
   const [currentSlideIdx, setCurrentSlideIdx] = useState<number>(0);
@@ -125,6 +154,11 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSearchFocused, setIsSearchFocused] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
+
+  const toggleFaq = (idx: number) => {
+    setOpenFaqIdx((prev) => (prev === idx ? null : idx));
+  };
 
   const totalSlides = SLIDES_ACERVO.length;
   const currentSlide = SLIDES_ACERVO[currentSlideIdx];
@@ -925,6 +959,73 @@ export default function HomePage() {
               </div>
 
             </div>
+          </div>
+        </section>
+
+        {/* ============================================================
+             7. PERGUNTAS FREQUENTES (FAQ ACADÊMICO)
+        ============================================================ */}
+        <section
+          id="secaoFAQ"
+          className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10"
+        >
+          <div className="text-center">
+            <h2 className="text-2xl lg:text-3xl font-bold text-slate-950 tracking-tight text-center">
+              Perguntas Frequentes
+            </h2>
+            <p className="text-sm text-slate-600 text-center mt-1 mb-10">
+              Esclarecimentos sobre o acesso ao acervo, navegação e uso das lâminas.
+            </p>
+          </div>
+
+          <div className="space-y-3" id="faqAccordionContainer">
+            {FAQ_ITEMS.map((item, idx) => {
+              const isOpen = openFaqIdx === idx;
+              return (
+                <div
+                  key={idx}
+                  className="bg-white border border-slate-200/80 rounded-xl mb-3 px-6 py-4 transition-all hover:border-teal-700/30"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleFaq(idx)}
+                    className="w-full text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="font-medium text-slate-900 text-sm sm:text-base leading-snug">
+                      {item.question}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${
+                        isOpen ? 'rotate-180 text-teal-800' : ''
+                      }`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className="pt-3 text-xs sm:text-sm text-slate-600 font-sans leading-relaxed border-t border-slate-100 mt-3">
+                      {item.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* BLOCO FINAL: ASSINATURA INSTITUCIONAL DE ENCERRAMENTO */}
+          <div className="mt-16 pt-10 border-t border-slate-200/80 text-center max-w-xl mx-auto">
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-2">
+              Feito por estudantes para estudantes.
+            </h3>
+            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4 font-sans">
+              Integramos a teoria morfológica à rotina prática do laboratório acadêmico.
+            </p>
+            <Link
+              href="/sobre"
+              className="text-xs font-semibold text-teal-800 hover:text-teal-950 transition-colors inline-flex items-center gap-1.5 no-underline group"
+            >
+              <span>Conhecer o projeto e a equipe</span>
+              <span className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
+            </Link>
           </div>
         </section>
 
