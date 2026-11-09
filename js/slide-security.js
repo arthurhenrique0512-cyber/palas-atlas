@@ -190,34 +190,25 @@ class SlideSecurityEngine {
       ? 'rgba(180, 83, 9, 0.06)' 
       : 'rgba(212, 175, 55, 0.065)';
 
-    const agora = new Date();
-    const dataStr = agora.toLocaleDateString('pt-BR');
-    const userLabel = this.currentUserIdentifier.includes('@') 
-      ? this._ofuscarEmail(this.currentUserIdentifier)
-      : this.currentUserIdentifier;
-
-    const textoLinha1 = `PALAS ATLAS • ACERVO PROTEGIDO`;
-    const textoLinha2 = `${userLabel} • ${dataStr} • CÓPIA PROIBIDA`;
+    const textoMarca = 'PALAS ATLAS';
 
     ctx.save();
     ctx.rotate((-22 * Math.PI) / 180);
 
-    const stepX = 380 * dpr;
-    const stepY = 220 * dpr;
+    const stepX = 320 * dpr;
+    const stepY = 180 * dpr;
     const startX = -width + (this.driftOffsetX * dpr);
     const endX = width * 2;
     const startY = -height + (this.driftOffsetY * dpr);
     const endY = height * 2;
 
-    ctx.font = `600 ${11 * dpr}px 'Inter', system-ui, sans-serif`;
+    ctx.font = `700 ${13 * dpr}px 'Inter', system-ui, sans-serif`;
     ctx.textAlign = 'center';
 
     for (let x = startX; x < endX; x += stepX) {
       for (let y = startY; y < endY; y += stepY) {
         ctx.fillStyle = goldAccent;
-        ctx.fillText(textoLinha1, x, y);
-        ctx.fillStyle = textColor;
-        ctx.fillText(textoLinha2, x, y + (16 * dpr));
+        ctx.fillText(textoMarca, x, y);
       }
     }
 
