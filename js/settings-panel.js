@@ -83,8 +83,11 @@ class SettingsPanel extends HTMLElement {
     }
 
     // 3. Tema Light/Dark (Sincronizado com data-theme global do Palas Atlas)
-    const themeVal = this.settings.theme === 'light' ? 'light' : 'dark';
+    const urlTheme = (typeof window !== 'undefined') ? new URLSearchParams(window.location.search).get('theme') : null;
+    const effectiveTheme = urlTheme || this.settings.theme || 'light';
+    const themeVal = effectiveTheme === 'dark' ? 'dark' : 'light';
     root.setAttribute('data-theme', themeVal);
+    root.classList.toggle('dark', themeVal === 'dark');
     try {
       localStorage.setItem('palas_theme', themeVal);
     } catch (e) {}
