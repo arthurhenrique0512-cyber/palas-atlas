@@ -121,21 +121,27 @@ class SlideSecurityEngine {
       this.watermarkCanvas.parentNode.removeChild(this.watermarkCanvas);
     }
 
+    // Anexa preferencialmente ao #viewerStage para ficar 100% visível sobre o canvas do OpenSeadragon
+    const host = document.getElementById('viewerStage') || this.viewerElement || document.getElementById('osd-viewer');
+    if (!host) return;
+
     const canvas = document.createElement('canvas');
     canvas.id = 'palas-security-watermark-overlay';
     canvas.setAttribute('aria-hidden', 'true');
     canvas.style.position = 'absolute';
-    canvas.style.inset = '0';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
     canvas.style.pointerEvents = 'none';
-    canvas.style.zIndex = '18'; // Acima dos azulejos e pinos, abaixo dos botões do revólver
+    canvas.style.zIndex = '25'; // Garantido acima do OpenSeadragon (z-index 1-15) e abaixo do painel de lentes (z-index 36)
     canvas.style.userSelect = 'none';
     canvas.style.webkitUserSelect = 'none';
-    canvas.style.opacity = '1';
+    canvas.style.display = 'block';
 
-    this.viewerElement.appendChild(canvas);
+    host.appendChild(canvas);
     this.watermarkCanvas = canvas;
+    this.targetHost = host;
     this._redimensionarMarcaDagua();
 
     // Loop de micro-deriva estocástica para quebrar filtros medianos de remoção algorítmica
@@ -143,8 +149,9 @@ class SlideSecurityEngine {
   }
 
   _redimensionarMarcaDagua() {
-    if (!this.watermarkCanvas || !this.viewerElement) return;
-    const rect = this.viewerElement.getBoundingClientRect();
+    const host = this.targetHost || this.viewerElement || document.getElementById('viewerStage') || document.getElementById('osd-viewer');
+    if (!this.watermarkCanvas || !host) return;
+    const rect = host.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     this.watermarkCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
     this.watermarkCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
@@ -182,32 +189,31 @@ class SlideSecurityEngine {
     ctx.clearRect(0, 0, width, height);
 
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    // Opacidade calculada para ser perceptível em prints mas não poluir o estudo citológico
-    const textColor = isLight 
-      ? 'rgba(15, 23, 42, 0.055)' 
-      : 'rgba(255, 255, 255, 0.048)';
-    const goldAccent = isLight 
-      ? 'rgba(180, 83, 9, 0.06)' 
-      : 'rgba(212, 175, 55, 0.065)';
+    // Opacidade calibrada para visibilidade clara e elegante contra tecidos histológicos
+    const watermarkColor = isLight 
+      ? 'rgba(15, 23, 42, 0.16)' 
+      : 'rgba(212, 175, 55, 0.22)';
 
     const textoMarca = 'PALAS ATLAS';
 
     ctx.save();
     ctx.rotate((-22 * Math.PI) / 180);
 
-    const stepX = 320 * dpr;
-    const stepY = 180 * dpr;
+    const stepX = 260 * dpr;
+    const stepY = 150 * dpr;
     const startX = -width + (this.driftOffsetX * dpr);
     const endX = width * 2;
     const startY = -height + (this.driftOffsetY * dpr);
     const endY = height * 2;
 
-    ctx.font = `700 ${13 * dpr}px 'Inter', system-ui, sans-serif`;
+    ctx.font = `800 ${15 * dpr}px 'Inter', system-ui, sans-serif`;
     ctx.textAlign = 'center';
+    ctx.shadowColor = isLight ? 'rgba(255, 255, 255, 0.45)' : 'rgba(0, 0, 0, 0.65)';
+    ctx.shadowBlur = 3 * dpr;
 
     for (let x = startX; x < endX; x += stepX) {
       for (let y = startY; y < endY; y += stepY) {
-        ctx.fillStyle = goldAccent;
+        ctx.fillStyle = watermarkColor;
         ctx.fillText(textoMarca, x, y);
       }
     }
@@ -403,5 +409,20 @@ class SlideSecurityEngine {
 // Instância singleton global para exportação
 const slideSecurity = new SlideSecurityEngine();
 window.slideSecurity = slideSecurity;
+
+// Auto-inicialização imediata quando o DOM estiver pronto
+if (typeof document !== 'undefined') {
+  const bootSecurity = () => {
+    const stage = document.getElementById('viewerStage') || document.getElementById('osd-viewer');
+    if (stage) {
+      slideSecurity.init({ viewerElement: stage });
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootSecurity);
+  } else {
+    setTimeout(bootSecurity, 50);
+  }
+}
 
 export { slideSecurity, SlideSecurityEngine };
