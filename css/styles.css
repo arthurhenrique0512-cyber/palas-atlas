@@ -1488,3 +1488,33 @@ html[data-theme="dark"] .hero-spec-card {
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
+/* Pontos de Interesse no microscopio */
+.pin-item-btn {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pin-item-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+.pin-item-btn.pin-active {
+  background-color: rgba(212, 175, 55, 0.16) !important;
+  border: 1px solid #d4af37 !important;
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+.pin-item-btn.pin-active .pin-label {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+.pin-item-btn.pin-active .pin-indicator {
+  background-color: #d4af37 !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.5) !important;
+  transform: scale(1.25);
+}
+.pin-item-btn.pin-active .pin-action {
+  color: #e5c158 !important;
+  font-weight: 600 !important;
+}
+
+

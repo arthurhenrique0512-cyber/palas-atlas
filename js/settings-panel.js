@@ -83,28 +83,37 @@ class SettingsPanel extends HTMLElement {
     }
 
     // 3. Tema Light/Dark (Sincronizado com data-theme global do Palas Atlas)
-    const urlTheme = (typeof window !== 'undefined') ? new URLSearchParams(window.location.search).get('theme') : null;
-    const effectiveTheme = urlTheme || this.settings.theme || 'light';
-    const themeVal = effectiveTheme === 'dark' ? 'dark' : 'light';
-    root.setAttribute('data-theme', themeVal);
-    root.classList.toggle('dark', themeVal === 'dark');
-    try {
-      localStorage.setItem('palas_theme', themeVal);
-    } catch (e) {}
-    if (typeof window.setPalasTheme === 'function' && document.documentElement.getAttribute('data-theme') !== themeVal) {
-      window.setPalasTheme(themeVal);
-    }
-    document.querySelectorAll('brand-logo').forEach(el => {
-      if (typeof el.render === 'function') el.render();
-    });
-    const btnToggle = document.getElementById('btnThemeToggle');
-    if (btnToggle) {
-      const isDark = themeVal === 'dark';
-      const iconSun = btnToggle.querySelector('.theme-icon-sun');
-      const iconMoon = btnToggle.querySelector('.theme-icon-moon');
-      if (iconSun && iconMoon) {
-        iconSun.classList.toggle('hidden', !isDark);
-        iconMoon.classList.toggle('hidden', isDark);
+    if (root.getAttribute('data-theme-lock') === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+      root.classList.add('dark');
+      document.querySelectorAll('brand-logo').forEach(el => {
+        el.setAttribute('theme', 'dark-bg');
+        if (typeof el.render === 'function') el.render();
+      });
+    } else {
+      const urlTheme = (typeof window !== 'undefined') ? new URLSearchParams(window.location.search).get('theme') : null;
+      const effectiveTheme = urlTheme || this.settings.theme || 'light';
+      const themeVal = effectiveTheme === 'dark' ? 'dark' : 'light';
+      root.setAttribute('data-theme', themeVal);
+      root.classList.toggle('dark', themeVal === 'dark');
+      try {
+        localStorage.setItem('palas_theme', themeVal);
+      } catch (e) {}
+      if (typeof window.setPalasTheme === 'function' && document.documentElement.getAttribute('data-theme') !== themeVal) {
+        window.setPalasTheme(themeVal);
+      }
+      document.querySelectorAll('brand-logo').forEach(el => {
+        if (typeof el.render === 'function') el.render();
+      });
+      const btnToggle = document.getElementById('btnThemeToggle');
+      if (btnToggle) {
+        const isDark = themeVal === 'dark';
+        const iconSun = btnToggle.querySelector('.theme-icon-sun');
+        const iconMoon = btnToggle.querySelector('.theme-icon-moon');
+        if (iconSun && iconMoon) {
+          iconSun.classList.toggle('hidden', !isDark);
+          iconMoon.classList.toggle('hidden', isDark);
+        }
       }
     }
 

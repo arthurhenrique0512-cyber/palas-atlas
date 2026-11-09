@@ -759,13 +759,13 @@ function renderizarDescricaoETextos() {
               id="btn-pino-${pin.id}"
               data-btn-pin-id="${pin.id}"
               onclick="window.focarPinoNoViewer('${pin.id}')"
-              class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-neutral-900/40 dark:hover:bg-neutral-900/70 border border-slate-200/80 dark:border-white/[0.04] hover:border-teal-600/50 dark:hover:border-teal-700/50 text-left transition-all group cursor-pointer"
+              class="pin-item-btn w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] hover:border-[#d4af37]/50 text-left transition-all group cursor-pointer"
             >
               <div class="flex items-center gap-2.5 truncate pr-2">
-                <span class="w-2 h-2 rounded-full bg-teal-600 dark:bg-teal-400 shrink-0"></span>
-                <span class="text-sm font-medium text-slate-800 dark:text-neutral-200 truncate group-hover:text-teal-700 dark:group-hover:text-teal-200 transition-colors">${pin.rotulo || "Estrutura"}</span>
+                <span class="pin-indicator w-2 h-2 rounded-full bg-[#d4af37] shrink-0"></span>
+                <span class="pin-label text-sm font-medium text-neutral-200 group-hover:text-white transition-colors truncate">${pin.rotulo || "Estrutura"}</span>
               </div>
-              <span class="text-xs text-slate-500 dark:text-neutral-500 group-hover:text-teal-700 dark:group-hover:text-teal-400 shrink-0 transition-colors">Focar &rarr;</span>
+              <span class="pin-action text-xs text-neutral-400 group-hover:text-[#d4af37] shrink-0 transition-colors">Focar &rarr;</span>
             </button>
           `).join('')}
         </div>
@@ -1093,13 +1093,38 @@ function destacarPinoNaSidebar(pinId) {
     const btnPinId = String(btn.getAttribute("data-btn-pin-id") || "").trim().toLowerCase();
     const isAtivo = btnPinId === idBuscado || 
                     btnPinId.replace(/^(pin[-_]|p)/i, "") === idBuscado.replace(/^(pin[-_]|p)/i, "");
+    const label = btn.querySelector(".pin-label");
+    const indicator = btn.querySelector(".pin-indicator");
+    const action = btn.querySelector(".pin-action");
+
     if (isAtivo) {
-      btn.classList.add("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
-      btn.classList.remove("border-white/[0.04]", "bg-neutral-900/40");
-      btn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      btn.classList.add("pin-active", "border-[#d4af37]", "bg-[#d4af37]/15", "ring-1", "ring-[#d4af37]/40", "shadow-lg", "shadow-[#d4af37]/10");
+      btn.classList.remove("border-white/[0.06]", "bg-white/[0.04]", "border-slate-200/80", "bg-slate-50");
+      if (label) {
+        label.classList.add("text-white", "font-semibold");
+        label.classList.remove("text-neutral-200", "text-slate-800");
+      }
+      if (indicator) {
+        indicator.classList.add("ring-2", "ring-[#d4af37]/60", "scale-125");
+      }
+      if (action) {
+        action.classList.add("text-[#d4af37]", "font-semibold");
+        action.classList.remove("text-neutral-400", "text-slate-500");
+      }
     } else {
-      btn.classList.remove("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
-      btn.classList.add("border-white/[0.04]", "bg-neutral-900/40");
+      btn.classList.remove("pin-active", "border-[#d4af37]", "bg-[#d4af37]/15", "ring-1", "ring-[#d4af37]/40", "shadow-lg", "shadow-[#d4af37]/10");
+      btn.classList.add("border-white/[0.06]", "bg-white/[0.04]");
+      if (label) {
+        label.classList.remove("text-white", "font-semibold");
+        label.classList.add("text-neutral-200");
+      }
+      if (indicator) {
+        indicator.classList.remove("ring-2", "ring-[#d4af37]/60", "scale-125");
+      }
+      if (action) {
+        action.classList.remove("text-[#d4af37]", "font-semibold");
+        action.classList.add("text-neutral-400");
+      }
     }
   });
 }
@@ -2003,11 +2028,6 @@ export function focarPinoNoViewer(pinIdRaw) {
   // Destaca o card do pino na lista lateral caso esteja visível
   destacarPinoNaSidebar(pinId);
 
-  // No mobile/tablet, fecha o drawer lateral para exibir o ponto focado no microscópio
-  if (isMobileOrLandscapeDrawer()) {
-    aplicarEstadoSidebar(true, false);
-  }
-
   // Auto-remove o marcador após 9s se não houver nova interação
   setTimeout(() => {
     if (overlayPinAtivo === overlayElem && viewer) {
@@ -2036,11 +2056,6 @@ export function focarQuestaoNoViewer(questaoId) {
   // Certifica visibilidade da aba de questões e destaca card correspondente
   alternarAbaPainel("questoes");
   destacarCardQuestaoNaSidebar(idBuscado);
-
-  // No mobile/tablet, fecha o drawer lateral para exibir o ponto focado no microscópio
-  if (isMobileOrLandscapeDrawer()) {
-    aplicarEstadoSidebar(true, false);
-  }
 
   if (!viewer || !viewer.viewport || !window.OpenSeadragon) {
     console.warn("[Palas Atlas] Viewer OpenSeadragon não inicializado ao tentar focar questão.");
