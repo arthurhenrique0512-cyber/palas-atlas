@@ -1,10 +1,22 @@
 [build]
   publish = "."
 
-# Redirecionamento da API de Assets diretamente para o Manifesto estático (Zero Cold Starts)
+# Catálogo Sanitizado de Lâminas (Oculta caminhos físicos brutos)
 [[redirects]]
   from = "/api/assets"
-  to = "/assets/histologia/manifest.json"
+  to = "/.netlify/functions/assets-manifest"
+  status = 200
+
+# Emissão de Tickets Efêmeros Assinados para Lâminas DZI
+[[redirects]]
+  from = "/api/tile-auth"
+  to = "/.netlify/functions/tile-auth"
+  status = 200
+
+# Gateway Seguro de Azulejos DZI com Rate Limiting e Anti-Scraping
+[[redirects]]
+  from = "/api/tile"
+  to = "/.netlify/functions/tile-proxy"
   status = 200
 
 # Redirecionamento da sincronização com Supabase
@@ -12,6 +24,20 @@
   from = "/api/sync-supabase"
   to = "/.netlify/functions/sync-supabase"
   status = 200
+
+# BLOQUEIO DE SEGURANÇA: Proíbe download direto do manifesto bruto
+[[redirects]]
+  from = "/assets/histologia/manifest.json"
+  to = "/404.html"
+  status = 403
+  force = true
+
+# BLOQUEIO DE SEGURANÇA: Proíbe download direto de pastas de azulejos (obriga passagem por /api/tile)
+[[redirects]]
+  from = "/assets/histologia/*_files/*"
+  to = "/404.html"
+  status = 403
+  force = true
 
 # Cabeçalhos de segurança globais
 [[headers]]
@@ -21,12 +47,15 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(self), microphone=(), geolocation=()"
+    Cross-Origin-Resource-Policy = "same-origin"
 
-# Lâminas Histológicas DZI (Azulejos Deep Zoom imutáveis)
+# Lâminas Histológicas DZI (Azulejos Deep Zoom protegidos)
 [[headers]]
   for = "/assets/histologia/*_files/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "private, no-transform, max-age=86400"
+    Cross-Origin-Resource-Policy = "same-origin"
+    X-Content-Type-Options = "nosniff"
 
 # Manifesto de lâminas (sempre revalidar para refletir novos deploys imediatamente)
 [[headers]]

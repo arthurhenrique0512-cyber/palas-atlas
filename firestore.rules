@@ -11,6 +11,14 @@ service cloud.firestore {
       // Criação, atualização e exclusão restritas exclusivamente a administradores autenticados
       allow write: if request.auth != null;
     }
+
+    // Coleção de auditoria forense e monitoramento anti-raspagem
+    match /laminas_access_audit/{auditId} {
+      // Registro de telemetria de visualização permitido
+      allow create: if true;
+      // Leitura e edição restritas exclusivamente a administradores
+      allow read, update, delete: if request.auth != null;
+    }
     
     // Regra padrão de segurança: nega qualquer acesso a coleções não declaradas
     match /{document=**} {

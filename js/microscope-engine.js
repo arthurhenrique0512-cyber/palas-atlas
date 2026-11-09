@@ -1227,6 +1227,15 @@ function inicializarOpenSeadragon() {
       viewer.container.style.userSelect = "none";
       viewer.container.style.webkitUserSelect = "none";
     }
+
+    // Ativa a camada de segurança Palas Atlas (marca d'água dinâmica e anti-scraping)
+    if (window.slideSecurity) {
+      window.slideSecurity.init({
+        viewerElement: container,
+        slideId: laminaAtualData.id || "lamina-ativa",
+        userEmail: window.__palasCurrentUser?.email || null
+      });
+    }
   } catch (err) {
     console.error("[Palas Atlas] Erro fatal ao instanciar OpenSeadragon:", err);
     exibirErroMicroscopio("Falha na inicialização do visualizador óptico.");
@@ -1294,6 +1303,23 @@ function inicializarOpenSeadragon() {
       homeZoomRef = viewer.viewport.getHomeZoom();
       
       const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+
+      // Vincula o gancho de proteção de URLs de azulejos DZI e atualiza lâmina ativa
+      try {
+        if (window.slideSecurity) {
+          window.slideSecurity.setSlide(laminaAtualData?.id || 'lamina-ativa');
+        }
+        if (item && item.source && typeof item.source.getTileUrl === "function") {
+          const origGetTileUrl = item.source.getTileUrl.bind(item.source);
+          item.source.getTileUrl = function(level, x, y) {
+            const rawUrl = origGetTileUrl(level, x, y);
+            return window.slideSecurity ? window.slideSecurity.obterUrlAzulejoProtegida(rawUrl) : rawUrl;
+          };
+        }
+      } catch (secErr) {
+        console.warn("[Palas Security] Hook de proteção em getTileUrl:", secErr);
+      }
+
       const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
       const nativeZoom = getNativeZoomRef();
 
