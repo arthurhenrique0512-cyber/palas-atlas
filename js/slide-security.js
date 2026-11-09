@@ -138,6 +138,24 @@ class SlideSecurityEngine {
     canvas.style.userSelect = 'none';
     canvas.style.webkitUserSelect = 'none';
     canvas.style.display = 'block';
+    canvas.style.opacity = '0'; // Oculto por padrão para estudo limpo e 100% nítido
+    canvas.style.transition = 'opacity 0.08s ease-out';
+
+    // Injeta regra CSS para que em impressões/PDFs a marca d'água seja forçada
+    if (!document.getElementById('palas-watermark-print-css')) {
+      const style = document.createElement('style');
+      style.id = 'palas-watermark-print-css';
+      style.textContent = `
+        @media print {
+          #palas-security-watermark-overlay {
+            opacity: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
 
     host.appendChild(canvas);
     this.watermarkCanvas = canvas;
@@ -146,6 +164,23 @@ class SlideSecurityEngine {
 
     // Loop de micro-deriva estocástica para quebrar filtros medianos de remoção algorítmica
     this._iniciarAnimacaoDeriva();
+  }
+
+  /**
+   * Dispara a exibição imediata da marca d'água quando uma tentativa de captura for detectada
+   * @param {number} durationMs Tempo em ms que a marca permanece visível
+   */
+  dispararMarcaDaguaCaptura(durationMs = 4500) {
+    if (!this.watermarkCanvas) return;
+    this._desenharMarcaDagua();
+    this.watermarkCanvas.style.opacity = '1';
+
+    if (this._watermarkFadeTimer) clearTimeout(this._watermarkFadeTimer);
+    this._watermarkFadeTimer = setTimeout(() => {
+      if (this.watermarkCanvas) {
+        this.watermarkCanvas.style.opacity = '0';
+      }
+    }, durationMs);
   }
 
   _redimensionarMarcaDagua() {
@@ -189,10 +224,10 @@ class SlideSecurityEngine {
     ctx.clearRect(0, 0, width, height);
 
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    // Opacidade calibrada para visibilidade clara e elegante contra tecidos histológicos
+    // Contraste elevado para estampar com nitidez no momento exato da captura/print
     const watermarkColor = isLight 
-      ? 'rgba(15, 23, 42, 0.16)' 
-      : 'rgba(212, 175, 55, 0.22)';
+      ? 'rgba(15, 23, 42, 0.38)' 
+      : 'rgba(212, 175, 55, 0.42)';
 
     const textoMarca = 'PALAS ATLAS';
 
@@ -238,6 +273,7 @@ class SlideSecurityEngine {
     this.viewerElement.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      this.dispararMarcaDaguaCaptura(3500);
       this._exibirAvisoSeguranca('Download direto e clique direito desativados para proteção de direitos autorais.');
       return false;
     }, true);
@@ -245,10 +281,63 @@ class SlideSecurityEngine {
     // 2. Previne arrasto de elementos para salvar como imagem
     this.viewerElement.addEventListener('dragstart', (e) => {
       e.preventDefault();
+      this.dispararMarcaDaguaCaptura(3500);
       return false;
     }, true);
 
-    // 3. Intercepta atalhos de salvar página, imprimir e inspecionar código
+    // 3. Detecção e reação imediata a teclas de Print Screen (Windows/Linux e Mac)
+    const onScreenshotKey = (e) => {
+      // PrintScreen / PrtScn (Windows/Linux)
+      if (e.key === 'PrintScreen' || e.code === 'PrintScreen' || e.keyCode === 44) {
+        this.dispararMarcaDaguaCaptura(5000);
+      }
+      // Mac: atalhos nativos de captura Cmd + Shift + 3/4/5
+      if (e.metaKey && e.shiftKey) {
+        this.dispararMarcaDaguaCaptura(5000);
+      }
+      // Windows: atalho da ferramenta de captura Win + Shift + S
+      if (e.shiftKey && (e.key === 'S' || e.key === 's') && (e.metaKey || e.ctrlKey)) {
+        this.dispararMarcaDaguaCaptura(5000);
+      }
+    };
+    window.addEventListener('keydown', onScreenshotKey, true);
+    window.addEventListener('keyup', onScreenshotKey, true);
+
+    // 4. Detecção de ferramentas de recorte externas (Snipping Tool, Lightshot, etc.)
+    // Ao acionar qualquer ferramenta de recorte externa, o navegador perde o foco (blur).
+    // Ativamos a marca d'água no blur para que qualquer print ou recorte capture a imagem com PALAS ATLAS!
+    window.addEventListener('blur', () => {
+      if (this.watermarkCanvas) {
+        this._desenharMarcaDagua();
+        this.watermarkCanvas.style.opacity = '1';
+      }
+    });
+
+    // Ao voltar para o navegador para continuar o estudo, a marca d'água desaparece suavemente
+    window.addEventListener('focus', () => {
+      if (this.watermarkCanvas) {
+        setTimeout(() => {
+          if (this.watermarkCanvas) {
+            this.watermarkCanvas.style.opacity = '0';
+          }
+        }, 400);
+      }
+    });
+
+    // 5. Suporte a caixas de diálogo de impressão nativa
+    window.addEventListener('beforeprint', () => {
+      if (this.watermarkCanvas) {
+        this._desenharMarcaDagua();
+        this.watermarkCanvas.style.opacity = '1';
+      }
+    });
+    window.addEventListener('afterprint', () => {
+      if (this.watermarkCanvas) {
+        this.watermarkCanvas.style.opacity = '0';
+      }
+    });
+
+    // 6. Intercepta atalhos de salvar página, imprimir e inspecionar código
     window.addEventListener('keydown', (e) => {
       const isCmdOrCtrl = e.ctrlKey || e.metaKey;
       const key = e.key ? e.key.toLowerCase() : '';
@@ -259,6 +348,7 @@ class SlideSecurityEngine {
       if (isCmdOrCtrl && (key === 's' || key === 'p' || key === 'u')) {
         e.preventDefault();
         e.stopPropagation();
+        this.dispararMarcaDaguaCaptura(4000);
         this._exibirAvisoSeguranca('Esta lâmina faz parte do acervo curricular protegido. O salvamento e impressão direta são desabilitados.');
         return false;
       }
