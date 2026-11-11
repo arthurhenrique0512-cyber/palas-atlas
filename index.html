@@ -7,67 +7,27 @@
   <script>
     // Inicialização instantânea do Tema (Padrão Institucional: Claro)
     (function() {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
       try {
-        var urlTheme = new URLSearchParams(window.location.search).get('theme');
-        var saved = localStorage.getItem('palas_theme');
-        var theme = (urlTheme === 'dark' || (!urlTheme && saved === 'dark')) ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', theme);
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'light');
-        document.documentElement.classList.remove('dark');
-      }
+        localStorage.setItem('palas_theme', 'light');
+      } catch (e) {}
     })();
 
-    window.setPalasTheme = function(theme) {
-      var next = theme === 'light' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      if (next === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+    window.setPalasTheme = function() {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
       try {
-        localStorage.setItem('palas_theme', next);
-        var legacy = localStorage.getItem('@PalasAtlas:Settings');
-        var obj = legacy ? JSON.parse(legacy) : {};
-        obj.theme = next;
-        localStorage.setItem('@PalasAtlas:Settings', JSON.stringify(obj));
+        localStorage.setItem('palas_theme', 'light');
       } catch (e) {}
       document.querySelectorAll('brand-logo').forEach(function(el) {
         if (typeof el.render === 'function') el.render();
       });
-      var btn = document.getElementById('btnThemeToggle');
-      if (btn) {
-        var isDark = next === 'dark';
-        btn.setAttribute('title', isDark ? 'Alternar para Tema Claro' : 'Alternar para Tema Escuro');
-        btn.setAttribute('aria-label', isDark ? 'Alternar para Tema Claro' : 'Alternar para Tema Escuro');
-        var iconSun = btn.querySelector('.theme-icon-sun');
-        var iconMoon = btn.querySelector('.theme-icon-moon');
-        if (iconSun && iconMoon) {
-          iconSun.classList.toggle('hidden', !isDark);
-          iconMoon.classList.toggle('hidden', isDark);
-        }
-      }
-      var sp = document.querySelector('settings-panel');
-      if (sp && sp.settings) {
-        sp.settings.theme = next;
-        if (typeof sp.updateUI === 'function') sp.updateUI();
-      }
     };
 
     window.togglePalasTheme = function() {
-      var current = document.documentElement.getAttribute('data-theme') || 'light';
-      window.setPalasTheme(current === 'dark' ? 'light' : 'dark');
+      window.setPalasTheme('light');
     };
-
-    document.addEventListener('DOMContentLoaded', function() {
-      window.setPalasTheme(document.documentElement.getAttribute('data-theme') || 'light');
-    });
   </script>
   <meta name="description" content="Plataforma de ensino morfológico focado em Histologia, Patologia, Parasitologia e Microbiologia para o ciclo básico." />
 

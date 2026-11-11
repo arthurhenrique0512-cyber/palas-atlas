@@ -1,44 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <title>Política de Privacidade — Palas Atlas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
     (function() {
-      try {
-        var saved = localStorage.getItem('palas_theme');
-        var theme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
-        document.documentElement.setAttribute('data-theme', theme);
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+      try { localStorage.setItem('palas_theme', 'light'); } catch (e) {}
     })();
-    window.setPalasTheme = function(theme) {
-      var next = theme === 'light' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      try { localStorage.setItem('palas_theme', next); } catch (e) {}
-      document.querySelectorAll('brand-logo').forEach(function(el) {
-        if (typeof el.render === 'function') el.render();
-      });
-      var btn = document.getElementById('btnThemeToggle');
-      if (btn) {
-        var isDark = next === 'dark';
-        var iconSun = btn.querySelector('.theme-icon-sun');
-        var iconMoon = btn.querySelector('.theme-icon-moon');
-        if (iconSun && iconMoon) {
-          iconSun.classList.toggle('hidden', !isDark);
-          iconMoon.classList.toggle('hidden', isDark);
-        }
-      }
-    };
-    window.togglePalasTheme = function() {
-      var current = document.documentElement.getAttribute('data-theme') || 'dark';
-      window.setPalasTheme(current === 'dark' ? 'light' : 'dark');
-    };
-    document.addEventListener('DOMContentLoaded', function() {
-      window.setPalasTheme(document.documentElement.getAttribute('data-theme') || 'dark');
-    });
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,15 +43,6 @@
 
       <!-- Bloco Direito: Ações / Links -->
       <div class="flex items-center gap-3 shrink-0">
-        <button id="btnThemeToggle" type="button" onclick="window.togglePalasTheme()" class="h-9 w-9 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 flex items-center justify-center active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none" aria-label="Alternar Tema" title="Alternar Tema">
-          <svg class="theme-icon-sun w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
-          </svg>
-          <svg class="theme-icon-moon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
-          </svg>
-        </button>
         <a href="termos.html" class="inline-flex px-3 py-1.5 text-xs font-sans font-semibold text-slate-600 hover:text-sky-700 rounded-xl hover:bg-slate-100 transition-colors no-underline">Termos de Uso</a>
       </div>
     </div>

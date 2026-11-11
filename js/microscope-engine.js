@@ -231,7 +231,7 @@ const fallbackLaminas = {
         <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
         <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
         <p><strong>Estratificação Epidérmica (da profundidade para a superfície):</strong></p>
-        <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
+        <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-700">
           <li><strong>Camada Basal (Germinativa):</strong> Fileira única de células cúbicas a prismáticas com alta atividade mitótica sobre a lâmina basal.</li>
           <li><strong>Camada Espinhosa:</strong> Múltiplas camadas de queratinócitos poliédricos unidos por densos desmossomos.</li>
           <li><strong>Camada Granulosa:</strong> Células achatadas com volumosos grânulos basofílicos de querato-hialina no citoplasma.</li>
@@ -385,7 +385,7 @@ const fallbackLaminas = {
         <h3>Tecido Ósseo Maduro — Alta Resolução 40x (v3.0 Panorama 6×8)</h3>
         <p>Varredura panorâmica ultradetalhada de <strong>48 fotos em objetiva de 40x</strong> montada em grade snake contínua (6 colunas × 8 linhas, 15% de sobreposição) via Fiji Stitching com recorte retangular limpo (sem rebarbas), totalizando <strong>6430 × 5630 pixels (~36.2 MP)</strong>.</p>
         <p>A ampliação de 40x permite observar com riqueza ultraestrutural:</p>
-        <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
+        <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-700">
           <li><strong>Canais de Havers:</strong> lúmen vascular central nítido circundado por lamelas cilíndricas concêntricas.</li>
           <li><strong>Lacunas de Osteócitos:</strong> cavidades elípticas escuras na matriz óssea mineralizada.</li>
           <li><strong>Rede de Canalículos:</strong> filamentos microvasculares e comunicantes que irradiam das lacunas através da matriz sólida.</li>
@@ -440,7 +440,7 @@ function iniciarMicroscopio() {
           <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
           <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
           <p><strong>Estratificação Epidérmica (da profundidade para a superfície):</strong></p>
-          <ul class="list-disc pl-5 space-y-1.5 text-xs text-neutral-300">
+          <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-700">
             <li><strong>Camada Basal (Germinativa):</strong> Fileira única de células cúbicas a prismáticas com alta atividade mitótica sobre a lâmina basal.</li>
             <li><strong>Camada Espinhosa:</strong> Múltiplas camadas de queratinócitos poliédricos unidos por densos desmossomos ("espinhos").</li>
             <li><strong>Camada Granulosa:</strong> Células achatadas com volumosos grânulos basofílicos de querato-hialina no citoplasma.</li>
@@ -740,7 +740,7 @@ function renderizarDescricaoETextos() {
   const html = formatarDescricaoMorfolgica(rawHtml);
 
   if (!html) {
-    container.innerHTML = `<p class="text-slate-500 dark:text-neutral-500 italic text-sm font-sans">Nenhum texto descritivo cadastrado para esta lamina.</p>`;
+    container.innerHTML = `<p class="text-slate-500 italic text-sm font-sans">Nenhum texto descritivo cadastrado para esta lamina.</p>`;
     return;
   }
 
@@ -748,8 +748,8 @@ function renderizarDescricaoETextos() {
   let secaoPinos = "";
   if (listaPinosAtual.length > 0) {
     secaoPinos = `
-      <div class="mt-8 border-t border-slate-200 dark:border-white/[0.06] pt-6">
-        <h4 class="text-[10px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-widest mb-4 font-mono">
+      <div class="mt-8 border-t border-slate-200 pt-6">
+        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 font-mono">
           Pontos de Interesse
         </h4>
         <div class="flex flex-col gap-2">
@@ -759,13 +759,13 @@ function renderizarDescricaoETextos() {
               id="btn-pino-${pin.id}"
               data-btn-pin-id="${pin.id}"
               onclick="window.focarPinoNoViewer('${pin.id}')"
-              class="pin-item-btn w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] hover:border-[#d4af37]/50 text-left transition-all group cursor-pointer"
+              class="pin-item-btn w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/90 hover:border-teal-600/40 text-left transition-all group cursor-pointer"
             >
               <div class="flex items-center gap-2.5 truncate pr-2">
-                <span class="pin-indicator w-2 h-2 rounded-full bg-[#d4af37] shrink-0"></span>
-                <span class="pin-label text-sm font-medium text-neutral-200 group-hover:text-white transition-colors truncate">${pin.rotulo || "Estrutura"}</span>
+                <span class="pin-indicator w-2 h-2 rounded-full bg-teal-600 shrink-0 transition-transform"></span>
+                <span class="pin-label text-sm font-medium text-slate-800 group-hover:text-teal-950 transition-colors truncate">${pin.rotulo || "Estrutura"}</span>
               </div>
-              <span class="pin-action text-xs text-neutral-400 group-hover:text-[#d4af37] shrink-0 transition-colors">Focar &rarr;</span>
+              <span class="pin-action text-xs text-slate-500 group-hover:text-teal-700 shrink-0 transition-colors">Focar &rarr;</span>
             </button>
           `).join('')}
         </div>
@@ -774,13 +774,13 @@ function renderizarDescricaoETextos() {
   }
 
   container.innerHTML = `
-    <div class="prose-atlas text-slate-700 dark:text-slate-300 text-sm font-sans leading-relaxed">
+    <div class="prose-atlas text-slate-700 text-sm font-sans leading-relaxed">
       ${html}
     </div>
     ${secaoPinos}
     <a
       href="mailto:contato@palasatlas.com?subject=Correção sugerida na peça: ${encodeURIComponent(tituloPeca)}"
-      class="text-xs text-slate-500 hover:text-teal-700 dark:text-neutral-500 dark:hover:text-teal-400 transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-slate-200 dark:border-white/[0.06] pt-4 w-fit"
+      class="text-xs text-slate-500 hover:text-teal-700 transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-slate-200 pt-4 w-fit"
     >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -792,8 +792,12 @@ function renderizarDescricaoETextos() {
 
   // Estiliza pin-links inline com tipografia acadêmica sóbria e alto contraste (sem caixas azuis)
   container.querySelectorAll('.pin-link, [data-pin-id]').forEach(el => {
-    el.className = "pin-link font-semibold text-teal-700 dark:text-teal-300 hover:text-teal-900 dark:hover:text-teal-200 underline underline-offset-4 decoration-teal-600/40 hover:decoration-teal-700 dark:decoration-teal-400/40 cursor-pointer transition-all bg-transparent border-0 p-0 inline";
+    el.className = "pin-link font-semibold text-teal-700 hover:text-teal-900 underline underline-offset-4 decoration-teal-600/40 hover:decoration-teal-700 cursor-pointer transition-all bg-transparent border-0 p-0 inline";
   });
+
+  if (pinAtivo) {
+    destacarPinoNaSidebar(pinAtivo);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -815,8 +819,8 @@ export function alternarAbaPainel(aba) {
   const abaAlvo = (aba === "questoes") ? "questoes" : "descricao";
   abaAtivaPainel = abaAlvo;
 
-  const estiloAtivo   = "tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-800 text-white dark:bg-teal-950/70 dark:text-teal-200 border border-teal-700 dark:border-teal-700/50 shadow-sm touch-manipulation flex items-center justify-center";
-  const estiloInativo = "tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-200 hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-transparent touch-manipulation flex items-center justify-center";
+  const estiloAtivo   = "tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-700 text-white border border-teal-700 shadow-sm touch-manipulation flex items-center justify-center";
+  const estiloInativo = "tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 border border-transparent touch-manipulation flex items-center justify-center";
 
   if (abaAlvo === "descricao") {
     if (containerDesc) containerDesc.classList.remove("hidden");
@@ -845,9 +849,9 @@ function atualizarBadgeContadorQuestoes() {
   badge.textContent = String(total);
 
   if (total > 0) {
-    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-teal-500/15 text-teal-300 border border-teal-500/30 font-mono font-medium";
+    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-teal-50 text-teal-800 border border-teal-200 font-mono font-medium";
   } else {
-    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-white/[0.06] text-neutral-400 font-mono border border-transparent";
+    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-slate-200 text-slate-700 font-mono border border-transparent";
   }
 }
 
@@ -873,8 +877,8 @@ function salvarRespostaEstudante(laminaId, questaoId, texto) {
   const statusEl = document.getElementById(`statusSalvo-${idSeguro}`);
   if (statusEl) {
     statusEl.textContent = "Salvando...";
-    statusEl.classList.remove("text-neutral-500");
-    statusEl.classList.add("text-[#c8ad5f]");
+    statusEl.classList.remove("text-slate-500");
+    statusEl.classList.add("text-teal-700");
   }
 
   clearTimeout(debounceTimersRespostas[idSeguro]);
@@ -884,8 +888,8 @@ function salvarRespostaEstudante(laminaId, questaoId, texto) {
       localStorage.setItem(chave, texto);
       if (statusEl) {
         statusEl.textContent = "Salvo localmente";
-        statusEl.classList.remove("text-[#c8ad5f]");
-        statusEl.classList.add("text-neutral-500");
+        statusEl.classList.remove("text-teal-700");
+        statusEl.classList.add("text-slate-500");
       }
     } catch (e) {
       console.warn("[Palas Atlas] Erro ao persistir resposta no localStorage:", e);
@@ -905,8 +909,8 @@ function salvarRespostaImediato(laminaId, questaoId, texto) {
     const statusEl = document.getElementById(`statusSalvo-${idSeguro}`);
     if (statusEl) {
       statusEl.textContent = "Salvo localmente";
-      statusEl.classList.remove("text-[#c8ad5f]");
-      statusEl.classList.add("text-neutral-500");
+      statusEl.classList.remove("text-teal-700");
+      statusEl.classList.add("text-slate-500");
     }
   } catch (e) {
     console.warn("[Palas Atlas] Erro ao persistir resposta imediata no localStorage:", e);
@@ -933,15 +937,15 @@ export function renderizarQuestoesNaSidebar(questoes) {
   if (!Array.isArray(questoes) || questoes.length === 0) {
     container.innerHTML = `
       <div class="py-12 px-2 text-center space-y-3">
-        <div class="w-10 h-10 mx-auto rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-neutral-500">
+        <div class="w-10 h-10 mx-auto rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.5L18 8.5V19a2 2 0 01-2 2z"/>
           </svg>
         </div>
-        <p class="text-xs text-neutral-400 font-sans leading-relaxed max-w-xs mx-auto">
+        <p class="text-xs text-slate-500 font-sans leading-relaxed max-w-xs mx-auto">
           Nenhuma questão de bancada cadastrada para esta lâmina pelo professor.
         </p>
-        <span class="inline-block text-[10px] font-mono text-neutral-500 tracking-wider uppercase">
+        <span class="inline-block text-[10px] font-mono text-slate-400 tracking-wider uppercase">
           Atividades Práticas de Laboratório
         </span>
       </div>
@@ -970,7 +974,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
       <div
         id="card-questao-${qId}"
         data-questao-id="${qId}"
-        class="card-questao rounded-xl border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-neutral-900/40 p-4 transition-all duration-200 hover:border-slate-300 dark:hover:border-white/[0.12] space-y-3"
+        class="card-questao rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all duration-200 hover:border-slate-300 space-y-3"
       >
         <!-- Cabeçalho Clicável da Questão -->
         <button
@@ -980,17 +984,17 @@ export function renderizarQuestoesNaSidebar(questoes) {
           title="Focar localização da questão no microscópio"
         >
           <div class="flex items-start gap-2.5 min-w-0">
-            <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-[#c8ad5f]/15 text-[#c8ad5f] border border-[#c8ad5f]/30 shrink-0 mt-0.5">
+            <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200 shrink-0 mt-0.5">
               Q${numeroQ}
             </span>
             <div class="min-w-0">
-              <h4 class="text-xs font-semibold text-slate-800 dark:text-neutral-200 tracking-wide font-sans group-hover:text-teal-700 dark:group-hover:text-[#c8ad5f] transition-colors leading-snug">
+              <h4 class="text-xs font-semibold text-slate-800 tracking-wide font-sans group-hover:text-teal-700 transition-colors leading-snug">
                 ${escaparHTML(tituloQ)}
               </h4>
             </div>
           </div>
           ${temCoordenadas ? `
-            <div class="flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 group-hover:text-teal-700 dark:group-hover:text-[#c8ad5f] shrink-0 transition-colors pt-0.5">
+            <div class="flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-slate-500 group-hover:text-teal-700 shrink-0 transition-colors pt-0.5">
               <span>Focar</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -1001,7 +1005,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
 
         <!-- Enunciado e Orientação Diagnóstica -->
         ${enunciadoQ ? `
-          <div class="text-xs text-slate-700 dark:text-neutral-300 font-sans leading-relaxed border-l-2 border-slate-300 dark:border-white/[0.08] ml-1 pl-2.5">
+          <div class="text-xs text-slate-700 font-sans leading-relaxed border-l-2 border-slate-300 ml-1 pl-2.5">
             ${escaparHTML(enunciadoQ)}
           </div>
         ` : ''}
@@ -1009,8 +1013,8 @@ export function renderizarQuestoesNaSidebar(questoes) {
         <!-- Área de Anotação / Resposta do Estudante (sem gabarito) -->
         <div class="space-y-1.5 pt-1">
           <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">
-            <span class="text-slate-500 dark:text-neutral-400">Resposta / Diagnóstico</span>
-            <span id="statusSalvo-${qId}" class="text-slate-500 dark:text-neutral-500 transition-colors">
+            <span class="text-slate-500">Resposta / Diagnóstico</span>
+            <span id="statusSalvo-${qId}" class="text-slate-500 transition-colors">
               ${respostaSalva ? "Salvo localmente" : ""}
             </span>
           </div>
@@ -1020,7 +1024,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
             rows="3"
             placeholder="Sua anotação / resposta diagnóstica..."
             style="resize:vertical; min-height:72px;"
-            class="w-full bg-white dark:bg-neutral-950/80 border border-slate-300 dark:border-white/[0.08] focus:border-teal-600 dark:focus:border-[#c8ad5f]/60 focus:ring-1 focus:ring-teal-600/30 dark:focus:ring-[#c8ad5f]/40 rounded-lg p-2.5 text-xs text-slate-800 dark:text-neutral-200 placeholder-slate-400 dark:placeholder-neutral-500 font-sans leading-relaxed outline-none transition-all"
+            class="w-full bg-white border border-slate-300 focus:border-teal-600 focus:ring-1 focus:ring-teal-600/30 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 font-sans leading-relaxed outline-none transition-all"
           >${escaparHTML(respostaSalva)}</textarea>
         </div>
       </div>
@@ -1030,10 +1034,10 @@ export function renderizarQuestoesNaSidebar(questoes) {
   container.innerHTML = `
     <div class="space-y-3 pt-1">
       <div class="flex items-center justify-between px-0.5 pb-1">
-        <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500">
           Caderno de Bancada
         </span>
-        <span class="text-[10px] font-mono text-neutral-500">
+        <span class="text-[10px] font-mono text-slate-500">
           ${questoes.length} ${questoes.length === 1 ? 'questão' : 'questões'}
         </span>
       </div>
@@ -1072,18 +1076,18 @@ function destacarCardQuestaoNaSidebar(qId) {
     const cardQId = card.getAttribute("data-questao-id");
     const isAtivo = String(cardQId) === idBuscado;
     if (isAtivo) {
-      card.classList.add("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
-      card.classList.remove("border-white/[0.06]", "bg-neutral-900/40");
+      card.classList.add("border-teal-600", "bg-teal-50/70", "ring-1", "ring-teal-600/30", "shadow-sm");
+      card.classList.remove("border-slate-200", "bg-slate-50");
       card.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
-      card.classList.remove("border-[#c8ad5f]/70", "bg-neutral-900/90", "ring-1", "ring-[#c8ad5f]/40", "shadow-lg", "shadow-[#c8ad5f]/5");
-      card.classList.add("border-white/[0.06]", "bg-neutral-900/40");
+      card.classList.remove("border-teal-600", "bg-teal-50/70", "ring-1", "ring-teal-600/30", "shadow-sm");
+      card.classList.add("border-slate-200", "bg-slate-50");
     }
   });
 }
 
 /**
- * Aplica destaque visual e rolagem suave ao botão do pino correspondente na lista lateral.
+ * Aplica destaque visual ao botão do pino correspondente na lista lateral.
  *
  * @param {string} pinId - ID do pino ativo
  */
@@ -1098,32 +1102,32 @@ function destacarPinoNaSidebar(pinId) {
     const action = btn.querySelector(".pin-action");
 
     if (isAtivo) {
-      btn.classList.add("pin-active", "border-[#d4af37]", "bg-[#d4af37]/15", "ring-1", "ring-[#d4af37]/40", "shadow-lg", "shadow-[#d4af37]/10");
-      btn.classList.remove("border-white/[0.06]", "bg-white/[0.04]", "border-slate-200/80", "bg-slate-50");
+      btn.classList.add("pin-active", "border-teal-600", "bg-teal-50", "ring-1", "ring-teal-600/30", "shadow-sm");
+      btn.classList.remove("border-slate-200/90", "bg-slate-50");
       if (label) {
-        label.classList.add("text-white", "font-semibold");
-        label.classList.remove("text-neutral-200", "text-slate-800");
+        label.classList.add("text-teal-950", "font-semibold");
+        label.classList.remove("text-slate-800");
       }
       if (indicator) {
-        indicator.classList.add("ring-2", "ring-[#d4af37]/60", "scale-125");
+        indicator.classList.add("ring-2", "ring-teal-500/40", "scale-125");
       }
       if (action) {
-        action.classList.add("text-[#d4af37]", "font-semibold");
-        action.classList.remove("text-neutral-400", "text-slate-500");
+        action.classList.add("text-teal-700", "font-semibold");
+        action.classList.remove("text-slate-500");
       }
     } else {
-      btn.classList.remove("pin-active", "border-[#d4af37]", "bg-[#d4af37]/15", "ring-1", "ring-[#d4af37]/40", "shadow-lg", "shadow-[#d4af37]/10");
-      btn.classList.add("border-white/[0.06]", "bg-white/[0.04]");
+      btn.classList.remove("pin-active", "border-teal-600", "bg-teal-50", "ring-1", "ring-teal-600/30", "shadow-sm");
+      btn.classList.add("border-slate-200/90", "bg-slate-50");
       if (label) {
-        label.classList.remove("text-white", "font-semibold");
-        label.classList.add("text-neutral-200");
+        label.classList.remove("text-teal-950", "font-semibold");
+        label.classList.add("text-slate-800");
       }
       if (indicator) {
-        indicator.classList.remove("ring-2", "ring-[#d4af37]/60", "scale-125");
+        indicator.classList.remove("ring-2", "ring-teal-500/40", "scale-125");
       }
       if (action) {
-        action.classList.remove("text-[#d4af37]", "font-semibold");
-        action.classList.add("text-neutral-400");
+        action.classList.remove("text-teal-700", "font-semibold");
+        action.classList.add("text-slate-500");
       }
     }
   });
@@ -1203,8 +1207,8 @@ function inicializarOpenSeadragon() {
       navigatorPosition:        "BOTTOM_RIGHT",
       navigatorWidth:           "120px",
       navigatorHeight:          "90px",
-      navigatorBackground:      "rgba(10,10,10,0.85)",
-      navigatorBorderColor:     "rgba(200,173,95,0.35)",
+      navigatorBackground:      "rgba(255,255,255,0.92)",
+      navigatorBorderColor:     "rgba(3,105,161,0.5)",
       navigatorAutoFade:        true,
       showReferenceStrip:       false,
       animationTime:            0.45,
@@ -1273,8 +1277,8 @@ function inicializarOpenSeadragon() {
       type:            window.OpenSeadragon.ScalebarType.MICROSCOPE,
       location:        window.OpenSeadragon.ScalebarLocation.TOP_RIGHT,
       pixelsPerMeter:  pixelsPerMeter,
-      color:           "#e4e4e7",
-      backgroundColor: "rgba(24, 24, 27, 0.8)",
+      color:           "#0f172a",
+      backgroundColor: "rgba(255, 255, 255, 0.92)",
       fontFamily:      "'JetBrains Mono', monospace",
       barThickness:    2,
       xOffset:         16,
@@ -1383,8 +1387,8 @@ function inicializarOpenSeadragon() {
         Object.assign(navParent.style, {
           overflow:     "hidden",
           borderRadius: "10px",
-          border:       "1px solid rgba(59,130,246,0.3)",
-          boxShadow:    "0 4px 24px rgba(0,0,0,0.6)"
+          border:       "1px solid #cbd5e1",
+          boxShadow:    "0 8px 24px rgba(15,23,42,0.12)"
         });
       }
 
@@ -1394,7 +1398,8 @@ function inicializarOpenSeadragon() {
           borderRadius: "8px",
           padding:      "4px 12px",
           backdropFilter: "blur(8px)",
-          border:       "1px solid rgba(63, 63, 70, 0.8)",
+          border:       "1px solid #cbd5e1",
+          boxShadow:    "0 4px 12px rgba(15,23,42,0.08)",
           fontSize:     "10px",
           fontWeight:   "600"
         });
@@ -1739,8 +1744,8 @@ function atualizarLenteBotaoAtivo() {
     const magAttr = btn.getAttribute("data-mag");
     const isAtivo = magAttr ? `${magAttr}x` === objetivo : btn.textContent.trim() === objetivo;
     btn.className = isAtivo
-      ? "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
-      : "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+      ? "lens-btn bg-[#0369a1] text-white font-bold shadow-sm shadow-sky-900/20 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+      : "lens-btn text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   });
 
   // Em telas compactas, centraliza suavemente o botão da objetiva ativa no revólver sem rolar a janela
@@ -1763,7 +1768,7 @@ function aplicarBloqueioObjetivas(maxMag) {
     const magBotao = Number(btn.getAttribute("data-mag")) || 4;
     if (magBotao > limiteMag) {
       btn.disabled = true;
-      btn.className = "lens-btn text-neutral-600 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono cursor-not-allowed opacity-25 min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+      btn.className = "lens-btn text-slate-300 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono cursor-not-allowed opacity-50 min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
       btn.title = `Objetiva não disponível (Máx: ${limiteMag}x)`;
     } else {
       btn.disabled = false;
@@ -1792,9 +1797,9 @@ function registrarDelegacaoGlobalDePinos() {
     evento.preventDefault();
 
     // Feedback visual imediato e tátil no link clicado
-    alvo.classList.add("ring-2", "ring-teal-400/60", "ring-offset-2", "ring-offset-neutral-950", "rounded-sm");
+    alvo.classList.add("ring-2", "ring-teal-500/50", "ring-offset-2", "ring-offset-white", "rounded-sm");
     setTimeout(() => {
-      alvo.classList.remove("ring-2", "ring-teal-400/60", "ring-offset-2", "ring-offset-neutral-950", "rounded-sm");
+      alvo.classList.remove("ring-2", "ring-teal-500/50", "ring-offset-2", "ring-offset-white", "rounded-sm");
     }, 1400);
 
     focarPinoNoViewer(pinIdRaw);
@@ -1907,9 +1912,9 @@ export function focarPinoNoViewer(pinIdRaw) {
     overlayElem.id = `viewer-pin-${pinId}`;
     overlayElem.style.cssText = "pointer-events:none; position:relative; width:100%; height:100%; z-index:40;";
     overlayElem.innerHTML = `
-      <div class="animate-pulse" style="position:absolute; inset:0; border-radius:50%; border:2.5px solid #c8ad5f; box-shadow:0 0 25px rgba(200,173,95,0.7), inset 0 0 20px rgba(200,173,95,0.25); background:rgba(200,173,95,0.12);"></div>
+      <div class="animate-pulse" style="position:absolute; inset:0; border-radius:50%; border:2.5px solid #0d9488; box-shadow:0 0 25px rgba(13,148,136,0.6), inset 0 0 20px rgba(13,148,136,0.2); background:rgba(13,148,136,0.1);"></div>
       ${pino.rotulo ? `
-        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(10,10,10,0.9); color:#c8ad5f; border:1px solid rgba(200,173,95,0.6); font-family:monospace; font-size:11px; font-weight:bold; padding:3px 9px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.9); white-space:nowrap;">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:monospace; font-size:11px; font-weight:bold; padding:3px 9px; border-radius:12px; box-shadow:0 4px 14px rgba(15,23,42,0.25); white-space:nowrap;">
           ${pino.rotulo}
         </div>
       ` : ''}
@@ -1956,18 +1961,18 @@ export function focarPinoNoViewer(pinIdRaw) {
     overlayElem.id = `viewer-pin-${pinId}`;
     overlayElem.style.cssText = "pointer-events:none; position:relative; width:100%; height:100%; z-index:40;";
     overlayElem.innerHTML = `
-      <svg viewBox="0 0 ${w} ${h}" class="w-full h-full overflow-visible" style="filter:drop-shadow(0 0 10px rgba(200,173,95,0.8));">
+      <svg viewBox="0 0 ${w} ${h}" class="w-full h-full overflow-visible" style="filter:drop-shadow(0 2px 8px rgba(15,23,42,0.45));">
         <defs>
           <marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#c8ad5f" />
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#0d9488" />
           </marker>
         </defs>
-        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#c8ad5f" stroke-width="4" stroke-linecap="round" marker-end="url(#${markerId})" />
-        <circle cx="${svgX1}" cy="${svgY1}" r="6" fill="#c8ad5f" stroke="#ffffff" stroke-width="2" />
+        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#0d9488" stroke-width="4" stroke-linecap="round" marker-end="url(#${markerId})" />
+        <circle cx="${svgX1}" cy="${svgY1}" r="6" fill="#0d9488" stroke="#ffffff" stroke-width="2" />
         <circle cx="${svgX2}" cy="${svgY2}" r="5" fill="#ffffff" class="animate-ping" />
       </svg>
       ${pino.rotulo ? `
-        <div style="position:absolute; left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform:translate(-50%, -130%); background:rgba(10,10,10,0.9); color:#c8ad5f; border:1px solid rgba(200,173,95,0.6); font-family:monospace; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.9);">
+        <div style="position:absolute; left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform:translate(-50%, -130%); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:monospace; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 12px rgba(15,23,42,0.25);">
           ${pino.rotulo}
         </div>
       ` : ''}
@@ -1989,10 +1994,10 @@ export function focarPinoNoViewer(pinIdRaw) {
     overlayElem.id = `viewer-pin-${pinId}`;
     overlayElem.style.cssText = "pointer-events:none; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:36px; height:36px; z-index:40;";
     overlayElem.innerHTML = `
-      <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(200,173,95,0.45);border-radius:50%;"></div>
-      <div style="position:relative;width:14px;height:14px;background:#c8ad5f;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(200,173,95,0.45),0 4px 16px rgba(0,0,0,0.9);"></div>
+      <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(13,148,136,0.45);border-radius:50%;"></div>
+      <div style="position:relative;width:14px;height:14px;background:#0d9488;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(13,148,136,0.45),0 4px 14px rgba(15,23,42,0.35);"></div>
       ${pino.rotulo ? `
-        <div style="position:absolute; top:100%; left:50%; transform:translate(-50%, 6px); background:rgba(10,10,10,0.9); color:#c8ad5f; border:1px solid rgba(200,173,95,0.6); font-family:monospace; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.9); white-space:nowrap; pointer-events:none;">
+        <div style="position:absolute; top:100%; left:50%; transform:translate(-50%, 6px); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:monospace; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:12px; box-shadow:0 4px 14px rgba(15,23,42,0.25); white-space:nowrap; pointer-events:none;">
           ${pino.rotulo}
         </div>
       ` : ''}
@@ -2122,8 +2127,8 @@ export function focarQuestaoNoViewer(questaoId) {
   pinElem.title = `Questão Q${numeroQ}: ${q.titulo || "Ponto de Investigação"}`;
 
   pinElem.innerHTML = `
-    <div class="animate-ping" style="position:absolute; width:100%; height:100%; border-radius:9999px; background:radial-gradient(circle, rgba(200,173,95,0.4) 0%, rgba(6,182,212,0.25) 70%, transparent 100%); border:1.5px solid rgba(200,173,95,0.7);"></div>
-    <div style="position:relative; min-width:32px; height:32px; padding:0 6px; background:#0a0a0a; border-radius:9999px; border:1.5px solid #c8ad5f; box-shadow:0 0 0 2px rgba(6,182,212,0.35), 0 0 16px rgba(200,173,95,0.5), 0 4px 14px rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; gap:2px;">
+    <div class="animate-ping" style="position:absolute; width:100%; height:100%; border-radius:9999px; background:radial-gradient(circle, rgba(13,148,136,0.4) 0%, rgba(3,105,161,0.2) 70%, transparent 100%); border:1.5px solid rgba(13,148,136,0.7);"></div>
+    <div style="position:relative; min-width:32px; height:32px; padding:0 6px; background:#0f766e; border-radius:9999px; border:2px solid #ffffff; box-shadow:0 0 0 2px rgba(13,148,136,0.35), 0 4px 14px rgba(15,23,42,0.35); display:flex; align-items:center; justify-content:center; gap:2px;">
       <span style="font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:800; color:#ffffff; letter-spacing:-0.02em;">Q${numeroQ}</span>
     </div>
   `;
@@ -2213,11 +2218,11 @@ export function trocarLente(objetivaDesejada, btnElement) {
 
   document.querySelectorAll(".lens-btn").forEach(l => {
     if (l.disabled) return;
-    l.className = "lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+    l.className = "lens-btn text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   });
 
   if (targetBtn && !targetBtn.disabled) {
-    targetBtn.className = "lens-btn bg-[#c8ad5f] text-neutral-950 font-bold shadow-md shadow-[#c8ad5f]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-lg text-xs font-mono transition-all cursor-pointer active-lens touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+    targetBtn.className = "lens-btn bg-[#0369a1] text-white font-bold shadow-sm shadow-sky-900/20 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer active-lens touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
   }
 
   // Em telas compactas, centraliza suavemente o botão da objetiva ativada no revólver sem rolar a janela
@@ -2245,7 +2250,7 @@ function exibirErroMicroscopio(msg) {
   const tituloEl = document.getElementById("slideTitle");
   if (tituloEl) tituloEl.textContent = "Lâmina Indisponível";
   const descEl = document.getElementById("slideDescriptionContainer");
-  if (descEl) descEl.innerHTML = `<p class="text-neutral-500 italic text-sm font-sans">Não foi possível recuperar os dados morfológicos desta peça.</p>`;
+  if (descEl) descEl.innerHTML = `<p class="text-slate-500 italic text-sm font-sans">Não foi possível recuperar os dados morfológicos desta peça.</p>`;
   listaQuestoesAtual = [];
   atualizarBadgeContadorQuestoes();
   renderizarQuestoesNaSidebar([]);
@@ -2255,21 +2260,21 @@ function exibirErroMicroscopio(msg) {
   container.classList.remove("opacity-0");
   container.innerHTML = `
     <div class="flex flex-col items-center justify-center w-full h-full text-center gap-4 p-8">
-      <div class="w-14 h-14 rounded-2xl bg-rose-950/40 border border-rose-900/60 flex items-center justify-center shadow-lg shadow-rose-950/20">
-        <svg class="w-7 h-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center shadow-sm">
+        <svg class="w-7 h-7 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
       </div>
       <div class="space-y-1">
-        <h3 class="text-sm font-semibold text-white tracking-wide">Falha no Carregamento</h3>
-        <p class="text-rose-400 text-xs font-mono max-w-sm leading-relaxed">${msg}</p>
+        <h3 class="text-sm font-semibold text-slate-900 tracking-wide">Falha no Carregamento</h3>
+        <p class="text-rose-600 text-xs font-mono max-w-sm leading-relaxed">${msg}</p>
       </div>
       <div class="flex items-center gap-3 mt-3">
-        <button type="button" onclick="window.location.reload()" class="px-4 py-2 text-xs font-mono font-medium text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl transition-all cursor-pointer">
+        <button type="button" onclick="window.location.reload()" class="px-4 py-2 text-xs font-mono font-medium text-white bg-teal-700 hover:bg-teal-800 border border-teal-700 rounded-xl transition-all cursor-pointer shadow-sm">
           Recarregar
         </button>
-        <a href="index.html" class="px-4 py-2 text-xs font-mono font-medium text-zinc-300 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 rounded-xl transition-all">
+        <a href="index.html" class="px-4 py-2 text-xs font-mono font-medium text-slate-700 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-300 rounded-xl transition-all shadow-sm">
           Voltar ao Início
         </a>
       </div>

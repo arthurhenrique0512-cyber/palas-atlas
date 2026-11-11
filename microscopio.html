@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark" data-theme="dark" data-theme-lock="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -12,24 +12,26 @@
   <!-- Favicon Oficial Palas Atlas -->
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
 
-  <!-- Estúdio de Microscopia: Padronizado em Modo Óptico Escuro (Preto Ônix + Dourado) -->
+  <!-- Estúdio de Microscopia: Padronizado no Design Clínico Institucional (Light Mode) -->
   <script>
     (function() {
       var root = document.documentElement;
-      root.setAttribute('data-theme', 'dark');
-      root.setAttribute('data-theme-lock', 'dark');
-      root.classList.add('dark');
+      root.setAttribute('data-theme', 'light');
+      root.classList.remove('dark');
+      try {
+        localStorage.setItem('palas_theme', 'light');
+      } catch (e) {}
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('brand-logo').forEach(function(el) {
-          el.setAttribute('theme', 'dark-bg');
+          el.setAttribute('theme', 'light-bg');
           if (typeof el.render === 'function') el.render();
         });
       });
     })();
   </script>
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=14">
-  <link rel="stylesheet" href="css/styles.css?v=22">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=15">
+  <link rel="stylesheet" href="css/styles.css?v=23">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -39,7 +41,7 @@
 
   <!-- Web Component da Marca e Configurações -->
   <script src="js/brand-logo.js?v=13"></script>
-  <script src="js/settings-panel.js?v=3"></script>
+  <script src="js/settings-panel.js?v=4"></script>
 
   <link rel="stylesheet" href="css/splash.css?v=2">
   <style>
@@ -57,7 +59,8 @@
       margin: 0 !important;
       padding: 0 !important;
       -webkit-text-size-adjust: 100% !important;
-      background-color: #060608 !important;
+      background-color: #f8fafc !important;
+      color: #1e293b !important;
     }
 
     #viewerLensPanel {
@@ -126,36 +129,6 @@
       background: transparent !important;
     }
 
-    /* Variação em modo escuro para .prose-atlas */
-    html.dark .prose-atlas,
-    html[data-theme="dark"] .prose-atlas {
-      color: #cbd5e1;
-    }
-    html.dark .prose-atlas h3,
-    html[data-theme="dark"] .prose-atlas h3       { color:#f4f2ed !important; }
-    html.dark .prose-atlas p,
-    html[data-theme="dark"] .prose-atlas p,
-    html.dark .prose-atlas li,
-    html[data-theme="dark"] .prose-atlas li       { color:#cbd5e1 !important; }
-    html.dark .prose-atlas strong,
-    html[data-theme="dark"] .prose-atlas strong,
-    html.dark .prose-atlas b,
-    html[data-theme="dark"] .prose-atlas b        { color:#f4f4f5 !important; }
-    html.dark .prose-atlas .pin-link,
-    html[data-theme="dark"] .prose-atlas .pin-link {
-      color: #5eead4 !important;
-      text-decoration-color: rgba(94, 234, 212, 0.4) !important;
-    }
-    html.dark .prose-atlas .pin-link:hover,
-    html[data-theme="dark"] .prose-atlas .pin-link:hover {
-      color: #99f6e4 !important;
-      text-decoration-color: #2dd4bf !important;
-    }
-    html.dark .prose-atlas .pin-link:active,
-    html[data-theme="dark"] .prose-atlas .pin-link:active {
-      color: #ccfbf1 !important;
-    }
-
     /* Botão de recolher painel: preenchimento do painel indica estado aberto */
     .viewer-sidebar-toggle .sidebar-icon-fill { opacity: .35; transition: opacity .3s ease; }
     .viewer-sidebar-toggle[aria-expanded="false"] .sidebar-icon-fill { opacity: 0; }
@@ -169,8 +142,8 @@
         bottom: 0 !important;
         height: 100% !important;
         z-index: 40 !important;
-        box-shadow: -10px 0 35px rgba(0, 0, 0, 0.85) !important;
-        background-color: rgba(12, 12, 15, 0.96) !important;
+        box-shadow: -10px 0 35px rgba(15, 23, 42, 0.18) !important;
+        background-color: rgba(255, 255, 255, 0.98) !important;
         backdrop-filter: blur(16px) !important;
         -webkit-backdrop-filter: blur(16px) !important;
       }
@@ -187,7 +160,7 @@
       #viewerSidebar {
         position: relative !important;
         box-shadow: none !important;
-        background-color: #0c0c0f !important;
+        background-color: #ffffff !important;
         backdrop-filter: none !important;
       }
       #viewerBackdrop {
@@ -199,268 +172,22 @@
       }
     }
 
-    /* Scrollbar minimalista */
+    /* Scrollbar minimalista clara */
     ::-webkit-scrollbar       { width: 5px; }
-    ::-webkit-scrollbar-track { background: #0c0c0f; }
-    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
-
-    /* ==========================================================================
-       TEMA CLARO NO MICROSCÓPIO VIRTUAL (Branco Frio #F8FAFC & Azul-Petróleo #0369A1)
-       ========================================================================== */
-    html[data-theme="light"],
-    html[data-theme="light"] body {
-      background-color: #f8fafc !important;
-      color: #1e293b !important;
-    }
-
-    html[data-theme="light"] ::-webkit-scrollbar-track { background: #f1f5f9; }
-    html[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
-    html[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-    html[data-theme="light"] header {
-      background-color: rgba(255, 255, 255, 0.94) !important;
-      border-bottom-color: #e2e8f0 !important;
-      box-shadow: 0 4px 24px -6px rgba(15, 23, 42, 0.06) !important;
-    }
-
-    html[data-theme="light"] header > div:first-child {
-      background: linear-gradient(to right, #0f172a, #0284c7, #0f172a) !important;
-    }
-
-    html[data-theme="light"] header button {
-      background-color: #f1f5f9 !important;
-      border-color: #e2e8f0 !important;
-      color: #334155 !important;
-    }
-
-    html[data-theme="light"] header button:hover {
-      background-color: #0f172a !important;
-      border-color: #0f172a !important;
-      color: #ffffff !important;
-    }
-
-    html[data-theme="light"] #viewerBreadcrumb {
-      color: #64748b !important;
-    }
-
-    html[data-theme="light"] #viewerStage,
-    html[data-theme="light"] #osd-viewer {
-      background-color: #eef2f6 !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel {
-      background-color: rgba(255, 255, 255, 0.95) !important;
-      border-color: #cbd5e1 !important;
-      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.14) !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel .lens-btn:not(.active-lens) {
-      color: #475569 !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel .lens-btn:not(.active-lens):hover {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel .lens-btn.active-lens {
-      background-color: #0284c7 !important;
-      color: #ffffff !important;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel .w-px {
-      background-color: #e2e8f0 !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel button:not(.lens-btn) {
-      color: #334155 !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel button:not(.lens-btn):hover {
-      background-color: #f1f5f9 !important;
-      color: #0369a1 !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel > div:last-child {
-      background-color: #f0f9ff !important;
-      border-color: rgba(2, 132, 199, 0.35) !important;
-    }
-
-    html[data-theme="light"] #viewerLensPanel > div:last-child span.rounded-full {
-      background-color: #0284c7 !important;
-    }
-
-    html[data-theme="light"] #zoomIndicatorDisplay {
-      color: #0369a1 !important;
-    }
-
-    html[data-theme="light"] #btnAjudaMicroscopio {
-      background-color: rgba(255, 255, 255, 0.9) !important;
-      color: #334155 !important;
-      border-color: #cbd5e1 !important;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
-    }
-    html[data-theme="light"] #btnAjudaMicroscopio:hover {
-      background-color: #ffffff !important;
-      color: #0f172a !important;
-      border-color: #94a3b8 !important;
-    }
-    html[data-theme="light"] #popoverAjudaMicroscopio {
-      background-color: rgba(255, 255, 255, 0.98) !important;
-      border-color: #e2e8f0 !important;
-      color: #334155 !important;
-      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12) !important;
-    }
-    html[data-theme="light"] #popoverAjudaMicroscopio span.text-teal-400 {
-      color: #0f766e !important;
-    }
-    html[data-theme="light"] #popoverAjudaMicroscopio kbd {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
-      border-color: #e2e8f0 !important;
-    }
-
-    html[data-theme="light"] #viewerSidebar {
-      background-color: #ffffff !important;
-      border-left-color: #e2e8f0 !important;
-      color: #334155 !important;
-    }
-
-    @media (max-width: 1023px), (max-height: 500px) {
-      html[data-theme="light"] #viewerSidebar {
-        background-color: rgba(255, 255, 255, 0.97) !important;
-        box-shadow: -10px 0 35px rgba(15, 23, 42, 0.18) !important;
-      }
-    }
-
-    html[data-theme="light"] #viewerSidebar > div > div:first-child {
-      background-color: #f8fafc !important;
-      border-bottom-color: #e2e8f0 !important;
-    }
-
-    html[data-theme="light"] #slideTitle {
-      color: #0f172a !important;
-    }
-
-    html[data-theme="light"] #slideColoracao {
-      background-color: #f8fafc !important;
-      border-color: #e2e8f0 !important;
-      color: #475569 !important;
-    }
-
-    html[data-theme="light"] #slideSeloOptico {
-      background-color: #f0fdfa !important;
-      border-color: #ccfbf1 !important;
-      color: #0f766e !important;
-    }
-
-    html[data-theme="light"] #viewerSidebar > div > div:nth-child(2) {
-      background-color: #f8fafc !important;
-      border-bottom-color: #e2e8f0 !important;
-    }
-
-    html[data-theme="light"] #btnTabDescricao.tab-btn-ativo,
-    html[data-theme="light"] #btnTabQuestoes.tab-btn-ativo {
-      background-color: #0f766e !important;
-      color: #ffffff !important;
-      border-color: #0d9488 !important;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
-    }
-
-    html[data-theme="light"] #btnTabDescricao.tab-btn-inativo,
-    html[data-theme="light"] #btnTabQuestoes.tab-btn-inativo {
-      background-color: transparent !important;
-      color: #64748b !important;
-      border-color: transparent !important;
-    }
-
-    html[data-theme="light"] #btnTabDescricao.tab-btn-inativo:hover,
-    html[data-theme="light"] #btnTabQuestoes.tab-btn-inativo:hover {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
-    }
-
-    html[data-theme="light"] #badgeContadorQuestoes {
-      background-color: #f0fdfa !important;
-      color: #0f766e !important;
-      border-color: #ccfbf1 !important;
-    }
-
-    html[data-theme="light"] #slideDescriptionContainer,
-    html[data-theme="light"] #slideQuestionsContainer {
-      background-color: #ffffff !important;
-    }
-
-    html[data-theme="light"] .prose-atlas h3     { color: #0f172a !important; }
-    html[data-theme="light"] .prose-atlas p,
-    html[data-theme="light"] .prose-atlas li     { color: #334155 !important; line-height: 1.75 !important; font-size: 0.875rem !important; }
-    html[data-theme="light"] .prose-atlas strong,
-    html[data-theme="light"] .prose-atlas b      { color: #0f172a !important; font-weight: 600 !important; background: transparent !important; }
-    html[data-theme="light"] .prose-atlas .pin-link {
-      color: #0f766e !important;
-      background: transparent !important;
-      border: none !important;
-      padding: 0 !important;
-      border-radius: 0 !important;
-      text-decoration: underline !important;
-      text-underline-offset: 4px !important;
-      text-decoration-color: rgba(15, 118, 110, 0.35) !important;
-      text-decoration-thickness: 1.5px !important;
-      font-weight: 600 !important;
-      cursor: pointer !important;
-      transition: color 0.15s ease, text-decoration-color 0.15s ease !important;
-      display: inline !important;
-    }
-    html[data-theme="light"] .prose-atlas .pin-link:hover {
-      color: #115e59 !important;
-      text-decoration-color: #0f766e !important;
-      background: transparent !important;
-    }
-    html[data-theme="light"] .prose-atlas .pin-link:active {
-      color: #042f2e !important;
-      background: transparent !important;
-    }
-
-    html[data-theme="light"] #slideDescriptionContainer button {
-      background-color: #f8fafc !important;
-      border-color: #e2e8f0 !important;
-    }
-    html[data-theme="light"] #slideDescriptionContainer button:hover {
-      background-color: #f0f9ff !important;
-      border-color: rgba(2, 132, 199, 0.4) !important;
-    }
-    html[data-theme="light"] #slideDescriptionContainer button span.text-neutral-200 {
-      color: #0f172a !important;
-    }
-    html[data-theme="light"] #slideDescriptionContainer button span.rounded-full {
-      background-color: #0284c7 !important;
-    }
-
-    html[data-theme="light"] .card-questao {
-      background-color: #f8fafc !important;
-      border-color: #e2e8f0 !important;
-    }
-    html[data-theme="light"] .card-questao h4 {
-      color: #0f172a !important;
-    }
-    html[data-theme="light"] .card-questao textarea {
-      background-color: #ffffff !important;
-      border-color: #cbd5e1 !important;
-      color: #0f172a !important;
-    }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
 
-<body class="bg-[#060608] w-full h-screen overflow-hidden flex flex-col font-sans text-slate-200 selection:bg-[#d4af37]/25 selection:text-white">
+<body class="bg-[#f8fafc] w-full h-screen overflow-hidden flex flex-col font-sans text-slate-800 selection:bg-teal-600/20 selection:text-teal-950">
 
   <!-- ════════════════════════════════════════════════════════════════════
-       BARRA SUPERIOR DO LEITOR (Estúdio Óptico Preto Ônix & Dourado / Claro Azul-Petróleo)
+       BARRA SUPERIOR DO LEITOR (Design Clínico Institucional Claro)
        ════════════════════════════════════════════════════════════════════ -->
-  <header class="shrink-0 w-full bg-[#09090c] z-50 relative border-b border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.75)]">
-    <!-- Filete Superior Dourado Clássico -->
-    <div class="h-[2px] w-full bg-gradient-to-r from-[#060608] via-[#d4af37] to-[#060608]"></div>
+  <header class="shrink-0 w-full bg-white/95 backdrop-blur-md z-50 relative border-b border-slate-200 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)]">
+    <!-- Filete Superior Institucional (Slate & Azul-Petróleo) -->
+    <div class="h-[2px] w-full bg-gradient-to-r from-slate-900 via-[#0369a1] to-slate-900"></div>
 
     <div class="px-3 sm:px-5 h-14 sm:h-16 flex items-center justify-between gap-4">
       <!-- Esquerda: Voltar + Divisor Vertical + Logotipo Oficial Agrupados + Breadcrumb -->
@@ -468,7 +195,7 @@
         <button
           type="button"
           onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
-          class="h-9 sm:h-10 px-3 sm:px-3.5 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/15 border border-white/[0.1] hover:border-[#d4af37]/40 flex items-center gap-1.5 text-xs font-semibold text-neutral-200 hover:text-[#e5c158] active:scale-95 transition-all duration-200 cursor-pointer shrink-0 touch-manipulation"
+          class="h-9 sm:h-10 px-3 sm:px-3.5 rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer shrink-0 touch-manipulation"
           aria-label="Voltar"
         >
           <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -477,13 +204,13 @@
           <span class="hidden sm:inline">Voltar</span>
         </button>
 
-        <span class="h-5 w-px bg-white/10 shrink-0"></span>
+        <span class="h-5 w-px bg-slate-200 shrink-0"></span>
 
         <a href="index.html" class="inline-flex items-center shrink-0 no-underline cursor-pointer" aria-label="Palas Atlas - Início">
-          <brand-logo theme="dark-bg" show-subtitle="false" size="sm"></brand-logo>
+          <brand-logo theme="light-bg" show-subtitle="false" size="sm"></brand-logo>
         </a>
 
-        <span id="viewerBreadcrumb" class="text-xs text-neutral-400 font-sans tracking-wide truncate max-w-[120px] sm:max-w-[180px] md:max-w-xs hidden"></span>
+        <span id="viewerBreadcrumb" class="text-xs text-slate-500 font-sans tracking-wide truncate max-w-[120px] sm:max-w-[180px] md:max-w-xs hidden"></span>
       </div>
 
       <!-- Direita: Recolher / Expandir painel lateral -->
@@ -491,7 +218,7 @@
         <button
           id="btnToggleSidebar"
           type="button"
-          class="viewer-sidebar-toggle h-9 sm:h-10 px-3 sm:px-3.5 flex items-center justify-center gap-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/15 border border-white/[0.1] hover:border-[#d4af37]/40 text-neutral-200 hover:text-[#e5c158] active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
+          class="viewer-sidebar-toggle h-9 sm:h-10 px-3 sm:px-3.5 flex items-center justify-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
           aria-label="Recolher painel de informações"
           aria-controls="viewerSidebar"
           aria-expanded="true"
@@ -514,8 +241,8 @@
        ════════════════════════════════════════════════════════════════════ -->
   <div class="flex flex-1 overflow-hidden relative">
 
-    <!-- Esquerda — Estúdio Óptico (expande quando o painel lateral é recolhido) -->
-    <main id="viewerStage" class="relative flex-1 min-w-0 h-full bg-neutral-950 overflow-hidden flex items-center justify-center">
+    <!-- Esquerda — Estúdio Óptico Clínico (expande quando o painel lateral é recolhido) -->
+    <main id="viewerStage" class="relative flex-1 min-w-0 h-full bg-[#eef2f6] overflow-hidden flex items-center justify-center">
 
       <!-- Skeleton / Splash de carregamento Vetorial -->
       <div id="osdSkeleton" class="fixed inset-0 splash-container flex flex-col items-center justify-center z-[99999] select-none">
@@ -554,89 +281,89 @@
 
       <!-- Container Deep Zoom (OpenSeadragon) -->
       <div id="osd-viewer"
-        class="w-full h-full bg-[#060608] relative overflow-hidden transition-opacity duration-500 opacity-0"
+        class="w-full h-full bg-[#eef2f6] relative overflow-hidden transition-opacity duration-500 opacity-0"
       ></div>
 
       <!-- REVÓLVER DE OBJETIVAS + CONTROLES DE ZOOM DINÂMICOS -->
       <div
         id="viewerLensPanel"
-        class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-36 flex items-center gap-1 sm:gap-1.5 lg:gap-1.5 p-1.5 sm:p-2 rounded-2xl bg-[#0d0d11]/95 backdrop-blur-xl border border-white/[0.14] shadow-[0_20px_50px_rgba(0,0,0,0.85)] text-xs font-mono select-none max-w-[calc(100%-16px)] sm:max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
+        class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-36 flex items-center gap-1 sm:gap-1.5 lg:gap-1.5 p-1.5 sm:p-2 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_16px_40px_rgba(15,23,42,0.12)] text-xs font-mono select-none max-w-[calc(100%-16px)] sm:max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
       >
         <!-- Valores nominais das objetivas -->
         <button
           type="button"
           onclick="window.trocarLente(4, this)"
-          class="lens-btn bg-[#d4af37] text-[#09090b] font-bold shadow-md shadow-[#d4af37]/25 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn bg-[#0369a1] text-white font-bold shadow-sm shadow-sky-900/20 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="4"
         >4x</button>
         <button
           type="button"
           onclick="window.trocarLente(10, this)"
-          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="10"
         >10x</button>
         <button
           type="button"
           onclick="window.trocarLente(40, this)"
-          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="40"
         >40x</button>
         <button
           type="button"
           onclick="window.trocarLente(60, this)"
-          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="60"
         >60x</button>
         <button
           type="button"
           onclick="window.trocarLente(100, this)"
-          class="lens-btn text-neutral-400 hover:text-white hover:bg-white/[0.06] active:bg-white/10 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+          class="lens-btn text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
           data-mag="100"
         >100x</button>
         
         <!-- Divisor sutil -->
-        <div class="w-px h-5 lg:h-4 bg-white/[0.1] shrink-0"></div>
+        <div class="w-px h-5 lg:h-4 bg-slate-200 shrink-0"></div>
 
         <!-- Controles manuais de Zoom (+ / - / Home) -->
         <button
           type="button"
           onclick="window.alterarZoom(1.35)"
-          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-neutral-300 hover:text-[#e5c158] hover:bg-white/[0.06] active:bg-white/10 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
+          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0369a1] hover:bg-slate-100 active:bg-slate-200 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
           title="Aproximar (+)"
           aria-label="Aproximar zoom"
         >+</button>
         <button
           type="button"
           onclick="window.alterarZoom(0.75)"
-          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-neutral-300 hover:text-[#e5c158] hover:bg-white/[0.06] active:bg-white/10 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
+          class="w-9 h-9 sm:w-10 sm:h-10 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0369a1] hover:bg-slate-100 active:bg-slate-200 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
           title="Afastar (&minus;)"
           aria-label="Afastar zoom"
         >&minus;</button>
         <button
           type="button"
           onclick="window.osdViewerAction('home')"
-          class="min-h-[38px] sm:min-h-[40px] lg:min-h-0 px-2.5 sm:px-3 lg:px-2.5 py-1 lg:py-1 flex items-center justify-center rounded-xl text-neutral-300 hover:text-[#d4af37] hover:bg-white/[0.06] active:bg-white/10 transition-all text-xs lg:text-[10.5px] tracking-wider uppercase font-semibold cursor-pointer touch-manipulation shrink-0"
+          class="min-h-[38px] sm:min-h-[40px] lg:min-h-0 px-2.5 sm:px-3 lg:px-2.5 py-1 lg:py-1 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0369a1] hover:bg-slate-100 active:bg-slate-200 transition-all text-xs lg:text-[10.5px] tracking-wider uppercase font-semibold cursor-pointer touch-manipulation shrink-0"
           title="Enquadramento geral"
           aria-label="Enquadramento geral 1 para 1"
         >1:1</button>
 
         <!-- Divisor sutil -->
-        <div class="w-px h-5 lg:h-4 bg-white/[0.1] shrink-0"></div>
+        <div class="w-px h-5 lg:h-4 bg-slate-200 shrink-0"></div>
 
         <!-- Display do Zoom Dinâmico em Tempo Real -->
-        <div class="flex items-center gap-1.5 px-2.5 py-1.5 lg:py-1 rounded-xl bg-[#060608] border border-[#d4af37]/30 shrink-0 min-h-[38px] sm:min-h-[40px] lg:min-h-0">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] animate-pulse"></span>
-          <span class="text-[#d4af37] font-bold text-xs" id="zoomIndicatorDisplay">4.0x</span>
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 lg:py-1 rounded-xl bg-sky-50 border border-sky-200 shrink-0 min-h-[38px] sm:min-h-[40px] lg:min-h-0">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#0284c7] animate-pulse"></span>
+          <span class="text-[#0369a1] font-bold text-xs" id="zoomIndicatorDisplay">4.0x</span>
         </div>
       </div>
 
       <!-- Botão Discreto de Ajuda / Atalhos de Navegação -->
-      <div class="absolute top-4 right-4 z-20" id="containerAjudaMicroscopio">
+      <div class="absolute top-14 right-4 z-20" id="containerAjudaMicroscopio">
         <button
           type="button"
           id="btnAjudaMicroscopio"
           onclick="window.toggleAjudaMicroscopio()"
-          class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold bg-[#0d0d11]/75 hover:bg-[#18181f] text-neutral-300 hover:text-white border border-white/[0.12] hover:border-white/25 shadow-lg backdrop-blur-md transition-all cursor-pointer select-none"
+          class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold bg-white/90 hover:bg-white text-slate-700 hover:text-slate-950 border border-slate-200 hover:border-slate-300 shadow-md backdrop-blur-md transition-all cursor-pointer select-none"
           aria-label="Atalhos e instruções do microscópio"
           title="Atalhos de navegação"
         >
@@ -645,37 +372,37 @@
         <!-- Popover com Guia Rápido de Gestos -->
         <div
           id="popoverAjudaMicroscopio"
-          class="hidden absolute right-0 top-10 w-64 p-3.5 rounded-2xl bg-[#0e0e12]/95 backdrop-blur-xl border border-white/[0.12] shadow-2xl text-xs text-neutral-300 z-30 transition-all select-none"
+          class="hidden absolute right-0 top-10 w-64 p-3.5 rounded-2xl bg-white/98 backdrop-blur-xl border border-slate-200 shadow-xl text-xs text-slate-700 z-30 transition-all select-none"
         >
-          <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-white/[0.08]">
-            <span class="text-[10px] font-mono uppercase tracking-widest text-teal-400 font-semibold">Navegação no Espécime</span>
+          <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-100">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-teal-700 font-semibold">Navegação no Espécime</span>
             <button
               type="button"
               onclick="window.toggleAjudaMicroscopio(false)"
-              class="text-neutral-400 hover:text-white text-base leading-none p-1 rounded transition-colors"
+              class="text-slate-400 hover:text-slate-900 text-base leading-none p-1 rounded transition-colors"
               aria-label="Fechar ajuda"
             >&times;</button>
           </div>
           <ul class="space-y-2 text-[11px] font-sans">
             <li class="flex items-center justify-between">
-              <span class="text-neutral-400">Zoom contínuo</span>
-              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">Scroll / Pinça</kbd>
+              <span class="text-slate-600">Zoom contínuo</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">Scroll / Pinça</kbd>
             </li>
             <li class="flex items-center justify-between">
-              <span class="text-neutral-400">Mover lâmina</span>
-              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">Arrastar / Pan</kbd>
+              <span class="text-slate-600">Mover lâmina</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">Arrastar / Pan</kbd>
             </li>
             <li class="flex items-center justify-between">
-              <span class="text-neutral-400">Ampliar área</span>
-              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">Duplo clique</kbd>
+              <span class="text-slate-600">Ampliar área</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">Duplo clique</kbd>
             </li>
             <li class="flex items-center justify-between">
-              <span class="text-neutral-400">Objetivas ópticas</span>
-              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">4x &bull; 10x &bull; 40x</kbd>
+              <span class="text-slate-600">Objetivas ópticas</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">4x &bull; 10x &bull; 40x</kbd>
             </li>
             <li class="flex items-center justify-between">
-              <span class="text-neutral-400">Redefinir campo</span>
-              <kbd class="px-2 py-0.5 rounded bg-white/[0.08] text-[10px] font-mono text-neutral-200 border border-white/[0.05]">1:1</kbd>
+              <span class="text-slate-600">Redefinir campo</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">1:1</kbd>
             </li>
           </ul>
         </div>
@@ -686,31 +413,31 @@
     <!-- Backdrop escurecido para mobile/tablet (fecha a barra lateral ao tocar fora) -->
     <div
       id="viewerBackdrop"
-      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[35] hidden opacity-0 transition-opacity duration-300 lg:hidden pointer-events-none"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[35] hidden opacity-0 transition-opacity duration-300 lg:hidden pointer-events-none"
       aria-hidden="true"
     ></div>
 
     <!-- Direita — Painel de Informações (retrátil) -->
     <aside
       id="viewerSidebar"
-      class="h-full bg-white dark:bg-[#0c0c0f] border-l border-slate-200 dark:border-white/[0.09] text-slate-700 dark:text-neutral-300 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
+      class="h-full bg-white border-l border-slate-200 text-slate-700 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
       aria-hidden="false"
     >
       <div class="w-[85vw] sm:w-[380px] max-w-[380px] h-full flex flex-col">
 
         <!-- Cabeçalho do Painel: Título e Coloração (Bloco Elevado) -->
-        <div class="px-5 sm:px-7 pt-5 sm:pt-6 pb-4 sm:pb-5 bg-slate-50 dark:bg-[#111115] border-b border-slate-200 dark:border-white/[0.08] shrink-0 flex items-start justify-between gap-3">
+        <div class="px-5 sm:px-7 pt-5 sm:pt-6 pb-4 sm:pb-5 bg-slate-50 border-b border-slate-200 shrink-0 flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <span class="inline-block text-[9.5px] font-mono uppercase tracking-[0.2em] text-slate-500 dark:text-neutral-500 mb-1">Análise Morfológica</span>
-            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-slate-900 dark:text-[#f4f2ed] leading-snug tracking-tight truncate sm:whitespace-normal">
+            <span class="inline-block text-[9.5px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-1">Análise Morfológica</span>
+            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-slate-900 leading-snug tracking-tight truncate sm:whitespace-normal">
               Carregando lâmina...
             </h2>
             <div class="mt-2.5 flex flex-wrap items-center gap-2">
-              <p id="slideColoracao" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-[11px] font-sans font-medium text-slate-700 dark:text-neutral-300">
+              <p id="slideColoracao" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-[11px] font-sans font-medium text-slate-700">
                 Hematoxilina e Eosina (H&amp;E)
               </p>
-              <span id="slideSeloOptico" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/40 text-[11px] font-sans font-medium text-teal-800 dark:text-teal-300" title="Resolução Óptica Nativa Travada">
-                <span class="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400"></span>
+              <span id="slideSeloOptico" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-50 border border-teal-200 text-[11px] font-sans font-medium text-teal-800" title="Resolução Óptica Nativa Travada">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
                 <span id="slideSeloOpticoTexto">40x Nativa</span>
               </span>
             </div>
@@ -719,7 +446,7 @@
           <button
             type="button"
             id="btnCloseSidebarMobile"
-            class="lg:hidden w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-800 dark:text-neutral-400 dark:hover:text-white active:bg-slate-100 dark:active:bg-white/10 rounded-xl transition-colors shrink-0 touch-manipulation cursor-pointer -mr-1 -mt-0.5"
+            class="lg:hidden w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-800 active:bg-slate-100 rounded-xl transition-colors shrink-0 touch-manipulation cursor-pointer -mr-1 -mt-0.5"
             aria-label="Fechar painel"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -727,12 +454,12 @@
         </div>
 
         <!-- Abas de Navegação do Painel Lateral -->
-        <div class="px-5 sm:px-7 py-3 flex items-center gap-2 border-b border-slate-200 dark:border-white/[0.07] bg-slate-100/70 dark:bg-[#0e0e12] shrink-0">
+        <div class="px-5 sm:px-7 py-3 flex items-center gap-2 border-b border-slate-200 bg-slate-100/70 shrink-0">
           <button
             id="btnTabDescricao"
             type="button"
             onclick="window.alternarAbaPainel('descricao')"
-            class="tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-800 text-white dark:bg-teal-950/70 dark:text-teal-200 border border-teal-700 dark:border-teal-700/50 shadow-sm touch-manipulation flex items-center justify-center"
+            class="tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-700 text-white border border-teal-700 shadow-sm touch-manipulation flex items-center justify-center"
           >
             Descrição
           </button>
@@ -740,27 +467,27 @@
             id="btnTabQuestoes"
             type="button"
             onclick="window.alternarAbaPainel('questoes')"
-            class="tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-200 hover:bg-slate-200/60 dark:hover:bg-white/[0.04] border border-transparent flex items-center gap-1.5 touch-manipulation justify-center"
+            class="tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 border border-transparent flex items-center gap-1.5 touch-manipulation justify-center"
           >
             <span>Questões</span>
-            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-200 dark:bg-white/[0.06] text-slate-700 dark:text-neutral-400 font-mono font-medium">0</span>
+            <span id="badgeContadorQuestoes" class="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-200 text-slate-700 font-mono font-medium">0</span>
           </button>
         </div>
 
         <!-- Descrição completa com hiperlinks de pinos -->
         <div
           id="slideDescriptionContainer"
-          class="px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-white dark:bg-[#0c0c0f] text-slate-700 dark:text-neutral-300"
+          class="px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-white text-slate-700"
           style="-webkit-overflow-scrolling:touch;"
         >
-          <div class="text-sm text-slate-500 dark:text-neutral-500 font-sans italic">
+          <div class="text-sm text-slate-500 font-sans italic">
             As informações desta lâmina serão renderizadas aqui.
           </div>
         </div>
 
         <div
           id="slideQuestionsContainer"
-          class="hidden px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-white dark:bg-[#0c0c0f] space-y-4 text-slate-700 dark:text-neutral-300"
+          class="hidden px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-white space-y-4 text-slate-700"
           style="-webkit-overflow-scrolling:touch;"
         >
           <!-- Questões renderizadas dinamicamente aqui -->
@@ -773,7 +500,7 @@
 
   <script type="module" src="js/firebase-config.js"></script>
   <script type="module" src="js/slide-security.js?v=20261109_reactive_print_v5"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261109_pin_v6"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261111_light_v7"></script>
 
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>
