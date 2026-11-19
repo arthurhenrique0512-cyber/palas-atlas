@@ -2,6 +2,11 @@
 **/.DS_Store
 node_modules/
 .npm/
+.next/
+out/
+dist/
+next-env.d.ts
+tsconfig.tsbuildinfo
 
 # Temporary files
 tmp/
@@ -14,3 +19,9 @@ tmp/
 Thumbs.db
 .env*.local
 .env.local
+
+# Estúdio de Produção de Mídia Palas Atlas
+context/
+pipelines/
+templates/
+exports/

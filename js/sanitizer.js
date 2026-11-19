@@ -5,6 +5,21 @@
  */
 
 /**
+ * Escapa caracteres especiais HTML para inserção segura em templates DOM e atributos.
+ * @param {string|number} str - Valor bruto a escapar.
+ * @returns {string} String escapada com entidades HTML.
+ */
+export function escaparHTML(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
  * Remove elementos e atributos potencialmente perigosos do HTML usando DOMParser nativo.
  * Elimina scripts, iframes, objetos, links javascript: e manipuladores on* (onerror, onclick, etc.).
  *
@@ -199,6 +214,7 @@ export function formatarDescricaoMorfolgica(rawInput) {
 }
 
 if (typeof window !== "undefined") {
+  window.escaparHTML = escaparHTML;
   window.formatarDescricaoMorfolgica = formatarDescricaoMorfolgica;
   window.sanitizarHTMLDescricao = sanitizarHTMLDescricao;
 }

@@ -1,8 +1,22 @@
 import { db } from "./firebase-config.js";
+import { escaparHTML } from "./sanitizer.js";
+import { catalogData } from "./catalog-data.js?v=20261118v2";
 
 let slidesCache = [];
 let isCacheLoaded = false;
 let debounceTimer;
+
+function getEstaticasCatalogo() {
+  const lista = [];
+  Object.values(catalogData || {}).forEach((disc) => {
+    (disc.topicos || []).forEach((t) => {
+      (t.laminasEstaticas || t.laminas || []).forEach((lam) => {
+        if (lam && lam.id) lista.push(lam);
+      });
+    });
+  });
+  return lista;
+}
 
 export function initGlobalSearch() {
   const searchInput = document.getElementById("global-search-input");
@@ -14,16 +28,28 @@ export function initGlobalSearch() {
 
   if (!searchInput) return;
 
-  // Carrega o cache das lâminas ativas ao focar no input pela primeira vez
+  // Carrega o cache das lâminas ativas (Firestore + fallback estático do catálogo) ao focar pela primeira vez
   const loadCache = async () => {
-    if (isCacheLoaded || !db) return;
-    try {
-      const snapshot = await db.collection("laminas").where("status", "==", "ativa").get();
-      slidesCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    if (isCacheLoaded) return;
+    const estaticas = getEstaticasCatalogo();
+    const mapa = new Map();
+    estaticas.forEach((s) => mapa.set(String(s.id), s));
+
+    if (typeof db !== "undefined" && db) {
+      try {
+        const snapshot = await Promise.race([
+          db.collection("laminas").where("status", "==", "ativa").get(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 4000))
+        ]);
+        snapshot.docs.forEach((doc) => mapa.set(String(doc.id), { id: doc.id, ...doc.data() }));
+        isCacheLoaded = true;
+      } catch (e) {
+        console.warn("[SearchEngine] Usando fallback estático para busca:", e.message || e);
+      }
+    } else {
       isCacheLoaded = true;
-    } catch (e) {
-      console.error("[SearchEngine] Erro ao carregar acervo para busca:", e);
     }
+    slidesCache = Array.from(mapa.values());
   };
 
   searchInput.addEventListener("focus", loadCache);
@@ -127,18 +153,18 @@ export function initGlobalSearch() {
 
       li.innerHTML = `
         <div class="flex items-center justify-between">
-          <span class="text-slate-900 font-medium text-sm">${title}</span>
-          <span class="text-[10px] bg-sky-50 text-sky-700 border border-sky-200/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold">${topico}</span>
+          <span class="text-slate-900 font-medium text-sm">${escaparHTML(title)}</span>
+          <span class="text-[10px] bg-sky-50 text-sky-700 border border-sky-200/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold">${escaparHTML(topico)}</span>
         </div>
         <div class="text-xs text-slate-500 font-sans flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
-          ${coloracao}
+          <span>${escaparHTML(coloracao)}</span>
         </div>
       `;
 
       li.addEventListener("click", () => {
         // Redireciona direto para o Microscópio
-        window.location.href = `microscopio.html?id=${slide.id}`;
+        window.location.href = `microscopio.html?id=${encodeURIComponent(String(slide.id || ""))}`;
       });
 
       resultsList.appendChild(li);

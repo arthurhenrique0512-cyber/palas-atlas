@@ -17,7 +17,11 @@ class SlideSecurityEngine {
   constructor() {
     this.initialized = false;
     this.sessionTicket = null;
+    this.ticketSlideId = null;
     this.ticketExpiresAt = 0;
+    this._pendingTicketPromise = null;
+    this._pendingTicketSlideId = null;
+    this.gatewayAvailable = null;
     this.viewerElement = null;
     this.watermarkCanvas = null;
     this.watermarkAnimFrame = null;
@@ -28,18 +32,22 @@ class SlideSecurityEngine {
     this.driftDirection = 1;
     this.lastDriftUpdate = 0;
     this.hardenedEventsBound = false;
+    this.authListenerBound = false;
+    this.themeObserver = null;
   }
 
   /**
    * Inicializa o motor de proteção para o visualizador
    * @param {Object} options
    * @param {HTMLElement} options.viewerElement Container do visualizador
-   * @param {string} options.slideId Identificador da lâmina atual
+   * @param {string|null} [options.slideId] Identificador da lâmina atual
    * @param {string} [options.userEmail] E-mail ou identificador do usuário
    */
   init(options = {}) {
     this.viewerElement = options.viewerElement || document.getElementById('osd-viewer');
-    this.currentSlideId = options.slideId || 'lamina-anon';
+    if (options.slideId) {
+      this.currentSlideId = options.slideId;
+    }
     this.currentUserIdentifier = options.userEmail || this._obterIdentificadorSessao();
 
     if (!this.viewerElement) {
@@ -47,39 +55,43 @@ class SlideSecurityEngine {
       return;
     }
 
-    // 1. Blindagem do DOM e atalhos de teclado (executado uma única vez)
+    // 1. Blindagem do DOM, tema e redimensionamento (executado uma única vez)
     if (!this.hardenedEventsBound) {
       this._aplicarBlindagemCliente();
       this._protegerCanvasAPI();
+      window.addEventListener('resize', () => this._redimensionarMarcaDagua());
+      this.themeObserver = new MutationObserver(() => this._redimensionarMarcaDagua());
+      this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
       this.hardenedEventsBound = true;
     }
 
     // 2. Instanciação e amarração da marca d'água dinâmica
     this._montarMarcaDaguaDinamica();
 
-    // 3. Ouvinte para sincronizar com mudanças de tema (claro/escuro) e redimensionamento
-    window.addEventListener('resize', () => this._redimensionarMarcaDagua());
-    const observer = new MutationObserver(() => this._redimensionarMarcaDagua());
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+    // 3. Inicia ciclo de autenticação de sessão apenas quando há lâmina definida
+    if (this.currentSlideId) {
+      this.renovarTicketSessao(this.currentSlideId);
+    }
 
-    // 4. Inicia ciclo de autenticação de sessão de azulejos
-    this.renovarTicketSessao(this.currentSlideId);
-
-    // 5. Rastreamento dinâmico do usuário autenticado no Firebase
-    const setupAuthListener = () => {
-      try {
-        if (window.firebase && typeof window.firebase.auth === 'function') {
-          window.firebase.auth().onAuthStateChanged((user) => {
-            if (user && user.email) {
-              this.currentUserIdentifier = user.email;
-              this._desenharMarcaDagua();
-            }
-          });
-        }
-      } catch (e) {}
-    };
-    setupAuthListener();
-    window.addEventListener('palas-firebase-ready', setupAuthListener);
+    // 4. Rastreamento dinâmico do usuário autenticado no Firebase (apenas uma vez)
+    if (!this.authListenerBound) {
+      const setupAuthListener = () => {
+        if (this.authListenerBound) return;
+        try {
+          if (window.firebase && typeof window.firebase.auth === 'function') {
+            this.authListenerBound = true;
+            window.firebase.auth().onAuthStateChanged((user) => {
+              if (user && user.email) {
+                this.currentUserIdentifier = user.email;
+                this._desenharMarcaDagua();
+              }
+            });
+          }
+        } catch (e) {}
+      };
+      setupAuthListener();
+      window.addEventListener('palas-firebase-ready', setupAuthListener);
+    }
 
     this.initialized = true;
     console.info('[Palas Security] Blindagem ativa contra cópia e raspagem de lâminas.');
@@ -393,57 +405,103 @@ class SlideSecurityEngine {
   /**
    * Solicita um ticket de sessão efêmero assinado para requisições de azulejos
    */
-  async renovarTicketSessao(slideId) {
+  async renovarTicketSessao(slideId, forceRefresh = false) {
     if (!slideId) return null;
     const now = Date.now();
-    if (this.sessionTicket && this.ticketExpiresAt > now + 60000) {
+    if (
+      !forceRefresh &&
+      this.sessionTicket &&
+      this.ticketSlideId === slideId &&
+      this.ticketExpiresAt > now + 60000
+    ) {
       return this.sessionTicket;
     }
 
-    try {
-      const res = await fetch(`/api/tile-auth?id=${encodeURIComponent(slideId)}`, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        this.sessionTicket = data.token;
-        this.ticketExpiresAt = data.expiresAt || (now + 15 * 60 * 1000);
-        return this.sessionTicket;
-      }
-    } catch (e) {
-      // Fallback em caso de ambiente estático sem servidor de funções ativo
+    if (this._pendingTicketPromise && this._pendingTicketSlideId === slideId && !forceRefresh) {
+      return this._pendingTicketPromise;
     }
 
-    // Fallback gerado localmente para manter a consistência de interface
-    this.sessionTicket = `palas-sec-${btoa(slideId + ':' + now).substring(0, 24)}`;
-    this.ticketExpiresAt = now + 15 * 60 * 1000;
-    return this.sessionTicket;
+    this._pendingTicketSlideId = slideId;
+    this._pendingTicketPromise = (async () => {
+      const controller = typeof AbortController === 'function' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 3500) : null;
+      try {
+        const res = await fetch(`/api/tile-auth?id=${encodeURIComponent(slideId)}`, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          signal: controller ? controller.signal : undefined
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.token) {
+            this.gatewayAvailable = true;
+            this.sessionTicket = data.token;
+            this.ticketSlideId = slideId;
+            this.ticketExpiresAt = data.expiresAt || (Date.now() + 15 * 60 * 1000);
+            return this.sessionTicket;
+          }
+        } else if (res.status === 404 || res.status === 405 || res.status === 501) {
+          this.gatewayAvailable = false;
+        }
+      } catch (e) {
+        // Ambiente estático sem funções ou timeout transitório
+      } finally {
+        if (timer) clearTimeout(timer);
+        this._pendingTicketPromise = null;
+        this._pendingTicketSlideId = null;
+      }
+      return this.sessionTicket;
+    })();
+
+    return this._pendingTicketPromise;
   }
 
   /**
-   * Constrói a URL segura de um azulejo com proteção contra hotlink e scrapers
+   * Constrói a URL segura de um azulejo DZI com proteção contra hotlink e scrapers
    * @param {string} rawTileUrl URL nativa do azulejo
    */
   obterUrlAzulejoProtegida(rawTileUrl) {
     if (!rawTileUrl) return rawTileUrl;
     if (rawTileUrl.includes('/api/tile?')) return rawTileUrl;
 
-    const token = this.sessionTicket || 'active';
-    const isWebProtocol = window.location.protocol === 'http:' || window.location.protocol === 'https:';
-
-    if (isWebProtocol) {
-      // Normaliza o caminho relativo do azulejo removendo domínio e prefixo
-      let cleanPath = rawTileUrl.replace(/^[a-z]+:\/\/[^\/]+/i, '');
-      cleanPath = cleanPath.split('?')[0].replace(/^\/+/, '');
-      cleanPath = cleanPath.replace(/^assets\/histologia\//, '');
-
-      return `/api/tile?p=${encodeURIComponent(cleanPath)}&t=${encodeURIComponent(token)}`;
+    // Preserva URLs DZI de origens externas (ex: CDN externo configurado no CMS)
+    if (/^(?:https?:)?\/\//i.test(rawTileUrl)) {
+      try {
+        const parsed = new URL(rawTileUrl, window.location.href);
+        if (parsed.origin !== window.location.origin) {
+          return rawTileUrl;
+        }
+      } catch (e) {
+        return rawTileUrl;
+      }
     }
 
-    // Fallback para desenvolvimento local via file://
-    const separador = rawTileUrl.includes('?') ? '&' : '?';
-    return `${rawTileUrl}${separador}token=${encodeURIComponent(token)}`;
+    // Só roteia pelo gateway de azulejos quando a URL é de um tile DZI local (*_files/level/x_y.ext)
+    const isDziTile = /_files\/\d+\/\d+_\d+\.(?:jpg|jpeg|png|webp)(?:\?|$)/i.test(rawTileUrl);
+    if (!isDziTile) return rawTileUrl;
+
+    const isWebProtocol = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+    const isLocalStatic =
+      this.gatewayAvailable === false &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    if (!isWebProtocol || isLocalStatic) {
+      return rawTileUrl;
+    }
+
+    // Normaliza o caminho relativo do azulejo removendo domínio e prefixo
+    let cleanPath = rawTileUrl.replace(/^[a-z]+:\/\/[^\/]+/i, '');
+    cleanPath = cleanPath.split('?')[0].replace(/^\/+/, '');
+    cleanPath = cleanPath.replace(/^assets\/histologia\//, '');
+
+    if (!this.sessionTicket) {
+      if (this.currentSlideId) {
+        this.renovarTicketSessao(this.currentSlideId);
+      }
+      return `/api/tile?p=${encodeURIComponent(cleanPath)}`;
+    }
+
+    return `/api/tile?p=${encodeURIComponent(cleanPath)}&t=${encodeURIComponent(this.sessionTicket)}`;
   }
 
   /**
@@ -478,12 +536,14 @@ class SlideSecurityEngine {
 
     toast.innerHTML = `
       <div style="display: flex; align-items: center; gap: 8px;">
-        <svg style="width: 16px; height: 16px; color: #d4af37; shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg style="width: 16px; height: 16px; color: #d4af37; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
         </svg>
-        <span>${mensagem}</span>
+        <span data-sec-toast-msg="1"></span>
       </div>
     `;
+    const msgEl = toast.querySelector('[data-sec-toast-msg="1"]');
+    if (msgEl) msgEl.textContent = String(mensagem || '');
 
     toast.style.opacity = '1';
     toast.style.transform = 'translateX(-50%) translateY(0)';

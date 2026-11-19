@@ -39,6 +39,9 @@ export const catalogData = {
             thumbnailUrl: "assets/histologia/lamina-real1-preview.jpg",
             questoes: [
               {
+                id: "q-pele-1",
+                numero: 1,
+                titulo: "Estratificação da Epiderme",
                 x: 1631.39,
                 y: 6802.9,
                 enunciado: "Identifique o estrato epidérmico caracterizado por queratinócitos achatados repletos de grânulos basofílicos densos de querato-hialina.",
@@ -73,7 +76,7 @@ export const catalogData = {
       {
         id: "osseo",
         titulo: "Tecido Ósseo Compacto e Esponjoso",
-        resumo: "Tecido conjuntivo rígido e mineralizado, composto por matriz orgânica (predomínio de colágeno tipo I) impregnada por matriz inorgânica (cristais de hidroxiapatita). Suas células incluem osteoblastos (síntese do osteoide), osteócitos (manutenção da matriz em lacunas comunicadas por canalículos) e osteoclastos (células multinucleadas responsáveis pela reabsorção óssea). Apresenta-se como Óssea Compacto (organizado em Sistemas de Havers ou Ósteons, com lamelas concêntricas ao redor de canais vasculares) e Óssea Esponjoso (rede tridimensional de trabéculas ósseas que delimitam cavidades preenchidas por medula óssea).",
+        resumo: "Tecido conjuntivo rígido e mineralizado, composto por matriz orgânica (predomínio de colágeno tipo I) impregnada por matriz inorgânica (cristais de hidroxiapatita). Suas células incluem osteoblastos (síntese do osteoide), osteócitos (manutenção da matriz em lacunas comunicadas por canalículos) e osteoclastos (células multinucleadas responsáveis pela reabsorção óssea). Apresenta-se como Ósseo Compacto (organizado em Sistemas de Havers ou Ósteons, com lamelas concêntricas ao redor de canais vasculares) e Ósseo Esponjoso (rede tridimensional de trabéculas ósseas que delimitam cavidades preenchidas por medula óssea).",
         laminasEstaticas: [
           {
             id: "cw3XGCgUwN71XdlwkUe5",
@@ -81,7 +84,7 @@ export const catalogData = {
             coloracao: "Desgaste • 40x Mapeamento 6x8 (48 fotos)",
             disciplina: "histologia",
             topico: "osseo",
-            maxMagnification: 100,
+            maxMagnification: 40,
             zoom4xRatio: 0.28,
             defaultCenter: { x: 0.5, y: 0.5 },
             dziUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
@@ -95,7 +98,7 @@ export const catalogData = {
             coloracao: "Desgaste • 10x Mapeamento 2x5",
             disciplina: "histologia",
             topico: "osseo",
-            maxMagnification: 40,
+            maxMagnification: 10,
             zoom4xRatio: 0.35,
             defaultCenter: { x: 0.5, y: 0.5 },
             dziUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
@@ -127,17 +130,12 @@ export const catalogData = {
       {
         id: "muscular",
         titulo: "Tecido Muscular Estriado Esquelético, Cardíaco e Liso",
-        resumo: `
-  <p>Especializado na contratilidade através do deslizamento dos miofilamentos de actina e miosina.</p>
-  <p>O <strong class="text-slate-900 font-bold">Muscular Estriado Esquelético</strong> apresenta fibras cilíndricas, longas, multinucleadas com núcleos periféricos e estriações transversais organizadas em sarcômeros (contração rápida e voluntária).</p>
-  <p>O <strong class="text-slate-900 font-bold">Muscular Estriado Cardíaco</strong> é constituído por células ramificadas com 1 a 2 núcleos centrais, unidas por discos intercalares com junções comunicantes e desmossomos (contração involuntária e rítmica).</p>
-  <p>O <strong class="text-slate-900 font-bold">Muscular Liso</strong> apresenta células fusiformes, uninucleadas centrais e sem estriações transversais (âncora em corpos densos; contração lenta, sustentada e involuntária em vísceras e vasos).</p>
-`
+        resumo: "Especializado na contratilidade através do deslizamento dos miofilamentos de actina e miosina. O Muscular Estriado Esquelético apresenta fibras cilíndricas, longas, multinucleadas com núcleos periféricos e estriações transversais organizadas em sarcômeros (contração rápida e voluntária). O Muscular Estriado Cardíaco é constituído por células ramificadas com 1 a 2 núcleos centrais, unidas por discos intercalares com junções comunicantes e desmossomos (contração involuntária e rítmica). O Muscular Liso apresenta células fusiformes, uninucleadas centrais e sem estriações transversais (âncora em corpos densos; contração lenta, sustentada e involuntária em vísceras e vasos)."
       },
       {
         id: "circulatorio",
         titulo: "Sistema Circulatório e Microvascularização",
-        resumo: "Sistema estruturado em vasos sanguíneos cuja parede padrão é formada por três túnicas: Íntima (endotélio plano simples e camada subendotelial), Média (músculo liso e lâminas elásticas) e Adventícia (tecido conjuntivo com vasa vasorum em grandes vasos). A Microvascularização compreende arteríolas, capilares e venulíneas post-capilares. Os capilares contêm apenas endotélio e lâmina basal, subdividindo-se em: Contínuos (junções oclusivas seladas, sem poros; ex: músculo e SNC), Fenestrados (poros perfurados na parede endotelial; ex: rins e intestinos) e Sinusoides/Descontínuos (trajeto tortuoso, amplas fenestras e lâmina basal descontínua; ex: fígado, baço e medula óssea)."
+        resumo: "Sistema estruturado em vasos sanguíneos cuja parede padrão é formada por três túnicas: Íntima (endotélio plano simples e camada subendotelial), Média (músculo liso e lâminas elásticas) e Adventícia (tecido conjuntivo com vasa vasorum em grandes vasos). A Microvascularização compreende arteríolas, capilares e vênulas pós-capilares. Os capilares contêm apenas endotélio e lâmina basal, subdividindo-se em: Contínuos (junções oclusivas seladas, sem poros; ex: músculo e SNC), Fenestrados (poros perfurados na parede endotelial; ex: rins e intestinos) e Sinusoides/Descontínuos (trajeto tortuoso, amplas fenestras e lâmina basal descontínua; ex: fígado, baço e medula óssea)."
       }
     ]
   },
@@ -156,7 +154,7 @@ export const catalogData = {
       {
         id: "nervoso",
         titulo: "Neuroanatomia Topográfica",
-        resumo: "Análise das divisões estruturais do Sistema Nervoso Central (Encéfalo e Medula Espinal) e Sistema Nervoso Periférico. Inclui configuração externa do tronco encefálico, sulcos corticais e vascularização poligoniana de Willis."
+        resumo: "Análise das divisões estruturais do Sistema Nervoso Central (Encéfalo e Medula Espinal) e Sistema Nervoso Periférico. Inclui configuração externa do tronco encefálico, sulcos corticais e vascularização do polígono de Willis."
       }
     ]
   },
@@ -251,14 +249,6 @@ export const catalogData = {
         resumo: "Morfologia microscópica de fungos de importância médica caracterizados por parede celular de quitina e glucanos. Compreende leveduras monocelulares com brotamento e pseudohifas (Candida spp.), bolores filamentosos com hifas hialinas septadas e conídios (Aspergillus spp.) e fungos dimórficos térmicos com clássica morfologia leveduriforme em 'roda de leme' em tecidos aquecidos (Paracoccidioides brasiliensis)."
       }
     ]
-  },
-  anatomia: {
-    tituloDisciplina: "Anatomia Macroscópica",
-    bibliografia: "Gray's Anatomy & Sobotta",
-    caminhoBase: "/assets/anatomia/",
-    corDestaque: "border-emerald-600 bg-emerald-50 text-emerald-800",
-    corPino: "bg-emerald-600",
-    topicos: []
   }
 };
 
@@ -283,52 +273,14 @@ export function getAllTopics() {
 }
 
 /**
- * Sincroniza e funde em tempo real as lâminas e peças cadastradas ou editadas no
- * Painel do Desenvolvedor (salvas no localStorage) com a estrutura teórica oficial de catalogData.
+ * Compatibilidade legada: o acervo personalizado em produção reside no Firestore,
+ * não em localStorage local. Mantido como no-op seguro para chamadores existentes.
  */
 export function sincronizarAcervoPersonalizado() {
-  let acervoSalvo = [];
-  try {
-    const raw = localStorage.getItem("palas_atlas_custom_slides");
-    if (raw) acervoSalvo = JSON.parse(raw);
-  } catch (e) {
-    acervoSalvo = [];
-  }
-  if (!Array.isArray(acervoSalvo) || acervoSalvo.length === 0) return;
-
-  window.App = window.App || {};
-  window.App._slidesListOverride = window.App._slidesListOverride || [];
-
-  acervoSalvo.forEach((lam) => {
-    // Adiciona ou atualiza no cache de substituição geral do Palas Atlas
-    const idxOverride = window.App._slidesListOverride.findIndex((l) => l.id === lam.id || (l.nome && lam.nome && l.nome.toLowerCase().trim() === lam.nome.toLowerCase().trim()));
-    if (idxOverride !== -1) {
-      window.App._slidesListOverride[idxOverride] = lam;
-    } else {
-      window.App._slidesListOverride.push(lam);
-    }
-
-    // Identifica a disciplina e o tópico curriculares alvo no catálogo oficial
-    const disc = catalogData[lam.disciplina];
-    if (disc && Array.isArray(disc.topicos)) {
-      const topicoObj = disc.topicos.find((t) => t.id === lam.topico || (t.titulo && t.titulo.toLowerCase().includes((lam.topico || "").toLowerCase())));
-      if (topicoObj) {
-        topicoObj.laminasEstaticas = Array.isArray(topicoObj.laminasEstaticas) ? topicoObj.laminasEstaticas : [];
-        // Atualiza a lâmina original/existente do catálogo ou adiciona no topo da lista se for uma nova lâmina
-        const idxLam = topicoObj.laminasEstaticas.findIndex((l) => l.id === lam.id || (l.nome && lam.nome && l.nome.toLowerCase().trim() === lam.nome.toLowerCase().trim()));
-        if (idxLam !== -1) {
-          topicoObj.laminasEstaticas[idxLam] = lam;
-        } else {
-          topicoObj.laminasEstaticas.unshift(lam);
-        }
-      }
-    }
-  });
+  // No-op: lâminas personalizadas são carregadas exclusivamente do Firestore.
 }
 
-// Expõe no namespace global para re-sincronização instantânea ao publicar no CMS e invoca na inicialização
-window.App = window.App || {};
-window.App.sincronizarAcervoPersonalizado = sincronizarAcervoPersonalizado;
 if (typeof window !== "undefined") {
-  sincronizarAcervoPersonalizado();
+  window.App = window.App || {};
+  window.App.sincronizarAcervoPersonalizado = sincronizarAcervoPersonalizado;
 }

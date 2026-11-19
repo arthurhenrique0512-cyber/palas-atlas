@@ -128,7 +128,7 @@ export function verificarGradeCostura({ fotoLargura, fotoAltura, colunas, linhas
   if (!fw || !fh || !c || !l || !cw || !ch) return null;
 
   let ov = Number(overlap) || 0;
-  if (ov > 1) ov = ov / 100; // aceita 15 ou 0.15
+  if (ov >= 1) ov = ov / 100; // aceita 1..90 (%) ou fração < 1 (ex: 0.15)
   ov = Math.max(0, Math.min(0.9, ov));
 
   const esperadaLargura = fw + (c - 1) * fw * (1 - ov);
@@ -205,14 +205,16 @@ export function emitirCertidaoOptica({ lamina = {}, manifesto = null, perfil = n
   // 3. Fator de redução entre costura e DZI
   const dziLargura = numeroPositivo(dimensoesDzi?.largura) || numeroPositivo(m.dziLargura);
   const dziAltura  = numeroPositivo(dimensoesDzi?.altura)  || numeroPositivo(m.dziAltura);
-  let fatorReducao = numeroPositivo(m.fatorReducao) || 1;
+  const fatorManifesto = numeroPositivo(m.fatorReducao);
+  let fatorReducao = fatorManifesto || 1;
   if (numeroPositivo(m.costuraLargura) && dziLargura) {
-    fatorReducao = calcularFatorReducao({
+    const fatorPorDimensoes = calcularFatorReducao({
       costuraLargura: m.costuraLargura,
       costuraAltura: m.costuraAltura,
       dziLargura,
       dziAltura
     });
+    fatorReducao = fatorManifesto ? Math.min(fatorManifesto, fatorPorDimensoes) : fatorPorDimensoes;
   }
   fatorReducao = Math.min(1, fatorReducao);
 
@@ -240,24 +242,22 @@ export function emitirCertidaoOptica({ lamina = {}, manifesto = null, perfil = n
       codigo: "grade_inconsistente",
       mensagem: `Dimensões costuradas (${m.costuraLargura}×${m.costuraAltura}) divergem do esperado pela grade (~${grade.esperadaLargura}×${grade.esperadaAltura}). Verifique se as fotos foram redimensionadas antes da costura.`
     });
-    if (grade.escalaEstimada < 1 - TOLERANCIA_GRADE) {
-      fatorReducao = Math.min(fatorReducao, grade.escalaEstimada);
-    }
   }
 
   const mppEfetivo = mppCalibrado ? calcularMppEfetivo(mppCalibrado, fatorReducao) : null;
   let ampliacaoMaxima = mppCalibrado
     ? calcularAmpliacaoMaximaReal(objetiva, mppCalibrado, mppEfetivo)
     : objetiva * fatorReducao;
-  ampliacaoMaxima = Math.round(ampliacaoMaxima * 10) / 10;
+  ampliacaoMaxima = Math.max(0.1, Math.round(ampliacaoMaxima * 10) / 10);
 
-  // 5. Faixa plausível do MPP para a objetiva declarada
-  if (mppCalibrado && mppDentroDaFaixa(objetiva, mppCalibrado) === false) {
+  // 5. Faixa plausível do MPP efetivo para a objetiva declarada
+  const mppValidacao = mppEfetivo || mppCalibrado;
+  if (mppValidacao && mppDentroDaFaixa(objetiva, mppValidacao) === false) {
     const faixa = FAIXAS_MPP_ESPERADAS[objetiva];
     alertas.push({
       nivel: "erro",
       codigo: "mpp_fora_da_faixa",
-      mensagem: `MPP de ${mppCalibrado.toFixed(4)} µm/px é implausível para objetiva de ${objetiva}x (faixa esperada ${faixa.min}–${faixa.max} µm/px). Revise a objetiva declarada ou a calibração.`
+      mensagem: `MPP de ${mppValidacao.toFixed(4)} µm/px é implausível para objetiva de ${objetiva}x (faixa esperada ${faixa.min}–${faixa.max} µm/px). Revise a objetiva declarada ou a calibração.`
     });
   }
 
@@ -269,8 +269,9 @@ export function emitirCertidaoOptica({ lamina = {}, manifesto = null, perfil = n
   } else if (mppCalibrado && (temManifesto || metodo.includes("micrometro") || metodo === "teorico_sensor")) {
     selo = SELOS.ESTIMADA;
   }
-  if (alertas.some(a => a.nivel === "erro") && selo === SELOS.VERIFICADA) {
-    selo = SELOS.ESTIMADA;
+  if (alertas.some(a => a.nivel === "erro")) {
+    if (selo === SELOS.VERIFICADA) selo = SELOS.ESTIMADA;
+    else if (selo === SELOS.ESTIMADA) selo = SELOS.NAO_VERIFICADA;
   }
   if (!temManifesto) {
     alertas.push({

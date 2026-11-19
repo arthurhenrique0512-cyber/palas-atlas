@@ -1,6 +1,9 @@
 [build]
   publish = "."
 
+[functions."assets-manifest"]
+  included_files = ["assets/histologia/manifest.json"]
+
 # Catálogo Sanitizado de Lâminas (Oculta caminhos físicos brutos)
 [[redirects]]
   from = "/api/assets"
@@ -35,6 +38,159 @@
 # BLOQUEIO DE SEGURANÇA: Proíbe download direto de pastas de azulejos (obriga passagem por /api/tile)
 [[redirects]]
   from = "/assets/histologia/*_files/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+# BLOQUEIO DE SEGURANÇA: Impede exposição pública de scripts internos, infraestrutura e migrações
+[[redirects]]
+  from = "/scripts/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/tools/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/supabase/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/firestore.rules"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/firebase.json"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/netlify.toml"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/package.json"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/package-lock.json"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/.env*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+# BLOQUEIO DE SEGURANÇA: Estúdio de Produção de Mídia (uso local apenas)
+[[redirects]]
+  from = "/ANTIGRAVITY.md"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/context/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/pipelines/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/templates/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/exports/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+# BLOQUEIO DE SEGURANÇA: Impede exposição pública de fontes Next.js e configurações de build
+[[redirects]]
+  from = "/app/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/components/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/camera-guide-mac/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/public/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/tsconfig.json"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/next.config.mjs"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/postcss.config.js"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/tailwind.config.js"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/next-env.d.ts"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/tsconfig.tsbuildinfo"
   to = "/404.html"
   status = 403
   force = true
@@ -79,3 +235,10 @@
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# Manifesto PWA
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json; charset=utf-8"
+    Cache-Control = "public, max-age=3600"

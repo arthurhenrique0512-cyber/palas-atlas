@@ -5,12 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Visualizador de Microscopia — Palas Atlas</title>
   <meta name="description" content="Visualizador de microscopia digital do Palas Atlas — análise morfológica interativa com marcadores anatômicos.">
+  <link rel="canonical" href="https://palasatlas.netlify.app/microscopio.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://palasatlas.netlify.app/microscopio.html">
+  <meta property="og:title" content="Visualizador de Microscopia — Palas Atlas">
+  <meta property="og:description" content="Explore lâminas histológicas digitais em alta definição com navegação óptica calibrada e régua morfométrica.">
+  <meta property="og:image" content="https://palasatlas.netlify.app/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Visualizador de Microscopia — Palas Atlas">
+  <meta name="twitter:description" content="Explore lâminas histológicas digitais em alta definição com navegação óptica calibrada.">
+  <meta name="twitter:image" content="https://palasatlas.netlify.app/og-preview.png">
+  <meta name="theme-color" content="#f8fafc">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Favicon Oficial Palas Atlas -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Favicon & PWA Oficial Palas Atlas -->
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
 
   <!-- Estúdio de Microscopia: Padronizado no Design Clínico Institucional (Light Mode) -->
   <script>
@@ -30,8 +43,8 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=15">
-  <link rel="stylesheet" href="css/styles.css?v=23">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261118v2">
+  <link rel="stylesheet" href="css/styles.css?v=20261118v2">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -40,10 +53,10 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
   <!-- Web Component da Marca e Configurações -->
-  <script src="js/brand-logo.js?v=13"></script>
-  <script src="js/settings-panel.js?v=4"></script>
+  <script src="js/brand-logo.js?v=20261118v2"></script>
+  <script src="js/settings-panel.js?v=20261118v2"></script>
 
-  <link rel="stylesheet" href="css/splash.css?v=2">
+  <link rel="stylesheet" href="css/splash.css?v=20261118v2">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
 
@@ -104,29 +117,34 @@
     .prose-atlas blockquote { border: none !important; margin: 0 !important; padding: 0 !important; }
     .prose-atlas .pin-link {
       color: #0f766e !important;
-      background: transparent !important;
+      background: rgba(13, 148, 136, 0.1) !important;
       border: none !important;
-      padding: 0 !important;
-      border-radius: 0 !important;
-      text-decoration: underline !important;
-      text-underline-offset: 4px !important;
-      text-decoration-color: rgba(15, 118, 110, 0.4) !important;
-      text-decoration-thickness: 1.5px !important;
+      border-bottom: 2px solid rgba(13, 148, 136, 0.6) !important;
+      padding: 0 4px !important;
+      border-radius: 4px !important;
+      text-decoration: none !important;
       font-weight: 600 !important;
       cursor: pointer !important;
-      transition: color 0.15s ease, text-decoration-color 0.15s ease !important;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
       display: inline !important;
       white-space: normal;
       touch-action: manipulation;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
     }
     .prose-atlas .pin-link:hover {
-      color: #115e59 !important;
-      text-decoration-color: #0f766e !important;
-      background: transparent !important;
+      color: #042f2e !important;
+      background: rgba(13, 148, 136, 0.2) !important;
+      border-bottom-color: #0d9488 !important;
     }
     .prose-atlas .pin-link:active {
       color: #042f2e !important;
-      background: transparent !important;
+      background: rgba(13, 148, 136, 0.28) !important;
+    }
+    .prose-atlas .pin-link.pin-link-active {
+      color: #92400e !important;
+      background: #fef3c7 !important;
+      border-bottom-color: #d97706 !important;
     }
 
     /* Botão de recolher painel: preenchimento do painel indica estado aberto */
@@ -150,8 +168,67 @@
       .openseadragon-navigator {
         width: 80px !important;
         height: 60px !important;
-        bottom: 8px !important;
-        right: 8px !important;
+        bottom: 12px !important;
+        right: 12px !important;
+      }
+    }
+
+    /* Mobile (< 640px): barra superior sem estouro, controles de lente sem scroll cortado e minimapa acima da barra */
+    @media (max-width: 639px) {
+      #viewerBreadcrumb {
+        display: none !important;
+      }
+      .openseadragon-navigator {
+        width: 72px !important;
+        height: 54px !important;
+        bottom: calc(max(12px, env(safe-area-inset-bottom, 12px)) + 58px) !important;
+        right: 10px !important;
+      }
+      #viewerLensPanel {
+        left: 10px !important;
+        right: 10px !important;
+        width: auto !important;
+        max-width: calc(100% - 20px) !important;
+        bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
+        justify-content: space-between !important;
+        gap: 2px !important;
+        padding: 5px 6px !important;
+      }
+      #viewerLensPanel .lens-btn {
+        min-width: 30px !important;
+        min-height: 36px !important;
+        padding: 0.25rem 0.35rem !important;
+        font-size: 11px !important;
+      }
+      #viewerLensPanel > div.w-px {
+        margin: 0 1px !important;
+      }
+      #viewerLensPanel button[onclick*="alterarZoom"] {
+        width: 32px !important;
+        height: 36px !important;
+      }
+      #viewerLensPanel button[onclick*="osdViewerAction"] {
+        min-height: 36px !important;
+        padding: 0.25rem 0.45rem !important;
+        font-size: 11px !important;
+      }
+      #viewerLensPanel > div:last-child {
+        min-height: 36px !important;
+        padding: 0.25rem 0.5rem !important;
+      }
+    }
+
+    /* Celular em paisagem (altura <= 500px): evita colisão entre sidebar aberta e barra de lentes */
+    @media (max-height: 500px) {
+      #viewerSidebar:not(.w-0) {
+        width: min(320px, 46vw) !important;
+      }
+      #viewerSidebar > div {
+        width: 100% !important;
+        min-width: 260px;
+      }
+      #viewerLensPanel {
+        max-width: calc(100% - 24px) !important;
       }
     }
 
@@ -185,17 +262,17 @@
   <!-- ════════════════════════════════════════════════════════════════════
        BARRA SUPERIOR DO LEITOR (Design Clínico Institucional Claro)
        ════════════════════════════════════════════════════════════════════ -->
-  <header class="shrink-0 w-full bg-white/95 backdrop-blur-md z-50 relative border-b border-slate-200 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)]">
+  <header class="shrink-0 w-full bg-white/95 backdrop-blur-md z-50 relative border-b border-slate-200 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)] overflow-x-hidden">
     <!-- Filete Superior Institucional (Slate & Azul-Petróleo) -->
     <div class="h-[2px] w-full bg-gradient-to-r from-slate-900 via-[#0369a1] to-slate-900"></div>
 
-    <div class="px-3 sm:px-5 h-14 sm:h-16 flex items-center justify-between gap-4">
-      <!-- Esquerda: Voltar + Divisor Vertical + Logotipo Oficial Agrupados + Breadcrumb -->
-      <div class="flex items-center gap-3 sm:gap-4 shrink-0 min-w-0">
+    <div class="px-2 sm:px-5 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
+      <!-- Esquerda: Voltar + Divisor Vertical + Logotipo Oficial Agrupados + Seletor Rápido -->
+      <div class="flex items-center gap-1.5 sm:gap-3.5 lg:gap-4 min-w-0 flex-1 lg:flex-initial lg:shrink-0">
         <button
           type="button"
           onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
-          class="h-9 sm:h-10 px-3 sm:px-3.5 rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer shrink-0 touch-manipulation"
+          class="min-w-[36px] min-h-[40px] sm:min-w-[42px] sm:min-h-[44px] lg:min-w-0 lg:min-h-0 h-10 sm:h-11 lg:h-10 px-2 sm:px-3.5 rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer shrink-0 touch-manipulation"
           aria-label="Voltar"
         >
           <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,25 +281,121 @@
           <span class="hidden sm:inline">Voltar</span>
         </button>
 
-        <span class="h-5 w-px bg-slate-200 shrink-0"></span>
+        <span class="hidden sm:inline-block h-5 w-px bg-slate-200 shrink-0"></span>
 
         <a href="index.html" class="inline-flex items-center shrink-0 no-underline cursor-pointer" aria-label="Palas Atlas - Início">
           <brand-logo theme="light-bg" show-subtitle="false" size="sm"></brand-logo>
         </a>
 
-        <span id="viewerBreadcrumb" class="text-xs text-slate-500 font-sans tracking-wide truncate max-w-[120px] sm:max-w-[180px] md:max-w-xs hidden"></span>
+        <span id="viewerBreadcrumb" class="text-xs text-slate-500 font-sans tracking-wide truncate max-w-[120px] sm:max-w-[180px] md:hidden hidden"></span>
+
+        <label for="viewerSlideSwitcher" class="sr-only">Trocar lâmina</label>
+        <select
+          id="viewerSlideSwitcher"
+          aria-label="Trocar lâmina"
+          title="Trocar lâmina rapidamente"
+          class="hidden md:inline-block ml-1 bg-slate-100 hover:bg-slate-200/70 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 px-2.5 py-1.5 h-10 max-w-[200px] lg:max-w-[220px] truncate cursor-pointer outline-none focus:border-sky-600 transition-colors"
+        ></select>
       </div>
 
-      <!-- Direita: Recolher / Expandir painel lateral -->
-      <div class="flex items-center gap-2 shrink-0">
+      <!-- Direita: Régua + Marcações + Compartilhar Vista + Tela Cheia + Acessibilidade + Painel -->
+      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+        <button
+          id="btnToggleRegua"
+          type="button"
+          onclick="window.toggleReguaMorfometrica && window.toggleReguaMorfometrica()"
+          class="btn-regua-toggle is-off min-w-[34px] min-h-[40px] sm:min-h-[44px] lg:min-h-0 h-10 sm:h-11 lg:h-10 px-2 sm:px-3 flex items-center justify-center gap-1.5 rounded-xl border active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
+          aria-pressed="false"
+          aria-label="Ativar régua morfométrica em micrômetros"
+          title="Régua morfométrica (D)"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.3 8.7L8.7 21.3c-1 1-2.5 1-3.4 0l-2.6-2.6c-1-1-1-2.5 0-3.4L15.3 2.7c1-1 2.5-1 3.4 0l2.6 2.6c1 1 1 2.5 0 3.4Z"/>
+            <path d="m7.5 10.5 2 2"/>
+            <path d="m10.5 7.5 2 2"/>
+            <path d="m13.5 4.5 2 2"/>
+            <path d="m4.5 13.5 2 2"/>
+          </svg>
+          <span class="hidden lg:inline text-xs font-semibold">Medir</span>
+        </button>
+
+        <button
+          id="btnToggleMarcacoes"
+          type="button"
+          onclick="window.toggleMarcacoesNoViewer && window.toggleMarcacoesNoViewer()"
+          class="btn-marcacoes-toggle is-on relative min-w-[34px] min-h-[40px] sm:min-h-[44px] lg:min-h-0 h-10 sm:h-11 lg:h-10 px-2 sm:px-3 flex items-center justify-center gap-1.5 rounded-xl border active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
+          aria-pressed="true"
+          aria-label="Mostrar ou ocultar marcações na lâmina"
+          title="Alternar visibilidade das marcações na lâmina (M)"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <circle cx="12" cy="12" r="8"></circle>
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2"></path>
+          </svg>
+          <span class="hidden xl:inline text-xs font-semibold">Marcações</span>
+          <span id="badgeContadorMarcacoes" class="max-sm:absolute max-sm:-top-1 max-sm:-right-1 px-1.5 py-0.5 rounded-full text-[9.5px] sm:text-[10px] font-mono font-bold bg-teal-600 text-white leading-none hidden">0</span>
+        </button>
+
+        <button
+          id="btnCompartilharCampo"
+          type="button"
+          onclick="window.copiarLinkCampoAtual && window.copiarLinkCampoAtual()"
+          class="w-[34px] sm:w-10 lg:w-10 min-h-[40px] sm:min-h-[44px] lg:min-h-0 h-10 sm:h-11 lg:h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation shrink-0"
+          aria-label="Copiar link deste campo"
+          title="Copiar link deste campo e aumento"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </button>
+
+        <button
+          id="btnFullscreen"
+          type="button"
+          onclick="window.toggleTelaCheiaMicroscopio && window.toggleTelaCheiaMicroscopio()"
+          class="hidden sm:flex w-10 min-h-[44px] lg:min-h-0 h-11 lg:h-10 items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation shrink-0"
+          aria-pressed="false"
+          aria-label="Alternar tela cheia"
+          title="Tela cheia (F)"
+        >
+          <svg data-fs-expand class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+            <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+            <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>
+          <svg data-fs-compress class="w-4 h-4 shrink-0 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
+            <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
+            <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
+            <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+          </svg>
+        </button>
+
+        <button
+          id="btnOpenSettingsViewer"
+          type="button"
+          onclick="window.App && window.App.openSettings && window.App.openSettings()"
+          class="w-[34px] sm:w-10 lg:w-10 min-h-[40px] sm:min-h-[44px] lg:min-h-0 h-10 sm:h-11 lg:h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation shrink-0"
+          aria-label="Abrir configurações de exibição e acessibilidade"
+          title="Acessibilidade e exibição"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+
         <button
           id="btnToggleSidebar"
           type="button"
-          class="viewer-sidebar-toggle h-9 sm:h-10 px-3 sm:px-3.5 flex items-center justify-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
+          class="viewer-sidebar-toggle min-w-[34px] min-h-[40px] sm:min-h-[44px] lg:min-h-0 h-10 sm:h-11 lg:h-10 px-2 sm:px-3.5 flex items-center justify-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
           aria-label="Recolher painel de informações"
           aria-controls="viewerSidebar"
           aria-expanded="true"
-          title="Alternar painel lateral"
+          title="Alternar painel lateral (P)"
         >
           <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4.5" width="18" height="15" rx="2.5"></rect>
@@ -279,9 +452,38 @@
         </div>
       </div>
 
+      <!-- Banner Discreto da Régua Morfométrica -->
+      <div
+        id="reguaBanner"
+        class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-[35] flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-sky-200 shadow-[0_8px_24px_rgba(15,23,42,0.12)] text-xs text-slate-700 select-none max-w-[calc(100%-24px)]"
+      >
+        <span class="w-2 h-2 rounded-full bg-[#0369a1] shrink-0"></span>
+        <span id="reguaBannerTexto" class="font-sans font-medium truncate">Clique no ponto inicial na lâmina (Esc para sair)</span>
+        <button
+          id="btnLimparRegua"
+          type="button"
+          onclick="window.limparMedicaoRegua && window.limparMedicaoRegua()"
+          class="hidden px-2 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-[11px] font-semibold text-slate-700 transition-colors cursor-pointer shrink-0"
+        >Limpar</button>
+        <button
+          type="button"
+          onclick="window.toggleReguaMorfometrica && window.toggleReguaMorfometrica(false)"
+          class="text-slate-400 hover:text-slate-800 text-sm leading-none px-1 cursor-pointer shrink-0"
+          aria-label="Sair da régua"
+        >&times;</button>
+      </div>
+
+      <!-- Toast flutuante discreto do visualizador -->
+      <div
+        id="viewerToast"
+        role="status"
+        aria-live="polite"
+        class="hidden absolute top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-slate-900/95 text-white text-xs font-sans font-medium shadow-xl pointer-events-none transition-opacity duration-200 whitespace-nowrap"
+      ></div>
+
       <!-- Container Deep Zoom (OpenSeadragon) -->
       <div id="osd-viewer"
-        class="w-full h-full bg-[#eef2f6] relative overflow-hidden transition-opacity duration-500 opacity-0"
+        class="w-full h-full bg-[#eef2f6] relative z-10 overflow-hidden transition-opacity duration-500 opacity-0"
       ></div>
 
       <!-- REVÓLVER DE OBJETIVAS + CONTROLES DE ZOOM DINÂMICOS -->
@@ -358,24 +560,24 @@
       </div>
 
       <!-- Botão Discreto de Ajuda / Atalhos de Navegação -->
-      <div class="absolute top-14 right-4 z-20" id="containerAjudaMicroscopio">
+      <div class="absolute top-16 sm:top-14 right-3 sm:right-4 z-30" id="containerAjudaMicroscopio">
         <button
           type="button"
           id="btnAjudaMicroscopio"
           onclick="window.toggleAjudaMicroscopio()"
-          class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold bg-white/90 hover:bg-white text-slate-700 hover:text-slate-950 border border-slate-200 hover:border-slate-300 shadow-md backdrop-blur-md transition-all cursor-pointer select-none"
+          class="w-10 h-10 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold bg-white/90 hover:bg-white text-slate-700 hover:text-slate-950 border border-slate-200 hover:border-slate-300 shadow-md backdrop-blur-md transition-all cursor-pointer select-none touch-manipulation"
           aria-label="Atalhos e instruções do microscópio"
           title="Atalhos de navegação"
         >
           ?
         </button>
-        <!-- Popover com Guia Rápido de Gestos -->
+        <!-- Popover com Guia Rápido de Gestos e Atalhos -->
         <div
           id="popoverAjudaMicroscopio"
-          class="hidden absolute right-0 top-10 w-64 p-3.5 rounded-2xl bg-white/98 backdrop-blur-xl border border-slate-200 shadow-xl text-xs text-slate-700 z-30 transition-all select-none"
+          class="hidden absolute right-0 top-10 w-72 max-h-[70vh] overflow-y-auto p-3.5 rounded-2xl bg-white/98 backdrop-blur-xl border border-slate-200 shadow-xl text-xs text-slate-700 z-30 transition-all select-none"
         >
           <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-100">
-            <span class="text-[10px] font-mono uppercase tracking-widest text-teal-700 font-semibold">Navegação no Espécime</span>
+            <span class="text-[10px] font-mono uppercase tracking-widest text-teal-700 font-semibold">Navegação e Atalhos</span>
             <button
               type="button"
               onclick="window.toggleAjudaMicroscopio(false)"
@@ -384,25 +586,41 @@
             >&times;</button>
           </div>
           <ul class="space-y-2 text-[11px] font-sans">
-            <li class="flex items-center justify-between">
+            <li class="flex items-center justify-between gap-2">
               <span class="text-slate-600">Zoom contínuo</span>
-              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">Scroll / Pinça</kbd>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">Scroll / Pinça / + -</kbd>
             </li>
-            <li class="flex items-center justify-between">
+            <li class="flex items-center justify-between gap-2">
               <span class="text-slate-600">Mover lâmina</span>
               <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">Arrastar / Pan</kbd>
             </li>
-            <li class="flex items-center justify-between">
-              <span class="text-slate-600">Ampliar área</span>
-              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">Duplo clique</kbd>
+            <li class="flex items-center justify-between gap-2">
+              <span class="text-slate-600">Objetivas (4x–100x)</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">1 &ndash; 5</kbd>
             </li>
-            <li class="flex items-center justify-between">
-              <span class="text-slate-600">Objetivas ópticas</span>
-              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">4x &bull; 10x &bull; 40x</kbd>
+            <li class="flex items-center justify-between gap-2">
+              <span class="text-slate-600">Redefinir campo (1:1)</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">R / 0</kbd>
             </li>
-            <li class="flex items-center justify-between">
-              <span class="text-slate-600">Redefinir campo</span>
-              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">1:1</kbd>
+            <li class="flex items-center justify-between gap-2">
+              <span class="text-slate-600">Régua morfométrica</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">D</kbd>
+            </li>
+            <li class="flex items-center justify-between gap-2">
+              <span class="text-slate-600">Mostrar/ocultar marcações</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">M</kbd>
+            </li>
+            <li class="flex items-center justify-between gap-2">
+              <span class="text-slate-600">Alternar painel lateral</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">P</kbd>
+            </li>
+            <li class="flex items-center justify-between gap-2">
+              <span class="text-slate-600">Tela cheia</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">F</kbd>
+            </li>
+            <li class="flex items-center justify-between gap-2">
+              <span class="text-slate-600">Navegar entre pinos</span>
+              <kbd class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-800 border border-slate-200">&larr; / &rarr;</kbd>
             </li>
           </ul>
         </div>
@@ -413,23 +631,31 @@
     <!-- Backdrop escurecido para mobile/tablet (fecha a barra lateral ao tocar fora) -->
     <div
       id="viewerBackdrop"
-      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[35] hidden opacity-0 transition-opacity duration-300 lg:hidden pointer-events-none"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[38] hidden opacity-0 transition-opacity duration-300 lg:hidden pointer-events-none"
       aria-hidden="true"
     ></div>
 
     <!-- Direita — Painel de Informações (retrátil) -->
     <aside
       id="viewerSidebar"
-      class="h-full bg-white border-l border-slate-200 text-slate-700 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
+      class="h-full bg-white border-l border-slate-200 text-slate-700 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[360px] lg:w-[320px] xl:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
       aria-hidden="false"
     >
-      <div class="w-[85vw] sm:w-[380px] max-w-[380px] h-full flex flex-col">
+      <div class="w-[85vw] sm:w-[360px] lg:w-[320px] xl:w-[380px] max-w-[380px] h-full flex flex-col">
 
         <!-- Cabeçalho do Painel: Título e Coloração (Bloco Elevado) -->
         <div class="px-5 sm:px-7 pt-5 sm:pt-6 pb-4 sm:pb-5 bg-slate-50 border-b border-slate-200 shrink-0 flex items-start justify-between gap-3">
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1">
+            <div class="md:hidden mb-3">
+              <label for="viewerSlideSwitcherMobile" class="sr-only">Trocar lâmina</label>
+              <select
+                id="viewerSlideSwitcherMobile"
+                aria-label="Trocar lâmina"
+                class="w-full bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 px-3 py-2 cursor-pointer outline-none focus:border-sky-600 transition-colors"
+              ></select>
+            </div>
             <span class="inline-block text-[9.5px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-1">Análise Morfológica</span>
-            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-slate-900 leading-snug tracking-tight truncate sm:whitespace-normal">
+            <h2 id="slideTitle" class="text-lg sm:text-xl font-serif font-extrabold text-slate-900 leading-snug tracking-tight">
               Carregando lâmina...
             </h2>
             <div class="mt-2.5 flex flex-wrap items-center gap-2">
@@ -498,9 +724,9 @@
 
   </div><!-- /workspace -->
 
-  <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/slide-security.js?v=20261109_reactive_print_v5"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261111_light_v7"></script>
+  <script type="module" src="js/firebase-config.js?v=20261118v2"></script>
+  <script type="module" src="js/slide-security.js?v=20261118v2"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261118v2"></script>
 
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>

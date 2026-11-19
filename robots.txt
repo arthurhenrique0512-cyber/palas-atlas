@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /tools/
+Disallow: /scripts/
+
+Sitemap: https://palasatlas.netlify.app/sitemap.xml

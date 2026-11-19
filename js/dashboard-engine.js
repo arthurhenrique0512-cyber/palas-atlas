@@ -16,7 +16,7 @@
 
 import { db } from "./firebase-config.js";
 import { getState, setFrenteAtiva } from "./state.js";
-import { sanitizarHTMLDescricao } from "./sanitizer.js";
+import { sanitizarHTMLDescricao, removerConteudoPerigoso, escaparHTML } from "./sanitizer.js";
 
 let editorPins = [];
 let editorQuestoes = [];
@@ -30,10 +30,27 @@ let raioCirculoAtual = 250;
 let setaPontoOrigem = null;
 let filtroStatusAtual = "todos";
 let _unsubDashboardAcervo = null;
+let _cmsAuthUnsub = null;
+let _editorAutoLoadTimer = null;
+let _editorTrackers = [];
 let moduloEmEdicaoId = null;
 let moduloEmEdicaoDisciplina = null;
 let summaryPointsEmEdicao = [];
 let laminasDoModuloCache = [];
+
+function getAuthenticatedUser() {
+  if (typeof firebase === "undefined" || typeof firebase.auth !== "function") return null;
+  const user = firebase.auth().currentUser;
+  if (!user || user.isAnonymous) return null;
+  return user;
+}
+
+function destruirTrackersEditor() {
+  while (_editorTrackers.length > 0) {
+    const tracker = _editorTrackers.pop();
+    try { tracker.destroy(); } catch (e) {}
+  }
+}
 
 const topicosCurriculares = {
   anatomia: [
@@ -170,6 +187,14 @@ export async function carregarListaDeAssets(forcar = false) {
     const data = await res.json();
     let assets = Array.isArray(data.assets) ? data.assets : [];
 
+    // Resolve caminho seguro caso /api/assets retorne manifesto sanitizado (sem campo `caminho`)
+    assets = assets
+      .map((a) => ({
+        ...a,
+        caminho: a.caminho || (a.id ? `assets/histologia/${a.id}${a.tipo === "dzi" ? ".dzi" : ""}` : "")
+      }))
+      .filter((a) => Boolean(a.caminho));
+
     // Lâminas essenciais garantidas sempre presentes no dropdown
     const essenciais = [
       { id: "cw3XGCgUwN71XdlwkUe5", nome: "Osso Maduro v3.0 (40x HD Panorama)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", largura: 6430, altura: 5630 },
@@ -179,9 +204,16 @@ export async function carregarListaDeAssets(forcar = false) {
     ];
 
     essenciais.forEach(e => {
-      const idx = assets.findIndex(a => a.id === e.id || a.caminho === e.caminho);
+      const eSlug = e.caminho.split("/").pop().replace(/\.dzi$/i, "").toLowerCase();
+      const idx = assets.findIndex(a =>
+        a.id === e.id ||
+        a.caminho === e.caminho ||
+        String(a.id || "").toLowerCase() === eSlug
+      );
       if (idx === -1) {
         assets.unshift(e);
+      } else if (!assets[idx].caminho) {
+        assets[idx].caminho = e.caminho;
       }
     });
 
@@ -215,15 +247,15 @@ function popularSeletorAssets(assets) {
 
   let html = `<option value="">-- Selecione uma lâmina do acervo --</option>`;
 
-  const dzis = assets.filter(a => a.tipo === "dzi");
-  const statics = assets.filter(a => a.tipo !== "dzi");
+  const dzis = assets.filter(a => a.tipo === "dzi" && a.caminho);
+  const statics = assets.filter(a => a.tipo !== "dzi" && a.caminho);
 
   if (dzis.length > 0) {
     html += `<optgroup label="Lâminas Piramidais (Deep Zoom DZI)">`;
     dzis.forEach(a => {
       const selected = (urlAtual && (urlAtual === a.caminho || urlAtual.includes(a.id))) ? "selected" : "";
-      const dims = a.largura > 0 ? ` [${a.largura}×${a.altura}]` : "";
-      html += `<option value="${a.caminho}" data-tipo="dzi" data-nome="${a.nome}" ${selected}>${a.nome}${dims}</option>`;
+      const dims = a.largura > 0 ? ` [${Number(a.largura) || 0}×${Number(a.altura) || 0}]` : "";
+      html += `<option value="${escaparHTML(a.caminho)}" data-tipo="dzi" data-nome="${escaparHTML(a.nome || "")}" ${selected}>${escaparHTML(a.nome || a.caminho)}${dims}</option>`;
     });
     html += `</optgroup>`;
   }
@@ -232,7 +264,7 @@ function popularSeletorAssets(assets) {
     html += `<optgroup label="Imagens Estáticas (Alta Definição)">`;
     statics.forEach(a => {
       const selected = (urlAtual && (urlAtual === a.caminho || urlAtual.includes(a.id))) ? "selected" : "";
-      html += `<option value="${a.caminho}" data-tipo="static" data-nome="${a.nome}" ${selected}>${a.nome}</option>`;
+      html += `<option value="${escaparHTML(a.caminho)}" data-tipo="static" data-nome="${escaparHTML(a.nome || "")}" ${selected}>${escaparHTML(a.nome || a.caminho)}</option>`;
     });
     html += `</optgroup>`;
   }
@@ -306,8 +338,8 @@ export function definirModoAnotacao(modo) {
   const btnCircle = document.getElementById("dashBtnModoCircle");
   const btnArrow = document.getElementById("dashBtnModoArrow");
 
-  const btnAtivoCls = "py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer";
-  const btnInativoCls = "py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer";
+  const btnAtivoCls = "py-2 px-2.5 rounded-lg text-xs font-mono font-semibold flex items-center justify-center gap-1.5 transition-all bg-amber-50 text-amber-800 border border-amber-300 shadow-xs cursor-pointer";
+  const btnInativoCls = "py-2 px-2.5 rounded-lg text-xs font-mono flex items-center justify-center gap-1.5 transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 cursor-pointer";
 
   if (btnPin) btnPin.className = modo === "pin" ? btnAtivoCls : btnInativoCls;
   if (btnCircle) btnCircle.className = modo === "circle" ? btnAtivoCls : btnInativoCls;
@@ -360,6 +392,43 @@ export function onAtualizarRaioCirculo(val) {
   if (label) label.textContent = `${raioCirculoAtual} px`;
 }
 
+function conectarAcervoCmsFirestore() {
+  if (typeof db === "undefined" || !db) return;
+  if (!getAuthenticatedUser()) {
+    if (typeof _unsubDashboardAcervo === "function") {
+      try { _unsubDashboardAcervo(); } catch (e) {}
+      _unsubDashboardAcervo = null;
+    }
+    acervoFirestoreCache = [];
+    const tbody = document.getElementById("tabelaAcervoCms");
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-xs font-mono text-slate-400 italic">Faça login administrativo para sincronizar e gerenciar o acervo.</td></tr>`;
+    }
+    return;
+  }
+
+  if (typeof _unsubDashboardAcervo === "function") {
+    try { _unsubDashboardAcervo(); } catch (e) {}
+    _unsubDashboardAcervo = null;
+  }
+  _unsubDashboardAcervo = db.collection("laminas").onSnapshot(
+    (snapshot) => {
+      acervoFirestoreCache = [];
+      snapshot.forEach((doc) => {
+        acervoFirestoreCache.push({ id: doc.id, ...doc.data() });
+      });
+      renderizarTabelaAcervo();
+    },
+    (err) => {
+      console.error("[Cloud Firestore] Erro ao sincronizar laminas em tempo real:", err);
+      const tbody = document.getElementById("tabelaAcervoCms");
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs font-mono text-rose-500">Falha ao ler laminas do Cloud Firestore. Verifique permissões da conta administrativa.</td></tr>`;
+      }
+    }
+  );
+}
+
 export function inicializarPainelCms() {
   atualizarTopicosCms("histologia");
   popularSelectModulosCms();
@@ -369,32 +438,27 @@ export function inicializarPainelCms() {
   atualizarEstadoBotaoModoQuestao();
   inicializarEventosPreviewInterativo();
   carregarListaDeAssets();
-  setTimeout(() => {
+
+  clearTimeout(_editorAutoLoadTimer);
+  _editorAutoLoadTimer = setTimeout(() => {
+    _editorAutoLoadTimer = null;
     if (!viewerInstance && document.getElementById("osd-editor-viewer") && !laminaEmEdicaoId) {
       carregarImagemNoEditor("assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", true, true);
     }
   }, 200);
-  if (typeof db !== "undefined" && db) {
-    if (typeof _unsubDashboardAcervo === "function") {
-      try { _unsubDashboardAcervo(); } catch (e) {}
-      _unsubDashboardAcervo = null;
-    }
-    _unsubDashboardAcervo = db.collection("laminas").onSnapshot(
-      (snapshot) => {
-        acervoFirestoreCache = [];
-        snapshot.forEach((doc) => {
-          acervoFirestoreCache.push({ id: doc.id, ...doc.data() });
-        });
-        renderizarTabelaAcervo();
-      },
-      (err) => {
-        console.error("[Cloud Firestore] Erro ao sincronizar laminas em tempo real:", err);
-        const tbody = document.getElementById("tabelaAcervoCms");
-        if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs font-mono text-rose-400">Falha ao ler laminas do Cloud Firestore. Verifique conexao ou permissoes no console.</td></tr>`;
+
+  conectarAcervoCmsFirestore();
+  if (!_cmsAuthUnsub && typeof firebase !== "undefined" && typeof firebase.auth === "function") {
+    _cmsAuthUnsub = firebase.auth().onAuthStateChanged((user) => {
+      if (user && !user.isAnonymous) {
+        conectarAcervoCmsFirestore();
+        if (moduloEmEdicaoId) {
+          carregarModuloParaEdicao(moduloEmEdicaoId, moduloEmEdicaoDisciplina || "histologia");
         }
+      } else {
+        conectarAcervoCmsFirestore();
       }
-    );
+    });
   }
 }
 
@@ -445,8 +509,26 @@ export function renderizarTabelaAcervo() {
   if (statAtivas) statAtivas.textContent = String(contAtivas);
   if (statInativas) statInativas.textContent = String(contInativas);
   if (!tbody) return;
+
+  if (!tbody.__cmsTableDelegated) {
+    tbody.__cmsTableDelegated = true;
+    tbody.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-cms-action]");
+      if (!btn) return;
+      const action = btn.getAttribute("data-cms-action");
+      const id = btn.getAttribute("data-id");
+      if (!id) return;
+      if (action === "edit") editarLaminaCms(id);
+      else if (action === "toggle") alternarStatusCms(id);
+      else if (action === "delete") {
+        const alvo = acervoFirestoreCache.find((item) => item.id === id);
+        excluirLaminaCms(id, alvo ? alvo.nome : id);
+      }
+    });
+  }
+
   if (acervoFirestoreCache.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-xs font-mono text-slate-400 italic">Nenhum registro encontrado no Cloud Firestore. Cadastre sua primeira lâmina na Aba 1 (Editor &amp; Cadastro).</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-xs font-mono text-slate-400 italic">${getAuthenticatedUser() ? "Nenhum registro encontrado no Cloud Firestore. Cadastre sua primeira lâmina na Aba 1 (Editor &amp; Cadastro)." : "Faça login administrativo para sincronizar e gerenciar o acervo."}</td></tr>`;
     return;
   }
   const listaFiltrada = acervoFirestoreCache.filter((lamina) => {
@@ -461,26 +543,26 @@ export function renderizarTabelaAcervo() {
   let rowsHtml = "";
   listaFiltrada.forEach((lamina) => {
     const totalPinos = (lamina.pinos || []).length;
-    const nomeSeguro = (lamina.nome || "Peça sem título").replace(/'/g, "\\'");
+    const idSafe = escaparHTML(String(lamina.id || ""));
     const isAtiva = lamina.status === "ativa";
     const badgeStatus = isAtiva
       ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[11px] font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Ativa</span>`
       : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-medium"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inativa</span>`;
     const botaoAlternar = isAtiva
-      ? `<button type="button" class="text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-100 border border-slate-200/60 transition-all text-xs font-medium cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Inativar</button>`
-      : `<button type="button" class="text-emerald-700 hover:text-emerald-800 px-2 py-1.5 rounded-lg hover:bg-emerald-50 border border-emerald-200/60 transition-all text-xs font-medium cursor-pointer" onclick="window.App.alternarStatusCms('${lamina.id}')">Ativar</button>`;
+      ? `<button type="button" data-cms-action="toggle" data-id="${idSafe}" class="text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-100 border border-slate-200/60 transition-all text-xs font-medium cursor-pointer">Inativar</button>`
+      : `<button type="button" data-cms-action="toggle" data-id="${idSafe}" class="text-emerald-700 hover:text-emerald-800 px-2 py-1.5 rounded-lg hover:bg-emerald-50 border border-emerald-200/60 transition-all text-xs font-medium cursor-pointer">Ativar</button>`;
     rowsHtml += `
       <tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100">
-        <td class="py-3 px-4"><div class="flex flex-col"><span class="text-xs font-semibold text-slate-900">${lamina.nome || "Peça Morfológica"}</span><span class="font-mono text-[11px] text-slate-400 mt-0.5">${lamina.id}</span></div></td>
-        <td class="py-3 px-4 text-xs text-slate-600 capitalize font-medium">${lamina.disciplina || "histologia"}</td>
-        <td class="py-3 px-4 text-xs text-slate-600">${formatarNomeTopico(lamina.topico)}</td>
-        <td class="py-3 px-4 text-xs text-slate-600">${lamina.coloracao || "Padrão"}</td>
+        <td class="py-3 px-4"><div class="flex flex-col"><span class="text-xs font-semibold text-slate-900">${escaparHTML(lamina.nome || "Peça Morfológica")}</span><span class="font-mono text-[11px] text-slate-400 mt-0.5">${idSafe}</span></div></td>
+        <td class="py-3 px-4 text-xs text-slate-600 capitalize font-medium">${escaparHTML(lamina.disciplina || "histologia")}</td>
+        <td class="py-3 px-4 text-xs text-slate-600">${escaparHTML(formatarNomeTopico(lamina.topico))}</td>
+        <td class="py-3 px-4 text-xs text-slate-600">${escaparHTML(lamina.coloracao || "Padrão")}</td>
         <td class="py-3 px-4 text-center whitespace-nowrap">${badgeStatus}</td>
         <td class="py-3 px-4 text-center"><div class="flex justify-center"><span class="flex items-center justify-center w-6 h-6 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium">${totalPinos}</span></div></td>
         <td class="py-3 px-4 text-right whitespace-nowrap space-x-1.5">
-          <button type="button" class="text-teal-700 hover:text-teal-800 hover:bg-teal-50 px-2.5 py-1.5 rounded-lg border border-teal-200/60 transition-all text-xs font-medium cursor-pointer" data-id="${lamina.id}" onclick="window.App.editarLaminaCms('${lamina.id}')">Editar no Canvas</button>
+          <button type="button" data-cms-action="edit" data-id="${idSafe}" class="text-teal-700 hover:text-teal-800 hover:bg-teal-50 px-2.5 py-1.5 rounded-lg border border-teal-200/60 transition-all text-xs font-medium cursor-pointer">Editar no Canvas</button>
           ${botaoAlternar}
-          <button type="button" class="text-slate-400 hover:text-rose-600 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-all text-xs font-medium cursor-pointer" data-id="${lamina.id}" onclick="window.App.excluirLaminaCms('${lamina.id}', '${nomeSeguro}')" title="Excluir Lâmina">
+          <button type="button" data-cms-action="delete" data-id="${idSafe}" class="text-slate-400 hover:text-rose-600 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-all text-xs font-medium cursor-pointer" title="Excluir Lâmina">
             <svg class="w-4 h-4 inline-block -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
           </button>
         </td>
@@ -493,6 +575,10 @@ export function renderizarTabelaAcervo() {
 export const renderizarAcervoCms = renderizarTabelaAcervo;
 
 export async function alternarStatusCms(id) {
+  if (!getAuthenticatedUser()) {
+    alert("Sessão administrativa expirada ou não autenticada. Faça login novamente.");
+    return;
+  }
   const lamina = acervoFirestoreCache.find((item) => item.id === id);
   if (!lamina) return;
   const novoStatus = lamina.status === "ativa" ? "inativa" : "ativa";
@@ -553,54 +639,52 @@ export async function editarLaminaCms(id) {
   if (assetSelect) {
     assetSelect.value = urlImagem;
   }
-  if (editorTexto) editorTexto.innerHTML = lamina.descricaoHTML || lamina.descricao || "";
+  if (editorTexto) editorTexto.innerHTML = removerConteudoPerigoso(lamina.descricaoHTML || lamina.descricao || "");
+
+  destruirTrackersEditor();
+  if (viewerInstance && typeof viewerInstance.clearOverlays === "function") viewerInstance.clearOverlays();
+
+  editorPins = (lamina.pinos || []).map((pin, i) => {
+    const rawEndX = pin.endX != null ? pin.endX : pin.end_x;
+    const rawEndY = pin.endY != null ? pin.endY : pin.end_y;
+    return {
+      id: pin.id || `pin_${Date.now()}_${i}`,
+      rotulo: pin.rotulo || pin.nome || `${i + 1}`,
+      type: pin.type || "pin",
+      x: Number(pin.x) || 0,
+      y: Number(pin.y) || 0,
+      zoom: pin.zoom != null ? Number(pin.zoom) : null,
+      radius: pin.radius != null ? Number(pin.radius) : (pin.type === "circle" ? 250 : null),
+      endX: rawEndX != null ? Number(rawEndX) : null,
+      endY: rawEndY != null ? Number(rawEndY) : null,
+      angle: pin.angle != null ? Number(pin.angle) : null,
+      stroke_color: pin.stroke_color || "#d4af37",
+      fill_color: pin.fill_color || null
+    };
+  });
+
+  editorQuestoes = (lamina.questoes || []).map((q, i) => {
+    const qClone = {
+      ...q,
+      id: q.id || `q_${Date.now()}_${i}`,
+      numero: q.numero || (i + 1),
+      titulo: q.titulo || q.enunciado || "",
+      x: Number(q.x) || 0,
+      y: Number(q.y) || 0
+    };
+    return qClone;
+  });
+
+  modoCriacaoQuestao = false;
+  atualizarEstadoBotaoModoQuestao();
+  atualizarInterfaceListaPinos();
+  atualizarDropdownPinosVinculacao();
+  atualizarInterfaceListaQuestoes();
+  inicializarEventosPreviewInterativo();
+
   const isDzi = urlImagem.endsWith(".dzi") || urlImagem.includes(".dzi?");
-  carregarImagemNoEditor(urlImagem, isDzi, false);
-  setTimeout(() => {
-    editorPins = [];
-    if (viewerInstance && typeof viewerInstance.clearOverlays === "function") viewerInstance.clearOverlays();
-    const pinosOrigem = (lamina.pinos || []);
-    if (pinosOrigem.length > 0) {
-      pinosOrigem.forEach((pin, i) => {
-        const pinoData = {
-          id: pin.id || `pin_${Date.now()}_${i}`,
-          rotulo: pin.rotulo || pin.nome || `${i + 1}`,
-          type: pin.type || "pin",
-          x: Number(pin.x) || 0,
-          y: Number(pin.y) || 0,
-          radius: pin.radius ? Number(pin.radius) : (pin.type === "circle" ? 250 : null),
-          endX: (pin.endX != null ? pin.endX : pin.end_x) ? Number(pin.endX ?? pin.end_x) : null,
-          endY: (pin.endY != null ? pin.endY : pin.end_y) ? Number(pin.endY ?? pin.end_y) : null,
-          angle: pin.angle ? Number(pin.angle) : null,
-          stroke_color: pin.stroke_color || "#d4af37",
-          fill_color: pin.fill_color || null
-        };
-        editorPins.push(pinoData);
-        renderizarPinoNoCanvas(pinoData);
-      });
-    }
-    atualizarInterfaceListaPinos();
-    atualizarDropdownPinosVinculacao();
-    editorQuestoes = [];
-    modoCriacaoQuestao = false;
-    atualizarEstadoBotaoModoQuestao();
-    const questoesOrigem = (lamina.questoes || []);
-    if (questoesOrigem.length > 0) {
-      questoesOrigem.forEach((q, i) => {
-        const questaoData = {
-          id: q.id || `q_${Date.now()}_${i}`,
-          numero: q.numero || (i + 1),
-          titulo: q.titulo || q.enunciado || "",
-          x: q.x || 0,
-          y: q.y || 0
-        };
-        editorQuestoes.push(questaoData);
-        renderizarQuestaoNoCanvas(questaoData);
-      });
-    }
-    atualizarInterfaceListaQuestoes();
-    inicializarEventosPreviewInterativo();
-  }, 350);
+  await carregarImagemNoEditor(urlImagem, isDzi, false);
+
   const txtBtnPublicar = document.getElementById("txtBtnPublicar");
   const btnCancelar = document.getElementById("btnCancelarEdicao");
   const statusBox = document.getElementById("dashCmsStatus");
@@ -614,6 +698,10 @@ export async function editarLaminaCms(id) {
 
 export async function excluirLaminaCms(idLamina, nomeLamina) {
   if (!idLamina) return;
+  if (!getAuthenticatedUser()) {
+    alert("Sessão administrativa expirada ou não autenticada. Faça login novamente.");
+    return;
+  }
   const alvoNome = nomeLamina || idLamina;
   if (!confirm(`Tem certeza que deseja excluir a lamina "${alvoNome}"? Esta acao nao podera ser desfeita.`)) return;
   try {
@@ -643,9 +731,10 @@ export function resetarFormularioDashboard() {
   if (disciplinaSelect) { disciplinaSelect.value = "histologia"; atualizarTopicosCms("histologia"); }
   if (coloracaoSelect) coloracaoSelect.value = "H&E";
   if (statusSelect) statusSelect.value = "inativa";
-  // Req 1: Reseta maxMagnification para o padrão 40
   const maxMagSelect = document.getElementById("dashMaxMagnification");
   if (maxMagSelect) maxMagSelect.value = "40";
+  const ratioInput = document.getElementById("dashZoom4xRatio");
+  if (ratioInput) ratioInput.value = "0.28";
   if (imgUrlInput) imgUrlInput.value = "";
   if (editorTexto) editorTexto.innerHTML = "";
   if (statusBox) { statusBox.innerHTML = ""; statusBox.classList.add("hidden"); }
@@ -663,6 +752,7 @@ export function resetarFormularioDashboard() {
   definirModoAnotacao("pin");
   const assetSelect = document.getElementById("dashAssetSelector");
   if (assetSelect) assetSelect.value = "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi";
+  destruirTrackersEditor();
   if (viewerInstance && typeof viewerInstance.clearOverlays === "function") viewerInstance.clearOverlays();
   carregarImagemNoEditor("assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", true, true);
   exibirToastDiscreto("Formulario redefinido para o modo de novo cadastro.", "emerald");
@@ -681,7 +771,12 @@ function exibirToastDiscreto(mensagem, tipo) {
   let corPonto = "bg-emerald-500";
   if (tipo === "red") corPonto = "bg-rose-500";
   else if (tipo === "blue") corPonto = "bg-blue-500";
-  toast.innerHTML = `<span class="w-2.5 h-2.5 rounded-full ${corPonto} shrink-0"></span><span>${mensagem}</span>`;
+  toast.textContent = "";
+  const dot = document.createElement("span");
+  dot.className = `w-2.5 h-2.5 rounded-full ${corPonto} shrink-0`;
+  const msgSpan = document.createElement("span");
+  msgSpan.textContent = String(mensagem || "");
+  toast.append(dot, msgSpan);
   toast.classList.remove("translate-y-20", "opacity-0");
   toast.classList.add("translate-y-0", "opacity-100");
   clearTimeout(toast._timer);
@@ -696,16 +791,16 @@ export function atualizarTopicosCms(disciplina) {
   if (!seletorTopico) return;
   const lista = topicosCurriculares[disciplina] || topicosCurriculares.histologia;
   let optionsHtml = "";
-  lista.forEach((item) => { optionsHtml += `<option value="${item.id}">${item.nome}</option>`; });
+  lista.forEach((item) => { optionsHtml += `<option value="${escaparHTML(item.id)}">${escaparHTML(item.nome)}</option>`; });
   seletorTopico.innerHTML = optionsHtml;
 }
 
-export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
+export async function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
   const inputUrl = document.getElementById("dashImgUrl");
   let url = urlParam !== undefined ? urlParam : (inputUrl ? inputUrl.value.trim() : "");
   if (url) {
-    url = url.replace(/muscular-esquelito/gi, "muscular-esqueletico");
-    if (!url.includes("/") && !url.startsWith("http") && !url.startsWith("data:")) url = `/assets/histologia/${url}`;
+    url = url.replace(/muscular-esquelito/gi, "muscular-esqueletico").trim();
+    if (!url.includes("/") && !url.startsWith("http") && !url.startsWith("data:")) url = `assets/histologia/${url}`;
   }
   if (inputUrl) inputUrl.value = url;
   let isDzi = isDziParam;
@@ -718,6 +813,7 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
   const containerId = "osd-editor-viewer";
   const container = document.getElementById(containerId);
   if (!container) { console.warn(`[Palas Atlas CMS] Container #${containerId} nao encontrado.`); return; }
+  destruirTrackersEditor();
   if (viewerInstance && typeof viewerInstance.destroy === "function") { viewerInstance.destroy(); viewerInstance = null; }
   if (!laminaEmEdicaoId && !isAutoLoad) {
     editorPins = [];
@@ -730,6 +826,13 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
   }
   const tileSourcesConfig = isDzi ? url : { type: "image", url: url };
   if (typeof window.OpenSeadragon !== "function") { console.error("[Palas Atlas CMS] Biblioteca OpenSeadragon nao carregada."); return; }
+
+  const slideKey = laminaEmEdicaoId || "cms-editor";
+  if (isDzi && window.slideSecurity && typeof window.slideSecurity.renovarTicketSessao === "function") {
+    window.slideSecurity.currentSlideId = slideKey;
+    await window.slideSecurity.renovarTicketSessao(slideKey);
+  }
+
   viewerInstance = window.OpenSeadragon({
     id: containerId,
     prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
@@ -745,14 +848,16 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
     animationTime: 0.4,
     blendTime: 0.1,
     constrainDuringPan: true,
-    maxZoomPixelRatio: 3,
+    maxZoomPixelRatio: 1,
     visibilityRatio: 1
   });
 
+  const initialMaxMag = Number(document.getElementById("dashMaxMagnification")?.value) || 40;
+  const initialMpp = (40 / initialMaxMag) * 0.156;
   viewerInstance.scalebar({
     type: window.OpenSeadragon.ScalebarType.MICROSCOPE,
     location: window.OpenSeadragon.ScalebarLocation.BOTTOM_LEFT,
-    pixelsPerMeter: 1000000,
+    pixelsPerMeter: Math.round(1e6 / initialMpp),
     color: "#f8fafc",
     backgroundColor: "rgba(23, 23, 23, 0.85)",
     fontFamily: "sans-serif",
@@ -764,24 +869,90 @@ export function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
     console.error("[Palas Atlas CMS] Erro ao carregar imagem no OpenSeadragon:", event);
     alert(`O sistema nao localizou o arquivo "${url}". Verifique se o arquivo existe no servidor.`);
   });
-  viewerInstance.addHandler("open", () => {
+  viewerInstance.addHandler("open", async () => {
     // Calibração e Análise Óptica Automática do DZI no CMS
     const item = viewerInstance.world && viewerInstance.world.getItemCount() > 0 ? viewerInstance.world.getItemAt(0) : null;
+    if (isDzi && item && item.source && typeof item.source.getTileUrl === "function" && window.slideSecurity) {
+      await window.slideSecurity.renovarTicketSessao(laminaEmEdicaoId || "cms-editor");
+      const origGetTileUrl = item.source.getTileUrl.bind(item.source);
+      item.source.getTileUrl = function(level, x, y) {
+        const rawUrl = origGetTileUrl(level, x, y);
+        return window.slideSecurity.obterUrlAzulejoProtegida(rawUrl);
+      };
+    }
     const maxMagEl = document.getElementById("dashMaxMagnification");
     const maxMag = maxMagEl ? Number(maxMagEl.value) || 40 : 40;
+    const mppAtual = (40 / maxMag) * 0.156;
+    if (typeof viewerInstance.scalebar === "function") {
+      viewerInstance.scalebar({
+        type: window.OpenSeadragon.ScalebarType.MICROSCOPE,
+        location: window.OpenSeadragon.ScalebarLocation.BOTTOM_LEFT,
+        pixelsPerMeter: Math.round(1e6 / mppAtual),
+        color: "#f8fafc",
+        backgroundColor: "rgba(23, 23, 23, 0.85)",
+        fontFamily: "sans-serif",
+        barThickness: 2,
+        xOffset: 24,
+        yOffset: 24
+      });
+    }
     atualizarCardAnaliseOpticaCms(item, maxMag);
 
     if (maxMagEl && !maxMagEl.__boundDziChange) {
       maxMagEl.__boundDziChange = true;
       maxMagEl.addEventListener("change", () => {
         if (viewerInstance && viewerInstance.world && viewerInstance.world.getItemCount() > 0) {
-          atualizarCardAnaliseOpticaCms(viewerInstance.world.getItemAt(0), maxMagEl.value);
+          const mg = Number(maxMagEl.value) || 40;
+          atualizarCardAnaliseOpticaCms(viewerInstance.world.getItemAt(0), mg);
+          if (typeof viewerInstance.scalebar === "function") {
+            viewerInstance.scalebar({
+              type: window.OpenSeadragon.ScalebarType.MICROSCOPE,
+              location: window.OpenSeadragon.ScalebarLocation.BOTTOM_LEFT,
+              pixelsPerMeter: Math.round(1e6 / ((40 / mg) * 0.156)),
+              color: "#f8fafc",
+              backgroundColor: "rgba(23, 23, 23, 0.85)",
+              fontFamily: "sans-serif",
+              barThickness: 2,
+              xOffset: 24,
+              yOffset: 24
+            });
+          }
         }
       });
     }
 
+    // Normaliza coordenadas 0..1 legadas antes de renderizar no editor
+    const cs = item && typeof item.getContentSize === "function" ? item.getContentSize() : null;
+    if (cs && cs.x > 1 && cs.y > 1) {
+      editorPins.forEach((p) => {
+        if (p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1) {
+          p.x = Math.round(p.x * cs.x * 100) / 100;
+          p.y = Math.round(p.y * cs.y * 100) / 100;
+          if (p.radius > 0 && p.radius <= 1) p.radius *= cs.x;
+          if (p.endX != null && p.endX >= 0 && p.endX <= 1 && p.endY != null && p.endY >= 0 && p.endY <= 1) {
+            p.endX = Math.round(p.endX * cs.x * 100) / 100;
+            p.endY = Math.round(p.endY * cs.y * 100) / 100;
+          }
+        }
+      });
+      editorQuestoes.forEach((q) => {
+        if (q.x >= 0 && q.x <= 1 && q.y >= 0 && q.y <= 1) {
+          q.x = Math.round(q.x * cs.x * 100) / 100;
+          q.y = Math.round(q.y * cs.y * 100) / 100;
+        }
+      });
+    }
+
+    destruirTrackersEditor();
+    if (typeof viewerInstance.clearOverlays === "function") viewerInstance.clearOverlays();
+    if (editorPins.length > 0) {
+      editorPins.forEach((p) => renderizarPinoNoCanvas(p));
+      atualizarInterfaceListaPinos();
+      atualizarDropdownPinosVinculacao();
+    }
     if (editorQuestoes.length > 0) {
       editorQuestoes.forEach((q) => renderizarQuestaoNoCanvas(q));
+      atualizarInterfaceListaQuestoes();
     }
   });
   viewerInstance.addHandler("canvas-click", (event) => {
@@ -936,6 +1107,7 @@ function renderizarPinoNoCanvas(pinoData) {
     const r = Number(pinoData.radius) || 250;
     const imgRect = new window.OpenSeadragon.Rect(pinoData.x - r, pinoData.y - r, 2 * r, 2 * r);
     const vpRect = viewerInstance.viewport.imageToViewportRectangle(imgRect);
+    const rotuloSafe = escaparHTML(pinoData.rotulo || "");
 
     const circleElem = document.createElement("div");
     circleElem.id = `editor-pin-${pinoData.id}`;
@@ -943,14 +1115,14 @@ function renderizarPinoNoCanvas(pinoData) {
     circleElem.style.cssText = "width:100%; height:100%; pointer-events:auto; z-index:30;";
     circleElem.innerHTML = `
       <div class="circle-ring w-full h-full rounded-full border-2 border-[#d4af37] bg-[#d4af37]/10 hover:bg-[#d4af37]/25 hover:border-amber-300 transition-all shadow-[0_0_15px_rgba(212,175,55,0.4)] flex items-center justify-center relative">
-        <span class="pin-badge text-[10px] font-mono font-bold text-[#d4af37] bg-black/80 px-2 py-0.5 rounded-full border border-[#d4af37]/50 shadow-md pointer-events-none">${pinoData.rotulo}</span>
+        <span class="pin-badge text-[10px] font-mono font-bold text-[#d4af37] bg-black/80 px-2 py-0.5 rounded-full border border-[#d4af37]/50 shadow-md pointer-events-none">${rotuloSafe}</span>
       </div>
       <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/95 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl z-50">
-        ${pinoData.rotulo} &bull; Círculo (R: ${Math.round(r)}px)
+        ${rotuloSafe} &bull; Círculo (R: ${Math.round(r)}px)
       </div>
     `;
 
-    new window.OpenSeadragon.MouseTracker({
+    const tracker = new window.OpenSeadragon.MouseTracker({
       element: circleElem,
       clickHandler: (e) => {
         e.originalEvent.stopPropagation();
@@ -960,6 +1132,8 @@ function renderizarPinoNoCanvas(pinoData) {
         destacarPinoTemporariamente(pinoData.id);
       }
     });
+    circleElem._osdTracker = tracker;
+    _editorTrackers.push(tracker);
 
     viewerInstance.addOverlay({ element: circleElem, location: vpRect });
     return;
@@ -987,7 +1161,8 @@ function renderizarPinoNoCanvas(pinoData) {
     const svgY1 = y1 - minY;
     const svgX2 = x2 - minX;
     const svgY2 = y2 - minY;
-    const markerId = `editor-marker-arrow-${pinoData.id}`;
+    const markerIdSafe = `editor-marker-arrow-${String(pinoData.id || "").replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+    const rotuloSafe = escaparHTML(pinoData.rotulo || "");
 
     const arrowElem = document.createElement("div");
     arrowElem.id = `editor-pin-${pinoData.id}`;
@@ -996,22 +1171,22 @@ function renderizarPinoNoCanvas(pinoData) {
     arrowElem.innerHTML = `
       <svg viewBox="0 0 ${w} ${h}" class="w-full h-full overflow-visible" style="filter: drop-shadow(0 0 6px rgba(212,175,55,0.6));">
         <defs>
-          <marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <marker id="${markerIdSafe}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M 0 1 L 10 5 L 0 9 z" fill="#d4af37" />
           </marker>
         </defs>
-        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#d4af37" stroke-width="4" stroke-linecap="round" marker-end="url(#${markerId})" />
+        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#d4af37" stroke-width="4" stroke-linecap="round" marker-end="url(#${markerIdSafe})" />
         <circle cx="${svgX1}" cy="${svgY1}" r="5" fill="#d4af37" stroke="#ffffff" stroke-width="1.5" />
       </svg>
       <div class="pin-badge absolute bg-neutral-950/90 text-[#d4af37] border border-[#d4af37]/40 text-[10px] font-mono px-1.5 py-0.5 rounded shadow pointer-events-none" style="left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform: translate(-50%, -120%);">
-        ${pinoData.rotulo}
+        ${rotuloSafe}
       </div>
       <div class="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/95 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl z-50" style="left:${(svgX2 / w) * 100}%; top:${(svgY2 / h) * 100}%; transform: translate(-50%, -130%);">
-        ${pinoData.rotulo} &bull; Seta (Alvo: ${Math.round(x2)}, ${Math.round(y2)})
+        ${rotuloSafe} &bull; Seta (Alvo: ${Math.round(x2)}, ${Math.round(y2)})
       </div>
     `;
 
-    new window.OpenSeadragon.MouseTracker({
+    const tracker = new window.OpenSeadragon.MouseTracker({
       element: arrowElem,
       clickHandler: (e) => {
         e.originalEvent.stopPropagation();
@@ -1021,12 +1196,15 @@ function renderizarPinoNoCanvas(pinoData) {
         destacarPinoTemporariamente(pinoData.id);
       }
     });
+    arrowElem._osdTracker = tracker;
+    _editorTrackers.push(tracker);
 
     viewerInstance.addOverlay({ element: arrowElem, location: vpRect });
     return;
   }
 
   // 3. ANOTAÇÃO TIPO PIN CLÁSSICO (Ponto Ancorado Fixo com Glow)
+  const rotuloSafe = escaparHTML(pinoData.rotulo || "");
   const pinElem = document.createElement("div");
   pinElem.id = `editor-pin-${pinoData.id}`;
   pinElem.className = "editor-pin group relative flex items-center justify-center cursor-pointer z-30 transition-transform duration-200 hover:scale-125";
@@ -1034,11 +1212,11 @@ function renderizarPinoNoCanvas(pinoData) {
   pinElem.innerHTML = `
     <div class="w-4 h-4 bg-[#d4af37] border-2 border-white rounded-full shadow-[0_0_15px_rgba(212,175,55,0.6)] animate-pulse"></div>
     <div class="pin-badge absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/90 text-white text-[11px] px-3 py-1 rounded-xl border border-white/[0.08] shadow-2xl font-mono backdrop-blur-xl">
-      ${pinoData.rotulo}
+      ${rotuloSafe}
     </div>
   `;
 
-  new window.OpenSeadragon.MouseTracker({
+  const tracker = new window.OpenSeadragon.MouseTracker({
     element: pinElem,
     clickHandler: (e) => {
       e.originalEvent.stopPropagation();
@@ -1048,6 +1226,8 @@ function renderizarPinoNoCanvas(pinoData) {
       destacarPinoTemporariamente(pinoData.id);
     }
   });
+  pinElem._osdTracker = tracker;
+  _editorTrackers.push(tracker);
 
   const location = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(pinoData.x, pinoData.y));
   viewerInstance.addOverlay({ element: pinElem, location: location, placement: window.OpenSeadragon.Placement.CENTER });
@@ -1078,46 +1258,66 @@ function atualizarInterfaceListaPinos() {
   const contadorBadge = document.getElementById("dashTotalPinosBadge");
   if (contadorBadge) contadorBadge.textContent = `${editorPins.length} ${editorPins.length === 1 ? "Marcação" : "Marcações"}`;
   if (!containerLista) return;
+
+  if (!containerLista.__cmsPinsDelegated) {
+    containerLista.__cmsPinsDelegated = true;
+    containerLista.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-pin-action]");
+      if (!btn) return;
+      const action = btn.getAttribute("data-pin-action");
+      const pid = btn.getAttribute("data-pin-id");
+      if (!pid) return;
+      if (action === "focus") focarPinoEditor(pid);
+      else if (action === "edit") editarRotuloPinoCms(pid);
+      else if (action === "delete") excluirPinoCms(pid);
+    });
+  }
+
   if (editorPins.length === 0) {
-    containerLista.innerHTML = `<p class="text-neutral-500 text-xs py-6 text-center border border-dashed border-white/[0.08] rounded-xl font-mono">Nenhuma marcação na imagem. Selecione Ponto, Círculo ou Seta e clique no canvas para adicionar.</p>`;
+    containerLista.innerHTML = `<p class="text-slate-500 text-xs py-6 text-center border border-dashed border-slate-200 rounded-xl font-mono">Nenhuma marcação na imagem. Selecione Ponto, Círculo ou Seta e clique no canvas para adicionar.</p>`;
     return;
   }
   let html = `<div class="space-y-2">`;
   editorPins.forEach((p) => {
-    let icone = "📍";
+    let icone = "P";
     let tipoTexto = "Ponto";
     let detalhesGeom = `X: ${Math.round(p.x)} &bull; Y: ${Math.round(p.y)}`;
     
     if (p.type === "circle") {
-      icone = "⭕";
+      icone = "C";
       tipoTexto = `Círculo (R: ${Math.round(p.radius || 250)}px)`;
       detalhesGeom = `Centro: (${Math.round(p.x)}, ${Math.round(p.y)})`;
     } else if (p.type === "arrow") {
-      icone = "↗️";
+      icone = "S";
       tipoTexto = "Seta Direcional";
-      detalhesGeom = `De (${Math.round(p.x)}, ${Math.round(p.y)}) &rarr; (${Math.round(p.endX || p.x)}, ${Math.round(p.endY || p.y)})`;
+      const ex = p.endX != null ? p.endX : p.x;
+      const ey = p.endY != null ? p.endY : p.y;
+      detalhesGeom = `De (${Math.round(p.x)}, ${Math.round(p.y)}) &rarr; (${Math.round(ex)}, ${Math.round(ey)})`;
     }
 
+    const idSafe = escaparHTML(String(p.id || ""));
+    const rotuloSafe = escaparHTML(p.rotulo || "");
+
     html += `
-      <div class="p-3 flex items-center justify-between bg-white/[0.02] border border-white/[0.06] rounded-xl hover:bg-white/[0.04] transition-colors">
-        <div class="flex items-center gap-3">
-          <div class="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[#d4af37] font-mono text-[10px] font-bold flex items-center justify-center shadow-sm shrink-0">
+      <div class="p-3 flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-xl hover:bg-white transition-colors">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 font-mono text-[10px] font-bold flex items-center justify-center shadow-2xs shrink-0">
             ${icone}
           </div>
-          <div class="flex flex-col">
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs text-neutral-200 font-mono font-medium">${p.rotulo}</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded bg-white/[0.04] text-[#d4af37] font-mono">${tipoTexto}</span>
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="text-xs text-slate-900 font-mono font-medium truncate">${rotuloSafe}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200/60 font-mono shrink-0">${tipoTexto}</span>
             </div>
-            <span class="text-[10px] text-neutral-500 font-mono mt-0.5">${detalhesGeom}</span>
+            <span class="text-[10px] text-slate-500 font-mono mt-0.5">${detalhesGeom}</span>
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <button type="button" onclick="window.App.focarPinoEditor('${p.id}')" class="text-[#d4af37] hover:text-[#e0c97f] text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Focar</button>
-          <span class="text-white/10 text-[10px]">|</span>
-          <button type="button" onclick="window.App.editarRotuloPinoCms('${p.id}')" class="text-neutral-400 hover:text-[#d4af37] text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Editar</button>
-          <span class="text-white/10 text-[10px]">|</span>
-          <button type="button" onclick="window.App.excluirPinoCms('${p.id}')" class="text-rose-400/80 hover:text-rose-400 text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Excluir</button>
+          <button type="button" data-pin-action="focus" data-pin-id="${idSafe}" class="text-teal-700 hover:text-teal-900 text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Focar</button>
+          <span class="text-slate-300 text-[10px]">|</span>
+          <button type="button" data-pin-action="edit" data-pin-id="${idSafe}" class="text-slate-600 hover:text-slate-900 text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Editar</button>
+          <span class="text-slate-300 text-[10px]">|</span>
+          <button type="button" data-pin-action="delete" data-pin-id="${idSafe}" class="text-rose-600 hover:text-rose-800 text-[10px] font-mono cursor-pointer transition-colors uppercase tracking-wider">Excluir</button>
         </div>
       </div>
     `;
@@ -1131,7 +1331,7 @@ function atualizarDropdownPinosVinculacao() {
   if (!seletor) return;
   if (editorPins.length === 0) { seletor.innerHTML = `<option value="">Nenhum pino cadastrado na lamina...</option>`; return; }
   let opt = `<option value="">Selecione um pino para vincular...</option>`;
-  editorPins.forEach((p) => { opt += `<option value="${p.id}">${p.rotulo} &bull; X:${Math.round(p.x)} Y:${Math.round(p.y)}</option>`; });
+  editorPins.forEach((p) => { opt += `<option value="${escaparHTML(String(p.id || ""))}">${escaparHTML(p.rotulo || "")} &bull; X:${Math.round(p.x)} Y:${Math.round(p.y)}</option>`; });
   seletor.innerHTML = opt;
 }
 
@@ -1142,7 +1342,7 @@ export function editarRotuloPinoCms(pinId) {
   if (novoRotulo !== null && novoRotulo.trim() !== "") {
     pino.rotulo = novoRotulo.trim();
     const elem = document.getElementById(`editor-pin-${pino.id}`);
-    if (elem) { const spanTexto = elem.querySelector("span"); if (spanTexto) spanTexto.textContent = pino.rotulo; elem.title = `Pino ${pino.rotulo} (X: ${pino.x}, Y: ${pino.y})`; }
+    if (elem) { const spanTexto = elem.querySelector("span, .pin-badge"); if (spanTexto) spanTexto.textContent = pino.rotulo; elem.title = `Pino ${pino.rotulo} (X: ${pino.x}, Y: ${pino.y})`; }
     atualizarInterfaceListaPinos();
     atualizarDropdownPinosVinculacao();
   }
@@ -1152,7 +1352,16 @@ export function excluirPinoCms(pinId) {
   const index = editorPins.findIndex((item) => item.id === pinId);
   if (index === -1) return;
   const elem = document.getElementById(`editor-pin-${pinId}`);
-  if (elem && viewerInstance) viewerInstance.removeOverlay(elem);
+  if (elem) {
+    if (elem._osdTracker) {
+      try { elem._osdTracker.destroy(); } catch (e) {}
+      _editorTrackers = _editorTrackers.filter((t) => t !== elem._osdTracker);
+      elem._osdTracker = null;
+    }
+    if (viewerInstance) {
+      try { viewerInstance.removeOverlay(elem); } catch (e) {}
+    }
+  }
   editorPins.splice(index, 1);
   atualizarInterfaceListaPinos();
   atualizarDropdownPinosVinculacao();
@@ -1172,7 +1381,11 @@ export function vincularTextoAoPino() {
   spanLink.className = "pin-link inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-white/[0.06] border border-white/[0.1] text-neutral-200 hover:text-white transition-colors cursor-pointer text-xs font-medium";
   spanLink.setAttribute("data-pin-id", pinId);
   spanLink.contentEditable = "false";
-  spanLink.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-[#d4af37] shrink-0"></span><span>${textoSelecionado}</span>`;
+  const dot = document.createElement("span");
+  dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37] shrink-0";
+  const labelSpan = document.createElement("span");
+  labelSpan.textContent = textoSelecionado;
+  spanLink.append(dot, labelSpan);
   spanLink.title = `Vinculo ativo com ${pinoVerificado.rotulo}`;
   range.deleteContents();
   range.insertNode(spanLink);
@@ -1198,8 +1411,8 @@ export function focarPinoEditor(pinId) {
     targetZoom = Math.min(targetZoom, viewerInstance.viewport.maxZoomLevel * 0.95);
   }
 
+  viewerInstance.viewport.zoomTo(targetZoom, pontoViewport, false);
   viewerInstance.viewport.panTo(pontoViewport, false);
-  viewerInstance.viewport.zoomTo(targetZoom, null, false);
   viewerInstance.viewport.applyConstraints();
   destacarPinoTemporariamente(pinId);
 }
@@ -1208,11 +1421,20 @@ export function inicializarEventosPreviewInterativo() {
   const editor = document.getElementById("dashEditorTexto");
   if (!editor || editor._eventosInteracaoInjetados) return;
 
-  // Intercepta colagem no editor para colar apenas texto puro e remover formatações externas
+  // Intercepta colagem no editor para inserir texto puro sem execCommand obsoleto
   editor.addEventListener("paste", (evento) => {
     evento.preventDefault();
-    const textoPuro = (evento.clipboardData || window.clipboardData).getData("text/plain");
-    document.execCommand("insertText", false, textoPuro);
+    const textoPuro = (evento.clipboardData || window.clipboardData).getData("text/plain") || "";
+    const selecao = window.getSelection();
+    if (!selecao || selecao.rangeCount === 0) return;
+    const range = selecao.getRangeAt(0);
+    range.deleteContents();
+    const textNode = document.createTextNode(textoPuro);
+    range.insertNode(textNode);
+    range.setStartAfter(textNode);
+    range.collapse(true);
+    selecao.removeAllRanges();
+    selecao.addRange(range);
   });
 
   // Clique direto no hiperlink do editor
@@ -1224,13 +1446,6 @@ export function inicializarEventosPreviewInterativo() {
     focarPinoEditor(pinId);
   });
 
-  editor.addEventListener("mouseover", (evento) => {
-    const alvo = evento.target.closest(".pin-link, [data-pin-id]");
-    if (!alvo) return;
-    const pinId = alvo.getAttribute("data-pin-id");
-    if (!pinId) return;
-    focarPinoEditor(pinId);
-  });
   editor._eventosInteracaoInjetados = true;
 }
 
@@ -1251,6 +1466,10 @@ export function osdEditorAction(acao) {
  *   status, pinos
  */
 export async function publicarLaminaCms() {
+  if (!getAuthenticatedUser()) {
+    alert("Sessão administrativa expirada ou não autenticada. Faça login novamente.");
+    return;
+  }
   const nome = (document.getElementById("dashNomeLamina") || { value: "" }).value.trim();
   const disciplina = (document.getElementById("dashSelectDisciplina") || { value: "histologia" }).value.trim();
   const topico = (document.getElementById("dashSelectTopico") || { value: "epitelial" }).value.trim();
@@ -1269,6 +1488,7 @@ export async function publicarLaminaCms() {
     type: p.type || "pin",
     x: p.x,
     y: p.y,
+    zoom: p.zoom != null ? p.zoom : null,
     radius: p.type === "circle" ? p.radius : null,
     endX: p.type === "arrow" ? (p.endX != null ? p.endX : p.end_x) : null,
     endY: p.type === "arrow" ? (p.endY != null ? p.endY : p.end_y) : null,
@@ -1279,6 +1499,7 @@ export async function publicarLaminaCms() {
     fill_color: p.fill_color || null
   }));
   const questoes = editorQuestoes.map((q) => ({
+    ...q,
     id: q.id,
     numero: q.numero,
     titulo: (q.titulo || "").trim(),
@@ -1322,10 +1543,11 @@ export async function publicarLaminaCms() {
         exibirToastDiscreto("Nova lamina cadastrada no Cloud Firestore e Supabase!", "emerald");
         if (statusBox) {
           const corBadge = status === "ativa" ? "emerald" : "rose";
+          const idSafe = escaparHTML(String(idGravado || ""));
           statusBox.innerHTML = `
-            <div class="font-bold uppercase tracking-wider text-${corBadge}-300">Lâmina Sincronizada (${status.toUpperCase()})</div>
-            <div class="mt-1 text-neutral-300 text-xs font-mono">ID: ${idGravado} (${pinos.length} marcações, ${questoes.length} questões vinculadas)</div>
-            <a href="microscopio.html?id=${idGravado}" target="_blank" rel="noopener noreferrer" class="mt-3 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 text-xs font-mono uppercase tracking-wider shadow-lg inline-flex items-center gap-2 cursor-pointer transition-all duration-300">
+            <div class="font-bold uppercase tracking-wider text-${corBadge}-300">Lâmina Sincronizada (${escaparHTML(String(status).toUpperCase())})</div>
+            <div class="mt-1 text-neutral-300 text-xs font-mono">ID: ${idSafe} (${pinos.length} marcações, ${questoes.length} questões vinculadas)</div>
+            <a href="microscopio.html?id=${encodeURIComponent(String(idGravado || ""))}" target="_blank" rel="noopener noreferrer" class="mt-3 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 text-xs font-mono uppercase tracking-wider shadow-lg inline-flex items-center gap-2 cursor-pointer transition-all duration-300">
               <span>Testar no Microscópio</span>
               <span>&rarr;</span>
             </a>
@@ -1334,19 +1556,32 @@ export async function publicarLaminaCms() {
         }
       }
 
-      // Sincronização em segundo plano com o Supabase PostgreSQL
+      // Sincronização em segundo plano com o Supabase PostgreSQL (autenticada via Firebase ID Token)
       try {
+        const currentUser =
+          typeof firebase !== "undefined" && typeof firebase.auth === "function"
+            ? firebase.auth().currentUser
+            : null;
+        const idToken = currentUser ? await currentUser.getIdToken() : null;
+        const syncHeaders = { "Content-Type": "application/json" };
+        if (idToken) {
+          syncHeaders["Authorization"] = `Bearer ${idToken}`;
+        }
+
         fetch("/api/sync-supabase", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: syncHeaders,
           body: JSON.stringify({
             laminaId: idGravado,
             laminaData,
             pinos
           })
-        }).then(r => r.json()).then(res => {
-          if (res && res.success) {
+        }).then(async (r) => {
+          const res = await r.json().catch(() => null);
+          if (r.ok && res && res.success) {
             console.log("[Supabase Sync] Sincronização concluída com PostgreSQL no Supabase.");
+          } else {
+            console.warn("[Supabase Sync] Sincronização secundária rejeitada:", r.status, res?.error || "");
           }
         }).catch(e => {
           console.warn("[Supabase Sync] Aviso: sincronização secundária assíncrona:", e.message);
@@ -1402,6 +1637,11 @@ function renderizarQuestaoNoCanvas(q) {
 
   const elemExistente = document.getElementById(`editor-qpin-${q.id}`);
   if (elemExistente) {
+    if (elemExistente._osdTracker) {
+      try { elemExistente._osdTracker.destroy(); } catch (e) {}
+      _editorTrackers = _editorTrackers.filter((t) => t !== elemExistente._osdTracker);
+      elemExistente._osdTracker = null;
+    }
     try { viewerInstance.removeOverlay(elemExistente); } catch (e) {}
     if (elemExistente.parentNode) elemExistente.parentNode.removeChild(elemExistente);
   }
@@ -1411,17 +1651,18 @@ function renderizarQuestaoNoCanvas(q) {
   qElem.className = "editor-qpin group relative flex items-center justify-center cursor-pointer z-40 transition-transform duration-200 hover:scale-125 select-none";
   qElem.title = `Questão Q${q.numero}: ${q.titulo || 'Clique para focar'} (X: ${q.x}, Y: ${q.y})`;
 
+  const numSafe = escaparHTML(String(q.numero || ""));
   qElem.innerHTML = `
     <div class="qpin-badge px-2 py-0.5 rounded-full bg-amber-400 text-neutral-950 font-mono font-bold text-[10px] tracking-wider border-2 border-white shadow-[0_0_16px_rgba(245,158,11,0.7)] flex items-center gap-1 animate-pulse transition-all">
-      <span>Q${q.numero}</span>
+      <span>Q${numSafe}</span>
     </div>
     <div class="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-neutral-950/95 text-neutral-200 text-[11px] px-3 py-1.5 rounded-xl border border-amber-400/30 shadow-2xl font-mono backdrop-blur-xl max-w-xs truncate">
-      <span class="text-amber-400 font-bold mr-1">Q${q.numero}:</span>
-      <span class="qpin-title">${escaparHtml(q.titulo || 'Questão sem enunciado')}</span>
+      <span class="text-amber-400 font-bold mr-1">Q${numSafe}:</span>
+      <span class="qpin-title">${escaparHTML(q.titulo || 'Questão sem enunciado')}</span>
     </div>
   `;
 
-  new window.OpenSeadragon.MouseTracker({
+  const tracker = new window.OpenSeadragon.MouseTracker({
     element: qElem,
     clickHandler: (e) => {
       e.originalEvent.stopPropagation();
@@ -1429,6 +1670,8 @@ function renderizarQuestaoNoCanvas(q) {
       focarQuestaoNoEditor(q.id);
     }
   });
+  qElem._osdTracker = tracker;
+  _editorTrackers.push(tracker);
 
   const location = viewerInstance.viewport.imageToViewportCoordinates(new window.OpenSeadragon.Point(q.x, q.y));
   viewerInstance.addOverlay({
@@ -1494,8 +1737,15 @@ export function excluirQuestaoCms(id) {
   if (index === -1) return;
 
   const qElem = document.getElementById(`editor-qpin-${id}`);
-  if (qElem && viewerInstance) {
-    try { viewerInstance.removeOverlay(qElem); } catch (e) {}
+  if (qElem) {
+    if (qElem._osdTracker) {
+      try { qElem._osdTracker.destroy(); } catch (e) {}
+      _editorTrackers = _editorTrackers.filter((t) => t !== qElem._osdTracker);
+      qElem._osdTracker = null;
+    }
+    if (viewerInstance) {
+      try { viewerInstance.removeOverlay(qElem); } catch (e) {}
+    }
     if (qElem.parentNode) qElem.parentNode.removeChild(qElem);
   }
 
@@ -1525,9 +1775,28 @@ function atualizarInterfaceListaQuestoes() {
 
   if (!containerLista) return;
 
+  if (!containerLista.__cmsQuestoesDelegated) {
+    containerLista.__cmsQuestoesDelegated = true;
+    containerLista.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-q-action]");
+      if (!btn) return;
+      const action = btn.getAttribute("data-q-action");
+      const qid = btn.getAttribute("data-q-id");
+      if (!qid) return;
+      if (action === "focus") focarQuestaoNoEditor(qid);
+      else if (action === "delete") excluirQuestaoCms(qid);
+    });
+    containerLista.addEventListener("input", (e) => {
+      const ta = e.target.closest("textarea[data-q-input-id]");
+      if (!ta) return;
+      const qid = ta.getAttribute("data-q-input-id");
+      if (qid) atualizarTituloQuestaoCms(qid, ta.value);
+    });
+  }
+
   if (editorQuestoes.length === 0) {
     containerLista.innerHTML = `
-      <p class="text-neutral-500 text-xs py-6 px-4 text-center border border-dashed border-white/[0.08] rounded-xl font-mono leading-relaxed">
+      <p class="text-slate-500 text-xs py-6 px-4 text-center border border-dashed border-slate-200 rounded-xl font-mono leading-relaxed">
         Nenhuma questão cadastrada para esta lâmina. Clique em '+ Nova Questão na Lâmina' e marque o ponto no canvas à direita.
       </p>
     `;
@@ -1536,27 +1805,31 @@ function atualizarInterfaceListaQuestoes() {
 
   let html = `<div class="space-y-3">`;
   editorQuestoes.forEach((q) => {
+    const qIdSafe = escaparHTML(String(q.id || ""));
+    const numSafe = escaparHTML(String(q.numero || ""));
     html += `
-      <div id="card-questao-${q.id}" class="p-3.5 bg-white/[0.02] border border-white/[0.06] rounded-xl hover:bg-white/[0.04] transition-all space-y-2.5 group">
+      <div id="card-questao-${qIdSafe}" class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl hover:bg-white transition-all space-y-2.5 group">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
-              Q${q.numero}
+            <span class="w-6 h-6 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
+              Q${numSafe}
             </span>
-            <span class="text-[10px] text-neutral-400 font-mono uppercase tracking-wider">Simulado de Bancada</span>
+            <span class="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Simulado de Bancada</span>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
             <button 
               type="button" 
-              onclick="window.App.focarQuestaoNoEditor('${q.id}')" 
-              class="px-2 py-1 rounded bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-amber-300 border border-white/[0.08] hover:border-amber-400/30 text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
+              data-q-action="focus"
+              data-q-id="${qIdSafe}"
+              class="px-2 py-1 rounded bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-800 border border-slate-200 text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
               title="Focar este ponto no canvas">
               Focar
             </button>
             <button 
               type="button" 
-              onclick="window.App.excluirQuestaoCms('${q.id}')" 
-              class="px-2 py-1 rounded bg-rose-500/5 hover:bg-rose-500/15 text-rose-400/80 hover:text-rose-400 border border-rose-500/20 text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
+              data-q-action="delete"
+              data-q-id="${qIdSafe}"
+              class="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-900 border border-rose-200 text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
               title="Excluir questão">
               Excluir
             </button>
@@ -1565,32 +1838,22 @@ function atualizarInterfaceListaQuestoes() {
 
         <div>
           <textarea 
-            id="dashQuestaoTitulo_${q.id}" 
+            id="dashQuestaoTitulo_${qIdSafe}" 
+            data-q-input-id="${qIdSafe}"
             rows="2"
             placeholder="Título / Pergunta da questão..." 
-            oninput="window.App.atualizarTituloQuestaoCms('${q.id}', this.value)"
-            class="w-full bg-neutral-950/60 border border-white/[0.08] focus:border-amber-400/40 text-xs text-white rounded-lg p-2.5 outline-none transition-colors font-sans placeholder-neutral-500 resize-y leading-relaxed">${escaparHtml(q.titulo || '')}</textarea>
+            class="w-full bg-white border border-slate-200 focus:border-teal-700 text-xs text-slate-900 rounded-lg p-2.5 outline-none transition-colors font-sans placeholder-slate-400 resize-y leading-relaxed">${escaparHTML(q.titulo || '')}</textarea>
         </div>
 
-        <div class="flex items-center justify-between text-[10px] font-mono text-neutral-500 pt-0.5 border-t border-white/[0.04]">
+        <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-0.5 border-t border-slate-200/70">
           <span>Coordenadas:</span>
-          <span class="text-neutral-400 font-mono">X: ${Math.round(q.x)} &bull; Y: ${Math.round(q.y)}</span>
+          <span class="text-slate-600 font-mono">X: ${Math.round(q.x)} &bull; Y: ${Math.round(q.y)}</span>
         </div>
       </div>
     `;
   });
   html += `</div>`;
   containerLista.innerHTML = html;
-}
-
-function escaparHtml(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
 
 /* ============================================================================
@@ -1898,11 +2161,11 @@ export async function carregarLaminasAssociadasModulo(topicoId) {
   container.innerHTML = laminas.map(lam => `
     <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 flex items-center justify-between gap-2.5 hover:bg-white hover:border-slate-300 transition-all">
       <div class="min-w-0">
-        <span class="text-xs font-bold text-slate-900 truncate block">${escaparHtml(lam.nome || "Lâmina")}</span>
-        <span class="text-[10px] font-mono text-slate-500 block">${escaparHtml(lam.coloracao || "Coloração")}</span>
+        <span class="text-xs font-bold text-slate-900 truncate block">${escaparHTML(lam.nome || "Lâmina")}</span>
+        <span class="text-[10px] font-mono text-slate-500 block">${escaparHTML(lam.coloracao || "Coloração")}</span>
       </div>
       <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-medium shrink-0 ${lam.status === 'ativa' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-rose-50 text-rose-700 border border-rose-200/60'}">
-        ${lam.status || 'ativa'}
+        ${escaparHTML(lam.status || 'ativa')}
       </span>
     </div>
   `).join("");
@@ -1911,6 +2174,29 @@ export async function carregarLaminasAssociadasModulo(topicoId) {
 export function renderizarRepeaterSummaryPoints() {
   const container = document.getElementById("cmsSummaryPointsList");
   if (!container) return;
+
+  if (!container.__cmsSummaryDelegated) {
+    container.__cmsSummaryDelegated = true;
+    container.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-point-remove]");
+      if (!btn) return;
+      const idx = Number(btn.getAttribute("data-point-remove"));
+      if (!isNaN(idx)) removerPontoResumoCms(idx);
+    });
+    container.addEventListener("input", (e) => {
+      const lbl = e.target.closest("input[data-point-label]");
+      if (lbl) {
+        const idx = Number(lbl.getAttribute("data-point-label"));
+        if (!isNaN(idx)) atualizarPontoResumoLabel(idx, lbl.value);
+        return;
+      }
+      const txt = e.target.closest("textarea[data-point-text]");
+      if (txt) {
+        const idx = Number(txt.getAttribute("data-point-text"));
+        if (!isNaN(idx)) atualizarPontoResumoText(idx, txt.value);
+      }
+    });
+  }
 
   if (!summaryPointsEmEdicao || summaryPointsEmEdicao.length === 0) {
     container.innerHTML = `
@@ -1932,7 +2218,7 @@ export function renderizarRepeaterSummaryPoints() {
         </div>
         <button 
           type="button" 
-          onclick="window.App.removerPontoResumoCms(${idx})" 
+          data-point-remove="${idx}"
           class="text-slate-400 hover:text-rose-600 p-1 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer text-xs font-medium flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1945,9 +2231,9 @@ export function renderizarRepeaterSummaryPoints() {
         <label class="text-[11px] font-medium text-slate-600 block">Rótulo / Título do Tópico (Label)</label>
         <input 
           type="text" 
-          value="${escaparHtml(ponto.label || '')}" 
+          data-point-label="${idx}"
+          value="${escaparHTML(ponto.label || '')}" 
           placeholder="Ex: Matriz Extracelular, Células Principais, Definição..." 
-          oninput="window.App.atualizarPontoResumoLabel(${idx}, this.value)"
           class="w-full bg-white border border-slate-200 focus:border-teal-700 text-slate-900 rounded-lg px-3.5 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-teal-700 shadow-2xs transition-all" />
       </div>
 
@@ -1955,9 +2241,9 @@ export function renderizarRepeaterSummaryPoints() {
         <label class="text-[11px] font-medium text-slate-600 block">Texto Descritivo e Detalhamento Morfológico</label>
         <textarea 
           rows="3" 
+          data-point-text="${idx}"
           placeholder="Descreva minuciosamente os critérios histológicos, composição química, populações celulares ou relevância diagnóstica..." 
-          oninput="window.App.atualizarPontoResumoText(${idx}, this.value)"
-          class="w-full bg-white border border-slate-200 focus:border-teal-700 text-slate-900 rounded-lg px-3.5 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-teal-700 custom-scrollbar leading-relaxed shadow-2xs transition-all">${escaparHtml(ponto.text || '')}</textarea>
+          class="w-full bg-white border border-slate-200 focus:border-teal-700 text-slate-900 rounded-lg px-3.5 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-teal-700 custom-scrollbar leading-relaxed shadow-2xs transition-all">${escaparHTML(ponto.text || '')}</textarea>
       </div>
     </div>
   `).join("");
@@ -1997,6 +2283,10 @@ export function removerPontoResumoCms(idx) {
 }
 
 export async function salvarModuloFirestore() {
+  if (!getAuthenticatedUser()) {
+    mostrarToastCms("Sessão administrativa expirada ou não autenticada. Faça login novamente.", "erro");
+    return;
+  }
   if (!moduloEmEdicaoId) {
     mostrarToastCms("Selecione um módulo antes de salvar.", "erro");
     return;
@@ -2085,7 +2375,7 @@ export function mostrarToastCms(mensagem, tipo = "sucesso") {
       <h5 class="text-xs font-mono font-bold uppercase tracking-wider ${isSucesso ? 'text-emerald-300' : 'text-rose-300'}">
         ${isSucesso ? 'Sincronização Cloud Firestore' : 'Atenção no Salvamento'}
       </h5>
-      <p class="text-xs font-sans text-neutral-200 mt-0.5 leading-snug">${escaparHtml(mensagem)}</p>
+      <p class="text-xs font-sans text-neutral-200 mt-0.5 leading-snug">${escaparHTML(mensagem)}</p>
     </div>
     <button type="button" class="text-neutral-400 hover:text-white shrink-0 p-1 cursor-pointer" onclick="this.parentElement.remove()">
       &times;
@@ -2110,10 +2400,17 @@ export function mostrarToastCms(mensagem, tipo = "sucesso") {
 
 export function encerrarPainelCms() {
   modoCriacaoQuestao = false;
+  clearTimeout(_editorAutoLoadTimer);
+  _editorAutoLoadTimer = null;
+  if (typeof _cmsAuthUnsub === "function") {
+    try { _cmsAuthUnsub(); } catch (e) {}
+    _cmsAuthUnsub = null;
+  }
   if (typeof _unsubDashboardAcervo === "function") {
     try { _unsubDashboardAcervo(); } catch (e) {}
     _unsubDashboardAcervo = null;
   }
+  destruirTrackersEditor();
   if (viewerInstance && typeof viewerInstance.destroy === "function") {
     try { viewerInstance.destroy(); } catch (e) {}
     viewerInstance = null;

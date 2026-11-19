@@ -5,12 +5,17 @@
 import { db } from "./firebase-config.js";
 import { setFrenteAtiva, subscribe, getState } from "./state.js";
 import { initGlobalSearch } from "./search-engine.js";
+import {
+  abrirTopico,
+  abrirDisciplinaHome,
+  encerrarListenersCatalogo
+} from "./histology-catalog.js?v=20261118v2";
 
 // Lazy loading sob demanda do dashboard-engine para otimizar o bundle do aluno
 let _dashboardEnginePromise = null;
 function carregarDashboardEngine() {
   if (!_dashboardEnginePromise) {
-    _dashboardEnginePromise = import("./dashboard-engine.js?v=20261105_v2");
+    _dashboardEnginePromise = import("./dashboard-engine.js?v=20261118v2");
   }
   return _dashboardEnginePromise;
 }
@@ -27,18 +32,10 @@ function toggleDashboard() {
 // Cache dos nós do DOM
 const elements = {
   pgHome: null,
-  pgAnatomia: null,
   pgHistologia: null,
   pgDashboard: null,
-
-  btnBackHome: null,
-  headerGlobal: null,
-  footerGlobal: null,
-  headerTitle: null,
-  headerSubtitle: null,
   sideDrawer: null,
-  drawerBackdrop: null,
-  btnAbrirMenu: null
+  drawerBackdrop: null
 };
 
 /**
@@ -46,30 +43,13 @@ const elements = {
  */
 function init() {
   elements.pgHome = document.getElementById("pgHome");
-  elements.pgAnatomia = document.getElementById("pgAnatomia");
   elements.pgHistologia = document.getElementById("pgHistologia");
   elements.pgDashboard = document.getElementById("pgDashboard");
-
-  elements.btnBackHome = document.getElementById("btnBackHome");
-  elements.headerGlobal = document.getElementById("headerGlobal");
-  elements.footerGlobal = document.getElementById("footerGlobal");
-  elements.headerTitle = document.getElementById("headerTitle");
-  elements.headerSubtitle = document.getElementById("headerSubtitle");
   elements.sideDrawer = document.getElementById("sideDrawer");
   elements.drawerBackdrop = document.getElementById("drawerBackdrop");
-  elements.btnAbrirMenu = document.getElementById("btnAbrirMenu");
 
   // Iniciar motor de busca
   initGlobalSearch();
-
-  // Navegação
-  if (elements.btnBackHome) {
-    elements.btnBackHome.addEventListener("click", goHome);
-  }
-
-  if (elements.btnAbrirMenu) {
-    elements.btnAbrirMenu.addEventListener("click", abrirMenuLateral);
-  }
 
   if (elements.drawerBackdrop && elements.sideDrawer) {
     // Retira o menu lateral de dentro do pgHome (que pode estar oculto) e o insere no escopo global
@@ -114,15 +94,11 @@ function init() {
   if (frenteParam === "admin" || frenteParam === "cms") {
     frenteParam = "dashboard";
   }
-  if (frenteParam && topicoParam && window.App && typeof window.App.abrirTopico === "function") {
-    window.App.abrirTopico(topicoParam, frenteParam);
+  if (frenteParam && topicoParam) {
+    abrirTopico(topicoParam, frenteParam, true);
   } else if (frenteParam && ["anatomia", "histologia", "patologia", "parasitologia", "microbiologia"].includes(frenteParam)) {
     renderView(getState());
-    setTimeout(() => {
-      if (window.App && typeof window.App.abrirDisciplinaHome === "function") {
-        window.App.abrirDisciplinaHome(frenteParam);
-      }
-    }, 150);
+    abrirDisciplinaHome(frenteParam, true);
   } else if (frenteParam === "dashboard") {
     setFrenteAtiva("dashboard");
   } else {
@@ -144,7 +120,6 @@ function renderView(state) {
 
   const allPages = [
     elements.pgHome,
-    elements.pgAnatomia,
     elements.pgHistologia,
     elements.pgDashboard
   ];
@@ -166,14 +141,11 @@ function renderView(state) {
   const isHomePage = !state.frenteAtiva;
   const isDashboard = state.frenteAtiva === 'dashboard';
 
-  const footerDark = document.getElementById("footer-dark");
   const footerLight = document.getElementById("footer-light");
 
   if (isDashboard) {
-    if (footerDark) footerDark.classList.add("hidden");
     if (footerLight) footerLight.classList.add("hidden");
   } else {
-    if (footerDark) footerDark.classList.add("hidden");
     if (footerLight) footerLight.classList.remove("hidden");
   }
 
@@ -230,9 +202,9 @@ function renderView(state) {
     if (logoLink) {
       logoLink.className = "group inline-flex items-center gap-2.5 py-1.5 px-1 transition-all duration-200 cursor-pointer select-none no-underline shrink-0";
     }
-    if (btnOpenDrawer) btnOpenDrawer.className = "h-10 px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs";
+    if (btnOpenDrawer) btnOpenDrawer.className = "lg:hidden h-10 px-2.5 sm:px-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none shadow-2xs shrink-0";
     if (btnVoltarGlobal) {
-      btnVoltarGlobal.className = "min-h-[38px] text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 border border-slate-200/90 rounded-xl transition-all text-xs font-sans font-semibold flex items-center justify-center gap-1.5 px-3 py-1.5 cursor-pointer active:scale-95 shrink-0";
+      btnVoltarGlobal.className = "min-h-[44px] lg:min-h-[38px] text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 border border-slate-200/90 rounded-xl transition-all text-xs font-sans font-semibold flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 cursor-pointer active:scale-95 shrink-0";
       btnVoltarGlobal.classList.remove("hidden");
       btnVoltarGlobal.classList.add("flex");
     }
@@ -249,6 +221,10 @@ function renderView(state) {
   // Encerra listeners e instâncias do CMS se não estiver no dashboard
   if (state.frenteAtiva !== "dashboard" && window.App && typeof window.App.encerrarPainelCms === "function") {
     window.App.encerrarPainelCms();
+  }
+  // Encerra listeners do catálogo quando na Home ou no Dashboard
+  if ((!state.frenteAtiva || state.frenteAtiva === "dashboard") && window.App && typeof window.App.encerrarListenersCatalogo === "function") {
+    window.App.encerrarListenersCatalogo();
   }
 
   // Renderização do Hub de Acesso (Home)
@@ -310,6 +286,9 @@ function selecionarFrente(frente, skipHistory = false) {
  * Reseta a disciplina ativa, retornando ao Hub Inicial.
  */
 function goHome(skipHistory = false) {
+  if (window.App && typeof window.App.encerrarListenersCatalogo === "function") {
+    window.App.encerrarListenersCatalogo();
+  }
   if (!skipHistory) {
     history.pushState({ frente: null }, "", window.location.pathname);
   }
@@ -490,45 +469,9 @@ window.toggleDashboard = toggleDashboard;
 
 window.navegarPara = navegarPara;
 
-/**
- * Inicializa e gerencia a transição morfológica do cabeçalho Palas Atlas com base no scroll na Home Page.
- */
-function inicializarHeaderDinamico() {
-  const palasHeaderWrapper = document.getElementById("palasHeaderWrapper");
-  const palasHeader = document.getElementById("palasHeader");
-  const homeContainer = document.getElementById("pgHome");
-
-  if (!palasHeader || !palasHeaderWrapper) return;
-
-  function handleScroll() {
-    const scrollY = window.scrollY || (homeContainer ? homeContainer.scrollTop : 0);
-    if (scrollY > 30) {
-      palasHeaderWrapper.classList.remove("p-0");
-      palasHeaderWrapper.classList.add("pt-4", "px-4");
-      palasHeader.className = "w-fit bg-black/80 backdrop-blur-2xl border border-white/10 px-8 py-2.5 shadow-2xl flex items-center justify-center transition-all duration-500 pointer-events-auto rounded-full";
-    } else {
-      palasHeaderWrapper.classList.remove("pt-4", "px-4");
-      palasHeaderWrapper.classList.add("p-0");
-      palasHeader.className = "w-full bg-black/60 backdrop-blur-xl border-b border-white/10 px-6 py-4 shadow-xl flex items-center justify-center transition-all duration-500 pointer-events-auto rounded-none";
-    }
-  }
-
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  if (homeContainer) {
-    homeContainer.addEventListener("scroll", handleScroll, { passive: true });
-  }
-  handleScroll();
-}
-
-// FIX MELHORIA 5: Unificado em um único ponto de entrada (bootstrap)
-// para evitar condição de corrida entre init() e inicializarHeaderDinamico().
-function bootstrap() {
-  init();
-  inicializarHeaderDinamico();
-}
-
+// Ponto de entrada único do roteador SPA
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", bootstrap);
+  document.addEventListener("DOMContentLoaded", init);
 } else {
-  bootstrap();
+  init();
 }

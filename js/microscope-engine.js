@@ -17,17 +17,13 @@
  */
 
 import { db } from "./firebase-config.js";
-import { removerConteudoPerigoso, sanitizarHTMLDescricao, formatarDescricaoMorfolgica } from "./sanitizer.js";
 import {
-  OBJETIVAS_PADRAO,
-  SELOS,
-  ROTULOS_SELO,
-  emitirCertidaoOptica,
-  calcularAmpliacaoExibida,
-  calcularCampoDeVisaoUm,
-  formatarComprimento,
-  objetivaDisponivel
-} from "./optics-calibration.js";
+  removerConteudoPerigoso,
+  sanitizarHTMLDescricao,
+  formatarDescricaoMorfolgica,
+  escaparHTML
+} from "./sanitizer.js";
+import { emitirCertidaoOptica, formatarComprimento } from "./optics-calibration.js?v=20261118v2";
 
 // ---------------------------------------------------------------------------
 // Estado do modulo
@@ -38,21 +34,77 @@ let listaQuestoesAtual      = [];
 let questaoAtivaId          = null;
 let overlayQuestaoAtiva     = null;
 let overlayPinAtivo         = null;
+let overlaysPinosPersistentes = [];
+let marcacoesVisiveis       = true;
 let laminaAtualData         = null;
 let pinAtivo                = null;
-let homeZoomRef              = null; // Zoom de referencia para enquadramento geral (4x)
-let nativeZoomRef            = null; // Zoom de referencia para resolucao nativa 1:1 da camera (maxMag)
+let homeZoomRef             = null; // Zoom de referencia para enquadramento geral (4x)
 let _delegacaoPinosRegistrada = false;
 let abaAtivaPainel          = "descricao";
 const debounceTimersRespostas = {};
+
+// Estado da Régua Morfométrica Interativa (µm / mm)
+let modoReguaAtivo          = false;
+let reguaPontoA             = null;
+let reguaPontoB             = null;
+let overlayRegua            = null;
+let _reguaOverlayIsPreview  = false;
+let _reguaPointerRaf        = null;
+let _reguaPointerMoveHandler = null;
+let _reguaPointerHost       = null;
+
+// Toast, Deep Link e Troca Rápida de Lâmina
+let _viewerToastTimer       = null;
+let _pendingUrlPinId        = null;
+let _atalhosRegistrados     = false;
+let _fullscreenRegistrado   = false;
+let _popstateRegistrado     = false;
+let _catalogoLaminasSwitcher = [];
+
+// Controle de concorrência e temporizadores do visualizador
+let _loadEpoch              = 0;
+let _viewerInstanceSeq      = 0;
+let _activeOpenTimer        = null;
 
 // Certidão Óptica: ampliação real comprovada da lâmina (ver js/optics-calibration.js)
 let certidaoOpticaAtual     = null;
 let manifestoOpticoAtual    = null;
 let perfilOpticoAtual       = null;
 
-// Motor do Microscópio: Interatividade completa e ampliação profunda ativa
-const LAMINA_ESTATICA = false;
+function isSafeSlideUrl(rawUrl) {
+  const val = String(rawUrl || "").trim();
+  if (!val) return false;
+  const lower = val.toLowerCase();
+  if (lower.startsWith("javascript:") || lower.startsWith("data:") || lower.startsWith("vbscript:") || lower.startsWith("//")) {
+    return false;
+  }
+  if (lower.startsWith("https://")) return true;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(val)) return false;
+  if (val.includes("..")) return false;
+  return true;
+}
+
+function atualizarScalebarOpenSeadragon(targetViewer, mppVal) {
+  if (!targetViewer || typeof targetViewer.scalebar !== "function" || !window.OpenSeadragon?.ScalebarType) return;
+  const ppm = mppVal && Number(mppVal) > 0 ? Math.round(1e6 / Number(mppVal)) : 0;
+  try {
+    targetViewer.scalebar({
+      type:            window.OpenSeadragon.ScalebarType.MICROSCOPE,
+      location:        window.OpenSeadragon.ScalebarLocation.TOP_RIGHT,
+      pixelsPerMeter:  ppm,
+      color:           "#0f172a",
+      backgroundColor: "rgba(255, 255, 255, 0.92)",
+      fontFamily:      "'JetBrains Mono', monospace",
+      barThickness:    2,
+      xOffset:         16,
+      yOffset:         16
+    });
+  } catch (e) {}
+  const sb = document.querySelector(".openseadragon-scalebar");
+  if (sb) {
+    sb.style.display = ppm > 0 ? "" : "none";
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Barra lateral retrátil (painel de informações e pontos de interesse)
@@ -81,7 +133,9 @@ function aplicarEstadoSidebar(recolhida, persistir) {
   const isDrawerMode = isMobileOrLandscapeDrawer();
 
   sidebar.classList.toggle("w-[85vw]", !recolhida);
-  sidebar.classList.toggle("sm:w-[380px]", !recolhida);
+  sidebar.classList.toggle("sm:w-[360px]", !recolhida);
+  sidebar.classList.toggle("lg:w-[320px]", !recolhida);
+  sidebar.classList.toggle("xl:w-[380px]", !recolhida);
   sidebar.classList.toggle("max-w-[380px]", !recolhida);
   sidebar.classList.toggle("opacity-100", !recolhida);
   sidebar.classList.toggle("pointer-events-auto", !recolhida);
@@ -129,6 +183,8 @@ function iniciarSidebarRetratil() {
   const backdrop = document.getElementById("viewerBackdrop");
   const btnClose = document.getElementById("btnCloseSidebarMobile");
   if (!sidebar) return;
+  if (sidebar.dataset.bound === "1") return;
+  sidebar.dataset.bound = "1";
 
   const isDrawerMode = isMobileOrLandscapeDrawer();
 
@@ -344,7 +400,7 @@ const fallbackLaminas = {
     nome: 'Osso Maduro 10x',
     disciplina: 'histologia',
     coloracao: 'Corte por Desgaste • 10x (Mapeamento 2x5)',
-    maxMagnification: 40,
+    maxMagnification: 10,
     objetivaCaptura: 10,
     zoom4xRatio: 0.35,
     mpp: 0.625,
@@ -370,7 +426,7 @@ const fallbackLaminas = {
     nome: 'Osso Maduro 40x',
     disciplina: 'histologia',
     coloracao: 'Corte por Desgaste • 40x (Mapeamento 6x8 • 48 Fotos)',
-    maxMagnification: 100,
+    maxMagnification: 40,
     objetivaCaptura: 40,
     zoom4xRatio: 0.28,
     mpp: 0.156,
@@ -410,11 +466,23 @@ fallbackLaminas['cw3XGCgUwN71XdlwkUe5'] = fallbackLaminas['osso_maduro_desgaste_
 function iniciarMicroscopio() {
   if (!document.getElementById("osd-viewer")) return;
   iniciarSidebarRetratil();
+  inicializarSeletorRapidoLaminas();
+  registrarDelegacaoGlobalDePinos();
+  registrarControleAjudaMicroscopio();
+  registrarAtalhosTecladoMicroscopio();
+  registrarControleFullscreenMicroscopio();
+  registrarPopstateMicroscopio();
+
   const urlParams = new URLSearchParams(window.location.search);
   const dziParam  = urlParams.get("dzi") || urlParams.get("file");
   const laminaId  = urlParams.get("id") || urlParams.get("laminaId");
+  _pendingUrlPinId = urlParams.get("pin") || null;
 
   if (dziParam) {
+    if (!isSafeSlideUrl(dziParam)) {
+      exibirErroMicroscopio("URL de lâmina inválida ou não autorizada.");
+      return;
+    }
     const isOsso = String(dziParam).toLowerCase().includes("osso");
     const isPele = String(dziParam).toLowerCase().includes("pele");
     const maxMagParam = Number(urlParams.get("maxMag") || urlParams.get("maxMagnification")) || 40;
@@ -475,19 +543,27 @@ function iniciarMicroscopio() {
       questoes = fallbackLaminas['osso_maduro_desgaste_ct']?.questoes || [];
     }
 
+    const rawNomeParam = urlParams.get("nome");
+    const rawDiscParam = urlParams.get("disciplina");
+    const rawColorParam = urlParams.get("coloracao");
+
     laminaAtualData = {
       id: "local-dzi",
-      nome: urlParams.get("nome") || defaultNome,
-      disciplina: urlParams.get("disciplina") || "histologia",
-      coloracao: urlParams.get("coloracao") || defaultColor,
+      nome: (rawNomeParam && rawNomeParam.trim()) ? rawNomeParam.trim().slice(0, 140) : defaultNome,
+      disciplina: (rawDiscParam && rawDiscParam.trim()) ? rawDiscParam.trim().slice(0, 60) : "histologia",
+      coloracao: (rawColorParam && rawColorParam.trim()) ? rawColorParam.trim().slice(0, 140) : defaultColor,
       maxMagnification: maxMagParam,
-      imagemUrl: dziParam,
+      imagemUrl: dziParam.trim(),
       descricaoHTML: defaultDesc,
       pinos: [],
       questoes: questoes
     };
+    window.laminaAtualData = laminaAtualData;
     listaPinosAtual = [];
     listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
+    atualizarBotaoMarcacoes();
+    atualizarBotaoRegua();
+    sincronizarSeletorRapidoLaminas("local-dzi");
     renderizarMetadadosDaLamina();
     renderizarDescricaoETextos();
     renderizarQuestoesNaSidebar(listaQuestoesAtual);
@@ -499,8 +575,6 @@ function iniciarMicroscopio() {
     console.warn("[Palas Atlas] Nenhum ID de lamina passado na URL (?id=...).");
     exibirErroMicroscopio("Nenhuma lâmina selecionada. Acesse pelo Catálogo de Tópicos.");
   }
-  registrarDelegacaoGlobalDePinos();
-  registrarControleAjudaMicroscopio();
 }
 
 /**
@@ -557,6 +631,7 @@ async function carregarLaminaNoMicroscopio(laminaId) {
     return;
   }
 
+  const myEpoch = ++_loadEpoch;
   const idBuscado = String(laminaId).trim();
 
   // 1. Se for uma das lâminas base conhecidas do acervo, carrega imediatamente
@@ -572,6 +647,9 @@ async function carregarLaminaNoMicroscopio(laminaId) {
     window.laminaAtualData = laminaAtualData;
     listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
     listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
+    atualizarBotaoMarcacoes();
+    atualizarBotaoRegua();
+    sincronizarSeletorRapidoLaminas(laminaAtualData.id);
     renderizarMetadadosDaLamina();
     renderizarDescricaoETextos();
     renderizarQuestoesNaSidebar(listaQuestoesAtual);
@@ -594,6 +672,7 @@ async function carregarLaminaNoMicroscopio(laminaId) {
               })
             )
           );
+          if (myEpoch !== _loadEpoch) return;
           const docRef = docSnapshots.find((d) => d && d.exists);
           if (!docRef) return;
 
@@ -605,11 +684,20 @@ async function carregarLaminaNoMicroscopio(laminaId) {
           if (textoValido(dados.disciplina)) laminaAtualData.disciplina = dados.disciplina;
           if (textoValido(dados.descricaoHTML)) laminaAtualData.descricaoHTML = dados.descricaoHTML;
           else if (textoValido(dados.descricao)) laminaAtualData.descricaoHTML = dados.descricao;
-          if (Array.isArray(dados.pinos)) {
+          if (Array.isArray(dados.pinos) && dados.pinos.length > 0) {
             laminaAtualData.pinos = dados.pinos;
             listaPinosAtual = dados.pinos;
+            atualizarBotaoMarcacoes();
+            if (viewer && viewer.world && viewer.world.getItemCount() > 0) {
+              renderizarTodasMarcacoesNoViewer();
+              if (_pendingUrlPinId) {
+                const alvoPin = _pendingUrlPinId;
+                _pendingUrlPinId = null;
+                focarPinoNoViewer(alvoPin);
+              }
+            }
           }
-          if (Array.isArray(dados.questoes)) {
+          if (Array.isArray(dados.questoes) && dados.questoes.length > 0) {
             laminaAtualData.questoes = dados.questoes;
             listaQuestoesAtual = dados.questoes;
             renderizarQuestoesNaSidebar(listaQuestoesAtual);
@@ -647,16 +735,29 @@ async function carregarLaminaNoMicroscopio(laminaId) {
       );
 
       const docRef = await Promise.race([fetchPromise, timeoutPromise]);
+      if (myEpoch !== _loadEpoch) return;
       if (docRef && docRef.exists) {
         const dados = docRef.data() || {};
         laminaAtualData = { id: docRef.id, ...dados };
+        window.laminaAtualData = laminaAtualData;
         let dziCandidate = laminaAtualData.dziUrl || (laminaAtualData.imagemUrl && laminaAtualData.imagemUrl.toLowerCase().endsWith('.dzi') ? laminaAtualData.imagemUrl : '');
         let img = dziCandidate || laminaAtualData.imagemUrl || laminaAtualData.imageUrl || laminaAtualData.caminhoImagemBase || '';
         if (img) {
-          laminaAtualData.imagemUrl = img.replace(/^\/+/, '');
+          img = img.trim();
+          if (img.startsWith("/") && !img.startsWith("//")) {
+            img = img.replace(/^\/+/, "");
+          }
+          if (!isSafeSlideUrl(img)) {
+            exibirErroMicroscopio("Caminho de imagem da lâmina inválido.");
+            return;
+          }
+          laminaAtualData.imagemUrl = img;
         }
         listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
         listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
+        atualizarBotaoMarcacoes();
+        atualizarBotaoRegua();
+        sincronizarSeletorRapidoLaminas(laminaAtualData.id);
         renderizarMetadadosDaLamina();
         renderizarDescricaoETextos();
         renderizarQuestoesNaSidebar(listaQuestoesAtual);
@@ -665,9 +766,12 @@ async function carregarLaminaNoMicroscopio(laminaId) {
         return;
       }
     } catch (err) {
+      if (myEpoch !== _loadEpoch) return;
       console.warn("[Palas Atlas] Aviso ao consultar Firestore para ID:", idBuscado, err);
     }
   }
+
+  if (myEpoch !== _loadEpoch) return;
 
   // 3. Fallback secundário por correspondência parcial de nome/slug
   const fallbackSecundario = Object.values(fallbackLaminas).find(l => 
@@ -676,8 +780,12 @@ async function carregarLaminaNoMicroscopio(laminaId) {
   );
   if (fallbackSecundario) {
     laminaAtualData = { ...fallbackSecundario };
+    window.laminaAtualData = laminaAtualData;
     listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
     listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
+    atualizarBotaoMarcacoes();
+    atualizarBotaoRegua();
+    sincronizarSeletorRapidoLaminas(laminaAtualData.id);
     renderizarMetadadosDaLamina();
     renderizarDescricaoETextos();
     renderizarQuestoesNaSidebar(listaQuestoesAtual);
@@ -738,36 +846,43 @@ function renderizarDescricaoETextos() {
   const tituloPeca = document.getElementById("slideTitle")?.textContent || "Lamina Histologica";
   const rawHtml = laminaAtualData.descricaoHTML || laminaAtualData.descricao || "";
   const html = formatarDescricaoMorfolgica(rawHtml);
-
-  if (!html) {
-    container.innerHTML = `<p class="text-slate-500 italic text-sm font-sans">Nenhum texto descritivo cadastrado para esta lamina.</p>`;
-    return;
-  }
+  const textoHtml = html || `<p class="text-slate-500 italic text-sm font-sans">Nenhum texto descritivo cadastrado para esta lâmina.</p>`;
 
   // Pontos de Interesse como lista clicavel abaixo do texto
   let secaoPinos = "";
   if (listaPinosAtual.length > 0) {
     secaoPinos = `
       <div class="mt-8 border-t border-slate-200 pt-6">
-        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 font-mono">
-          Pontos de Interesse
-        </h4>
-        <div class="flex flex-col gap-2">
-          ${listaPinosAtual.map(pin => `
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">
+            Pontos de Interesse
+          </h4>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200">
+            ${listaPinosAtual.length} ${listaPinosAtual.length === 1 ? "marcação" : "marcações"}
+          </span>
+        </div>
+        <div class="flex flex-col gap-2.5">
+          ${listaPinosAtual.map((pin, idx) => {
+            const tipoLabel = pin.type === "circle" ? "Área" : (pin.type === "arrow" ? "Seta" : "");
+            const pinIdSafe = escaparHTML(String(pin.id ?? idx + 1));
+            return `
             <button
               type="button"
-              id="btn-pino-${pin.id}"
-              data-btn-pin-id="${pin.id}"
-              onclick="window.focarPinoNoViewer('${pin.id}')"
-              class="pin-item-btn w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/90 hover:border-teal-600/40 text-left transition-all group cursor-pointer"
+              id="btn-pino-${pinIdSafe}"
+              data-btn-pin-id="${pinIdSafe}"
+              class="pin-item-btn w-full flex items-center justify-between p-3 rounded-xl text-left transition-all group cursor-pointer"
             >
-              <div class="flex items-center gap-2.5 truncate pr-2">
-                <span class="pin-indicator w-2 h-2 rounded-full bg-teal-600 shrink-0 transition-transform"></span>
-                <span class="pin-label text-sm font-medium text-slate-800 group-hover:text-teal-950 transition-colors truncate">${pin.rotulo || "Estrutura"}</span>
+              <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                <span class="pin-indicator w-6 h-6 rounded-full bg-teal-700 text-white border-2 border-white shadow-sm flex items-center justify-center text-[11px] font-mono font-bold shrink-0 transition-transform">${idx + 1}</span>
+                <div class="min-w-0">
+                  <span class="pin-label block text-sm font-semibold text-slate-800 group-hover:text-teal-950 transition-colors truncate">${escaparHTML(pin.rotulo || "Estrutura")}</span>
+                  ${tipoLabel ? `<span class="text-[10px] font-mono uppercase tracking-wider text-slate-500">${tipoLabel}</span>` : ""}
+                </div>
               </div>
-              <span class="pin-action text-xs text-slate-500 group-hover:text-teal-700 shrink-0 transition-colors">Focar &rarr;</span>
+              <span class="pin-action text-xs font-medium text-teal-700 group-hover:text-teal-900 shrink-0 transition-colors">Focar &rarr;</span>
             </button>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
       </div>
     `;
@@ -775,7 +890,7 @@ function renderizarDescricaoETextos() {
 
   container.innerHTML = `
     <div class="prose-atlas text-slate-700 text-sm font-sans leading-relaxed">
-      ${html}
+      ${textoHtml}
     </div>
     ${secaoPinos}
     <a
@@ -790,9 +905,19 @@ function renderizarDescricaoETextos() {
     </a>
   `;
 
-  // Estiliza pin-links inline com tipografia acadêmica sóbria e alto contraste (sem caixas azuis)
+  if (!container.__pinClickDelegated) {
+    container.__pinClickDelegated = true;
+    container.addEventListener("click", (evento) => {
+      const btn = evento.target.closest("button[data-btn-pin-id]");
+      if (!btn) return;
+      const pinId = btn.getAttribute("data-btn-pin-id");
+      if (pinId) focarPinoNoViewer(pinId);
+    });
+  }
+
+  // Estiliza pin-links inline com destaque morfológico claro e acessível
   container.querySelectorAll('.pin-link, [data-pin-id]').forEach(el => {
-    el.className = "pin-link font-semibold text-teal-700 hover:text-teal-900 underline underline-offset-4 decoration-teal-600/40 hover:decoration-teal-700 cursor-pointer transition-all bg-transparent border-0 p-0 inline";
+    el.className = "pin-link cursor-pointer transition-all";
   });
 
   if (pinAtivo) {
@@ -853,19 +978,6 @@ function atualizarBadgeContadorQuestoes() {
   } else {
     badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-slate-200 text-slate-700 font-mono border border-transparent";
   }
-}
-
-/**
- * Escapa strings para inserção segura no DOM.
- */
-function escaparHTML(texto) {
-  if (texto === null || texto === undefined) return "";
-  return String(texto)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
 
 /**
@@ -954,13 +1066,15 @@ export function renderizarQuestoesNaSidebar(questoes) {
   }
 
   const cardsHtml = questoes.map((q, index) => {
-    const qId = q.id ? String(q.id) : `q_${index + 1}`;
-    q.id = qId;
+    const qIdRaw = q.id ? String(q.id) : `q_${index + 1}`;
+    q.id = qIdRaw;
+    const qIdSafe = escaparHTML(qIdRaw);
     const numeroQ = q.numero !== undefined && q.numero !== null ? q.numero : (index + 1);
+    const numeroQSafe = escaparHTML(String(numeroQ));
     const tituloQ = q.titulo || q.pergunta || (q.enunciado ? (q.enunciado.length > 70 ? q.enunciado.slice(0, 67) + '...' : q.enunciado) : `Questão ${numeroQ}`);
     const enunciadoQ = q.enunciado && q.enunciado !== tituloQ ? q.enunciado : "";
 
-    const chaveStorage = `palasAtlas.respostas.${laminaId}.${qId}`;
+    const chaveStorage = `palasAtlas.respostas.${laminaId}.${qIdRaw}`;
     let respostaSalva = "";
     try {
       respostaSalva = localStorage.getItem(chaveStorage) || "";
@@ -968,24 +1082,27 @@ export function renderizarQuestoesNaSidebar(questoes) {
       console.warn("[Palas Atlas] Falha ao recuperar resposta salva:", e);
     }
 
-    const temCoordenadas = (Number(q.x) > 0 || Number(q.y) > 0);
+    const temCoordenadas = (
+      q.x !== undefined && q.x !== null && q.x !== "" && !isNaN(Number(q.x)) &&
+      q.y !== undefined && q.y !== null && q.y !== "" && !isNaN(Number(q.y))
+    );
 
     return `
       <div
-        id="card-questao-${qId}"
-        data-questao-id="${qId}"
+        id="card-questao-${qIdSafe}"
+        data-questao-id="${qIdSafe}"
         class="card-questao rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all duration-200 hover:border-slate-300 space-y-3"
       >
         <!-- Cabeçalho Clicável da Questão -->
         <button
           type="button"
-          onclick="window.focarQuestaoNoViewer('${qId}')"
+          data-questao-focus-id="${qIdSafe}"
           class="w-full text-left flex items-start justify-between gap-3 group cursor-pointer focus:outline-none"
           title="Focar localização da questão no microscópio"
         >
           <div class="flex items-start gap-2.5 min-w-0">
             <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200 shrink-0 mt-0.5">
-              Q${numeroQ}
+              Q${numeroQSafe}
             </span>
             <div class="min-w-0">
               <h4 class="text-xs font-semibold text-slate-800 tracking-wide font-sans group-hover:text-teal-700 transition-colors leading-snug">
@@ -1014,13 +1131,13 @@ export function renderizarQuestoesNaSidebar(questoes) {
         <div class="space-y-1.5 pt-1">
           <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">
             <span class="text-slate-500">Resposta / Diagnóstico</span>
-            <span id="statusSalvo-${qId}" class="text-slate-500 transition-colors">
+            <span id="statusSalvo-${qIdSafe}" class="text-slate-500 transition-colors">
               ${respostaSalva ? "Salvo localmente" : ""}
             </span>
           </div>
           <textarea
-            id="resposta-${qId}"
-            data-questao-id="${qId}"
+            id="resposta-${qIdSafe}"
+            data-questao-id="${qIdSafe}"
             rows="3"
             placeholder="Sua anotação / resposta diagnóstica..."
             style="resize:vertical; min-height:72px;"
@@ -1045,9 +1162,15 @@ export function renderizarQuestoesNaSidebar(questoes) {
     </div>
   `;
 
-  // Anexa listeners de input e blur usando delegação de eventos estável
+  // Anexa listeners de clique, input e blur usando delegação de eventos estável
   if (!container.__eventosRespostasVinculados) {
     container.__eventosRespostasVinculados = true;
+    container.addEventListener("click", (evento) => {
+      const btnFocus = evento.target.closest("[data-questao-focus-id]");
+      if (!btnFocus) return;
+      const qid = btnFocus.getAttribute("data-questao-focus-id");
+      if (qid) focarQuestaoNoViewer(qid);
+    });
     container.addEventListener("input", (evento) => {
       const textarea = evento.target.closest("textarea[data-questao-id]");
       if (!textarea) return;
@@ -1093,50 +1216,50 @@ function destacarCardQuestaoNaSidebar(qId) {
  */
 function destacarPinoNaSidebar(pinId) {
   const idBuscado = String(pinId || "").trim().toLowerCase();
+  const norm = (val) => String(val || "").replace(/^(pin[-_]|p)/i, "").trim().toLowerCase();
+  const buscadoNorm = norm(idBuscado);
+
   document.querySelectorAll("[data-btn-pin-id]").forEach((btn) => {
     const btnPinId = String(btn.getAttribute("data-btn-pin-id") || "").trim().toLowerCase();
-    const isAtivo = btnPinId === idBuscado || 
-                    btnPinId.replace(/^(pin[-_]|p)/i, "") === idBuscado.replace(/^(pin[-_]|p)/i, "");
-    const label = btn.querySelector(".pin-label");
-    const indicator = btn.querySelector(".pin-indicator");
+    const isAtivo = Boolean(idBuscado) && (
+      btnPinId === idBuscado ||
+      (buscadoNorm && norm(btnPinId) === buscadoNorm)
+    );
     const action = btn.querySelector(".pin-action");
 
     if (isAtivo) {
-      btn.classList.add("pin-active", "border-teal-600", "bg-teal-50", "ring-1", "ring-teal-600/30", "shadow-sm");
-      btn.classList.remove("border-slate-200/90", "bg-slate-50");
-      if (label) {
-        label.classList.add("text-teal-950", "font-semibold");
-        label.classList.remove("text-slate-800");
-      }
-      if (indicator) {
-        indicator.classList.add("ring-2", "ring-teal-500/40", "scale-125");
-      }
+      btn.classList.add("pin-active");
       if (action) {
-        action.classList.add("text-teal-700", "font-semibold");
-        action.classList.remove("text-slate-500");
+        action.textContent = "Em foco";
       }
+      btn.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
-      btn.classList.remove("pin-active", "border-teal-600", "bg-teal-50", "ring-1", "ring-teal-600/30", "shadow-sm");
-      btn.classList.add("border-slate-200/90", "bg-slate-50");
-      if (label) {
-        label.classList.remove("text-teal-950", "font-semibold");
-        label.classList.add("text-slate-800");
-      }
-      if (indicator) {
-        indicator.classList.remove("ring-2", "ring-teal-500/40", "scale-125");
-      }
+      btn.classList.remove("pin-active");
       if (action) {
-        action.classList.remove("text-teal-700", "font-semibold");
-        action.classList.add("text-slate-500");
+        action.innerHTML = "Focar &rarr;";
       }
     }
   });
+
+  // Destaca também os links inline correspondentes no texto descritivo
+  const descContainer = document.getElementById("slideDescriptionContainer");
+  if (descContainer) {
+    descContainer.querySelectorAll(".pin-link, [data-pin-id], [data-pin]").forEach((el) => {
+      const rawAttr = el.getAttribute("data-pin-id") || el.getAttribute("data-pin") || el.getAttribute("data-id") || "";
+      const rawNorm = norm(rawAttr);
+      const isLinkAtivo = Boolean(idBuscado) && (
+        rawAttr.trim().toLowerCase() === idBuscado ||
+        (buscadoNorm && rawNorm === buscadoNorm)
+      );
+      el.classList.toggle("pin-link-active", isLinkAtivo);
+    });
+  }
 }
 
 // ---------------------------------------------------------------------------
 // 5. Inicializa o OpenSeadragon com constraints de trava e escalas corretas
 // ---------------------------------------------------------------------------
-function inicializarOpenSeadragon() {
+async function inicializarOpenSeadragon() {
   if (!laminaAtualData) return;
   const containerId = "osd-viewer";
   const container   = document.getElementById(containerId);
@@ -1154,27 +1277,61 @@ function inicializarOpenSeadragon() {
   if (typeof imagemUrl === "string") {
     imagemUrl = imagemUrl.trim();
   }
-  if (!imagemUrl) {
-    exibirErroMicroscopio("Esta lâmina não possui URL de imagem cadastrada.");
+  if (!imagemUrl || !isSafeSlideUrl(imagemUrl)) {
+    exibirErroMicroscopio(!imagemUrl ? "Esta lâmina não possui URL de imagem cadastrada." : "URL de imagem da lâmina inválida.");
     return;
   }
 
-  const previewFallback = laminaAtualData.previewImage || laminaAtualData.thumbnailUrl || "";
+  const rawFallback = laminaAtualData.previewImage || laminaAtualData.thumbnailUrl || "";
+  const previewFallback = isSafeSlideUrl(rawFallback) ? String(rawFallback).trim() : "";
+
+  if (_activeOpenTimer) {
+    clearTimeout(_activeOpenTimer);
+    _activeOpenTimer = null;
+  }
+
+  limparMedicaoRegua();
+  if (modoReguaAtivo) {
+    toggleReguaMorfometrica(false);
+  }
+  if (_reguaPointerHost && _reguaPointerMoveHandler) {
+    try { _reguaPointerHost.removeEventListener("pointermove", _reguaPointerMoveHandler); } catch (e) {}
+    _reguaPointerHost = null;
+    _reguaPointerMoveHandler = null;
+  }
+
+  limparMarcacoesPinosViewer();
+  if (overlayQuestaoAtiva) {
+    removerOverlayComSeguranca(overlayQuestaoAtiva);
+    overlayQuestaoAtiva = null;
+  }
+  pinAtivo = null;
+  questaoAtivaId = null;
+  homeZoomRef = null;
+  certidaoOpticaAtual = null;
+  laminaAtualData._usingPreviewFallback = false;
 
   if (viewer && typeof viewer.destroy === "function") {
     try {
       viewer.destroy();
     } catch (e) {}
     viewer = null;
+    window.viewer = null;
   }
 
+  const mySeq = ++_viewerInstanceSeq;
   const isDzi = imagemUrl.endsWith(".dzi") || imagemUrl.includes(".dzi?");
   const tileSourcesConfig = isDzi ? imagemUrl : { type: "image", url: imagemUrl };
 
+  // Garante o ticket HMAC assinado ANTES da abertura do DZI para nenhum azulejo sair sem autorização
+  if (isDzi && window.slideSecurity && typeof window.slideSecurity.renovarTicketSessao === "function") {
+    await window.slideSecurity.renovarTicketSessao(laminaAtualData.id || "lamina-ativa");
+  }
+  if (mySeq !== _viewerInstanceSeq) return;
+
   // MPP da lamina (microns por pixel) — calibrado com referência biológica na Pele Espessa (48px = 7.5 µm -> 0.156 µm/px a 40x)
-  const maxMag = Number(laminaAtualData.maxMagnification || laminaAtualData.maxZoomLevel || laminaAtualData.maxMag) || 40;
-  const mpp = Number(laminaAtualData.mpp) || (40 / maxMag) * 0.156;
-  const pixelsPerMeter = Math.round(1e6 / mpp);
+  const maxMagInicial = Number(laminaAtualData.maxMagnification || laminaAtualData.maxZoomLevel || laminaAtualData.maxMag) || 40;
+  const mppInicial = Number(laminaAtualData.mpp) || (40 / maxMagInicial) * 0.156;
 
   // TRAVA FÍSICA RIGOROSA: maxZoomPixelRatio: 1.0 (garante resolução nativa 1:1, ZERO ampliação vazia / pixel esticado)
   const maxZoomPixelRatio = 1.0;
@@ -1214,6 +1371,10 @@ function inicializarOpenSeadragon() {
       animationTime:            0.45,
       blendTime:                0.1,
       maxZoomPixelRatio:        maxZoomPixelRatio,
+      // Evita over-fetching de 4x em 4x/10x/20x mantendo nitidez 1:1 em 40x e respeitando o rate-limit de /api/tile
+      minPixelRatio:            0.75,
+      immediateRender:          true,
+      imageLoaderLimit:         6,
 
       // Motor de Ampliação e Navegação Totalmente Ativo
       mouseNavEnabled:          true,
@@ -1267,30 +1428,25 @@ function inicializarOpenSeadragon() {
     }
   } catch (err) {
     console.error("[Palas Atlas] Erro fatal ao instanciar OpenSeadragon:", err);
+    viewer = null;
+    window.viewer = null;
     exibirErroMicroscopio("Falha na inicialização do visualizador óptico.");
     return;
   }
 
   // Configuração base da régua
-  if (window.OpenSeadragon.ScalebarType && viewer) {
-    viewer.scalebar({
-      type:            window.OpenSeadragon.ScalebarType.MICROSCOPE,
-      location:        window.OpenSeadragon.ScalebarLocation.TOP_RIGHT,
-      pixelsPerMeter:  pixelsPerMeter,
-      color:           "#0f172a",
-      backgroundColor: "rgba(255, 255, 255, 0.92)",
-      fontFamily:      "'JetBrains Mono', monospace",
-      barThickness:    2,
-      xOffset:         16,
-      yOffset:         16
-    });
-  }
+  atualizarScalebarOpenSeadragon(viewer, mppInicial);
 
   // Tratamento de falha no carregamento do DZI/imagem (Tratamento Robusto)
   const onOpenFailed = (event) => {
+    if (mySeq !== _viewerInstanceSeq) return;
     console.warn("[Palas Atlas] OpenSeadragon open-failed:", event);
     if (!fallbackAttempted && isDzi && previewFallback && previewFallback !== imagemUrl) {
       fallbackAttempted = true;
+      laminaAtualData._usingPreviewFallback = true;
+      atualizarScalebarOpenSeadragon(viewer, 0);
+      if (modoReguaAtivo) toggleReguaMorfometrica(false);
+      atualizarBotaoRegua();
       console.info("[Palas Atlas] Tentando fallback para imagem estática:", previewFallback);
       try {
         viewer.open({ type: "image", url: previewFallback });
@@ -1300,18 +1456,41 @@ function inicializarOpenSeadragon() {
       }
     }
     hasFailed = true;
+    if (_activeOpenTimer) {
+      clearTimeout(_activeOpenTimer);
+      _activeOpenTimer = null;
+    }
+    if (viewer && typeof viewer.destroy === "function") {
+      try { viewer.destroy(); } catch (e) {}
+    }
+    viewer = null;
+    window.viewer = null;
     exibirErroMicroscopio(`Não foi possível carregar o arquivo da lâmina digital. Verifique sua conexão ou tente novamente.`);
   };
 
   viewer.addHandler("open-failed", onOpenFailed);
 
+  // Função unificada de Indicador Dinâmico de Zoom com cálculo de magnificação ótica real
+  const updateZoomDisplay = () => {
+    if (!viewer || !viewer.viewport || !homeZoomRef) return;
+    const mag = calcularMagnificacaoOtica();
+    const display = document.getElementById("zoomIndicatorDisplay");
+    if (display) {
+      display.textContent = formatarMagnificacaoOtica(mag);
+    }
+    atualizarLenteBotaoAtivo();
+  };
+
   // Evento: imagem aberta com sucesso
   const onOpenSuccess = () => {
-    if (hasFailed) return;
-    const elapsed = Date.now() - (window.__microscopeStartTime || Date.now());
-    const remainingTime = 0;
+    if (mySeq !== _viewerInstanceSeq || hasFailed || !viewer || !viewer.viewport) return;
+    if (_activeOpenTimer) {
+      clearTimeout(_activeOpenTimer);
+      _activeOpenTimer = null;
+    }
 
     setTimeout(() => {
+      if (mySeq !== _viewerInstanceSeq) return;
       // Remove skeleton de carregamento de forma imediata e limpa
       const skeleton  = document.getElementById("osdSkeleton");
       const osdCanvas = document.getElementById("osd-viewer");
@@ -1320,66 +1499,100 @@ function inicializarOpenSeadragon() {
         skeleton.style.opacity = '0';
         skeleton.style.pointerEvents = 'none';
         setTimeout(() => {
+          if (mySeq !== _viewerInstanceSeq) return;
           skeleton.style.display = 'none';
           skeleton.classList.add("hidden");
           skeleton.classList.remove("flex");
         }, 210);
       }
       if (osdCanvas) osdCanvas.classList.remove("opacity-0");
-    }, remainingTime);
+    }, 0);
 
-    if (viewer && viewer.viewport) {
-      homeZoomRef = viewer.viewport.getHomeZoom();
-      
-      const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+    homeZoomRef = viewer.viewport.getHomeZoom();
 
-      // Vincula o gancho de proteção de URLs de azulejos DZI e atualiza lâmina ativa
-      try {
-        if (window.slideSecurity) {
-          window.slideSecurity.setSlide(laminaAtualData?.id || 'lamina-ativa');
-        }
-        if (item && item.source && typeof item.source.getTileUrl === "function") {
-          const origGetTileUrl = item.source.getTileUrl.bind(item.source);
-          item.source.getTileUrl = function(level, x, y) {
-            const rawUrl = origGetTileUrl(level, x, y);
-            return window.slideSecurity ? window.slideSecurity.obterUrlAzulejoProtegida(rawUrl) : rawUrl;
-          };
-        }
-      } catch (secErr) {
-        console.warn("[Palas Security] Hook de proteção em getTileUrl:", secErr);
+    const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+
+    // Vincula o gancho de proteção de URLs de azulejos DZI e atualiza lâmina ativa
+    try {
+      if (window.slideSecurity) {
+        window.slideSecurity.setSlide(laminaAtualData?.id || 'lamina-ativa');
       }
+      if (item && item.source && typeof item.source.getTileUrl === "function") {
+        const origGetTileUrl = item.source.getTileUrl.bind(item.source);
+        item.source.getTileUrl = function(level, x, y) {
+          const rawUrl = origGetTileUrl(level, x, y);
+          return window.slideSecurity ? window.slideSecurity.obterUrlAzulejoProtegida(rawUrl) : rawUrl;
+        };
+      }
+    } catch (secErr) {
+      console.warn("[Palas Security] Hook de proteção em getTileUrl:", secErr);
+    }
 
-      const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
-      const nativeZoom = getNativeZoomRef();
-
+    if (item) {
       // Análise Óptica Automática e Rigorosa da Pirâmide DZI
-      analisarProporcoesOpticasDzi(item, maxMag);
+      analisarProporcoesOpticasDzi(item, maxMagInicial);
       aplicarLimitesOpticos();
+      renderizarMetadadosDaLamina();
 
       const urlParams = new URLSearchParams(window.location.search);
+      const maxMagAtual = getMaxMagLamina();
       const initialMagParam = urlParams.get("mag");
-      // Padrão de abertura do laboratório: começa na objetiva de 4x (como no microscópio real), permitindo override via ?mag=
-      const targetInitialMag = initialMagParam !== null ? Number(initialMagParam) : 4;
+      const parsedMag = (initialMagParam !== null && initialMagParam !== "") ? Number(initialMagParam) : NaN;
+      // Padrão de abertura do laboratório: começa na objetiva de 4x, permitindo override via ?mag=
+      const targetInitialMag = Number.isFinite(parsedMag)
+        ? Math.max(4, Math.min(maxMagAtual, parsedMag))
+        : 4;
       const targetInitialZoom = calcularZoomParaMagnificacao(targetInitialMag);
 
       const imgBounds = viewer.world.getItemAt(0)?.getBounds();
       const centerPoint = imgBounds ? imgBounds.getCenter() : viewer.viewport.getCenter();
+      const contentSize = typeof item.getContentSize === "function" ? item.getContentSize() : null;
 
-      // Ponto focal inicial da lâmina (se especificado) ou ponto morfológico de interesse
+      const xParam = urlParams.get("x");
+      const yParam = urlParams.get("y");
+      const xNum = (xParam !== null && xParam !== "") ? Number(xParam) : NaN;
+      const yNum = (yParam !== null && yParam !== "") ? Number(yParam) : NaN;
+      const hasUrlCoords = Number.isFinite(xNum) && Number.isFinite(yNum) && xNum >= 0 && xNum <= 1 && yNum >= 0 && yNum <= 1;
+
+      // Ponto focal inicial da lâmina (prioriza deep-link ?x=&y= da URL; senão defaultCenter acima de 4x)
       let initialPoint = centerPoint;
-      if (targetInitialMag > 4 && laminaAtualData?.defaultCenter) {
-        initialPoint = new window.OpenSeadragon.Point(
-          laminaAtualData.defaultCenter.x,
-          laminaAtualData.defaultCenter.y
-        );
+      if (hasUrlCoords) {
+        const convertedUrl = converterPontoParaViewport(xNum, yNum, contentSize);
+        if (convertedUrl) initialPoint = convertedUrl;
+      } else if (targetInitialMag > 4 && laminaAtualData?.defaultCenter) {
+        const dcx = Number(laminaAtualData.defaultCenter.x);
+        const dcy = Number(laminaAtualData.defaultCenter.y);
+        const converted = (!isNaN(dcx) && !isNaN(dcy)) ? converterPontoParaViewport(dcx, dcy, contentSize) : null;
+        if (converted) initialPoint = converted;
       }
       viewer.viewport.zoomTo(targetInitialZoom, initialPoint, true);
       viewer.viewport.panTo(initialPoint, true);
+      viewer.viewport.applyConstraints(true);
     }
 
-    aplicarBloqueioObjetivas(maxMag);
+    aplicarBloqueioObjetivas(getMaxMagLamina());
     atualizarLenteBotaoAtivo();
     updateZoomDisplay();
+    atualizarBotaoMarcacoes();
+    atualizarBotaoRegua();
+    renderizarTodasMarcacoesNoViewer();
+
+    const pinUrlParam = new URLSearchParams(window.location.search).get("pin");
+    if (pinUrlParam && !_pendingUrlPinId) {
+      _pendingUrlPinId = pinUrlParam;
+    }
+    if (_pendingUrlPinId && Array.isArray(listaPinosAtual) && listaPinosAtual.length > 0) {
+      const pinIdNorm = String(_pendingUrlPinId).trim().toLowerCase();
+      const existePin = listaPinosAtual.some(p =>
+        String(p.id || "").trim().toLowerCase() === pinIdNorm ||
+        String(p.rotulo || "").trim().toLowerCase() === pinIdNorm
+      );
+      if (existePin) {
+        const alvoPin = _pendingUrlPinId;
+        _pendingUrlPinId = null;
+        focarPinoNoViewer(alvoPin);
+      }
+    }
 
     setTimeout(() => {
       const navParent = document.querySelector(".openseadragon-navigator");
@@ -1403,6 +1616,7 @@ function inicializarOpenSeadragon() {
           fontSize:     "10px",
           fontWeight:   "600"
         });
+        scalebarEl.style.display = laminaAtualData?._usingPreviewFallback ? "none" : "";
       }
     }, 400);
   };
@@ -1412,11 +1626,19 @@ function inicializarOpenSeadragon() {
     onOpenSuccess();
   }
 
-  // Garantia absoluta contra travamentos no carregador (Timeout de segurança)
-  setTimeout(() => {
+  // Garantia absoluta contra travamentos no carregador (Timeout rastreado por sequência)
+  _activeOpenTimer = setTimeout(() => {
+    _activeOpenTimer = null;
+    if (mySeq !== _viewerInstanceSeq) return;
     const skeleton = document.getElementById("osdSkeleton");
     if (skeleton && skeleton.style.display !== "none" && !skeleton.classList.contains("hidden")) {
       if (!viewer || !viewer.isOpen()) {
+        hasFailed = true;
+        if (viewer && typeof viewer.destroy === "function") {
+          try { viewer.destroy(); } catch (e) {}
+        }
+        viewer = null;
+        window.viewer = null;
         exibirErroMicroscopio("Tempo limite excedido ao carregar a lâmina. Tente recarregar a página.");
       } else {
         skeleton.style.opacity = '0';
@@ -1429,38 +1651,18 @@ function inicializarOpenSeadragon() {
     }
   }, 4500);
 
-  // Função unificada de Indicador Dinâmico de Zoom com cálculo de magnificação ótica real
-  const updateZoomDisplay = () => {
-    if (!viewer || !viewer.viewport || !homeZoomRef) return;
-    const mag = calcularMagnificacaoOtica();
-    const display = document.getElementById("zoomIndicatorDisplay");
-    if (display) {
-      display.textContent = formatarMagnificacaoOtica(mag);
-    }
-    atualizarLenteBotaoAtivo();
-  };
-
   viewer.addHandler("open", updateZoomDisplay);
   viewer.addHandler("animation", updateZoomDisplay);
   viewer.addHandler("animation-finish", updateZoomDisplay);
+  viewer.addHandler("zoom", updateZoomDisplay);
 
-  viewer.addHandler("zoom", () => {
-    if (!homeZoomRef || !viewer || !viewer.viewport) return;
-    const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
-    const zoom4x = getZoom4xRef();
-    const minOSDZoom = zoom4x * 0.90;
-    const maxOSDZoom = calcularZoomParaMagnificacao(maxMag);
-
-    // Clamping estrito impedindo ultrapassar o teto físico ou desaproximar além da visão mínima (4x)
-    const current = viewer.viewport.getZoom();
-    if (current < minOSDZoom) {
-      viewer.viewport.zoomTo(minOSDZoom, null, true);
-    } else if (current > maxOSDZoom) {
-      viewer.viewport.zoomTo(maxOSDZoom, null, true);
-    }
-
-    updateZoomDisplay();
-  });
+  // Eventos da Régua Morfométrica Interativa (sem interferir em pan/pinch)
+  viewer.addHandler("canvas-click", handleCanvasClickRegua);
+  if (viewer.canvas) {
+    _reguaPointerHost = viewer.canvas;
+    _reguaPointerMoveHandler = handlePointerMoveRegua;
+    _reguaPointerHost.addEventListener("pointermove", _reguaPointerMoveHandler, { passive: true });
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1530,8 +1732,14 @@ export function aplicarLimitesOpticos() {
   viewer.viewport.minZoomLevel = minOSDZoom;
   viewer.viewport.maxZoomLevel = maxOSDZoom;
 
+  atualizarScalebarOpenSeadragon(
+    viewer,
+    laminaAtualData?._usingPreviewFallback ? 0 : (Number(laminaAtualData?.mpp) || (40 / maxMag) * 0.156)
+  );
+
   aplicarBloqueioObjetivas(maxMag);
   atualizarLenteBotaoAtivo();
+  atualizarBotaoRegua();
 }
 
 // ---------------------------------------------------------------------------
@@ -1807,8 +2015,411 @@ function registrarDelegacaoGlobalDePinos() {
 }
 
 // ---------------------------------------------------------------------------
-// 8. Foca o pino no viewer com zoom real e centralização precisa
+// 8. Motor de Marcações de Alto Contraste & Foco Óptico no Viewer
 // ---------------------------------------------------------------------------
+
+/**
+ * Converte coordenadas da imagem (pixels ou normalizadas 0..1) para o sistema
+ * de coordenadas do viewport do OpenSeadragon.
+ */
+function converterPontoParaViewport(xVal, yVal, contentSize) {
+  if (!viewer || !viewer.viewport || !window.OpenSeadragon) return null;
+  const px = Number(xVal);
+  const py = Number(yVal);
+  if (isNaN(px) || isNaN(py)) return null;
+
+  if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && contentSize && contentSize.x > 1) {
+    return viewer.viewport.imageToViewportCoordinates(
+      new window.OpenSeadragon.Point(px * contentSize.x, py * contentSize.y)
+    );
+  }
+  return viewer.viewport.imageToViewportCoordinates(
+    new window.OpenSeadragon.Point(px, py)
+  );
+}
+
+/**
+ * Destrói o MouseTracker associado (se houver) e remove o overlay do OpenSeadragon.
+ */
+function removerOverlayComSeguranca(elem) {
+  if (!elem) return;
+  if (elem._osdTracker) {
+    try { elem._osdTracker.destroy(); } catch (e) {}
+    elem._osdTracker = null;
+  }
+  if (viewer) {
+    try { viewer.removeOverlay(elem); } catch (e) {}
+  }
+}
+
+/**
+ * Remove todas as marcações de pinos atualmente sobrepostas no OpenSeadragon.
+ */
+function limparMarcacoesPinosViewer() {
+  if (Array.isArray(overlaysPinosPersistentes)) {
+    overlaysPinosPersistentes.forEach((item) => removerOverlayComSeguranca(item?.element));
+  }
+  overlaysPinosPersistentes = [];
+
+  if (overlayPinAtivo) {
+    removerOverlayComSeguranca(overlayPinAtivo);
+    overlayPinAtivo = null;
+  }
+
+  document.querySelectorAll('[id^="viewer-pin-"]').forEach((el) => {
+    removerOverlayComSeguranca(el);
+  });
+}
+
+/**
+ * Sincroniza o botão "Marcações" na barra superior com o estado e quantidade atual.
+ */
+function atualizarBotaoMarcacoes() {
+  const btn = document.getElementById("btnToggleMarcacoes");
+  const badge = document.getElementById("badgeContadorMarcacoes");
+  const total = Array.isArray(listaPinosAtual) ? listaPinosAtual.length : 0;
+
+  if (badge) {
+    badge.textContent = String(total);
+    badge.classList.toggle("hidden", total === 0);
+    badge.className = marcacoesVisiveis
+      ? `px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-teal-600 text-white leading-none ${total === 0 ? "hidden" : ""}`
+      : `px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-300 text-slate-700 leading-none ${total === 0 ? "hidden" : ""}`;
+  }
+
+  if (btn) {
+    btn.classList.toggle("is-on", marcacoesVisiveis);
+    btn.classList.toggle("is-off", !marcacoesVisiveis);
+    btn.setAttribute("aria-pressed", String(marcacoesVisiveis));
+    btn.title = marcacoesVisiveis
+      ? "Ocultar marcações na lâmina"
+      : "Mostrar todas as marcações na lâmina";
+  }
+}
+
+/**
+ * Vincula clique/toque via MouseTracker do OpenSeadragon para focar o pino ao
+ * clicar diretamente sobre a marcação na lâmina.
+ */
+function vincularCliqueMarcacaoViewer(targetElem, pinId, overlayContainer) {
+  if (!targetElem || !window.OpenSeadragon) return;
+  const tracker = new window.OpenSeadragon.MouseTracker({
+    element: targetElem,
+    clickHandler: (e) => {
+      if (e && e.originalEvent) {
+        e.originalEvent.stopPropagation();
+        e.originalEvent.preventDefault();
+      }
+      if (abaAtivaPainel !== "descricao") {
+        alternarAbaPainel("descricao");
+      }
+      focarPinoNoViewer(pinId);
+    }
+  });
+  overlayContainer._osdTracker = tracker;
+}
+
+/**
+ * Constrói e insere no OpenSeadragon o overlay de alto contraste para um pino
+ * (suporta 'pin', 'circle' e 'arrow'), diferenciando estado normal e em foco.
+ */
+function criarOverlayPino(pino, idx, isAtivo, contentSize) {
+  const pinId = String(pino.id || idx + 1);
+  const rotuloSeguro = escaparHTML(pino.rotulo || "");
+  const numeroLabel = idx + 1;
+
+  // Paleta clínica limpa e de alto contraste em qualquer coloração histológica
+  const accent = isAtivo ? "#f59e0b" : "#0d9488";
+  const accentCore = isAtivo ? "#d97706" : "#0f766e";
+  const glowColor = isAtivo ? "rgba(245, 158, 11, 0.72)" : "rgba(13, 148, 136, 0.42)";
+  const fillSoft = isAtivo ? "rgba(245, 158, 11, 0.14)" : "rgba(13, 148, 136, 0.08)";
+  const zIndexVal = isAtivo ? 48 : 40;
+  const rootClass = `viewer-marker-root${isAtivo ? " is-active" : ""}`;
+  const pillClass = isAtivo ? "viewer-marker-pill is-active" : "viewer-marker-pill";
+  const badgeSize = isAtivo ? 26 : 22;
+  const badgeShadow = isAtivo
+    ? "0 0 0 2px #0f172a, 0 0 18px rgba(245,158,11,0.85), 0 4px 12px rgba(15,23,42,0.45)"
+    : "0 2px 8px rgba(15,23,42,0.45), 0 0 0 1px rgba(15,23,42,0.22)";
+
+  let overlayElem = null;
+
+  // 1. ANOTAÇÃO TIPO CÍRCULO (Delimitação Estrutural)
+  if (pino.type === "circle") {
+    let r = Number(pino.radius) || 250;
+    let px = Number(pino.x) || 0;
+    let py = Number(pino.y) || 0;
+    if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && contentSize && contentSize.x > 1) {
+      px *= contentSize.x;
+      py *= contentSize.y;
+      if (r > 0 && r <= 1) r *= contentSize.x;
+    }
+
+    const imgRect = new window.OpenSeadragon.Rect(px - r, py - r, 2 * r, 2 * r);
+    const vpRect = viewer.viewport.imageToViewportRectangle(imgRect);
+
+    overlayElem = document.createElement("div");
+    overlayElem.id = `viewer-pin-${pinId}`;
+    overlayElem.className = rootClass;
+    overlayElem.style.cssText = `pointer-events:none; position:relative; width:100%; height:100%; z-index:${zIndexVal};`;
+
+    const borderWidth = isAtivo ? 4 : 3;
+    const ringShadow = isAtivo
+      ? `0 0 0 2.5px rgba(255,255,255,0.96), 0 0 24px ${glowColor}, inset 0 0 18px ${fillSoft}`
+      : `0 0 0 2px rgba(255,255,255,0.9), 0 3px 14px rgba(15,23,42,0.3), inset 0 0 12px ${fillSoft}`;
+
+    overlayElem.innerHTML = `
+      <div class="${isAtivo ? "viewer-circle-active-ring" : ""}" style="position:absolute; inset:0; border-radius:50%; border:${borderWidth}px solid ${accent}; box-shadow:${ringShadow}; background:${fillSoft}; pointer-events:none;"></div>
+      <div data-pin-hit="1" title="${rotuloSeguro || `Área ${numeroLabel}`}" style="position:absolute; top:0; left:50%; transform:translate(-50%, -50%); pointer-events:auto; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center;">
+        <div style="width:${badgeSize}px; height:${badgeSize}px; border-radius:9999px; background:${accentCore}; border:2px solid #ffffff; box-shadow:${badgeShadow}; display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'JetBrains Mono', monospace; font-size:${isAtivo ? 11.5 : 10}px; font-weight:800; color:#ffffff; line-height:1;">${numeroLabel}</span>
+        </div>
+        ${rotuloSeguro ? `
+          <div class="viewer-marker-pill-wrap" style="position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);">
+            <div class="${pillClass}">
+              <span class="viewer-marker-pill-dot"></span>
+              <span>${rotuloSeguro}</span>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    `;
+
+    viewer.addOverlay({
+      element: overlayElem,
+      location: vpRect
+    });
+
+    const hitEl = overlayElem.querySelector('[data-pin-hit="1"]');
+    vincularCliqueMarcacaoViewer(hitEl, pinId, overlayElem);
+
+  // 2. ANOTAÇÃO TIPO SETA DIRECIONAL (Vetor Haste -> Alvo Celular)
+  } else if (pino.type === "arrow") {
+    let x1 = Number(pino.x) || 0;
+    let y1 = Number(pino.y) || 0;
+    const rawEndX = pino.endX != null ? pino.endX : pino.end_x;
+    const rawEndY = pino.endY != null ? pino.endY : pino.end_y;
+    const originNormalized = (x1 >= 0 && x1 <= 1 && y1 >= 0 && y1 <= 1 && contentSize && contentSize.x > 1);
+    if (originNormalized) {
+      x1 *= contentSize.x;
+      y1 *= contentSize.y;
+    }
+    let x2 = rawEndX != null ? Number(rawEndX) : x1 + 100;
+    let y2 = rawEndY != null ? Number(rawEndY) : y1 + 100;
+    if (rawEndX != null && rawEndY != null && x2 >= 0 && x2 <= 1 && y2 >= 0 && y2 <= 1 && contentSize && contentSize.x > 1) {
+      x2 *= contentSize.x;
+      y2 *= contentSize.y;
+    }
+
+    const pad = Math.max(48, Math.hypot(x2 - x1, y2 - y1) * 0.14);
+    const minX = Math.min(x1, x2) - pad;
+    const minY = Math.min(y1, y2) - pad;
+    const maxX = Math.max(x1, x2) + pad;
+    const maxY = Math.max(y1, y2) + pad;
+    const w = Math.max(1, maxX - minX);
+    const h = Math.max(1, maxY - minY);
+    const imgRect = new window.OpenSeadragon.Rect(minX, minY, w, h);
+    const vpRect = viewer.viewport.imageToViewportRectangle(imgRect);
+
+    const svgX1 = x1 - minX;
+    const svgY1 = y1 - minY;
+    const svgX2 = x2 - minX;
+    const svgY2 = y2 - minY;
+    const pctX1 = (svgX1 / w) * 100;
+    const pctY1 = (svgY1 / h) * 100;
+    const pctX2 = (svgX2 / w) * 100;
+    const pctY2 = (svgY2 / h) * 100;
+    const angleRad = Math.atan2(y2 - y1, x2 - x1);
+    const angleDeg = angleRad * (180 / Math.PI);
+    const headSize = isAtivo ? 24 : 20;
+    const tipAnchorX = (22 / 24) * headSize;
+    const tipAnchorY = headSize / 2;
+
+    // Posiciona a etiqueta no lado oposto à direção da seta para nunca cobrir a haste
+    const dirX = Math.cos(angleRad);
+    const dirY = Math.sin(angleRad);
+    let labelTransform = "translate(-50%, calc(-100% - 16px))";
+    if (Math.abs(dirY) >= Math.abs(dirX)) {
+      labelTransform = dirY > 0
+        ? "translate(-50%, calc(-100% - 16px))"
+        : "translate(-50%, 16px)";
+    } else {
+      labelTransform = dirX > 0
+        ? "translate(calc(-100% - 16px), -50%)"
+        : "translate(16px, -50%)";
+    }
+
+    overlayElem = document.createElement("div");
+    overlayElem.id = `viewer-pin-${pinId}`;
+    overlayElem.className = rootClass;
+    overlayElem.style.cssText = `pointer-events:none; position:relative; width:100%; height:100%; z-index:${zIndexVal};`;
+    overlayElem.innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" class="w-full h-full overflow-visible" style="filter:drop-shadow(0 2px 5px rgba(15,23,42,0.55)); pointer-events:none;">
+        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#ffffff" stroke-width="${isAtivo ? 8 : 6}" stroke-linecap="butt" vector-effect="non-scaling-stroke" />
+        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="${accent}" stroke-width="${isAtivo ? 4.5 : 3.2}" stroke-linecap="butt" vector-effect="non-scaling-stroke" />
+      </svg>
+
+      <!-- Ponta da seta com espessura fixa em pixels de tela -->
+      <div data-pin-hit="arrow-tip" title="${rotuloSeguro || `Seta ${numeroLabel}`}" style="position:absolute; left:${pctX2}%; top:${pctY2}%; width:0; height:0; pointer-events:auto; cursor:pointer; z-index:2;">
+        ${isAtivo ? `
+          <div class="viewer-marker-radar" style="position:absolute; left:-20px; top:-20px; width:40px; height:40px; border-radius:9999px; background:rgba(245,158,11,0.32); border:2px solid #fbbf24; pointer-events:none;"></div>
+        ` : ""}
+        <svg width="${headSize}" height="${headSize}" viewBox="0 0 24 24" style="position:absolute; left:-${tipAnchorX}px; top:-${tipAnchorY}px; transform-origin:${tipAnchorX}px ${tipAnchorY}px; transform:rotate(${angleDeg}deg); overflow:visible; filter:drop-shadow(0 2px 5px rgba(15,23,42,0.65));">
+          <path d="M 3 4 L 22 12 L 3 20 L 7.5 12 Z" fill="${accent}" stroke="#ffffff" stroke-width="2.4" stroke-linejoin="round" />
+        </svg>
+      </div>
+
+      <!-- Origem numerada + Rótulo revelado no hover/foco (sempre oposto à seta) -->
+      <div data-pin-hit="arrow-label" title="${rotuloSeguro || `Seta ${numeroLabel}`}" style="position:absolute; left:${pctX1}%; top:${pctY1}%; width:0; height:0; pointer-events:auto; cursor:pointer; z-index:3;">
+        <div style="position:absolute; left:0; top:0; transform:translate(-50%, -50%); width:${badgeSize}px; height:${badgeSize}px; border-radius:9999px; background:${accentCore}; border:2px solid #ffffff; box-shadow:${badgeShadow}; display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'JetBrains Mono', monospace; font-size:${isAtivo ? 11.5 : 10}px; font-weight:800; color:#ffffff; line-height:1;">${numeroLabel}</span>
+        </div>
+        ${rotuloSeguro ? `
+          <div class="viewer-marker-pill-wrap" style="position:absolute; left:0; top:0; transform:${labelTransform};">
+            <div class="${pillClass}">
+              <span class="viewer-marker-pill-dot"></span>
+              <span>${rotuloSeguro}</span>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    `;
+
+    viewer.addOverlay({
+      element: overlayElem,
+      location: vpRect
+    });
+
+    const tipHit = overlayElem.querySelector('[data-pin-hit="arrow-tip"]');
+    const labelHit = overlayElem.querySelector('[data-pin-hit="arrow-label"]');
+    if (tipHit) {
+      const t1 = new window.OpenSeadragon.MouseTracker({
+        element: tipHit,
+        clickHandler: (e) => {
+          if (e?.originalEvent) { e.originalEvent.stopPropagation(); e.originalEvent.preventDefault(); }
+          if (abaAtivaPainel !== "descricao") alternarAbaPainel("descricao");
+          focarPinoNoViewer(pinId);
+        }
+      });
+      overlayElem._osdTracker = t1;
+    }
+    if (labelHit) {
+      const t2 = new window.OpenSeadragon.MouseTracker({
+        element: labelHit,
+        clickHandler: (e) => {
+          if (e?.originalEvent) { e.originalEvent.stopPropagation(); e.originalEvent.preventDefault(); }
+          if (abaAtivaPainel !== "descricao") alternarAbaPainel("descricao");
+          focarPinoNoViewer(pinId);
+        }
+      });
+      if (overlayElem._osdTracker) {
+        const prev = overlayElem._osdTracker;
+        overlayElem._osdTracker = {
+          destroy: () => {
+            try { prev.destroy(); } catch (e) {}
+            try { t2.destroy(); } catch (e) {}
+          }
+        };
+      } else {
+        overlayElem._osdTracker = t2;
+      }
+    }
+
+  // 3. ANOTAÇÃO TIPO PIN CLÁSSICO
+  } else {
+    const targetPoint = converterPontoParaViewport(pino.x, pino.y, contentSize);
+    if (!targetPoint) return null;
+
+    const coreSize = isAtivo ? 28 : 24;
+    const containerSize = isAtivo ? 56 : 28;
+
+    overlayElem = document.createElement("div");
+    overlayElem.id = `viewer-pin-${pinId}`;
+    overlayElem.className = `${rootClass} viewer-pin-interactive`;
+    overlayElem.style.cssText = `pointer-events:auto; cursor:pointer; position:relative; width:${containerSize}px; height:${containerSize}px; z-index:${zIndexVal};`;
+    overlayElem.title = pino.rotulo ? `${numeroLabel}. ${pino.rotulo}` : `Marcação ${numeroLabel}`;
+
+    const coreShadow = isAtivo
+      ? "0 0 0 2px #0f172a, 0 0 20px rgba(245,158,11,0.9), 0 4px 14px rgba(15,23,42,0.5)"
+      : "0 2px 8px rgba(15,23,42,0.45), 0 0 0 1px rgba(15,23,42,0.22)";
+
+    // Wrapper flex interno garante centralização imune a alterações de display pelo OpenSeadragon
+    overlayElem.innerHTML = `
+      <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+        ${isAtivo ? `
+          <div class="viewer-marker-radar" style="position:absolute; inset:0; border-radius:9999px; background:rgba(245,158,11,0.36); border:2px solid #fbbf24; pointer-events:none;"></div>
+        ` : ""}
+        <div style="position:relative; width:${coreSize}px; height:${coreSize}px; background:${accentCore}; border-radius:9999px; border:${isAtivo ? "2.5px" : "2px"} solid #ffffff; box-shadow:${coreShadow}; display:flex; align-items:center; justify-content:center; transition:transform 0.18s ease;">
+          <span style="font-family:'JetBrains Mono', monospace; font-size:${isAtivo ? 12 : 10.5}px; font-weight:800; color:#ffffff; line-height:1;">${numeroLabel}</span>
+        </div>
+        ${rotuloSeguro ? `
+          <div class="viewer-marker-pill-wrap" style="position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%);">
+            <div class="${pillClass}">
+              <span class="viewer-marker-pill-dot"></span>
+              <span>${rotuloSeguro}</span>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    `;
+
+    viewer.addOverlay({
+      element: overlayElem,
+      location: targetPoint,
+      placement: window.OpenSeadragon.Placement.CENTER
+    });
+
+    vincularCliqueMarcacaoViewer(overlayElem, pinId, overlayElem);
+  }
+
+  if (isAtivo) {
+    overlayPinAtivo = overlayElem;
+  }
+  return overlayElem;
+}
+
+/**
+ * Renderiza sobre o OpenSeadragon todas as marcações da lâmina atual (quando
+ * marcacoesVisiveis está ligado), ou apenas a marcação em foco (se ocultas).
+ */
+export function renderizarTodasMarcacoesNoViewer() {
+  if (!viewer || !viewer.viewport || !window.OpenSeadragon) return;
+  const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+  if (!item) return;
+  const contentSize = item.getContentSize();
+
+  limparMarcacoesPinosViewer();
+
+  const pool = (Array.isArray(listaPinosAtual) && listaPinosAtual.length > 0)
+    ? listaPinosAtual
+    : (Array.isArray(laminaAtualData?.pinos) ? laminaAtualData.pinos : []);
+
+  if (pool.length === 0) return;
+
+  const idAtivoNorm = pinAtivo ? String(pinAtivo).trim().toLowerCase() : "";
+
+  pool.forEach((pino, idx) => {
+    const pId = String(pino.id || idx + 1);
+    const isAtivo = Boolean(idAtivoNorm) && pId.trim().toLowerCase() === idAtivoNorm;
+    if (!marcacoesVisiveis && !isAtivo) return;
+
+    const elem = criarOverlayPino(pino, idx, isAtivo, contentSize);
+    if (elem) {
+      overlaysPinosPersistentes.push({ pinId: pId, element: elem });
+    }
+  });
+}
+
+/**
+ * Alterna a exibição contínua das marcações na lâmina histológica.
+ *
+ * @param {boolean} [forcarEstado]
+ */
+export function toggleMarcacoesNoViewer(forcarEstado) {
+  marcacoesVisiveis = typeof forcarEstado === "boolean" ? forcarEstado : !marcacoesVisiveis;
+  atualizarBotaoMarcacoes();
+  renderizarTodasMarcacoesNoViewer();
+}
+
 export function focarPinoNoViewer(pinIdRaw) {
   if (!viewer || !viewer.viewport || !window.OpenSeadragon) {
     console.warn("[Palas Atlas] Viewer OpenSeadragon não inicializado ao tentar focar pino.");
@@ -1846,172 +2457,58 @@ export function focarPinoNoViewer(pinIdRaw) {
   const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
   const contentSize = item ? item.getContentSize() : null;
 
-  // Função auxiliar de conversão consistente de coordenadas
-  function converterPontoParaViewport(xVal, yVal) {
-    let px = Number(xVal);
-    let py = Number(yVal);
-    if (isNaN(px) || isNaN(py)) return null;
-
-    if (px > 0 && px <= 1 && py > 0 && py <= 1 && contentSize && contentSize.x > 1) {
-      return viewer.viewport.imageToViewportCoordinates(
-        new window.OpenSeadragon.Point(px * contentSize.x, py * contentSize.y)
-      );
-    }
-    return viewer.viewport.imageToViewportCoordinates(
-      new window.OpenSeadragon.Point(px, py)
-    );
-  }
-
-  // Remove pin de anotação ativo anterior
-  if (overlayPinAtivo) {
-    try { viewer.removeOverlay(overlayPinAtivo); } catch (e) {}
-    overlayPinAtivo = null;
-  }
-  if (pinAtivo) {
-    const anterior = document.getElementById(`viewer-pin-${pinAtivo}`);
-    if (anterior) { try { viewer.removeOverlay(anterior); } catch (e) {} }
-    pinAtivo = null;
-  }
-
   // Remove pin de questão ativa se houver
   if (overlayQuestaoAtiva) {
-    try { viewer.removeOverlay(overlayQuestaoAtiva); } catch (e) {}
+    removerOverlayComSeguranca(overlayQuestaoAtiva);
     overlayQuestaoAtiva = null;
     questaoAtivaId = null;
   }
 
   const pinId = String(pino.id || idBuscado);
-  let overlayElem = null;
-  let targetPoint = null;
+  pinAtivo = pinId;
 
-  // Cálculo do Zoom Óptico Ideal
+  // Renderiza todas as marcações mantendo o pino focado em destaque máximo
+  renderizarTodasMarcacoesNoViewer();
+
+  // Cálculo do Ponto Alvo e do Zoom Óptico Ideal
   const homeZoom = homeZoomRef || viewer.viewport.getHomeZoom() || 1;
+  let targetPoint = null;
   let targetZoom;
+
   if (pino.zoom && Number(pino.zoom) > 0) {
     targetZoom = Number(pino.zoom);
   } else {
     targetZoom = Math.max(viewer.viewport.getZoom(), homeZoom * 3.5);
   }
 
-  // 1. ANOTAÇÃO TIPO CÍRCULO (Delimitação Estrutural)
   if (pino.type === "circle") {
     let r = Number(pino.radius) || 250;
-    let px = Number(pino.x) || 0;
-    let py = Number(pino.y) || 0;
-    if (px > 0 && px <= 1 && py > 0 && py <= 1 && contentSize && contentSize.x > 1) {
-      px *= contentSize.x;
-      py *= contentSize.y;
-      if (r > 0 && r <= 1) r *= contentSize.x;
+    const px = Number(pino.x) || 0;
+    const py = Number(pino.y) || 0;
+    if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && contentSize && contentSize.x > 1 && r > 0 && r <= 1) {
+      r *= contentSize.x;
     }
-
-    const imgRect = new window.OpenSeadragon.Rect(px - r, py - r, 2 * r, 2 * r);
-    const vpRect = viewer.viewport.imageToViewportRectangle(imgRect);
-    targetPoint = converterPontoParaViewport(pino.x, pino.y);
-
-    overlayElem = document.createElement("div");
-    overlayElem.id = `viewer-pin-${pinId}`;
-    overlayElem.style.cssText = "pointer-events:none; position:relative; width:100%; height:100%; z-index:40;";
-    overlayElem.innerHTML = `
-      <div class="animate-pulse" style="position:absolute; inset:0; border-radius:50%; border:2.5px solid #0d9488; box-shadow:0 0 25px rgba(13,148,136,0.6), inset 0 0 20px rgba(13,148,136,0.2); background:rgba(13,148,136,0.1);"></div>
-      ${pino.rotulo ? `
-        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:monospace; font-size:11px; font-weight:bold; padding:3px 9px; border-radius:12px; box-shadow:0 4px 14px rgba(15,23,42,0.25); white-space:nowrap;">
-          ${pino.rotulo}
-        </div>
-      ` : ''}
-    `;
-
-    viewer.addOverlay({
-      element: overlayElem,
-      location: vpRect
-    });
-
+    targetPoint = converterPontoParaViewport(pino.x, pino.y, contentSize);
     targetZoom = homeZoom * Math.min(5.5, Math.max(2.2, 1400 / (r * 2)));
-
-  // 2. ANOTAÇÃO TIPO SETA DIRECIONAL (Vetor Haste -> Alvo Celular)
   } else if (pino.type === "arrow") {
-    let x1 = Number(pino.x) || 0;
-    let y1 = Number(pino.y) || 0;
-    let x2 = Number(pino.endX != null ? pino.endX : (pino.end_x != null ? pino.end_x : x1 + 100));
-    let y2 = Number(pino.endY != null ? pino.endY : (pino.end_y != null ? pino.end_y : y1 + 100));
-
-    if (x1 > 0 && x1 <= 1 && y1 > 0 && y1 <= 1 && contentSize && contentSize.x > 1) {
-      x1 *= contentSize.x;
-      y1 *= contentSize.y;
-      x2 *= contentSize.x;
-      y2 *= contentSize.y;
+    const rawEndX = pino.endX != null ? pino.endX : pino.end_x;
+    const rawEndY = pino.endY != null ? pino.endY : pino.end_y;
+    if (rawEndX != null && rawEndY != null) {
+      targetPoint = converterPontoParaViewport(rawEndX, rawEndY, contentSize);
+    } else {
+      let px = Number(pino.x) || 0;
+      let py = Number(pino.y) || 0;
+      if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && contentSize && contentSize.x > 1) {
+        px *= contentSize.x;
+        py *= contentSize.y;
+      }
+      targetPoint = viewer.viewport.imageToViewportCoordinates(
+        new window.OpenSeadragon.Point(px + 100, py + 100)
+      );
     }
-
-    const pad = Math.max(30, Math.hypot(x2 - x1, y2 - y1) * 0.08);
-    const minX = Math.min(x1, x2) - pad;
-    const minY = Math.min(y1, y2) - pad;
-    const maxX = Math.max(x1, x2) + pad;
-    const maxY = Math.max(y1, y2) + pad;
-    const w = Math.max(1, maxX - minX);
-    const h = Math.max(1, maxY - minY);
-    const imgRect = new window.OpenSeadragon.Rect(minX, minY, w, h);
-    const vpRect = viewer.viewport.imageToViewportRectangle(imgRect);
-
-    const svgX1 = x1 - minX;
-    const svgY1 = y1 - minY;
-    const svgX2 = x2 - minX;
-    const svgY2 = y2 - minY;
-    const markerId = `viewer-marker-arrow-${pinId}`;
-
-    overlayElem = document.createElement("div");
-    overlayElem.id = `viewer-pin-${pinId}`;
-    overlayElem.style.cssText = "pointer-events:none; position:relative; width:100%; height:100%; z-index:40;";
-    overlayElem.innerHTML = `
-      <svg viewBox="0 0 ${w} ${h}" class="w-full h-full overflow-visible" style="filter:drop-shadow(0 2px 8px rgba(15,23,42,0.45));">
-        <defs>
-          <marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#0d9488" />
-          </marker>
-        </defs>
-        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#0d9488" stroke-width="4" stroke-linecap="round" marker-end="url(#${markerId})" />
-        <circle cx="${svgX1}" cy="${svgY1}" r="6" fill="#0d9488" stroke="#ffffff" stroke-width="2" />
-        <circle cx="${svgX2}" cy="${svgY2}" r="5" fill="#ffffff" class="animate-ping" />
-      </svg>
-      ${pino.rotulo ? `
-        <div style="position:absolute; left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform:translate(-50%, -130%); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:monospace; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 12px rgba(15,23,42,0.25);">
-          ${pino.rotulo}
-        </div>
-      ` : ''}
-    `;
-
-    viewer.addOverlay({
-      element: overlayElem,
-      location: vpRect
-    });
-
-    // Ponto de foco exato na ponta da seta (alvo celular)
-    targetPoint = converterPontoParaViewport(pino.endX != null ? pino.endX : (pino.end_x != null ? pino.end_x : x2), pino.endY != null ? pino.endY : (pino.end_y != null ? pino.end_y : y2));
-
-  // 3. ANOTAÇÃO TIPO PIN CLÁSSICO
   } else {
-    targetPoint = converterPontoParaViewport(pino.x, pino.y);
-
-    overlayElem = document.createElement("div");
-    overlayElem.id = `viewer-pin-${pinId}`;
-    overlayElem.style.cssText = "pointer-events:none; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:36px; height:36px; z-index:40;";
-    overlayElem.innerHTML = `
-      <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(13,148,136,0.45);border-radius:50%;"></div>
-      <div style="position:relative;width:14px;height:14px;background:#0d9488;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(13,148,136,0.45),0 4px 14px rgba(15,23,42,0.35);"></div>
-      ${pino.rotulo ? `
-        <div style="position:absolute; top:100%; left:50%; transform:translate(-50%, 6px); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:monospace; font-size:11px; font-weight:bold; padding:2px 8px; border-radius:12px; box-shadow:0 4px 14px rgba(15,23,42,0.25); white-space:nowrap; pointer-events:none;">
-          ${pino.rotulo}
-        </div>
-      ` : ''}
-    `;
-
-    viewer.addOverlay({
-      element: overlayElem,
-      location: targetPoint,
-      placement: window.OpenSeadragon.Placement.CENTER
-    });
+    targetPoint = converterPontoParaViewport(pino.x, pino.y, contentSize);
   }
-
-  overlayPinAtivo = overlayElem;
-  pinAtivo = pinId;
 
   // Limite de segurança de zoom
   if (viewer.viewport.maxZoomLevel) {
@@ -2021,32 +2518,21 @@ export function focarPinoNoViewer(pinIdRaw) {
     targetZoom = Math.max(targetZoom, viewer.viewport.minZoomLevel);
   }
 
-  // TRANSIÇÃO PRECISA DE CENTRALIZAÇÃO E AMPLIAÇÃO
-  // No OpenSeadragon, panTo(center, false) define o novo centro do viewport e
-  // zoomTo(targetZoom, null, false) amplia em direção ao centro sem deslocá-lo.
+  // TRANSIÇÃO PRECISA DE CENTRALIZAÇÃO E AMPLIAÇÃO ANCORADA NO ALVO
   if (targetPoint) {
+    viewer.viewport.zoomTo(targetZoom, targetPoint, false);
     viewer.viewport.panTo(targetPoint, false);
-    viewer.viewport.zoomTo(targetZoom, null, false);
     viewer.viewport.applyConstraints();
   }
 
-  // Destaca o card do pino na lista lateral caso esteja visível
+  // Destaca o card do pino na lista lateral e links inline no texto
   destacarPinoNaSidebar(pinId);
-
-  // Auto-remove o marcador após 9s se não houver nova interação
-  setTimeout(() => {
-    if (overlayPinAtivo === overlayElem && viewer) {
-      try { viewer.removeOverlay(overlayElem); } catch (e) {}
-      if (pinAtivo === pinId) pinAtivo = null;
-      overlayPinAtivo = null;
-    }
-  }, 9000);
 }
 
 /**
  * Localiza e foca uma questão prática de bancada no visualizador OpenSeadragon.
  * Realiza a conversão precisa de coordenadas, insere um overlay pulsante
- * em ouro-champanhe / ciano e navega com centralização perfeita (pan & zoom).
+ * em alto contraste e navega com centralização perfeita (pan & zoom).
  *
  * @param {string|number} questaoId
  */
@@ -2073,72 +2559,62 @@ export function focarQuestaoNoViewer(questaoId) {
     return;
   }
 
-  let posX = Number(q.x) || 0;
-  let posY = Number(q.y) || 0;
-
   const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
   const contentSize = item ? item.getContentSize() : null;
-
-  // Se coordenadas estiverem normalizadas (0 a 1), converte para pixels originais da imagem
-  if (posX > 0 && posX <= 1 && posY > 0 && posY <= 1 && contentSize && contentSize.x > 1) {
-    posX *= contentSize.x;
-    posY *= contentSize.y;
-  }
-
-  // Converte coordenadas usando OpenSeadragon
-  const pontoViewport = viewer.viewport.imageToViewportCoordinates(
-    new window.OpenSeadragon.Point(posX, posY)
-  );
+  const pontoViewport = converterPontoParaViewport(q.x || 0, q.y || 0, contentSize);
+  if (!pontoViewport) return;
 
   // Remove overlay de questão ativa anterior
   if (overlayQuestaoAtiva) {
-    try {
-      viewer.removeOverlay(overlayQuestaoAtiva);
-    } catch (e) {}
+    removerOverlayComSeguranca(overlayQuestaoAtiva);
     overlayQuestaoAtiva = null;
   }
   if (questaoAtivaId) {
     const elemAnterior = document.getElementById(`viewer-qpin-${questaoAtivaId}`);
-    if (elemAnterior) {
-      try { viewer.removeOverlay(elemAnterior); } catch (e) {}
-    }
+    if (elemAnterior) removerOverlayComSeguranca(elemAnterior);
   }
 
-  // Remove pino comum de estrutura ativo se houver
-  if (overlayPinAtivo) {
-    try { viewer.removeOverlay(overlayPinAtivo); } catch (e) {}
-    overlayPinAtivo = null;
-  }
+  // Limpa o foco de estrutura anterior mantendo marcações persistentes no estado padrão
   if (pinAtivo) {
-    const anteriorPin = document.getElementById(`viewer-pin-${pinAtivo}`);
-    if (anteriorPin) {
-      try { viewer.removeOverlay(anteriorPin); } catch (e) {}
-      pinAtivo = null;
-    }
+    pinAtivo = null;
+    destacarPinoNaSidebar(null);
+    renderizarTodasMarcacoesNoViewer();
   }
 
   const numeroQ = q.numero !== undefined && q.numero !== null ? q.numero : (listaQuestoesAtual.indexOf(q) + 1);
+  const numeroQSafe = escaparHTML(String(numeroQ));
 
-  // Cria elemento do pino pulsante com outer glowing ring em ouro-champanhe/ciano e inner badge
+  // Pino de questão com alto contraste (âmbar + slate escuro + anel duplo + radar)
   const pinElem = document.createElement("div");
   pinElem.id = `viewer-qpin-${q.id}`;
-  pinElem.className = "viewer-qpin cursor-pointer";
-  pinElem.style.cssText = "position:relative; display:flex; align-items:center; justify-content:center; width:46px; height:46px; z-index:45; pointer-events:auto;";
+  pinElem.className = "viewer-marker-root is-active viewer-qpin cursor-pointer";
+  pinElem.style.cssText = "position:relative; width:58px; height:58px; z-index:50; pointer-events:auto;";
   pinElem.title = `Questão Q${numeroQ}: ${q.titulo || "Ponto de Investigação"}`;
 
   pinElem.innerHTML = `
-    <div class="animate-ping" style="position:absolute; width:100%; height:100%; border-radius:9999px; background:radial-gradient(circle, rgba(13,148,136,0.4) 0%, rgba(3,105,161,0.2) 70%, transparent 100%); border:1.5px solid rgba(13,148,136,0.7);"></div>
-    <div style="position:relative; min-width:32px; height:32px; padding:0 6px; background:#0f766e; border-radius:9999px; border:2px solid #ffffff; box-shadow:0 0 0 2px rgba(13,148,136,0.35), 0 4px 14px rgba(15,23,42,0.35); display:flex; align-items:center; justify-content:center; gap:2px;">
-      <span style="font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:800; color:#ffffff; letter-spacing:-0.02em;">Q${numeroQ}</span>
+    <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+      <div class="viewer-marker-radar" style="position:absolute; inset:0; border-radius:9999px; background:rgba(245,158,11,0.34); border:2px solid #fbbf24; pointer-events:none;"></div>
+      <div style="position:relative; min-width:34px; height:34px; padding:0 8px; background:#0f172a; border-radius:9999px; border:2px solid #fbbf24; box-shadow:0 0 0 2px #ffffff, 0 0 18px rgba(245,158,11,0.85), 0 6px 16px rgba(15,23,42,0.45); display:flex; align-items:center; justify-content:center; gap:2px;">
+        <span style="font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:800; color:#fef3c7; letter-spacing:-0.02em;">Q${numeroQSafe}</span>
+      </div>
+      <div class="viewer-marker-pill-wrap" style="position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%);">
+        <div class="viewer-marker-pill is-active">
+          <span class="viewer-marker-pill-dot"></span>
+          <span>Questão Q${numeroQSafe}</span>
+        </div>
+      </div>
     </div>
   `;
 
-  pinElem.addEventListener("click", (e) => {
-    e.stopPropagation();
-    alternarAbaPainel("questoes");
-    destacarCardQuestaoNaSidebar(idBuscado);
-    if (isMobileOrLandscapeDrawer()) {
-      aplicarEstadoSidebar(false, false);
+  pinElem._osdTracker = new window.OpenSeadragon.MouseTracker({
+    element: pinElem,
+    clickHandler: (e) => {
+      if (e?.originalEvent) { e.originalEvent.stopPropagation(); e.originalEvent.preventDefault(); }
+      alternarAbaPainel("questoes");
+      destacarCardQuestaoNaSidebar(idBuscado);
+      if (isMobileOrLandscapeDrawer()) {
+        aplicarEstadoSidebar(false, false);
+      }
     }
   });
 
@@ -2151,7 +2627,7 @@ export function focarQuestaoNoViewer(questaoId) {
   overlayQuestaoAtiva = pinElem;
   questaoAtivaId = idBuscado;
 
-  // Pan & Zoom com centralização precisa
+  // Pan & Zoom com centralização precisa ancorada na questão
   let targetZoom = (q.zoom && Number(q.zoom) > 0)
     ? Number(q.zoom)
     : Math.max(viewer.viewport.getZoom(), (homeZoomRef || 1) * 3.5);
@@ -2163,8 +2639,8 @@ export function focarQuestaoNoViewer(questaoId) {
     targetZoom = Math.max(targetZoom, viewer.viewport.minZoomLevel);
   }
 
+  viewer.viewport.zoomTo(targetZoom, pontoViewport, false);
   viewer.viewport.panTo(pontoViewport, false);
-  viewer.viewport.zoomTo(targetZoom, null, false);
   viewer.viewport.applyConstraints();
 }
 
@@ -2268,7 +2744,7 @@ function exibirErroMicroscopio(msg) {
       </div>
       <div class="space-y-1">
         <h3 class="text-sm font-semibold text-slate-900 tracking-wide">Falha no Carregamento</h3>
-        <p class="text-rose-600 text-xs font-mono max-w-sm leading-relaxed">${msg}</p>
+        <p class="text-rose-600 text-xs font-mono max-w-sm leading-relaxed">${escaparHTML(String(msg || ""))}</p>
       </div>
       <div class="flex items-center gap-3 mt-3">
         <button type="button" onclick="window.location.reload()" class="px-4 py-2 text-xs font-mono font-medium text-white bg-teal-700 hover:bg-teal-800 border border-teal-700 rounded-xl transition-all cursor-pointer shadow-sm">
@@ -2283,6 +2759,613 @@ function exibirErroMicroscopio(msg) {
 }
 
 // ---------------------------------------------------------------------------
+// 11. Régua Morfométrica, Deep Link, Tela Cheia, Atalhos e Troca Rápida
+// ---------------------------------------------------------------------------
+
+function exibirToastViewer(mensagem, duracaoMs = 2400) {
+  const toast = document.getElementById("viewerToast");
+  if (!toast) return;
+  toast.textContent = String(mensagem || "");
+  toast.classList.remove("hidden", "opacity-0");
+  toast.classList.add("opacity-100");
+  if (_viewerToastTimer) clearTimeout(_viewerToastTimer);
+  _viewerToastTimer = setTimeout(() => {
+    toast.classList.remove("opacity-100");
+    toast.classList.add("opacity-0");
+    setTimeout(() => {
+      if (toast.classList.contains("opacity-0")) {
+        toast.classList.add("hidden");
+      }
+    }, 200);
+  }, duracaoMs);
+}
+
+function obterMppAtivo() {
+  if (!laminaAtualData || laminaAtualData._usingPreviewFallback) return null;
+  const mpp = Number(laminaAtualData.mpp);
+  return Number.isFinite(mpp) && mpp > 0 ? mpp : null;
+}
+
+function atualizarBotaoRegua() {
+  const btn = document.getElementById("btnToggleRegua");
+  if (!btn) return;
+  const mpp = obterMppAtivo();
+  if (!mpp) {
+    btn.disabled = true;
+    btn.classList.remove("is-on");
+    btn.classList.add("is-off");
+    btn.setAttribute("aria-pressed", "false");
+    btn.title = "Régua indisponível sem calibração óptica";
+    return;
+  }
+  btn.disabled = false;
+  btn.classList.toggle("is-on", modoReguaAtivo);
+  btn.classList.toggle("is-off", !modoReguaAtivo);
+  btn.setAttribute("aria-pressed", String(modoReguaAtivo));
+  btn.title = modoReguaAtivo
+    ? "Desativar régua morfométrica (D)"
+    : "Régua morfométrica em micrômetros (D)";
+}
+
+function atualizarBannerRegua(texto, mostrarLimpar = false) {
+  const banner = document.getElementById("reguaBanner");
+  const txtEl = document.getElementById("reguaBannerTexto");
+  const btnLimpar = document.getElementById("btnLimparRegua");
+  if (txtEl && texto !== undefined) txtEl.textContent = texto;
+  if (btnLimpar) btnLimpar.classList.toggle("hidden", !mostrarLimpar);
+  if (banner && modoReguaAtivo) {
+    banner.classList.remove("hidden");
+  }
+}
+
+export function limparMedicaoRegua() {
+  if (_reguaPointerRaf) {
+    cancelAnimationFrame(_reguaPointerRaf);
+    _reguaPointerRaf = null;
+  }
+  if (overlayRegua) {
+    removerOverlayComSeguranca(overlayRegua);
+    overlayRegua = null;
+  }
+  reguaPontoA = null;
+  reguaPontoB = null;
+  _reguaOverlayIsPreview = false;
+  if (modoReguaAtivo) {
+    atualizarBannerRegua("Clique no ponto inicial na lâmina (Esc para sair)", false);
+  }
+}
+
+export function toggleReguaMorfometrica(forcarEstado) {
+  const mpp = obterMppAtivo();
+  const proximoEstado = typeof forcarEstado === "boolean" ? forcarEstado : !modoReguaAtivo;
+
+  if (proximoEstado && !mpp) {
+    exibirToastViewer("Régua indisponível nesta imagem sem calibração óptica.");
+    atualizarBotaoRegua();
+    return;
+  }
+
+  modoReguaAtivo = proximoEstado;
+
+  const osdEl = document.getElementById("osd-viewer");
+  if (osdEl) {
+    osdEl.classList.toggle("cursor-crosshair", modoReguaAtivo);
+  }
+  if (viewer) {
+    if (viewer.gestureSettingsMouse) viewer.gestureSettingsMouse.dblClickToZoom = !modoReguaAtivo;
+    if (viewer.gestureSettingsTouch) viewer.gestureSettingsTouch.dblClickToZoom = !modoReguaAtivo;
+  }
+
+  const banner = document.getElementById("reguaBanner");
+  if (modoReguaAtivo) {
+    if (banner) banner.classList.remove("hidden");
+    if (reguaPontoA && reguaPontoB) {
+      const distUm = Math.hypot(reguaPontoB.x - reguaPontoA.x, reguaPontoB.y - reguaPontoA.y) * mpp;
+      atualizarBannerRegua(`Medida: ${formatarComprimento(distUm)} — clique em outro ponto para nova medição`, true);
+    } else if (reguaPontoA) {
+      atualizarBannerRegua("Clique no ponto final para medir", false);
+    } else {
+      atualizarBannerRegua("Clique no ponto inicial na lâmina (Esc para sair)", false);
+    }
+  } else {
+    limparMedicaoRegua();
+    if (banner) banner.classList.add("hidden");
+  }
+
+  atualizarBotaoRegua();
+}
+
+function renderizarOverlayRegua(pA, pB, isPreview = false) {
+  if (!viewer || !viewer.viewport || !window.OpenSeadragon) return null;
+  const mpp = obterMppAtivo();
+  if (!mpp) return null;
+
+  const dx = pB.x - pA.x;
+  const dy = pB.y - pA.y;
+  const distPx = Math.hypot(dx, dy);
+  const distUm = distPx * mpp;
+  const label = distUm > 0 ? formatarComprimento(distUm) : "0,0 µm";
+
+  const pad = Math.max(40, distPx * 0.25);
+  const minX = Math.min(pA.x, pB.x) - pad;
+  const minY = Math.min(pA.y, pB.y) - pad;
+  const maxX = Math.max(pA.x, pB.x) + pad;
+  const maxY = Math.max(pA.y, pB.y) + pad;
+  const w = Math.max(1, maxX - minX);
+  const h = Math.max(1, maxY - minY);
+
+  const imgRect = new window.OpenSeadragon.Rect(minX, minY, w, h);
+  const vpRect = viewer.viewport.imageToViewportRectangle(imgRect);
+
+  const svgX1 = pA.x - minX;
+  const svgY1 = pA.y - minY;
+  const svgX2 = pB.x - minX;
+  const svgY2 = pB.y - minY;
+  const pctX1 = (svgX1 / w) * 100;
+  const pctY1 = (svgY1 / h) * 100;
+  const pctX2 = (svgX2 / w) * 100;
+  const pctY2 = (svgY2 / h) * 100;
+  const midPctX = ((svgX1 + svgX2) / 2 / w) * 100;
+  const midPctY = ((svgY1 + svgY2) / 2 / h) * 100;
+
+  const html = `
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" class="w-full h-full overflow-visible" style="pointer-events:none; filter:drop-shadow(0 1px 3px rgba(15,23,42,0.5));">
+      <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#ffffff" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke" ${isPreview ? 'stroke-dasharray="6 4"' : ''} />
+      <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#0369a1" stroke-width="2.5" stroke-linecap="round" vector-effect="non-scaling-stroke" ${isPreview ? 'stroke-dasharray="6 4"' : ''} />
+    </svg>
+    <div style="position:absolute; left:${pctX1}%; top:${pctY1}%; transform:translate(-50%, -50%); width:10px; height:10px; border-radius:9999px; background:#0369a1; border:2px solid #ffffff; box-shadow:0 1px 4px rgba(15,23,42,0.5); pointer-events:none;"></div>
+    <div style="position:absolute; left:${pctX2}%; top:${pctY2}%; transform:translate(-50%, -50%); width:10px; height:10px; border-radius:9999px; background:#0369a1; border:2px solid #ffffff; box-shadow:0 1px 4px rgba(15,23,42,0.5); pointer-events:none;"></div>
+    <div style="position:absolute; left:${midPctX}%; top:${midPctY}%; transform:translate(-50%, calc(-100% - 10px)); z-index:4; pointer-events:${isPreview ? 'none' : 'auto'};">
+      <div class="viewer-ruler-pill">
+        <span>${escaparHTML(label)}</span>
+        ${!isPreview ? `<button type="button" data-ruler-clear="1" class="viewer-ruler-clear-btn" aria-label="Limpar medição" title="Limpar medição">&times;</button>` : ''}
+      </div>
+    </div>
+  `;
+
+  if (isPreview && overlayRegua && _reguaOverlayIsPreview) {
+    overlayRegua.innerHTML = html;
+    try {
+      viewer.updateOverlay(overlayRegua, vpRect);
+    } catch (e) {}
+    return label;
+  }
+
+  if (overlayRegua) {
+    removerOverlayComSeguranca(overlayRegua);
+    overlayRegua = null;
+  }
+
+  const elem = document.createElement("div");
+  elem.id = "viewer-ruler-overlay";
+  elem.style.cssText = "pointer-events:none; position:relative; width:100%; height:100%; z-index:45;";
+  elem.innerHTML = html;
+
+  viewer.addOverlay({
+    element: elem,
+    location: vpRect
+  });
+
+  if (!isPreview) {
+    const clearBtn = elem.querySelector('[data-ruler-clear="1"]');
+    if (clearBtn) {
+      elem._osdTracker = new window.OpenSeadragon.MouseTracker({
+        element: clearBtn,
+        clickHandler: (e) => {
+          if (e?.originalEvent) {
+            e.originalEvent.stopPropagation();
+            e.originalEvent.preventDefault();
+          }
+          limparMedicaoRegua();
+        }
+      });
+    }
+  }
+
+  overlayRegua = elem;
+  _reguaOverlayIsPreview = isPreview;
+  return label;
+}
+
+function handleCanvasClickRegua(ev) {
+  if (!modoReguaAtivo || !ev || !ev.quick || !viewer || !viewer.viewport || !ev.position) return;
+  const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+  if (!item) return;
+
+  const vpPt = viewer.viewport.pointFromPixel(ev.position);
+  const imgPt = item.viewportToImageCoordinates(vpPt);
+  if (!imgPt || !Number.isFinite(imgPt.x) || !Number.isFinite(imgPt.y)) return;
+
+  if (!reguaPontoA || (reguaPontoA && reguaPontoB)) {
+    if (overlayRegua) {
+      removerOverlayComSeguranca(overlayRegua);
+      overlayRegua = null;
+      _reguaOverlayIsPreview = false;
+    }
+    reguaPontoA = { x: imgPt.x, y: imgPt.y };
+    reguaPontoB = null;
+    atualizarBannerRegua("Clique no ponto final para medir", false);
+  } else {
+    if (_reguaPointerRaf) {
+      cancelAnimationFrame(_reguaPointerRaf);
+      _reguaPointerRaf = null;
+    }
+    reguaPontoB = { x: imgPt.x, y: imgPt.y };
+    const label = renderizarOverlayRegua(reguaPontoA, reguaPontoB, false);
+    atualizarBannerRegua(`Medida: ${label || "—"} — clique novamente para nova medição`, true);
+  }
+}
+
+function handlePointerMoveRegua(e) {
+  if (!modoReguaAtivo || !reguaPontoA || reguaPontoB || !viewer || !viewer.canvas || !viewer.viewport) return;
+  if (_reguaPointerRaf) return;
+  const clientX = e.clientX;
+  const clientY = e.clientY;
+
+  _reguaPointerRaf = requestAnimationFrame(() => {
+    _reguaPointerRaf = null;
+    if (!modoReguaAtivo || !reguaPontoA || reguaPontoB || !viewer || !viewer.canvas) return;
+    const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+    if (!item) return;
+
+    const rect = viewer.canvas.getBoundingClientRect();
+    const webPt = new window.OpenSeadragon.Point(clientX - rect.left, clientY - rect.top);
+    const vpPt = viewer.viewport.pointFromPixel(webPt);
+    const imgPt = item.viewportToImageCoordinates(vpPt);
+    if (!imgPt || !Number.isFinite(imgPt.x) || !Number.isFinite(imgPt.y)) return;
+
+    renderizarOverlayRegua(reguaPontoA, { x: imgPt.x, y: imgPt.y }, true);
+  });
+}
+
+export async function copiarLinkCampoAtual() {
+  if (!viewer || !viewer.viewport || !laminaAtualData) return null;
+  const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
+  if (!item || typeof item.getContentSize !== "function") return null;
+
+  const cs = item.getContentSize();
+  const centerVp = viewer.viewport.getCenter(true);
+  const imgPt = item.viewportToImageCoordinates(centerVp);
+  const nx = cs.x > 0 ? Math.max(0, Math.min(1, imgPt.x / cs.x)).toFixed(4) : "0.5000";
+  const ny = cs.y > 0 ? Math.max(0, Math.min(1, imgPt.y / cs.y)).toFixed(4) : "0.5000";
+  const magRaw = calcularMagnificacaoOtica();
+  const mag = Number(magRaw.toFixed(1));
+
+  const params = new URLSearchParams();
+  if (laminaAtualData.id === "local-dzi" && laminaAtualData.imagemUrl) {
+    params.set("dzi", laminaAtualData.imagemUrl);
+  } else {
+    params.set("id", laminaAtualData.id || "");
+  }
+  params.set("x", nx);
+  params.set("y", ny);
+  params.set("mag", String(mag));
+  if (pinAtivo) {
+    params.set("pin", pinAtivo);
+  }
+
+  const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+  window.__lastCopiedSlideUrl = shareUrl;
+
+  let copied = false;
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      await navigator.clipboard.writeText(shareUrl);
+      copied = true;
+    }
+  } catch (e) {}
+
+  if (!copied) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = shareUrl;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      copied = document.execCommand("copy");
+      document.body.removeChild(ta);
+    } catch (e) {}
+  }
+
+  exibirToastViewer(copied ? "Link do campo copiado" : "Link preparado na barra de endereço");
+  return shareUrl;
+}
+
+function atualizarBotaoFullscreen() {
+  const btn = document.getElementById("btnFullscreen");
+  if (!btn) return;
+  const isFs = Boolean(
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    (viewer && typeof viewer.isFullPage === "function" && viewer.isFullPage())
+  );
+  btn.setAttribute("aria-pressed", String(isFs));
+  btn.title = isFs ? "Sair da tela cheia (F)" : "Tela cheia (F)";
+  const expandIcon = btn.querySelector("[data-fs-expand]");
+  const compressIcon = btn.querySelector("[data-fs-compress]");
+  if (expandIcon) expandIcon.classList.toggle("hidden", isFs);
+  if (compressIcon) compressIcon.classList.toggle("hidden", !isFs);
+}
+
+export async function toggleTelaCheiaMicroscopio() {
+  const isFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+  try {
+    if (!isFs) {
+      const docEl = document.documentElement;
+      if (typeof docEl.requestFullscreen === "function") {
+        await docEl.requestFullscreen();
+      } else if (typeof docEl.webkitRequestFullscreen === "function") {
+        docEl.webkitRequestFullscreen();
+      } else {
+        osdViewerAction("fullpage");
+      }
+    } else {
+      if (typeof document.exitFullscreen === "function") {
+        await document.exitFullscreen();
+      } else if (typeof document.webkitExitFullscreen === "function") {
+        document.webkitExitFullscreen();
+      } else {
+        osdViewerAction("fullpage");
+      }
+    }
+  } catch (err) {
+    osdViewerAction("fullpage");
+  }
+  atualizarBotaoFullscreen();
+}
+
+function registrarControleFullscreenMicroscopio() {
+  if (_fullscreenRegistrado) return;
+  _fullscreenRegistrado = true;
+  const onFsChange = () => {
+    atualizarBotaoFullscreen();
+    setTimeout(sincronizarTamanhoDoViewer, 60);
+  };
+  document.addEventListener("fullscreenchange", onFsChange);
+  document.addEventListener("webkitfullscreenchange", onFsChange);
+}
+
+function registrarAtalhosTecladoMicroscopio() {
+  if (_atalhosRegistrados) return;
+  _atalhosRegistrados = true;
+
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const active = document.activeElement;
+    if (active && (
+      active.tagName === "INPUT" ||
+      active.tagName === "TEXTAREA" ||
+      active.tagName === "SELECT" ||
+      active.isContentEditable
+    )) {
+      return;
+    }
+
+    const key = e.key;
+    const lower = key ? key.toLowerCase() : "";
+
+    const lensMap = { "1": 4, "2": 10, "3": 40, "4": 60, "5": 100 };
+    if (key in lensMap) {
+      const mag = lensMap[key];
+      if (mag <= getMaxMagLamina()) {
+        e.preventDefault();
+        trocarLente(mag);
+      }
+      return;
+    }
+
+    if (key === "+" || key === "=") {
+      e.preventDefault();
+      alterarZoom(1.35);
+      return;
+    }
+    if (key === "-" || key === "_") {
+      e.preventDefault();
+      alterarZoom(0.75);
+      return;
+    }
+    if (lower === "r" || key === "0") {
+      e.preventDefault();
+      osdViewerAction("home");
+      return;
+    }
+    if (lower === "m") {
+      e.preventDefault();
+      toggleMarcacoesNoViewer();
+      return;
+    }
+    if (lower === "d") {
+      e.preventDefault();
+      toggleReguaMorfometrica();
+      return;
+    }
+    if (lower === "p") {
+      e.preventDefault();
+      const sidebar = document.getElementById("viewerSidebar");
+      if (sidebar) aplicarEstadoSidebar(!sidebar.classList.contains("w-0"), true);
+      return;
+    }
+    if (lower === "f") {
+      e.preventDefault();
+      toggleTelaCheiaMicroscopio();
+      return;
+    }
+    if (key === "ArrowRight" || key === "ArrowLeft") {
+      if (Array.isArray(listaPinosAtual) && listaPinosAtual.length > 0) {
+        e.preventDefault();
+        const dir = key === "ArrowRight" ? 1 : -1;
+        const currentIdx = pinAtivo
+          ? listaPinosAtual.findIndex(p => String(p.id || "").toLowerCase() === String(pinAtivo).toLowerCase())
+          : -1;
+        const nextIdx = currentIdx === -1
+          ? (dir === 1 ? 0 : listaPinosAtual.length - 1)
+          : (currentIdx + dir + listaPinosAtual.length) % listaPinosAtual.length;
+        const targetPin = listaPinosAtual[nextIdx];
+        if (targetPin) {
+          if (abaAtivaPainel !== "descricao") alternarAbaPainel("descricao");
+          focarPinoNoViewer(targetPin.id || nextIdx + 1);
+        }
+      }
+      return;
+    }
+    if (key === "Escape" && modoReguaAtivo) {
+      toggleReguaMorfometrica(false);
+    }
+  });
+}
+
+const CATALOGO_BASE_SWITCHER = [
+  { id: "cw3XGCgUwN71XdlwkUe5", nome: "Osso Maduro 40x", meta: "Desgaste • 40x", aliases: ["osso_maduro_desgaste_ct_3.0", "osso_3.0", "osso-3.0"] },
+  { id: "FFGk5d9kOAct5HIDdjQ7", nome: "Osso Maduro 10x", meta: "Desgaste • 10x", aliases: ["osso_maduro_desgaste_ct_2.0", "osso_2.0", "osso-2.0"] },
+  { id: "96ZYqoM2SV8p4fB2QgeM", nome: "Osso Maduro", meta: "Desgaste • 40x", aliases: ["osso_maduro_desgaste_ct", "osso-maduro", "osso_maduro"] },
+  { id: "a3oRvXvJpMKAtU2RE85q", nome: "Pele Espessa", meta: "H&E • 40x", aliases: ["lamina-real1", "lamina-real-1", "pele_espessa", "pele-espessa"] }
+];
+
+function resolverIdCanonicoSwitcher(slideId) {
+  const alvo = String(slideId || "").trim().toLowerCase();
+  if (!alvo) return "";
+  const match = _catalogoLaminasSwitcher.find(item =>
+    String(item.id).toLowerCase() === alvo ||
+    (Array.isArray(item.aliases) && item.aliases.some(a => String(a).toLowerCase() === alvo))
+  );
+  return match ? match.id : String(slideId).trim();
+}
+
+function renderizarOpcoesSwitcher(selectedId) {
+  const selects = [
+    document.getElementById("viewerSlideSwitcher"),
+    document.getElementById("viewerSlideSwitcherMobile")
+  ].filter(Boolean);
+  if (selects.length === 0) return;
+
+  const isLocalDzi = selectedId === "local-dzi";
+  const canonicoAtivo = isLocalDzi ? "local-dzi" : resolverIdCanonicoSwitcher(selectedId);
+
+  selects.forEach((sel) => {
+    sel.innerHTML = "";
+    if (isLocalDzi) {
+      const optLocal = document.createElement("option");
+      optLocal.value = "local-dzi";
+      optLocal.textContent = laminaAtualData?.nome || "Lâmina Local";
+      sel.appendChild(optLocal);
+    }
+    _catalogoLaminasSwitcher.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.textContent = item.nome;
+      sel.appendChild(opt);
+    });
+    if (canonicoAtivo && Array.from(sel.options).some(o => o.value === canonicoAtivo)) {
+      sel.value = canonicoAtivo;
+    }
+  });
+}
+
+function sincronizarSeletorRapidoLaminas(slideId) {
+  if (!_catalogoLaminasSwitcher.length) {
+    _catalogoLaminasSwitcher = CATALOGO_BASE_SWITCHER.map(item => ({ ...item }));
+  }
+  renderizarOpcoesSwitcher(slideId);
+}
+
+function inicializarSeletorRapidoLaminas() {
+  _catalogoLaminasSwitcher = CATALOGO_BASE_SWITCHER.map(item => ({ ...item }));
+  renderizarOpcoesSwitcher(laminaAtualData?.id || "");
+
+  const selects = [
+    document.getElementById("viewerSlideSwitcher"),
+    document.getElementById("viewerSlideSwitcherMobile")
+  ].filter(Boolean);
+
+  selects.forEach((sel) => {
+    if (sel.dataset.bound === "1") return;
+    sel.dataset.bound = "1";
+    sel.addEventListener("change", (e) => {
+      const novoId = e.target.value;
+      sel.blur();
+      if (novoId && novoId !== "local-dzi") {
+        trocarLaminaNoViewer(novoId);
+      }
+    });
+  });
+
+  if (typeof db !== "undefined" && db) {
+    db.collection("laminas")
+      .where("status", "==", "ativa")
+      .get()
+      .then((snapshot) => {
+        if (!snapshot || snapshot.empty) return;
+        const extras = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data() || {};
+          const docIdLower = String(doc.id).toLowerCase();
+          const existe = _catalogoLaminasSwitcher.find(base =>
+            String(base.id).toLowerCase() === docIdLower ||
+            (Array.isArray(base.aliases) && base.aliases.some(a => String(a).toLowerCase() === docIdLower))
+          );
+          if (existe) {
+            if (data.nome && data.nome.trim()) existe.nome = data.nome.trim();
+          } else if (data.nome && data.nome.trim()) {
+            extras.push({ id: doc.id, nome: data.nome.trim(), aliases: [] });
+          }
+        });
+        if (extras.length > 0) {
+          extras.sort((a, b) => a.nome.localeCompare(b.nome));
+          _catalogoLaminasSwitcher = [..._catalogoLaminasSwitcher, ...extras];
+        }
+        renderizarOpcoesSwitcher(laminaAtualData?.id || "");
+      })
+      .catch(() => {});
+  }
+}
+
+export function trocarLaminaNoViewer(novoId, skipHistory = false) {
+  if (!novoId) return;
+  const atualCanonico = resolverIdCanonicoSwitcher(laminaAtualData?.id);
+  const novoCanonico = resolverIdCanonicoSwitcher(novoId);
+  if (atualCanonico && novoCanonico && atualCanonico === novoCanonico) return;
+
+  if (modoReguaAtivo) toggleReguaMorfometrica(false);
+  else limparMedicaoRegua();
+
+  pinAtivo = null;
+  questaoAtivaId = null;
+  _pendingUrlPinId = null;
+
+  if (!skipHistory) {
+    history.pushState({ id: novoId }, "", `microscopio.html?id=${encodeURIComponent(novoId)}`);
+  }
+
+  const skeleton = document.getElementById("osdSkeleton");
+  const osdCanvas = document.getElementById("osd-viewer");
+  if (osdCanvas) osdCanvas.classList.add("opacity-0");
+  if (skeleton) {
+    skeleton.classList.remove("hidden");
+    skeleton.classList.add("flex");
+    skeleton.style.display = "flex";
+    skeleton.style.opacity = "1";
+    skeleton.style.pointerEvents = "auto";
+  }
+
+  carregarLaminaNoMicroscopio(novoId);
+}
+
+function registrarPopstateMicroscopio() {
+  if (_popstateRegistrado) return;
+  _popstateRegistrado = true;
+  window.addEventListener("popstate", () => {
+    const params = new URLSearchParams(window.location.search);
+    const nextId = params.get("id") || params.get("laminaId");
+    _pendingUrlPinId = params.get("pin") || null;
+    if (nextId) {
+      trocarLaminaNoViewer(nextId, true);
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Exposicao global (compatibilidade com onclick no HTML)
 // ---------------------------------------------------------------------------
 window.App = window.App || {};
@@ -2293,6 +3376,7 @@ Object.assign(window.App, {
   alternarAbaPainel,
   renderizarQuestoesNaSidebar,
   carregarLaminaPorId: carregarLaminaNoMicroscopio,
+  trocarLaminaNoViewer,
   trocarLente,
   alterarZoom,
   calcularMagnificacaoOtica,
@@ -2306,7 +3390,13 @@ Object.assign(window.App, {
   aplicarEstadoSidebar,
   fecharSidebar: () => aplicarEstadoSidebar(true, true),
   abrirSidebar:  () => aplicarEstadoSidebar(false, true),
-  toggleAjudaMicroscopio
+  toggleAjudaMicroscopio,
+  toggleMarcacoesNoViewer,
+  renderizarTodasMarcacoesNoViewer,
+  toggleReguaMorfometrica,
+  limparMedicaoRegua,
+  copiarLinkCampoAtual,
+  toggleTelaCheiaMicroscopio
 });
 window.osdViewerAction              = osdViewerAction;
 window.focarPinoNoViewer            = focarPinoNoViewer;
@@ -2314,6 +3404,7 @@ window.focarQuestaoNoViewer         = focarQuestaoNoViewer;
 window.alternarAbaPainel            = alternarAbaPainel;
 window.renderizarQuestoesNaSidebar  = renderizarQuestoesNaSidebar;
 window.carregarLaminaPorId          = carregarLaminaNoMicroscopio;
+window.trocarLaminaNoViewer         = trocarLaminaNoViewer;
 window.trocarLente                  = trocarLente;
 window.alterarZoom                  = alterarZoom;
 window.calcularMagnificacaoOtica     = calcularMagnificacaoOtica;
@@ -2330,6 +3421,12 @@ window.abrirSidebar                 = () => aplicarEstadoSidebar(false, true);
 window.getViewer                    = () => viewer;
 window.getLaminaAtualData           = () => laminaAtualData;
 window.toggleAjudaMicroscopio       = toggleAjudaMicroscopio;
+window.toggleMarcacoesNoViewer      = toggleMarcacoesNoViewer;
+window.renderizarTodasMarcacoesNoViewer = renderizarTodasMarcacoesNoViewer;
+window.toggleReguaMorfometrica      = toggleReguaMorfometrica;
+window.limparMedicaoRegua           = limparMedicaoRegua;
+window.copiarLinkCampoAtual         = copiarLinkCampoAtual;
+window.toggleTelaCheiaMicroscopio   = toggleTelaCheiaMicroscopio;
 
 export {
   carregarLaminaNoMicroscopio as carregarLaminaPorId,

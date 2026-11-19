@@ -42,8 +42,8 @@
       "largura": 2300,
       "altura": 3670,
       "tileSize": 256,
-      "maxMagnification": 40,
-      "mpp": 0.156,
+      "maxMagnification": 10,
+      "mpp": 0.625,
       "metodoCalibracao": "referencia_biologica_hemacia_7.5um",
       "preview": "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg"
     },

@@ -1,52 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <title>Estrutura não localizada — Palas Atlas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f8fafc">
+
+  <script>
+    (function() {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+      try { localStorage.setItem('palas_theme', 'light'); } catch (e) {}
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <!-- Favicon Oficial Palas Atlas -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Favicon & PWA Oficial Palas Atlas -->
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=1">
-  <script src="js/brand-logo.js?v=4"></script>
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261118v2">
+  <link rel="stylesheet" href="css/styles.css?v=20261118v2">
+  <script src="js/brand-logo.js?v=20261118v2"></script>
 </head>
 
-<body class="min-h-screen flex flex-col items-center justify-center bg-neutral-950 font-sans text-center p-6 text-neutral-200 selection:bg-neutral-800 selection:text-white">
+<body class="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] font-sans text-center p-6 text-slate-800 selection:bg-sky-600/20 selection:text-slate-900 relative overflow-hidden">
 
-  <div class="max-w-md w-full flex flex-col items-center">
+  <div class="absolute inset-0 pointer-events-none" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+  <div class="relative z-10 max-w-md w-full bg-white border border-slate-200/90 rounded-3xl p-8 sm:p-10 shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08)] flex flex-col items-center">
     <!-- Logotipo da Marca -->
-    <div class="mb-8 cursor-pointer">
-      <brand-logo theme="dark-bg" show-subtitle="false" size="md"></brand-logo>
-    </div>
+    <a href="index.html" class="mb-7 no-underline cursor-pointer" aria-label="Palas Atlas - Início">
+      <brand-logo theme="light-bg" show-subtitle="false" size="md"></brand-logo>
+    </a>
 
     <!-- Badge de Erro 404 -->
-    <span class="text-xs font-mono tracking-[0.25em] text-[#d4af37] uppercase bg-[#d4af37]/10 border border-[#d4af37]/25 px-3 py-1 rounded-full mb-4">
+    <span class="text-xs font-mono tracking-[0.2em] text-sky-800 uppercase bg-sky-50 border border-sky-200 px-3.5 py-1 rounded-full mb-4 font-semibold">
       Erro 404 &bull; Quadrante Vazio
     </span>
 
-    <h1 class="font-serif text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
+    <h1 class="font-serif text-2xl sm:text-3xl font-bold text-slate-900 mb-3 tracking-tight">
       Estrutura não localizada
     </h1>
 
-    <p class="text-neutral-400 text-sm leading-relaxed mb-8 max-w-sm">
-      A lâmina histológica, peça anatômica ou recurso solicitado não foi encontrado no acervo do atlas.
+    <p class="text-slate-600 text-sm leading-relaxed mb-8 max-w-sm">
+      A lâmina histológica ou recurso solicitado não foi encontrado no acervo do atlas.
     </p>
     
-    <div class="flex items-center gap-3">
-      <a href="index.html" class="inline-flex items-center gap-2 bg-[#d4af37] hover:bg-[#e0c97f] text-neutral-950 px-6 py-3 rounded-full text-xs font-mono uppercase tracking-wider font-semibold transition-all duration-200 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_25px_rgba(212,175,55,0.35)]">
+    <div class="flex flex-wrap items-center justify-center gap-3 w-full">
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white px-6 py-3 min-h-[44px] rounded-xl text-xs font-sans font-semibold transition-all duration-200 shadow-sm no-underline">
         &larr; Retornar ao Início
       </a>
-      <button onclick="window.history.back()" type="button" class="inline-flex items-center gap-2 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 hover:text-white border border-white/[0.08] px-5 py-3 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer">
+      <button onclick="window.history.back()" type="button" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 px-5 py-3 min-h-[44px] rounded-xl text-xs font-sans font-semibold transition-all duration-200 cursor-pointer">
         Voltar
       </button>
     </div>
   </div>
 
-  <footer class="mt-16 text-center text-[10px] text-neutral-600 font-mono tracking-widest uppercase">
+  <footer class="relative z-10 mt-10 text-center text-[10px] text-slate-400 font-mono tracking-widest uppercase">
     Palas Atlas &bull; Acervo Morfológico Digital
   </footer>
 
