@@ -4,6 +4,15 @@
 [functions."assets-manifest"]
   included_files = ["assets/histologia/manifest.json"]
 
+[functions."tile-proxy"]
+  included_files = [
+    "assets/histologia/lamina-real1_files/**",
+    "assets/histologia/osso_maduro_desgaste_ct_files/**",
+    "assets/histologia/osso_maduro_desgaste_ct_2.0_files/**",
+    "assets/histologia/osso_maduro_desgaste_ct_3.0_files/**",
+    "assets/histologia/epitelio-simples-escamoso_files/**"
+  ]
+
 # Catálogo Sanitizado de Lâminas (Oculta caminhos físicos brutos)
 [[redirects]]
   from = "/api/assets"
