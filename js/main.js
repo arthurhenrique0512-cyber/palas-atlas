@@ -9,13 +9,13 @@ import {
   abrirTopico,
   abrirDisciplinaHome,
   encerrarListenersCatalogo
-} from "./histology-catalog.js?v=20261118v2";
+} from "./histology-catalog.js?v=20261118v3";
 
 // Lazy loading sob demanda do dashboard-engine para otimizar o bundle do aluno
 let _dashboardEnginePromise = null;
 function carregarDashboardEngine() {
   if (!_dashboardEnginePromise) {
-    _dashboardEnginePromise = import("./dashboard-engine.js?v=20261118v2");
+    _dashboardEnginePromise = import("./dashboard-engine.js?v=20261118v3");
   }
   return _dashboardEnginePromise;
 }

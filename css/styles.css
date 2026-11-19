@@ -1528,36 +1528,30 @@ html[data-theme="dark"] .hero-spec-card {
 /* Pontos de Interesse no microscopio (Paleta Clínica Institucional Light) */
 .pin-item-btn {
   background-color: #f8fafc;
-  border: 1.5px solid #cbd5e1;
-  border-left: 4px solid #0d9488;
+  border: 1px solid #e2e8f0;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .pin-item-btn:hover {
   background-color: #f0fdfa;
-  border-color: #0d9488;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.12);
-  transform: translateY(-1px);
+  border-color: rgba(13, 148, 136, 0.45);
 }
 .pin-item-btn.pin-active {
-  background-color: #fffbeb !important;
-  border: 1.5px solid #f59e0b !important;
-  border-left: 5px solid #d97706 !important;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28), 0 6px 18px rgba(180, 83, 9, 0.14) !important;
+  background-color: #f0fdfa !important;
+  border: 1px solid #0d9488 !important;
+  box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.25), 0 4px 12px rgba(15, 23, 42, 0.06) !important;
 }
 .pin-item-btn.pin-active .pin-label {
-  color: #78350f !important;
-  font-weight: 700 !important;
+  color: #042f2e !important;
+  font-weight: 600 !important;
 }
 .pin-item-btn.pin-active .pin-indicator {
-  background-color: #d97706 !important;
-  color: #ffffff !important;
-  border-color: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35) !important;
-  transform: scale(1.1);
+  background-color: #0d9488 !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25) !important;
+  transform: scale(1.25);
 }
 .pin-item-btn.pin-active .pin-action {
-  color: #b45309 !important;
-  font-weight: 700 !important;
+  color: #0f766e !important;
+  font-weight: 600 !important;
 }
 
 /* Marcadores sobre o canvas OpenSeadragon (Alto Contraste em qualquer coloração H&E / Desgaste) */

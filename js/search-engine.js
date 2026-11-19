@@ -1,6 +1,6 @@
 import { db } from "./firebase-config.js";
 import { escaparHTML } from "./sanitizer.js";
-import { catalogData } from "./catalog-data.js?v=20261118v2";
+import { catalogData } from "./catalog-data.js?v=20261118v3";
 
 let slidesCache = [];
 let isCacheLoaded = false;
