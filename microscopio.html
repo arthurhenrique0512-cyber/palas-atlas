@@ -43,8 +43,8 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261118v3">
-  <link rel="stylesheet" href="css/styles.css?v=20261118v3">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261118v4">
+  <link rel="stylesheet" href="css/styles.css?v=20261118v4">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -53,10 +53,10 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
   <!-- Web Component da Marca e Configurações -->
-  <script src="js/brand-logo.js?v=20261118v3"></script>
-  <script src="js/settings-panel.js?v=20261118v3"></script>
+  <script src="js/brand-logo.js?v=20261118v4"></script>
+  <script src="js/settings-panel.js?v=20261118v4"></script>
 
-  <link rel="stylesheet" href="css/splash.css?v=20261118v3">
+  <link rel="stylesheet" href="css/splash.css?v=20261118v4">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
 
@@ -117,30 +117,31 @@
     .prose-atlas blockquote { border: none !important; margin: 0 !important; padding: 0 !important; }
     .prose-atlas .pin-link {
       color: #0f766e !important;
-      background: transparent !important;
+      background: rgba(13, 148, 136, 0.09) !important;
       border: none !important;
-      padding: 0 !important;
-      border-radius: 0 !important;
-      text-decoration: underline !important;
-      text-underline-offset: 4px !important;
-      text-decoration-color: rgba(15, 118, 110, 0.4) !important;
-      text-decoration-thickness: 1.5px !important;
+      border-bottom: 1.5px solid rgba(13, 148, 136, 0.45) !important;
+      padding: 1px 5px !important;
+      border-radius: 5px !important;
+      text-decoration: none !important;
       font-weight: 600 !important;
       cursor: pointer !important;
-      transition: color 0.15s ease, text-decoration-color 0.15s ease !important;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
       display: inline !important;
       white-space: normal;
       touch-action: manipulation;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
     }
-    .prose-atlas .pin-link:hover,
-    .prose-atlas .pin-link.pin-link-active {
-      color: #115e59 !important;
-      text-decoration-color: #0f766e !important;
-      background: transparent !important;
-    }
-    .prose-atlas .pin-link:active {
+    .prose-atlas .pin-link:hover {
       color: #042f2e !important;
-      background: transparent !important;
+      background: rgba(13, 148, 136, 0.18) !important;
+      border-bottom-color: #0d9488 !important;
+    }
+    .prose-atlas .pin-link.pin-link-active {
+      color: #0369a1 !important;
+      background: #e0f2fe !important;
+      border-bottom-color: #0284c7 !important;
+      box-shadow: 0 0 0 1px rgba(2, 132, 199, 0.25) !important;
     }
 
     /* Botão de recolher painel: preenchimento do painel indica estado aberto */
@@ -720,9 +721,9 @@
 
   </div><!-- /workspace -->
 
-  <script type="module" src="js/firebase-config.js?v=20261118v3"></script>
-  <script type="module" src="js/slide-security.js?v=20261118v3"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261118v3"></script>
+  <script type="module" src="js/firebase-config.js?v=20261118v4"></script>
+  <script type="module" src="js/slide-security.js?v=20261118v4"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261118v4"></script>
 
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>

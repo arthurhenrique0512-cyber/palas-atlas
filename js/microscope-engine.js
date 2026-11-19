@@ -865,9 +865,9 @@ function renderizarDescricaoETextos() {
               type="button"
               id="btn-pino-${pinIdSafe}"
               data-btn-pin-id="${pinIdSafe}"
-              class="pin-item-btn w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-teal-50/70 border border-slate-200/90 hover:border-teal-600/40 text-left transition-all group cursor-pointer"
+              class="pin-item-btn w-full flex items-center justify-between p-3 rounded-xl text-left transition-all group cursor-pointer"
             >
-              <div class="flex items-center gap-2.5 truncate pr-2">
+              <div class="flex items-center gap-2.5 min-w-0 pr-2 pl-0.5">
                 <span class="pin-indicator w-2 h-2 rounded-full bg-teal-600 shrink-0 transition-transform"></span>
                 <span class="pin-label text-sm font-medium text-slate-800 group-hover:text-teal-950 transition-colors truncate">${escaparHTML(pin.rotulo || "Estrutura")}</span>
               </div>
@@ -903,13 +903,13 @@ function renderizarDescricaoETextos() {
       const btn = evento.target.closest("button[data-btn-pin-id]");
       if (!btn) return;
       const pinId = btn.getAttribute("data-btn-pin-id");
-      if (pinId) focarPinoNoViewer(pinId);
+      if (pinId) focarPinoNoViewer(pinId, { permitirToggle: true });
     });
   }
 
-  // Estiliza pin-links inline com tipografia acadêmica sóbria e alto contraste
+  // Estiliza pin-links inline via .pin-link (definida em microscopio.html)
   container.querySelectorAll('.pin-link, [data-pin-id]').forEach(el => {
-    el.className = "pin-link font-semibold text-teal-700 hover:text-teal-900 underline underline-offset-4 decoration-teal-600/40 hover:decoration-teal-700 cursor-pointer transition-all bg-transparent border-0 p-0 inline";
+    el.className = "pin-link cursor-pointer transition-all";
   });
 
   if (pinAtivo) {
@@ -1217,41 +1217,14 @@ function destacarPinoNaSidebar(pinId) {
       btnPinId === idBuscado ||
       (buscadoNorm && norm(btnPinId) === buscadoNorm)
     );
-    const label = btn.querySelector(".pin-label");
-    const indicator = btn.querySelector(".pin-indicator");
     const action = btn.querySelector(".pin-action");
 
+    btn.classList.toggle("pin-active", isAtivo);
+    if (action) {
+      action.innerHTML = isAtivo ? "Ocultar &times;" : "Focar &rarr;";
+    }
     if (isAtivo) {
-      btn.classList.add("pin-active", "border-teal-600", "bg-teal-50", "ring-1", "ring-teal-600/30", "shadow-sm");
-      btn.classList.remove("border-slate-200/90", "bg-slate-50");
-      if (label) {
-        label.classList.add("text-teal-950", "font-semibold");
-        label.classList.remove("text-slate-800");
-      }
-      if (indicator) {
-        indicator.classList.add("ring-2", "ring-teal-500/40", "scale-125");
-      }
-      if (action) {
-        action.classList.add("text-teal-700", "font-semibold");
-        action.classList.remove("text-slate-500");
-        action.innerHTML = "Focar &rarr;";
-      }
       btn.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } else {
-      btn.classList.remove("pin-active", "border-teal-600", "bg-teal-50", "ring-1", "ring-teal-600/30", "shadow-sm");
-      btn.classList.add("border-slate-200/90", "bg-slate-50");
-      if (label) {
-        label.classList.remove("text-teal-950", "font-semibold");
-        label.classList.add("text-slate-800");
-      }
-      if (indicator) {
-        indicator.classList.remove("ring-2", "ring-teal-500/40", "scale-125");
-      }
-      if (action) {
-        action.classList.remove("text-teal-700", "font-semibold");
-        action.classList.add("text-slate-500");
-        action.innerHTML = "Focar &rarr;";
-      }
     }
   });
 
@@ -1674,6 +1647,9 @@ async function inicializarOpenSeadragon() {
   viewer.addHandler("animation", updateZoomDisplay);
   viewer.addHandler("animation-finish", updateZoomDisplay);
   viewer.addHandler("zoom", updateZoomDisplay);
+  viewer.addHandler("animation", atualizarPosicaoLabelsCirculos);
+  viewer.addHandler("animation-finish", atualizarPosicaoLabelsCirculos);
+  viewer.addHandler("zoom", atualizarPosicaoLabelsCirculos);
 
   // Eventos da Régua Morfométrica Interativa (sem interferir em pan/pinch)
   viewer.addHandler("canvas-click", handleCanvasClickRegua);
@@ -2022,14 +1998,7 @@ function registrarDelegacaoGlobalDePinos() {
                      alvo.textContent?.trim();
     if (!pinIdRaw) return;
     evento.preventDefault();
-
-    // Feedback visual imediato e tátil no link clicado
-    alvo.classList.add("ring-2", "ring-teal-500/50", "ring-offset-2", "ring-offset-white", "rounded-sm");
-    setTimeout(() => {
-      alvo.classList.remove("ring-2", "ring-teal-500/50", "ring-offset-2", "ring-offset-white", "rounded-sm");
-    }, 1400);
-
-    focarPinoNoViewer(pinIdRaw);
+    focarPinoNoViewer(pinIdRaw, { permitirToggle: true });
   });
 }
 
@@ -2058,17 +2027,44 @@ function converterPontoParaViewport(xVal, yVal, contentSize) {
 }
 
 /**
- * Destrói o MouseTracker associado (se houver) e remove o overlay do OpenSeadragon.
+ * Destrói o MouseTracker no próximo tick (após o handler pointerup atual do OpenSeadragon)
+ * para evitar crash interno em `activePointersLists`, removendo o overlay de imediato.
  */
+function agendarDestruicaoTracker(tracker) {
+  if (!tracker) return;
+  setTimeout(() => {
+    try {
+      if (typeof tracker.destroy === "function") tracker.destroy();
+    } catch (e) {}
+  }, 0);
+}
+
 function removerOverlayComSeguranca(elem) {
   if (!elem) return;
   if (elem._osdTracker) {
-    try { elem._osdTracker.destroy(); } catch (e) {}
+    agendarDestruicaoTracker(elem._osdTracker);
     elem._osdTracker = null;
+  }
+  if (Array.isArray(elem._osdTrackers)) {
+    elem._osdTrackers.forEach(agendarDestruicaoTracker);
+    elem._osdTrackers = null;
   }
   if (viewer) {
     try { viewer.removeOverlay(elem); } catch (e) {}
   }
+}
+
+/**
+ * Remove o foco ativo da marcação na lâmina e na barra lateral.
+ */
+function limparFocoPinoAtivo() {
+  if (_pinAutoHideTimer) {
+    clearTimeout(_pinAutoHideTimer);
+    _pinAutoHideTimer = null;
+  }
+  pinAtivo = null;
+  destacarPinoNaSidebar(null);
+  renderizarTodasMarcacoesNoViewer();
 }
 
 /**
@@ -2119,22 +2115,34 @@ function atualizarBotaoMarcacoes() {
  * Vincula clique/toque via MouseTracker do OpenSeadragon para focar o pino ao
  * clicar diretamente sobre a marcação na lâmina.
  */
-function vincularCliqueMarcacaoViewer(targetElem, pinId, overlayContainer) {
-  if (!targetElem || !window.OpenSeadragon) return;
-  const tracker = new window.OpenSeadragon.MouseTracker({
-    element: targetElem,
-    clickHandler: (e) => {
-      if (e && e.originalEvent) {
-        e.originalEvent.stopPropagation();
-        e.originalEvent.preventDefault();
+function vincularCliqueMarcacaoViewer(targetElems, pinId, overlayContainer) {
+  if (!targetElems || !window.OpenSeadragon) return;
+  const elems = (Array.isArray(targetElems) ? targetElems : [targetElems]).filter(Boolean);
+  if (elems.length === 0) return;
+
+  overlayContainer._osdTrackers = overlayContainer._osdTrackers || [];
+  elems.forEach((el) => {
+    const tracker = new window.OpenSeadragon.MouseTracker({
+      element: el,
+      clickHandler: (e) => {
+        if (!e || !e.quick) return;
+        if (e.originalEvent) {
+          e.originalEvent.stopPropagation();
+          e.originalEvent.preventDefault();
+        }
+        const isMesmoAtivo = Boolean(pinAtivo) && String(pinAtivo).trim().toLowerCase() === String(pinId).trim().toLowerCase();
+        if (!marcacoesVisiveis || isMesmoAtivo) {
+          limparFocoPinoAtivo();
+          return;
+        }
+        if (abaAtivaPainel !== "descricao") {
+          alternarAbaPainel("descricao");
+        }
+        focarPinoNoViewer(pinId, { permitirToggle: false });
       }
-      if (abaAtivaPainel !== "descricao") {
-        alternarAbaPainel("descricao");
-      }
-      focarPinoNoViewer(pinId);
-    }
+    });
+    overlayContainer._osdTrackers.push(tracker);
   });
-  overlayContainer._osdTracker = tracker;
 }
 
 /**
@@ -2146,6 +2154,12 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
   const rotuloSeguro = escaparHTML(pino.rotulo || "");
   const zIndexVal = isAtivo ? 48 : 40;
   const rootClass = `viewer-marker-root${isAtivo ? " is-active" : ""}`;
+  const strokeCore = isAtivo ? "#0284c7" : "#0d9488";
+  const fillSoft = isAtivo ? "rgba(2, 132, 199, 0.12)" : "rgba(13, 148, 136, 0.06)";
+  const tagClass = isAtivo ? "viewer-marker-tag is-active" : "viewer-marker-tag";
+  const closeHint = isAtivo ? '<span class="viewer-marker-tag-close" aria-hidden="true">&times;</span>' : "";
+  const titleText = isAtivo ? `${pino.rotulo || "Marcação"} — clique para ocultar` : (pino.rotulo || "Clique para focar");
+  const titleSafe = escaparHTML(titleText);
 
   let overlayElem = null;
 
@@ -2168,12 +2182,20 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
     overlayElem.className = rootClass;
     overlayElem.style.cssText = `pointer-events:none; position:relative; width:100%; height:100%; z-index:${zIndexVal};`;
     overlayElem.innerHTML = `
-      <div class="animate-pulse" style="position:absolute; inset:0; border-radius:50%; border:2.5px solid #0d9488; box-shadow:0 0 25px rgba(13,148,136,0.6), inset 0 0 20px rgba(13,148,136,0.2); background:rgba(13,148,136,0.1); pointer-events:none;"></div>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-full overflow-visible ${isAtivo ? "viewer-circle-focus-svg" : ""}" style="pointer-events:none; filter:drop-shadow(0 1px 3px rgba(15,23,42,0.35));">
+        <circle data-pin-hit="circle-ring" cx="50" cy="50" r="48.5" fill="none" stroke="transparent" stroke-width="18" vector-effect="non-scaling-stroke" style="pointer-events:stroke; cursor:pointer;" />
+        <circle cx="50" cy="50" r="48.5" fill="${fillSoft}" stroke="#ffffff" stroke-width="${isAtivo ? 6.5 : 4.5}" opacity="0.92" vector-effect="non-scaling-stroke" style="pointer-events:none;" />
+        <circle cx="50" cy="50" r="48.5" fill="none" stroke="${strokeCore}" stroke-width="${isAtivo ? 3.2 : 2.2}" vector-effect="non-scaling-stroke" style="pointer-events:none;" />
+      </svg>
       ${rotuloSeguro ? `
-        <div data-pin-hit="1" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:'Inter', system-ui, sans-serif; font-size:11px; font-weight:600; padding:3px 9px; border-radius:12px; box-shadow:0 4px 14px rgba(15,23,42,0.25); white-space:nowrap; pointer-events:auto; cursor:pointer;">
-          ${rotuloSeguro}
+        <div data-pin-hit="circle-label" title="${titleSafe}" style="position:absolute; top:0; left:50%; transform:translate(-50%, calc(-100% - 8px)); pointer-events:auto; cursor:pointer; z-index:2;">
+          <div class="${tagClass}">
+            <span class="viewer-marker-tag-dot"></span>
+            <span>${rotuloSeguro}</span>
+            ${closeHint}
+          </div>
         </div>
-      ` : ''}
+      ` : ""}
     `;
 
     viewer.addOverlay({
@@ -2181,8 +2203,9 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
       location: vpRect
     });
 
-    const hitEl = overlayElem.querySelector('[data-pin-hit="1"]');
-    if (hitEl) vincularCliqueMarcacaoViewer(hitEl, pinId, overlayElem);
+    const ringHit = overlayElem.querySelector('[data-pin-hit="circle-ring"]');
+    const labelHit = overlayElem.querySelector('[data-pin-hit="circle-label"]');
+    vincularCliqueMarcacaoViewer([ringHit, labelHit], pinId, overlayElem);
 
   // 2. ANOTAÇÃO TIPO SETA DIRECIONAL (Vetor Haste -> Alvo Celular)
   } else if (pino.type === "arrow") {
@@ -2216,28 +2239,61 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
     const svgY1 = y1 - minY;
     const svgX2 = x2 - minX;
     const svgY2 = y2 - minY;
-    const markerId = `viewer-marker-arrow-${pinId.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+    const pctX1 = (svgX1 / w) * 100;
+    const pctY1 = (svgY1 / h) * 100;
+    const pctX2 = (svgX2 / w) * 100;
+    const pctY2 = (svgY2 / h) * 100;
+    const angleRad = Math.atan2(y2 - y1, x2 - x1);
+    const angleDeg = angleRad * (180 / Math.PI);
+    const headSize = isAtivo ? 22 : 18;
+    const tipAnchorX = (22 / 24) * headSize;
+    const tipAnchorY = headSize / 2;
+
+    const dirX = Math.cos(angleRad);
+    const dirY = Math.sin(angleRad);
+    let labelTransform = "translate(-50%, calc(-100% - 14px))";
+    if (Math.abs(dirY) >= Math.abs(dirX)) {
+      labelTransform = dirY > 0
+        ? "translate(-50%, calc(-100% - 14px))"
+        : "translate(-50%, 14px)";
+    } else {
+      labelTransform = dirX > 0
+        ? "translate(calc(-100% - 14px), -50%)"
+        : "translate(14px, -50%)";
+    }
 
     overlayElem = document.createElement("div");
     overlayElem.id = `viewer-pin-${pinId}`;
     overlayElem.className = rootClass;
     overlayElem.style.cssText = `pointer-events:none; position:relative; width:100%; height:100%; z-index:${zIndexVal};`;
     overlayElem.innerHTML = `
-      <svg viewBox="0 0 ${w} ${h}" class="w-full h-full overflow-visible" style="filter:drop-shadow(0 2px 8px rgba(15,23,42,0.45)); pointer-events:none;">
-        <defs>
-          <marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#0d9488" />
-          </marker>
-        </defs>
-        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#0d9488" stroke-width="4" stroke-linecap="round" marker-end="url(#${markerId})" />
-        <circle cx="${svgX1}" cy="${svgY1}" r="6" fill="#0d9488" stroke="#ffffff" stroke-width="2" />
-        <circle cx="${svgX2}" cy="${svgY2}" r="5" fill="#ffffff" class="animate-ping" />
+      <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" class="w-full h-full overflow-visible" style="filter:drop-shadow(0 1px 4px rgba(15,23,42,0.45)); pointer-events:none;">
+        <line data-pin-hit="arrow-line" x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="transparent" stroke-width="18" vector-effect="non-scaling-stroke" style="pointer-events:stroke; cursor:pointer;" />
+        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#ffffff" stroke-width="${isAtivo ? 6.5 : 4.8}" stroke-linecap="round" vector-effect="non-scaling-stroke" style="pointer-events:none;" />
+        <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="${strokeCore}" stroke-width="${isAtivo ? 3.4 : 2.4}" stroke-linecap="round" vector-effect="non-scaling-stroke" style="pointer-events:none;" />
       </svg>
-      ${rotuloSeguro ? `
-        <div data-pin-hit="arrow-label" style="position:absolute; left:${(svgX1 / w) * 100}%; top:${(svgY1 / h) * 100}%; transform:translate(-50%, -130%); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:'Inter', system-ui, sans-serif; font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 12px rgba(15,23,42,0.25); pointer-events:auto; cursor:pointer;">
-          ${rotuloSeguro}
-        </div>
-      ` : ''}
+
+      <div data-pin-hit="arrow-tip" title="${titleSafe}" style="position:absolute; left:${pctX2}%; top:${pctY2}%; width:28px; height:28px; transform:translate(-50%, -50%); pointer-events:auto; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center;">
+        ${isAtivo ? `
+          <div class="viewer-marker-radar" style="position:absolute; inset:-4px; border-radius:9999px; background:rgba(2,132,199,0.26); border:1.5px solid #0284c7; pointer-events:none;"></div>
+        ` : ""}
+        <svg width="${headSize}" height="${headSize}" viewBox="0 0 24 24" style="position:relative; transform:rotate(${angleDeg}deg); overflow:visible; filter:drop-shadow(0 1px 4px rgba(15,23,42,0.5)); pointer-events:none;">
+          <path d="M 3 4 L 22 12 L 3 20 L 7.5 12 Z" fill="${strokeCore}" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round" />
+        </svg>
+      </div>
+
+      <div style="position:absolute; left:${pctX1}%; top:${pctY1}%; width:0; height:0; pointer-events:none; z-index:3;">
+        <div style="position:absolute; left:0; top:0; transform:translate(-50%, -50%); width:8px; height:8px; border-radius:9999px; background:${strokeCore}; border:1.5px solid #ffffff; box-shadow:0 1px 4px rgba(15,23,42,0.4); pointer-events:none;"></div>
+        ${rotuloSeguro ? `
+          <div data-pin-hit="arrow-label" title="${titleSafe}" style="position:absolute; left:0; top:0; transform:${labelTransform}; pointer-events:auto; cursor:pointer;">
+            <div class="${tagClass}">
+              <span class="viewer-marker-tag-dot"></span>
+              <span>${rotuloSeguro}</span>
+              ${closeHint}
+            </div>
+          </div>
+        ` : ""}
+      </div>
     `;
 
     viewer.addOverlay({
@@ -2245,28 +2301,42 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
       location: vpRect
     });
 
+    const lineHit = overlayElem.querySelector('[data-pin-hit="arrow-line"]');
+    const tipHit = overlayElem.querySelector('[data-pin-hit="arrow-tip"]');
     const labelHit = overlayElem.querySelector('[data-pin-hit="arrow-label"]');
-    if (labelHit) vincularCliqueMarcacaoViewer(labelHit, pinId, overlayElem);
+    vincularCliqueMarcacaoViewer([lineHit, tipHit, labelHit], pinId, overlayElem);
 
   // 3. ANOTAÇÃO TIPO PIN CLÁSSICO
   } else {
     const targetPoint = converterPontoParaViewport(pino.x, pino.y, contentSize);
     if (!targetPoint) return null;
 
+    const dotSize = isAtivo ? 16 : 14;
+    const dotShadow = isAtivo
+      ? "0 0 0 3px rgba(2,132,199,0.32), 0 4px 14px rgba(3,105,161,0.45)"
+      : "0 0 0 2.5px rgba(13,148,136,0.28), 0 3px 10px rgba(15,23,42,0.35)";
+
     overlayElem = document.createElement("div");
     overlayElem.id = `viewer-pin-${pinId}`;
     overlayElem.className = `${rootClass} viewer-pin-interactive`;
-    overlayElem.style.cssText = `pointer-events:auto; cursor:pointer; position:relative; width:36px; height:36px; z-index:${zIndexVal};`;
-    overlayElem.title = pino.rotulo || "";
+    overlayElem.style.cssText = `pointer-events:none; position:relative; width:36px; height:36px; z-index:${zIndexVal};`;
     overlayElem.innerHTML = `
-      <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
-        <div class="animate-ping" style="position:absolute;width:100%;height:100%;background:rgba(13,148,136,0.45);border-radius:50%;"></div>
-        <div style="position:relative;width:14px;height:14px;background:#0d9488;border-radius:50%;border:2px solid #ffffff;box-shadow:0 0 0 3px rgba(13,148,136,0.45),0 4px 14px rgba(15,23,42,0.35);"></div>
+      <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+        <div data-pin-hit="pin-dot" title="${titleSafe}" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:auto; cursor:pointer;">
+          ${isAtivo ? `
+            <div class="viewer-marker-radar" style="position:absolute; width:36px; height:36px; border-radius:9999px; background:rgba(2,132,199,0.26); border:1.5px solid #0284c7; pointer-events:none;"></div>
+          ` : ""}
+          <div style="position:relative; width:${dotSize}px; height:${dotSize}px; background:${strokeCore}; border-radius:9999px; border:2.5px solid #ffffff; box-shadow:${dotShadow}; pointer-events:none;"></div>
+        </div>
         ${rotuloSeguro ? `
-          <div style="position:absolute; top:100%; left:50%; transform:translate(-50%, 6px); background:rgba(255,255,255,0.96); color:#0f766e; border:1px solid #0d9488; font-family:'Inter', system-ui, sans-serif; font-size:11px; font-weight:600; padding:2px 8px; border-radius:12px; box-shadow:0 4px 14px rgba(15,23,42,0.25); white-space:nowrap; pointer-events:none;">
-            ${rotuloSeguro}
+          <div data-pin-hit="pin-label" title="${titleSafe}" style="position:absolute; top:calc(100% + 6px); left:50%; transform:translateX(-50%); pointer-events:auto; cursor:pointer;">
+            <div class="${tagClass}">
+              <span class="viewer-marker-tag-dot"></span>
+              <span>${rotuloSeguro}</span>
+              ${closeHint}
+            </div>
           </div>
-        ` : ''}
+        ` : ""}
       </div>
     `;
 
@@ -2276,7 +2346,9 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
       placement: window.OpenSeadragon.Placement.CENTER
     });
 
-    vincularCliqueMarcacaoViewer(overlayElem, pinId, overlayElem);
+    const dotHit = overlayElem.querySelector('[data-pin-hit="pin-dot"]');
+    const labelHit = overlayElem.querySelector('[data-pin-hit="pin-label"]');
+    vincularCliqueMarcacaoViewer([dotHit, labelHit], pinId, overlayElem);
   }
 
   if (isAtivo) {
@@ -2315,6 +2387,38 @@ export function renderizarTodasMarcacoesNoViewer() {
       overlaysPinosPersistentes.push({ pinId: pId, element: elem });
     }
   });
+
+  requestAnimationFrame(atualizarPosicaoLabelsCirculos);
+}
+
+/**
+ * Reposiciona etiquetas de círculos caso a borda superior do círculo esteja
+ * próxima ao cabeçalho ou fora do palco visível, evitando corte do rótulo.
+ */
+function atualizarPosicaoLabelsCirculos() {
+  const stage = document.getElementById("viewerStage");
+  if (!stage) return;
+  const stageRect = stage.getBoundingClientRect();
+  document.querySelectorAll('[data-pin-hit="circle-label"]').forEach((labelEl) => {
+    const root = labelEl.closest(".viewer-marker-root");
+    if (!root) return;
+    const rect = root.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    if (rect.top < stageRect.top + 42) {
+      if (rect.bottom + 48 < stageRect.bottom) {
+        labelEl.style.top = "calc(100% + 8px)";
+        labelEl.style.transform = "translateX(-50%)";
+      } else {
+        const insideTop = Math.max(10, Math.round(stageRect.top - rect.top + 12));
+        labelEl.style.top = `${insideTop}px`;
+        labelEl.style.transform = "translateX(-50%)";
+      }
+    } else {
+      labelEl.style.top = "0";
+      labelEl.style.transform = "translate(-50%, calc(-100% - 8px))";
+    }
+  });
 }
 
 /**
@@ -2336,7 +2440,7 @@ export function toggleMarcacoesNoViewer(forcarEstado) {
   renderizarTodasMarcacoesNoViewer();
 }
 
-export function focarPinoNoViewer(pinIdRaw) {
+export function focarPinoNoViewer(pinIdRaw, { permitirToggle = false } = {}) {
   if (!viewer || !viewer.viewport || !window.OpenSeadragon) {
     console.warn("[Palas Atlas] Viewer OpenSeadragon não inicializado ao tentar focar pino.");
     return;
@@ -2370,6 +2474,12 @@ export function focarPinoNoViewer(pinIdRaw) {
     return;
   }
 
+  const pinId = String(pino.id || idBuscado);
+  if (permitirToggle && pinAtivo && String(pinAtivo).trim().toLowerCase() === pinId.trim().toLowerCase()) {
+    limparFocoPinoAtivo();
+    return;
+  }
+
   const item = viewer.world && viewer.world.getItemCount() > 0 ? viewer.world.getItemAt(0) : null;
   const contentSize = item ? item.getContentSize() : null;
 
@@ -2380,7 +2490,6 @@ export function focarPinoNoViewer(pinIdRaw) {
     questaoAtivaId = null;
   }
 
-  const pinId = String(pino.id || idBuscado);
   pinAtivo = pinId;
 
   // Renderiza todas as marcações mantendo o pino focado em destaque máximo
@@ -2514,22 +2623,22 @@ export function focarQuestaoNoViewer(questaoId) {
   const numeroQ = q.numero !== undefined && q.numero !== null ? q.numero : (listaQuestoesAtual.indexOf(q) + 1);
   const numeroQSafe = escaparHTML(String(numeroQ));
 
-  // Pino de questão com alto contraste (âmbar + slate escuro + anel duplo + radar)
+  // Pino de questão com alto contraste clínico (azul-petróleo + anel duplo branco)
   const pinElem = document.createElement("div");
   pinElem.id = `viewer-qpin-${q.id}`;
   pinElem.className = "viewer-marker-root is-active viewer-qpin cursor-pointer";
-  pinElem.style.cssText = "position:relative; width:58px; height:58px; z-index:50; pointer-events:auto;";
+  pinElem.style.cssText = "position:relative; width:56px; height:56px; z-index:50; pointer-events:auto;";
   pinElem.title = `Questão Q${numeroQ}: ${q.titulo || "Ponto de Investigação"}`;
 
   pinElem.innerHTML = `
     <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
-      <div class="viewer-marker-radar" style="position:absolute; inset:0; border-radius:9999px; background:rgba(245,158,11,0.34); border:2px solid #fbbf24; pointer-events:none;"></div>
-      <div style="position:relative; min-width:34px; height:34px; padding:0 8px; background:#0f172a; border-radius:9999px; border:2px solid #fbbf24; box-shadow:0 0 0 2px #ffffff, 0 0 18px rgba(245,158,11,0.85), 0 6px 16px rgba(15,23,42,0.45); display:flex; align-items:center; justify-content:center; gap:2px;">
-        <span style="font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:800; color:#fef3c7; letter-spacing:-0.02em;">Q${numeroQSafe}</span>
+      <div class="viewer-marker-radar" style="position:absolute; inset:4px; border-radius:9999px; background:rgba(2,132,199,0.28); border:1.5px solid #0284c7; pointer-events:none;"></div>
+      <div style="position:relative; min-width:34px; height:34px; padding:0 8px; background:#0369a1; border-radius:9999px; border:2px solid #ffffff; box-shadow:0 0 0 2px #0369a1, 0 6px 16px rgba(3,105,161,0.45); display:flex; align-items:center; justify-content:center; gap:2px;">
+        <span style="font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:800; color:#ffffff; letter-spacing:-0.02em;">Q${numeroQSafe}</span>
       </div>
-      <div class="viewer-marker-pill-wrap" style="position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%);">
-        <div class="viewer-marker-pill is-active">
-          <span class="viewer-marker-pill-dot"></span>
+      <div style="position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%); pointer-events:none;">
+        <div class="viewer-marker-tag is-active">
+          <span class="viewer-marker-tag-dot"></span>
           <span>Questão Q${numeroQSafe}</span>
         </div>
       </div>
@@ -3140,8 +3249,12 @@ function registrarAtalhosTecladoMicroscopio() {
       }
       return;
     }
-    if (key === "Escape" && modoReguaAtivo) {
-      toggleReguaMorfometrica(false);
+    if (key === "Escape") {
+      if (modoReguaAtivo) {
+        toggleReguaMorfometrica(false);
+      } else if (pinAtivo) {
+        limparFocoPinoAtivo();
+      }
     }
   });
 }
