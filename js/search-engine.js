@@ -6,6 +6,11 @@ let slidesCache = [];
 let isCacheLoaded = false;
 let debounceTimer;
 
+export function invalidarCacheBusca() {
+  slidesCache = [];
+  isCacheLoaded = false;
+}
+
 function getEstaticasCatalogo() {
   const lista = [];
   Object.values(catalogData || {}).forEach((disc) => {
@@ -44,6 +49,7 @@ export function initGlobalSearch() {
         snapshot.docs.forEach((doc) => mapa.set(String(doc.id), { id: doc.id, ...doc.data() }));
         isCacheLoaded = true;
       } catch (e) {
+        isCacheLoaded = true;
         console.warn("[SearchEngine] Usando fallback estático para busca:", e.message || e);
       }
     } else {
@@ -59,12 +65,16 @@ export function initGlobalSearch() {
     
     // Toggle botão de clear
     if (term.length > 0) {
-      searchClear.classList.remove("hidden");
-      searchClear.classList.add("flex");
+      if (searchClear) {
+        searchClear.classList.remove("hidden");
+        searchClear.classList.add("flex");
+      }
     } else {
-      searchClear.classList.add("hidden");
-      searchClear.classList.remove("flex");
-      dropdown.classList.add("hidden");
+      if (searchClear) {
+        searchClear.classList.add("hidden");
+        searchClear.classList.remove("flex");
+      }
+      if (dropdown) dropdown.classList.add("hidden");
       return;
     }
 
@@ -81,14 +91,14 @@ export function initGlobalSearch() {
       searchInput.value = "";
       searchClear.classList.add("hidden");
       searchClear.classList.remove("flex");
-      dropdown.classList.add("hidden");
+      if (dropdown) dropdown.classList.add("hidden");
       searchInput.focus();
     });
   }
 
   // Fechar dropdown clicando fora
   document.addEventListener("click", (e) => {
-    if (searchContainer && !searchContainer.contains(e.target)) {
+    if (dropdown && searchContainer && !searchContainer.contains(e.target)) {
       dropdown.classList.add("hidden");
     }
   });
@@ -96,7 +106,7 @@ export function initGlobalSearch() {
   // Fechar com ESC
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      dropdown.classList.add("hidden");
+      if (dropdown) dropdown.classList.add("hidden");
       searchInput.blur();
     }
   });
@@ -107,6 +117,7 @@ export function initGlobalSearch() {
   }
 
   function performSearch(term) {
+    if (!dropdown) return;
     if (term.length < 2) {
       dropdown.classList.add("hidden");
       return;
@@ -131,6 +142,7 @@ export function initGlobalSearch() {
   }
 
   function renderResults(matches, term) {
+    if (!resultsList || !emptyState) return;
     resultsList.innerHTML = "";
     
     if (matches.length === 0) {

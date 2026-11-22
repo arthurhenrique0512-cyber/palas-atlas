@@ -19,6 +19,18 @@ function scanAssets() {
     process.exit(1);
   }
 
+  const existingById = new Map();
+  if (fs.existsSync(MANIFEST_PATH)) {
+    try {
+      const prev = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+      for (const item of prev.assets || []) {
+        if (item && item.id) existingById.set(item.id, item);
+      }
+    } catch (err) {
+      console.warn('[Aviso] Não foi possível ler manifest.json anterior:', err.message);
+    }
+  }
+
   const entries = fs.readdirSync(ASSETS_DIR);
   const items = [];
 
@@ -42,12 +54,13 @@ function scanAssets() {
       const previewCandidate = `${baseSlug}-preview.jpg`;
       const hasPreview = fs.existsSync(path.join(ASSETS_DIR, previewCandidate));
 
-      const maxMag = baseSlug.includes("medula") ? 10 : 40;
-      const mpp = baseSlug.includes("medula") ? 0.625 : 0.156;
+      const prevMeta = existingById.get(baseSlug);
+      const maxMag = prevMeta?.maxMagnification || 40;
+      const mpp = prevMeta?.mpp || Number(((40 / maxMag) * 0.156).toFixed(3));
 
       items.push({
         id: baseSlug,
-        nome: formatarNome(baseSlug),
+        nome: prevMeta?.nome || formatarNome(baseSlug),
         tipo: 'dzi',
         formato: 'Deep Zoom Image (.dzi)',
         caminho: `assets/histologia/${entry}`,
@@ -56,8 +69,8 @@ function scanAssets() {
         altura: height,
         tileSize,
         maxMagnification: maxMag,
-        mpp: mpp,
-        metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
+        mpp,
+        metodoCalibracao: prevMeta?.metodoCalibracao || 'referencia_biologica_hemacia_7.5um',
         preview: hasPreview ? `assets/histologia/${previewCandidate}` : null
       });
     } else if (stat.isFile() && (entry.endsWith('.jpg') || entry.endsWith('.png')) && !entry.includes('-preview')) {

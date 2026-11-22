@@ -17,6 +17,14 @@
 import { db } from "./firebase-config.js";
 import { getState, setFrenteAtiva } from "./state.js";
 import { sanitizarHTMLDescricao, removerConteudoPerigoso, escaparHTML } from "./sanitizer.js";
+import { invalidarCacheBusca } from "./search-engine.js";
+
+const LAMINAS_ESSENCIAIS = [
+  { id: "cw3XGCgUwN71XdlwkUe5", nome: "Osso Maduro v3.0 (40x HD Panorama)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", largura: 6430, altura: 5630 },
+  { id: "FFGk5d9kOAct5HIDdjQ7", nome: "Osso Maduro v2.0 (10x Mapeamento)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi", largura: 2300, altura: 3670 },
+  { id: "96ZYqoM2SV8p4fB2QgeM", nome: "Osso Maduro Original (40x Desgaste)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct.dzi", largura: 6120, altura: 4944 },
+  { id: "a3oRvXvJpMKAtU2RE85q", nome: "Pele Espessa (40x H&E)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/lamina-real1.dzi", largura: 2536, altura: 9370 }
+];
 
 let editorPins = [];
 let editorQuestoes = [];
@@ -53,13 +61,6 @@ function destruirTrackersEditor() {
 }
 
 const topicosCurriculares = {
-  anatomia: [
-    { id: "macro_sistemas", nome: "Macroscopia Geral e Esferas Organicas" },
-    { id: "neuroanatomia", nome: "Neuroanatomia e Encefalo" },
-    { id: "cardiovascular", nome: "Coracao e Grandes Vasos" },
-    { id: "locomotor", nome: "Sistema Locomotor e Osseo" },
-    { id: "esplanchnologia", nome: "Esplanchnologia e Visceras Toracoabdominais" }
-  ],
   histologia: [
     { id: "epitelial", nome: "Tecido Epitelial de Revestimento e Glandular" },
     { id: "conjuntivo", nome: "Tecido Conjuntivo Propriamente Dito" },
@@ -109,17 +110,20 @@ export function alternarTopicoCms(topico) {
   const contAcervo = document.getElementById("topicoCmsAcervo");
   const contModulos = document.getElementById("topicoCmsModulos");
 
-  if (topico !== "editor" && viewerInstance && typeof viewerInstance.destroy === "function") {
-    try { viewerInstance.destroy(); } catch(e) {}
-    viewerInstance = null;
+  if (topico !== "editor") {
+    destruirTrackersEditor();
+    if (viewerInstance && typeof viewerInstance.destroy === "function") {
+      try { viewerInstance.destroy(); } catch (e) {}
+      viewerInstance = null;
+    }
   }
   
   const btnEditor = document.getElementById("btnTopicoEditor");
   const btnAcervo = document.getElementById("btnTopicoAcervo");
   const btnModulos = document.getElementById("btnTopicoModulos");
   
-  const clsAtivo = "px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-white text-slate-900 shadow-sm";
-  const clsInativo = "px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer text-slate-600 hover:text-slate-900";
+  const clsAtivo = "flex-1 lg:flex-initial whitespace-nowrap px-1.5 sm:px-3.5 py-2 lg:py-1.5 text-[10px] sm:text-xs font-semibold text-center rounded-lg transition-all cursor-pointer bg-white text-slate-900 shadow-sm";
+  const clsInativo = "flex-1 lg:flex-initial whitespace-nowrap px-1.5 sm:px-3.5 py-2 lg:py-1.5 text-[10px] sm:text-xs font-medium text-center rounded-lg transition-all cursor-pointer text-slate-600 hover:text-slate-900";
   
   if (contEditor) contEditor.classList.add("hidden");
   if (contAcervo) contAcervo.classList.add("hidden");
@@ -147,6 +151,11 @@ export function alternarTopicoCms(topico) {
   } else {
     if (contEditor) contEditor.classList.remove("hidden");
     if (btnEditor) btnEditor.className = clsAtivo;
+    if (!viewerInstance && document.getElementById("osd-editor-viewer")) {
+      const inputUrl = document.getElementById("dashImgUrl");
+      const urlAtual = (inputUrl && inputUrl.value.trim()) || "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi";
+      carregarImagemNoEditor(urlAtual, undefined, true);
+    }
   }
 }
 
@@ -196,14 +205,7 @@ export async function carregarListaDeAssets(forcar = false) {
       .filter((a) => Boolean(a.caminho));
 
     // Lâminas essenciais garantidas sempre presentes no dropdown
-    const essenciais = [
-      { id: "cw3XGCgUwN71XdlwkUe5", nome: "Osso Maduro v3.0 (40x HD Panorama)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", largura: 6430, altura: 5630 },
-      { id: "FFGk5d9kOAct5HIDdjQ7", nome: "Osso Maduro v2.0 (10x Mapeamento)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi", largura: 2300, altura: 3670 },
-      { id: "96ZYqoM2SV8p4fB2QgeM", nome: "Osso Maduro Original (40x Desgaste)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct.dzi", largura: 6120, altura: 4944 },
-      { id: "a3oRvXvJpMKAtU2RE85q", nome: "Pele Espessa (40x H&E)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/lamina-real1.dzi", largura: 2536, altura: 9370 }
-    ];
-
-    essenciais.forEach(e => {
+    LAMINAS_ESSENCIAIS.forEach(e => {
       const eSlug = e.caminho.split("/").pop().replace(/\.dzi$/i, "").toLowerCase();
       const idx = assets.findIndex(a =>
         a.id === e.id ||
@@ -211,7 +213,7 @@ export async function carregarListaDeAssets(forcar = false) {
         String(a.id || "").toLowerCase() === eSlug
       );
       if (idx === -1) {
-        assets.unshift(e);
+        assets.unshift({ ...e });
       } else if (!assets[idx].caminho) {
         assets[idx].caminho = e.caminho;
       }
@@ -224,12 +226,7 @@ export async function carregarListaDeAssets(forcar = false) {
     }
   } catch (err) {
     console.warn("[Palas Atlas CMS] Falha ao carregar lista dinâmica de assets:", err);
-    const fallbackAssets = [
-      { id: "cw3XGCgUwN71XdlwkUe5", nome: "Osso Maduro v3.0 (40x HD Panorama)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi", largura: 6430, altura: 5630 },
-      { id: "FFGk5d9kOAct5HIDdjQ7", nome: "Osso Maduro v2.0 (10x Mapeamento)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi", largura: 2300, altura: 3670 },
-      { id: "96ZYqoM2SV8p4fB2QgeM", nome: "Osso Maduro Original (40x Desgaste)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/osso_maduro_desgaste_ct.dzi", largura: 6120, altura: 4944 },
-      { id: "a3oRvXvJpMKAtU2RE85q", nome: "Pele Espessa (40x H&E)", tipo: "dzi", formato: "Deep Zoom Image (.dzi)", caminho: "assets/histologia/lamina-real1.dzi", largura: 2536, altura: 9370 }
-    ];
+    const fallbackAssets = LAMINAS_ESSENCIAIS.map((item) => ({ ...item }));
     acervoAssetsCache = fallbackAssets;
     popularSeletorAssets(fallbackAssets);
     if (badgeInfo) {
@@ -294,8 +291,8 @@ export function onAssetSelecionado(caminho) {
       const dims = asset.largura > 0 ? ` (${asset.largura}×${asset.altura} px)` : "";
       badgeInfo.textContent = `${asset.formato}${dims}`;
     }
-    // Sugere o nome formatado caso seja nova lâmina ou nome padrão
-    if (nomeInput && (!laminaEmEdicaoId || !nomeInput.value || nomeInput.value.includes("Músculo Estriado Esquelético"))) {
+    // Sugere o nome formatado caso seja nova lâmina ou campo vazio
+    if (nomeInput && (!laminaEmEdicaoId || !nomeInput.value.trim())) {
       nomeInput.value = asset.nome;
     }
   }
@@ -350,8 +347,8 @@ export function definirModoAnotacao(modo) {
   const quickCircle = document.getElementById("dashQuickBtnCircle");
   const quickArrow = document.getElementById("dashQuickBtnArrow");
 
-  const quickAtivoCls = "px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 shadow-sm cursor-pointer";
-  const quickInativoCls = "px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-neutral-400 hover:text-white border border-transparent hover:bg-white/[0.04] cursor-pointer";
+  const quickAtivoCls = "px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all bg-teal-700 text-white border border-teal-500/50 shadow-sm cursor-pointer";
+  const quickInativoCls = "px-2 py-1 rounded text-[10px] font-mono flex items-center gap-1 transition-all text-slate-300 hover:text-white border border-transparent hover:bg-slate-800 cursor-pointer";
 
   if (quickPin) quickPin.className = modo === "pin" ? quickAtivoCls : quickInativoCls;
   if (quickCircle) quickCircle.className = modo === "circle" ? quickAtivoCls : quickInativoCls;
@@ -473,11 +470,6 @@ function formatarNomeTopico(topico) {
     cartilaginoso: "Cartilaginoso",
     adiposo: "Adiposo",
     circulatorio: "Circulatório",
-    macro_sistemas: "Macroscopia Geral",
-    neuroanatomia: "Neuroanatomia",
-    cardiovascular: "Cardiovascular",
-    locomotor: "Locomotor",
-    esplanchnologia: "Esplanchnologia",
     lesao_celular: "Lesão Celular",
     inflamacao: "Inflamação",
     reparo_tecidual: "Reparo Tecidual",
@@ -572,8 +564,6 @@ export function renderizarTabelaAcervo() {
   tbody.innerHTML = rowsHtml;
 }
 
-export const renderizarAcervoCms = renderizarTabelaAcervo;
-
 export async function alternarStatusCms(id) {
   if (!getAuthenticatedUser()) {
     alert("Sessão administrativa expirada ou não autenticada. Faça login novamente.");
@@ -585,6 +575,7 @@ export async function alternarStatusCms(id) {
   try {
     if (typeof db !== "undefined" && db) {
       await db.collection("laminas").doc(id).update({ status: novoStatus });
+      invalidarCacheBusca();
       exibirToastDiscreto(
         `Lamina "${lamina.nome}" alterada para: ${novoStatus === "ativa" ? "Ativa e Publicada" : "Inativa (Rascunho)"}`,
         novoStatus === "ativa" ? "emerald" : "blue"
@@ -628,11 +619,9 @@ export async function editarLaminaCms(id) {
     }
   }
   if (statusSelect) statusSelect.value = lamina.status || "inativa";
-  // Req 1: Carrega maxMagnification e zoom4xRatio ao editar
+  // Carrega maxMagnification ao editar
   const maxMagSelect = document.getElementById("dashMaxMagnification");
   if (maxMagSelect) maxMagSelect.value = String(lamina.maxMagnification || 40);
-  const ratioInput = document.getElementById("dashZoom4xRatio");
-  if (ratioInput) ratioInput.value = Number(lamina.zoom4xRatio || 0.28).toFixed(2);
   const urlImagem = lamina.imagemUrl || lamina.dziUrl || lamina.imageUrl || lamina.caminhoImagemBase || "";
   if (imgUrlInput) imgUrlInput.value = urlImagem;
   const assetSelect = document.getElementById("dashAssetSelector");
@@ -707,6 +696,7 @@ export async function excluirLaminaCms(idLamina, nomeLamina) {
   try {
     if (typeof db !== "undefined" && db) {
       await db.collection("laminas").doc(idLamina).delete();
+      invalidarCacheBusca();
       if (laminaEmEdicaoId === idLamina) resetarFormularioDashboard();
       exibirToastDiscreto("Lamina removida do acervo (metadados deletados). Arquivo fisico preservado.", "red");
     } else {
@@ -733,8 +723,6 @@ export function resetarFormularioDashboard() {
   if (statusSelect) statusSelect.value = "inativa";
   const maxMagSelect = document.getElementById("dashMaxMagnification");
   if (maxMagSelect) maxMagSelect.value = "40";
-  const ratioInput = document.getElementById("dashZoom4xRatio");
-  if (ratioInput) ratioInput.value = "0.28";
   if (imgUrlInput) imgUrlInput.value = "";
   if (editorTexto) editorTexto.innerHTML = "";
   if (statusBox) { statusBox.innerHTML = ""; statusBox.classList.add("hidden"); }
@@ -765,12 +753,13 @@ function exibirToastDiscreto(mensagem, tipo) {
   if (!toast) {
     toast = document.createElement("div");
     toast.id = toastId;
-    toast.className = "fixed bottom-6 right-6 z-[100] px-5 py-3.5 rounded-2xl bg-neutral-950/80 backdrop-blur-2xl border border-white/[0.08] text-neutral-200 text-xs font-mono font-medium shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none flex items-center gap-3";
+    toast.className = "fixed bottom-6 right-6 z-[100] px-5 py-3.5 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 text-xs font-mono font-medium shadow-xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none flex items-center gap-3";
     document.body.appendChild(toast);
   }
   let corPonto = "bg-emerald-500";
   if (tipo === "red") corPonto = "bg-rose-500";
   else if (tipo === "blue") corPonto = "bg-blue-500";
+  else if (tipo === "amber") corPonto = "bg-amber-500";
   toast.textContent = "";
   const dot = document.createElement("span");
   dot.className = `w-2.5 h-2.5 rounded-full ${corPonto} shrink-0`;
@@ -799,7 +788,7 @@ export async function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
   const inputUrl = document.getElementById("dashImgUrl");
   let url = urlParam !== undefined ? urlParam : (inputUrl ? inputUrl.value.trim() : "");
   if (url) {
-    url = url.replace(/muscular-esquelito/gi, "muscular-esqueletico").trim();
+    url = url.trim();
     if (!url.includes("/") && !url.startsWith("http") && !url.startsWith("data:")) url = `assets/histologia/${url}`;
   }
   if (inputUrl) inputUrl.value = url;
@@ -827,7 +816,12 @@ export async function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
   const tileSourcesConfig = isDzi ? url : { type: "image", url: url };
   if (typeof window.OpenSeadragon !== "function") { console.error("[Palas Atlas CMS] Biblioteca OpenSeadragon nao carregada."); return; }
 
-  const slideKey = laminaEmEdicaoId || "cms-editor";
+  const slideKey =
+    (window.slideSecurity && typeof window.slideSecurity.extrairSlugDzi === "function"
+      ? window.slideSecurity.extrairSlugDzi(url)
+      : null) ||
+    laminaEmEdicaoId ||
+    "cms-editor";
   if (isDzi && window.slideSecurity && typeof window.slideSecurity.renovarTicketSessao === "function") {
     window.slideSecurity.currentSlideId = slideKey;
     await window.slideSecurity.renovarTicketSessao(slideKey);
@@ -852,6 +846,23 @@ export async function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
     visibilityRatio: 1
   });
 
+  const protegerFonteEditor = (item) => {
+    if (!isDzi || !item || !item.source || typeof item.source.getTileUrl !== "function" || !window.slideSecurity) return;
+    if (item.source._palasProtected) return;
+    const origGetTileUrl = item.source.getTileUrl.bind(item.source);
+    item.source.getTileUrl = function(level, x, y) {
+      const rawUrl = origGetTileUrl(level, x, y);
+      return window.slideSecurity.obterUrlAzulejoProtegida(rawUrl);
+    };
+    item.source._palasProtected = true;
+  };
+
+  if (isDzi && viewerInstance.world) {
+    viewerInstance.world.addHandler("add-item", ({ item }) => {
+      protegerFonteEditor(item);
+    });
+  }
+
   const initialMaxMag = Number(document.getElementById("dashMaxMagnification")?.value) || 40;
   const initialMpp = (40 / initialMaxMag) * 0.156;
   viewerInstance.scalebar({
@@ -869,17 +880,10 @@ export async function carregarImagemNoEditor(urlParam, isDziParam, isAutoLoad) {
     console.error("[Palas Atlas CMS] Erro ao carregar imagem no OpenSeadragon:", event);
     alert(`O sistema nao localizou o arquivo "${url}". Verifique se o arquivo existe no servidor.`);
   });
-  viewerInstance.addHandler("open", async () => {
+  viewerInstance.addHandler("open", () => {
     // Calibração e Análise Óptica Automática do DZI no CMS
     const item = viewerInstance.world && viewerInstance.world.getItemCount() > 0 ? viewerInstance.world.getItemAt(0) : null;
-    if (isDzi && item && item.source && typeof item.source.getTileUrl === "function" && window.slideSecurity) {
-      await window.slideSecurity.renovarTicketSessao(laminaEmEdicaoId || "cms-editor");
-      const origGetTileUrl = item.source.getTileUrl.bind(item.source);
-      item.source.getTileUrl = function(level, x, y) {
-        const rawUrl = origGetTileUrl(level, x, y);
-        return window.slideSecurity.obterUrlAzulejoProtegida(rawUrl);
-      };
-    }
+    protegerFonteEditor(item);
     const maxMagEl = document.getElementById("dashMaxMagnification");
     const maxMag = maxMagEl ? Number(maxMagEl.value) || 40 : 40;
     const mppAtual = (40 / maxMag) * 0.156;
@@ -1033,12 +1037,11 @@ export function atualizarCardAnaliseOpticaCms(item, maxMagNominal) {
   if (!card) return;
 
   const maxMag = Number(maxMagNominal) || 40;
-  let w = 0, h = 0, tileSize = 256;
+  let w = 0, h = 0;
 
   if (item && item.source && item.source.dimensions) {
     w = item.source.dimensions.x;
     h = item.source.dimensions.y;
-    tileSize = item.source.tileSize || 256;
   }
 
   if (w <= 0 || h <= 0) {
@@ -1046,31 +1049,11 @@ export function atualizarCardAnaliseOpticaCms(item, maxMagNominal) {
     return;
   }
 
-  const mp = ((w * h) / 1e6).toFixed(1);
-  const ratio = (w / h).toFixed(2);
-  const isVertical = h > w * 1.8;
-
-  const dimEl = document.getElementById("dashDziDimensions");
-  const mpEl = document.getElementById("dashDziMegapixels");
-  const geomEl = document.getElementById("dashDziGeometria");
-  const tetoEl = document.getElementById("dashDziTeto");
   const badgeEl = document.getElementById("dashDziBadgeMag");
-  const ratioInput = document.getElementById("dashZoom4xRatio");
-
   const mppCalculado = ((40 / maxMag) * 0.156).toFixed(3);
   const summaryEl = document.getElementById("dashDziLineSummary");
   if (summaryEl) summaryEl.textContent = `${w} × ${h} px • ${maxMag}x (${mppCalculado} µm/px)`;
-  if (dimEl) dimEl.textContent = `${w} × ${h}`;
-  if (mpEl) mpEl.textContent = `${mp} Megapixels`;
-  if (geomEl) geomEl.textContent = `${ratio}:1 (${isVertical ? "Faixa Vertical" : "Mosaico Amplo"})`;
-  if (tetoEl) tetoEl.textContent = `${maxMag}x (${mppCalculado} µm/px)`;
   if (badgeEl) badgeEl.textContent = `Nativa: ${maxMag}x`;
-
-  // Se for nova lâmina ou campo vazio, sugere automaticamente o ratio baseado na geometria física
-  if (ratioInput && (!laminaEmEdicaoId || !ratioInput.value)) {
-    const recommended = isVertical ? 0.65 : 0.28;
-    ratioInput.value = recommended.toFixed(2);
-  }
 
   card.classList.remove("hidden");
 }
@@ -1378,11 +1361,11 @@ export function vincularTextoAoPino() {
   const range = selecao.getRangeAt(0);
   const textoSelecionado = range.toString();
   const spanLink = document.createElement("span");
-  spanLink.className = "pin-link inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-white/[0.06] border border-white/[0.1] text-neutral-200 hover:text-white transition-colors cursor-pointer text-xs font-medium";
+  spanLink.className = "pin-link inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-200/80 border border-slate-300 text-slate-900 hover:bg-slate-200 transition-colors cursor-pointer text-xs font-medium";
   spanLink.setAttribute("data-pin-id", pinId);
   spanLink.contentEditable = "false";
   const dot = document.createElement("span");
-  dot.className = "w-1.5 h-1.5 rounded-full bg-[#d4af37] shrink-0";
+  dot.className = "w-1.5 h-1.5 rounded-full bg-teal-600 shrink-0";
   const labelSpan = document.createElement("span");
   labelSpan.textContent = textoSelecionado;
   spanLink.append(dot, labelSpan);
@@ -1492,8 +1475,6 @@ export async function publicarLaminaCms() {
     radius: p.type === "circle" ? p.radius : null,
     endX: p.type === "arrow" ? (p.endX != null ? p.endX : p.end_x) : null,
     endY: p.type === "arrow" ? (p.endY != null ? p.endY : p.end_y) : null,
-    end_x: p.type === "arrow" ? (p.endX != null ? p.endX : p.end_x) : null,
-    end_y: p.type === "arrow" ? (p.endY != null ? p.endY : p.end_y) : null,
     angle: p.type === "arrow" ? p.angle : null,
     stroke_color: p.stroke_color || "#d4af37",
     fill_color: p.fill_color || null
@@ -1506,11 +1487,9 @@ export async function publicarLaminaCms() {
     x: q.x,
     y: q.y
   }));
-  // Coleta maxMagnification e zoom4xRatio individual da lâmina
+  // Coleta maxMagnification individual da lâmina
   const maxMagEl = document.getElementById("dashMaxMagnification");
   const maxMagnification = maxMagEl ? Number(maxMagEl.value) || 40 : 40;
-  const ratioEl = document.getElementById("dashZoom4xRatio");
-  const zoom4xRatio = ratioEl ? parseFloat(ratioEl.value) || 0.28 : 0.28;
   const mpp = (40 / maxMagnification) * 0.156;
   const laminaData = {
     nome,
@@ -1526,28 +1505,31 @@ export async function publicarLaminaCms() {
     objetivaCaptura: maxMagnification,
     mpp: Number(mpp.toFixed(4)),
     metodoCalibracao: "referencia_biologica_hemacia_7.5um",
-    zoom4xRatio,
     dataModificacao: new Date().toISOString()
   };
   const statusBox = document.getElementById("dashCmsStatus");
+  const btnPub = document.getElementById("btnPublicarCms");
+  if (btnPub) btnPub.disabled = true;
   try {
     let idGravado = laminaEmEdicaoId;
     if (typeof db !== "undefined" && db) {
       if (laminaEmEdicaoId) {
         await db.collection("laminas").doc(laminaEmEdicaoId).update(laminaData);
-        exibirToastDiscreto("Lamina atualizada com sucesso no Cloud Firestore e Supabase!", "emerald");
+        invalidarCacheBusca();
+        exibirToastDiscreto("Lâmina atualizada com sucesso no Cloud Firestore!", "emerald");
       } else {
-        const docRef = await db.collection("laminas").add(laminaData);
+        const docRef = db.collection("laminas").doc();
         idGravado = docRef.id;
-        await db.collection("laminas").doc(idGravado).update({ id: idGravado });
-        exibirToastDiscreto("Nova lamina cadastrada no Cloud Firestore e Supabase!", "emerald");
+        await docRef.set({ ...laminaData, id: idGravado });
+        invalidarCacheBusca();
+        exibirToastDiscreto("Nova lâmina cadastrada no Cloud Firestore!", "emerald");
         if (statusBox) {
-          const corBadge = status === "ativa" ? "emerald" : "rose";
+          const corBadge = status === "ativa" ? "text-emerald-800" : "text-rose-700";
           const idSafe = escaparHTML(String(idGravado || ""));
           statusBox.innerHTML = `
-            <div class="font-bold uppercase tracking-wider text-${corBadge}-300">Lâmina Sincronizada (${escaparHTML(String(status).toUpperCase())})</div>
-            <div class="mt-1 text-neutral-300 text-xs font-mono">ID: ${idSafe} (${pinos.length} marcações, ${questoes.length} questões vinculadas)</div>
-            <a href="microscopio.html?id=${encodeURIComponent(String(idGravado || ""))}" target="_blank" rel="noopener noreferrer" class="mt-3 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-[#d4af37]/10 text-neutral-200 hover:text-[#d4af37] border border-white/[0.08] hover:border-[#d4af37]/40 text-xs font-mono uppercase tracking-wider shadow-lg inline-flex items-center gap-2 cursor-pointer transition-all duration-300">
+            <div class="font-bold uppercase tracking-wider ${corBadge}">Lâmina Sincronizada (${escaparHTML(String(status).toUpperCase())})</div>
+            <div class="mt-1 text-slate-600 text-xs font-mono">ID: ${idSafe} (${pinos.length} marcações, ${questoes.length} questões vinculadas)</div>
+            <a href="microscopio.html?id=${encodeURIComponent(String(idGravado || ""))}" target="_blank" rel="noopener noreferrer" class="mt-3 px-4 py-2 rounded-xl bg-white hover:bg-teal-50 text-teal-800 border border-teal-200 hover:border-teal-300 text-xs font-mono uppercase tracking-wider shadow-xs inline-flex items-center gap-2 cursor-pointer transition-all duration-200 no-underline">
               <span>Testar no Microscópio</span>
               <span>&rarr;</span>
             </a>
@@ -1568,9 +1550,12 @@ export async function publicarLaminaCms() {
           syncHeaders["Authorization"] = `Bearer ${idToken}`;
         }
 
+        const syncController = new AbortController();
+        const syncTimer = setTimeout(() => syncController.abort(), 5000);
         fetch("/api/sync-supabase", {
           method: "POST",
           headers: syncHeaders,
+          signal: syncController.signal,
           body: JSON.stringify({
             laminaId: idGravado,
             laminaData,
@@ -1585,6 +1570,8 @@ export async function publicarLaminaCms() {
           }
         }).catch(e => {
           console.warn("[Supabase Sync] Aviso: sincronização secundária assíncrona:", e.message);
+        }).finally(() => {
+          clearTimeout(syncTimer);
         });
       } catch (errSync) {}
 
@@ -1599,6 +1586,8 @@ export async function publicarLaminaCms() {
   } catch (err) {
     console.error("[Cloud Firestore] Erro de escrita:", err);
     alert("Falha ao gravar no Cloud Firestore. Verifique conexao e permissoes de seguranca.");
+  } finally {
+    if (btnPub) btnPub.disabled = false;
   }
 }
 
@@ -1624,11 +1613,11 @@ function atualizarEstadoBotaoModoQuestao() {
   const btn = document.getElementById("btnAtivarModoQuestao");
   if (!btn) return;
   if (modoCriacaoQuestao) {
-    btn.className = "w-full bg-amber-500/20 text-amber-300 border border-amber-400/60 ring-2 ring-amber-400/30 rounded-xl py-2.5 px-4 text-xs font-mono tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg animate-pulse";
-    btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0"></span><span id="txtBtnAtivarModoQuestao">Clique na lâmina para posicionar a questão</span>`;
+    btn.className = "w-full bg-amber-50 text-amber-800 border border-amber-300 ring-2 ring-amber-200 rounded-lg py-2 px-3 text-xs font-semibold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer animate-pulse";
+    btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping shrink-0"></span><span id="txtBtnAtivarModoQuestao">Clique na lâmina para posicionar a questão</span>`;
   } else {
-    btn.className = "w-full bg-white/[0.04] hover:bg-amber-400/10 text-neutral-300 hover:text-amber-300 border border-white/[0.08] hover:border-amber-400/40 rounded-xl py-2.5 px-4 text-xs font-mono tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm group";
-    btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400/80 group-hover:scale-125 transition-transform shrink-0"></span><span id="txtBtnAtivarModoQuestao">+ Nova Questão na Lâmina</span>`;
+    btn.className = "w-full bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg py-2 px-3 text-xs font-semibold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer";
+    btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span><span id="txtBtnAtivarModoQuestao">+ Nova Questão na Lâmina</span>`;
   }
 }
 
@@ -1705,9 +1694,9 @@ export function focarQuestaoNoEditor(id) {
   const card = document.getElementById(`card-questao-${q.id}`);
   if (card) {
     card.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    card.classList.add("ring-2", "ring-amber-400/70", "!bg-white/[0.08]");
+    card.classList.add("ring-2", "ring-amber-400/70", "!bg-amber-50");
     setTimeout(() => {
-      card.classList.remove("ring-2", "ring-amber-400/70", "!bg-white/[0.08]");
+      card.classList.remove("ring-2", "ring-amber-400/70", "!bg-amber-50");
     }, 1500);
   }
 
@@ -2018,8 +2007,7 @@ export function popularSelectModulosCms() {
     histologia: "Histologia Básica & Especial",
     patologia: "Patologia Geral & Especial",
     parasitologia: "Parasitologia Médica",
-    microbiologia: "Microbiologia Clínica",
-    anatomia: "Anatomia Humana"
+    microbiologia: "Microbiologia Clínica"
   };
 
   Object.keys(topicosCurriculares).forEach((discKey) => {
@@ -2243,7 +2231,7 @@ export function renderizarRepeaterSummaryPoints() {
           rows="3" 
           data-point-text="${idx}"
           placeholder="Descreva minuciosamente os critérios histológicos, composição química, populações celulares ou relevância diagnóstica..." 
-          class="w-full bg-white border border-slate-200 focus:border-teal-700 text-slate-900 rounded-lg px-3.5 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-teal-700 custom-scrollbar leading-relaxed shadow-2xs transition-all">${escaparHTML(ponto.text || '')}</textarea>
+          class="w-full bg-white border border-slate-200 focus:border-teal-700 text-slate-900 rounded-lg px-3.5 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-teal-700 scrollbar-thin leading-relaxed shadow-2xs transition-all">${escaparHTML(ponto.text || '')}</textarea>
       </div>
     </div>
   `).join("");
@@ -2355,29 +2343,29 @@ export function mostrarToastCms(mensagem, tipo = "sucesso") {
   const toast = document.createElement("div");
   const isSucesso = tipo === "sucesso";
 
-  toast.className = `pointer-events-auto transform transition-all duration-300 ease-out translate-y-4 opacity-0 flex items-start gap-3 p-4 rounded-2xl shadow-2xl border backdrop-blur-xl ${
-    isSucesso 
-      ? 'bg-[#0f1715]/95 border-emerald-500/40 text-emerald-100 shadow-[0_12px_40px_rgba(16,185,129,0.2)]'
-      : 'bg-[#1c0f13]/95 border-rose-500/40 text-rose-100 shadow-[0_12px_40px_rgba(244,63,94,0.2)]'
+  toast.className = `pointer-events-auto transform transition-all duration-300 ease-out translate-y-4 opacity-0 flex items-start gap-3 p-4 rounded-2xl shadow-xl border backdrop-blur-md ${
+    isSucesso
+      ? 'bg-white border-emerald-200 text-slate-800'
+      : 'bg-white border-rose-200 text-slate-800'
   }`;
 
   const iconeHtml = isSucesso
-    ? `<div class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 text-emerald-400">
+    ? `<div class="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0 text-emerald-700">
          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
        </div>`
-    : `<div class="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center shrink-0 text-rose-400">
+    : `<div class="w-6 h-6 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0 text-rose-700">
          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
        </div>`;
 
   toast.innerHTML = `
     ${iconeHtml}
     <div class="flex-1 min-w-0 pt-0.5">
-      <h5 class="text-xs font-mono font-bold uppercase tracking-wider ${isSucesso ? 'text-emerald-300' : 'text-rose-300'}">
+      <h5 class="text-xs font-mono font-bold uppercase tracking-wider ${isSucesso ? 'text-emerald-800' : 'text-rose-800'}">
         ${isSucesso ? 'Sincronização Cloud Firestore' : 'Atenção no Salvamento'}
       </h5>
-      <p class="text-xs font-sans text-neutral-200 mt-0.5 leading-snug">${escaparHTML(mensagem)}</p>
+      <p class="text-xs font-sans text-slate-600 mt-0.5 leading-snug">${escaparHTML(mensagem)}</p>
     </div>
-    <button type="button" class="text-neutral-400 hover:text-white shrink-0 p-1 cursor-pointer" onclick="this.parentElement.remove()">
+    <button type="button" class="text-slate-400 hover:text-slate-800 shrink-0 p-1 cursor-pointer" onclick="this.parentElement.remove()">
       &times;
     </button>
   `;
@@ -2395,11 +2383,9 @@ export function mostrarToastCms(mensagem, tipo = "sucesso") {
   }, 4500);
 }
 
-/* =========================================================
-   ========================================================= */
-
 export function encerrarPainelCms() {
   modoCriacaoQuestao = false;
+  setaPontoOrigem = null;
   clearTimeout(_editorAutoLoadTimer);
   _editorAutoLoadTimer = null;
   if (typeof _cmsAuthUnsub === "function") {
@@ -2417,16 +2403,13 @@ export function encerrarPainelCms() {
   }
 }
 
-window.osdEditorAction = osdEditorAction;
-window.publicarLaminaCms = publicarLaminaCms;
-
 // inicializarPainelCms() e chamada pelo main.js via window.App.inicializarPainelCms()
 // quando frenteAtiva === "dashboard" no renderView. Nao executar aqui automaticamente.
 
 window.App = window.App || {};
 Object.assign(window.App, {
   inicializarPainelCms, encerrarPainelCms, toggleDashboard, alternarTopicoCms, filtroAcervoCms,
-  alternarStatusCms, renderizarTabelaAcervo, renderizarAcervoCms,
+  alternarStatusCms, renderizarTabelaAcervo,
   editarLaminaCms, excluirLaminaCms, resetarFormularioDashboard,
   atualizarTopicosCms, carregarImagemNoEditor, adicionarPinoEditor,
   editarRotuloPinoCms, excluirPinoCms, vincularTextoAoPino,
@@ -2440,43 +2423,3 @@ Object.assign(window.App, {
   renderizarRepeaterSummaryPoints, atualizarPontoResumoLabel, atualizarPontoResumoText,
   adicionarPontoResumoCms, removerPontoResumoCms, salvarModuloFirestore, mostrarToastCms
 });
-window.inicializarPainelCms = inicializarPainelCms;
-window.encerrarPainelCms = encerrarPainelCms;
-window.toggleDashboard = toggleDashboard;
-window.alternarTopicoCms = alternarTopicoCms;
-window.filtroAcervoCms = filtroAcervoCms;
-window.alternarStatusCms = alternarStatusCms;
-window.renderizarTabelaAcervo = renderizarTabelaAcervo;
-window.renderizarAcervoCms = renderizarAcervoCms;
-window.editarLaminaCms = editarLaminaCms;
-window.excluirLaminaCms = excluirLaminaCms;
-window.resetarFormularioDashboard = resetarFormularioDashboard;
-window.atualizarTopicosCms = atualizarTopicosCms;
-window.carregarImagemNoEditor = carregarImagemNoEditor;
-window.adicionarPinoEditor = adicionarPinoEditor;
-window.editarRotuloPinoCms = editarRotuloPinoCms;
-window.excluirPinoCms = excluirPinoCms;
-window.vincularTextoAoPino = vincularTextoAoPino;
-window.osdEditorAction = osdEditorAction;
-window.publicarLaminaCms = publicarLaminaCms;
-window.ativarModoNovaQuestao = ativarModoNovaQuestao;
-window.atualizarTituloQuestaoCms = atualizarTituloQuestaoCms;
-window.excluirQuestaoCms = excluirQuestaoCms;
-window.focarQuestaoNoEditor = focarQuestaoNoEditor;
-window.focarPinoEditor = focarPinoEditor;
-window.atualizarCardAnaliseOpticaCms = atualizarCardAnaliseOpticaCms;
-window.carregarListaDeAssets = carregarListaDeAssets;
-window.onAssetSelecionado = onAssetSelecionado;
-window.alternarModoCaminhoManual = alternarModoCaminhoManual;
-window.definirModoAnotacao = definirModoAnotacao;
-window.onAtualizarRaioCirculo = onAtualizarRaioCirculo;
-window.popularSelectModulosCms = popularSelectModulosCms;
-window.onModuloSelecionado = onModuloSelecionado;
-window.carregarModuloParaEdicao = carregarModuloParaEdicao;
-window.renderizarRepeaterSummaryPoints = renderizarRepeaterSummaryPoints;
-window.atualizarPontoResumoLabel = atualizarPontoResumoLabel;
-window.atualizarPontoResumoText = atualizarPontoResumoText;
-window.adicionarPontoResumoCms = adicionarPontoResumoCms;
-window.removerPontoResumoCms = removerPontoResumoCms;
-window.salvarModuloFirestore = salvarModuloFirestore;
-window.mostrarToastCms = mostrarToastCms;

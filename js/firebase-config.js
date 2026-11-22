@@ -27,15 +27,5 @@ try {
   window.dispatchEvent(new CustomEvent('palas-firebase-ready', { detail: { db, auth } }));
 } catch (e) {}
 
-// Limpeza definitiva dos dados antigos do localStorage para evitar duplicidades ou conflitos com a nuvem
-try {
-  localStorage.removeItem("palas_atlas_custom_slides");
-  localStorage.removeItem("pecas_locais");
-  localStorage.removeItem("palas_atlas_old_cache");
-  console.info("[Palas Atlas - Cloud Firestore] Inicializado com sucesso. Cache do localStorage limpo e migrado para a nuvem.");
-} catch (error) {
-  console.warn("[Palas Atlas - Cloud Firestore] Aviso durante a limpeza do cache no localStorage:", error);
-}
-
 export { db, auth };
 

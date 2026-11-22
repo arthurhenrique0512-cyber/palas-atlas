@@ -1,7 +1,7 @@
 /* ==========================================================================
    PALAS ATLAS — TELA DE CARREGAMENTO & PRELOADER (DESIGN SYSTEM OFICIAL)
    Fidelidade Tipográfica: Cormorant Garamond + Inter
-   Paleta: Slate-900 / Azul-Petróleo (#0369A1) no Claro | Marfim (#F4F2ED) / Ouro (#D4AF37) no Escuro
+   Paleta: Slate-900 (#0F172A) / Azul-Petróleo (#0369A1) — Light Mode Oficial
    ========================================================================== */
 
 @keyframes splashFadeInScale {
@@ -111,58 +111,6 @@
   background: linear-gradient(90deg, #0d9488, #0369a1, #0d9488) !important;
   border-radius: 9999px !important;
   animation: splashSweepLine 2.2s ease-in-out infinite;
-}
-
-/* ==========================================================================
-   TEMA ESCURO (Ônix & Dourado / Microscópio Científico)
-   ========================================================================== */
-html.dark .splash-container,
-[data-theme="dark"] .splash-container,
-html[data-theme="dark"] .splash-container {
-  background: #090a0f !important;
-  color: #f4f2ed !important;
-}
-
-html.dark .splash-shimmer-palas,
-[data-theme="dark"] .splash-shimmer-palas,
-html[data-theme="dark"] .splash-shimmer-palas {
-  font-family: 'Cormorant Garamond', Georgia, serif !important;
-  color: #f4f2ed !important;
-  font-weight: 700 !important;
-}
-
-html.dark .splash-owl-anim,
-[data-theme="dark"] .splash-owl-anim,
-html[data-theme="dark"] .splash-owl-anim {
-  color: #d4af37 !important;
-  opacity: 1;
-  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.28));
-}
-
-html.dark .splash-shimmer-atlas,
-[data-theme="dark"] .splash-shimmer-atlas,
-html[data-theme="dark"] .splash-shimmer-atlas {
-  font-family: 'Cormorant Garamond', Georgia, serif !important;
-  color: #d4af37 !important;
-  font-weight: 700 !important;
-}
-
-html.dark .splash-subtitle,
-[data-theme="dark"] .splash-subtitle,
-html[data-theme="dark"] .splash-subtitle {
-  color: #a1a1aa !important;
-}
-
-html.dark .splash-progress-track,
-[data-theme="dark"] .splash-progress-track,
-html[data-theme="dark"] .splash-progress-track {
-  background: rgba(255, 255, 255, 0.08) !important;
-}
-
-html.dark .splash-progress-bar,
-[data-theme="dark"] .splash-progress-bar,
-html[data-theme="dark"] .splash-progress-bar {
-  background: linear-gradient(90deg, #d4af37, #fef08a, #d4af37) !important;
 }
 
 /* ==========================================================================

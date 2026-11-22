@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import {
   Search,
   ArrowRight,
   Microscope,
-  Layers,
   FlaskConical,
   Compass,
   GraduationCap,
@@ -18,29 +17,10 @@ import {
   Info,
 } from 'lucide-react';
 
-// Tipagem TypeScript para as lâminas da vitrine e busca
-export interface SlideItem {
-  id: string;
-  title: string;
-  category: string;
-  stain?: string;
-  thumbnailUrl: string;
-  link: string;
-  disciplina: string;
-  tags?: string[];
-}
+import type { SlideItem } from '@/lib/types/atlas';
+export type { SlideItem, DisciplinaItem } from '@/lib/types/atlas';
 
-// Tipagem para os cards de disciplinas
-export interface DisciplinaItem {
-  id: string;
-  nome: string;
-  slug: string;
-  descricao: string;
-  icone: string;
-  totalLaminas: number;
-}
-
-// Dados padrão do catálogo acadêmico
+// Dados padrão do catálogo acadêmico (4 lâminas oficiais do acervo)
 const SLIDES_ACERVO: SlideItem[] = [
   {
     id: 'cw3XGCgUwN71XdlwkUe5',
@@ -48,7 +28,7 @@ const SLIDES_ACERVO: SlideItem[] = [
     category: 'Histologia • Tecido Ósseo',
     stain: 'Desgaste • 40x',
     thumbnailUrl: '/assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
-    link: '/microscopio?id=cw3XGCgUwN71XdlwkUe5',
+    link: '/microscopio.html?id=cw3XGCgUwN71XdlwkUe5',
     disciplina: 'histologia',
     tags: ['canal de havers', 'ósteon', 'canalículos', 'osteócitos', 'osso compacto'],
   },
@@ -58,64 +38,29 @@ const SLIDES_ACERVO: SlideItem[] = [
     category: 'Histologia • Sistema Tegumentar',
     stain: 'H&E • 40x',
     thumbnailUrl: '/assets/histologia/lamina-real1-preview.jpg',
-    link: '/microscopio?id=a3oRvXvJpMKAtU2RE85q',
+    link: '/microscopio.html?id=a3oRvXvJpMKAtU2RE85q',
     disciplina: 'histologia',
     tags: ['epiderme', 'derme', 'estrato córneo', 'queratinócitos', 'papilas dérmicas'],
   },
   {
-    id: 'osso_maduro_desgaste_ct_2.0',
-    title: 'Osso Maduro 10x (Visão Geral)',
+    id: 'FFGk5d9kOAct5HIDdjQ7',
+    title: 'Osso Maduro 10x',
     category: 'Histologia • Tecido Ósseo',
     stain: 'Desgaste • 10x',
     thumbnailUrl: '/assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
-    link: '/microscopio?id=osso_maduro_desgaste_ct_2.0',
+    link: '/microscopio.html?id=FFGk5d9kOAct5HIDdjQ7',
     disciplina: 'histologia',
     tags: ['ósteons', 'periósteo', 'endósteo', 'visão panorâmica'],
   },
   {
-    id: 'osso_maduro_desgaste_ct',
-    title: 'Osso Compacto Descalcificado',
-    category: 'Histologia • Matriz Mineral',
-    stain: 'H&E • 20x',
+    id: '96ZYqoM2SV8p4fB2QgeM',
+    title: 'Osso Maduro',
+    category: 'Histologia • Tecido Ósseo',
+    stain: 'Desgaste • 40x',
     thumbnailUrl: '/assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
-    link: '/microscopio?id=osso_maduro_desgaste_ct',
+    link: '/microscopio.html?id=96ZYqoM2SV8p4fB2QgeM',
     disciplina: 'histologia',
-    tags: ['matriz óssea', 'osteoblastos', 'medula óssea'],
-  },
-];
-
-const DISCIPLINAS: DisciplinaItem[] = [
-  {
-    id: 'histologia',
-    nome: 'Histologia Geral e Tecidos',
-    slug: 'histologia',
-    descricao: 'Análise microscópica dos 4 tecidos fundamentais, órgãos e sistemas com técnicas citoquímicas.',
-    icone: 'Layers',
-    totalLaminas: 48,
-  },
-  {
-    id: 'patologia',
-    nome: 'Patologia Geral',
-    slug: 'patologia',
-    descricao: 'Lesões celulares elementares, processos inflamatórios, distúrbios hemodinâmicos e neoplasias.',
-    icone: 'FlaskConical',
-    totalLaminas: 32,
-  },
-  {
-    id: 'parasitologia',
-    nome: 'Parasitologia Médica',
-    slug: 'parasitologia',
-    descricao: 'Identificação morfológica de protozoários, helmintos, trofozoítos, cistos, ovos e larvas de interesse clínico.',
-    icone: 'Compass',
-    totalLaminas: 24,
-  },
-  {
-    id: 'microbiologia',
-    nome: 'Microbiologia e Micologia',
-    slug: 'microbiologia',
-    descricao: 'Bacterioscopia por Gram, colorações de Ziehl-Neelsen e estruturas fúngicas filamentosas e leveduriformes.',
-    icone: 'GraduationCap',
-    totalLaminas: 18,
+    tags: ['matriz óssea', 'ósteons', 'canalículos', 'osso compacto'],
   },
 ];
 
@@ -162,28 +107,46 @@ export default function HomePage() {
 
   const totalSlides = SLIDES_ACERVO.length;
   const currentSlide = SLIDES_ACERVO[currentSlideIdx];
+  const isTransitioningRef = useRef<boolean>(false);
+  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handlePrevSlide = useCallback(() => {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+    setIsTransitioning(true);
+    setCurrentSlideIdx((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+    if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
+    transitionTimeoutRef.current = setTimeout(() => {
+      isTransitioningRef.current = false;
+      setIsTransitioning(false);
+    }, 220);
+  }, [totalSlides]);
+
+  const handleNextSlide = useCallback(() => {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+    setIsTransitioning(true);
+    setCurrentSlideIdx((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
+    if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
+    transitionTimeoutRef.current = setTimeout(() => {
+      isTransitioningRef.current = false;
+      setIsTransitioning(false);
+    }, 220);
+  }, [totalSlides]);
 
   // Rotação automática suave do carrossel de lâminas a cada 8 segundos
   useEffect(() => {
     const timer = setInterval(() => {
       handleNextSlide();
     }, 8000);
-    return () => clearInterval(timer);
-  }, [currentSlideIdx]);
-
-  const handlePrevSlide = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentSlideIdx((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
-    setTimeout(() => setIsTransitioning(false), 220);
-  }, [isTransitioning, totalSlides]);
-
-  const handleNextSlide = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentSlideIdx((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
-    setTimeout(() => setIsTransitioning(false), 220);
-  }, [isTransitioning, totalSlides]);
+    return () => {
+      clearInterval(timer);
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = null;
+      }
+    };
+  }, [handleNextSlide]);
 
   // Filtragem de lâminas para o dropdown de busca
   const searchResults = useMemo(() => {
@@ -270,7 +233,7 @@ export default function HomePage() {
               Dúvidas
             </a>
             <Link
-              href="/sobre"
+              href="/sobre.html"
               className="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline"
             >
               Sobre Nós
@@ -329,7 +292,7 @@ export default function HomePage() {
             </span>
             <div className="space-y-1">
               <Link
-                href="/histologia"
+                href="/disciplinas/osseo"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3 text-slate-700 hover:text-teal-700 hover:bg-slate-50 px-3.5 py-2.5 rounded-xl transition-all text-sm font-medium"
               >
@@ -337,7 +300,7 @@ export default function HomePage() {
                 <span>Histologia</span>
               </Link>
               <Link
-                href="/patologia"
+                href="/index.html?frente=patologia"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3 text-slate-700 hover:text-teal-700 hover:bg-slate-50 px-3.5 py-2.5 rounded-xl transition-all text-sm font-medium"
               >
@@ -345,7 +308,7 @@ export default function HomePage() {
                 <span>Patologia</span>
               </Link>
               <Link
-                href="/parasitologia"
+                href="/index.html?frente=parasitologia"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3 text-slate-700 hover:text-teal-700 hover:bg-slate-50 px-3.5 py-2.5 rounded-xl transition-all text-sm font-medium"
               >
@@ -353,7 +316,7 @@ export default function HomePage() {
                 <span>Parasitologia</span>
               </Link>
               <Link
-                href="/microbiologia"
+                href="/index.html?frente=microbiologia"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3 text-slate-700 hover:text-teal-700 hover:bg-slate-50 px-3.5 py-2.5 rounded-xl transition-all text-sm font-medium"
               >
@@ -365,7 +328,7 @@ export default function HomePage() {
 
           <div className="pt-5 border-t border-slate-200/80 space-y-1">
             <Link
-              href="/sobre"
+              href="/sobre.html"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 text-slate-600 hover:text-teal-700 hover:bg-slate-50 px-3.5 py-2.5 rounded-xl transition-all text-sm font-medium"
             >
@@ -388,35 +351,35 @@ export default function HomePage() {
         ============================================================ */}
         <section
           id="secaoInstitucionalTopo"
-          className="relative overflow-hidden bg-gradient-to-b from-[#edf4f3] via-[#f5f9f8] to-white pt-14 pb-20 lg:pt-20 lg:pb-28 border-b border-slate-200/80"
+          className="relative overflow-hidden bg-gradient-to-b from-[#edf4f3] via-[#f5f9f8] to-white pt-8 pb-12 sm:pt-14 sm:pb-20 lg:pt-20 lg:pb-28 border-b border-slate-200/80"
         >
           {/* Iluminação suave puramente estética */}
           <div className="pointer-events-none absolute -top-24 right-1/4 w-[500px] h-[500px] rounded-full bg-teal-500/5 blur-3xl" />
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-14 items-center relative z-10">
             
             {/* Coluna Esquerda (lg:col-span-6): Peso Editorial */}
             <div className="lg:col-span-6 flex flex-col items-start text-left justify-center">
               
               {/* Pílula superior com fundo branco elevado */}
-              <div className="inline-flex items-center gap-2 bg-white/90 border border-teal-900/10 shadow-sm text-teal-950 text-[11px] font-semibold tracking-widest uppercase px-3.5 py-1.5 rounded-full mb-6">
+              <div className="inline-flex items-center gap-2 bg-white/90 border border-teal-900/10 shadow-sm text-teal-950 text-[10px] sm:text-[11px] font-semibold tracking-widest uppercase px-3 sm:px-3.5 py-1.5 rounded-full mb-4 sm:mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-600" />
-                <span>• ATLAS MORFOLÓGICO DIGITAL</span>
+                <span>Atlas Morfológico Digital</span>
               </div>
 
               {/* Título Principal com alto impacto tipográfico e Ciências Morfológicas em fonte serifada */}
-              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-tight text-slate-950 leading-[1.08] text-left">
+              <h1 className="text-[30px] sm:text-5xl lg:text-[54px] font-bold tracking-tight text-slate-950 leading-[1.08] sm:leading-[1.08] lg:leading-[1.08] text-left">
                 Atlas Integrado de <br />
                 <span className="font-serif text-teal-900 font-bold">Ciências Morfológicas</span>
               </h1>
 
               {/* Subtítulo Limpo */}
-              <p className="text-slate-600 text-base sm:text-lg font-sans font-normal leading-relaxed max-w-xl text-left mt-5">
+              <p className="text-slate-600 text-sm sm:text-lg font-sans font-normal leading-relaxed max-w-xl text-left mt-3.5 sm:mt-5">
                 Explore lâminas microscópicas reais em alta definição com navegação óptica interativa.
               </p>
 
               {/* Rodapé institucional discreto separado por linha fina */}
-              <div className="mt-8 pt-6 border-t border-slate-200/80 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-slate-500">
+              <div className="mt-5 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-200/80 flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2 text-[11px] sm:text-xs font-medium text-slate-500">
                 <span>Ensino Morfológico Universitário</span>
                 <span className="text-slate-300">•</span>
                 <span>Acesso 100% Aberto</span>
@@ -427,56 +390,56 @@ export default function HomePage() {
 
             {/* Coluna Direita (lg:col-span-6): Grid 2x2 Escalonado */}
             <div className="lg:col-span-6 w-full">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5 items-start">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:gap-5 items-start">
                 
                 {/* Card 1: Alta Definição */}
-                <div className="bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mb-3.5">
-                    <Microscope className="w-5 h-5" />
+                <div className="bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mb-2.5 sm:mb-3.5">
+                    <Microscope className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 text-sm mb-1">
+                  <h3 className="font-semibold text-slate-900 text-xs sm:text-sm mb-1">
                     Alta Definição
                   </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
                     Cortes histológicos digitalizados com nitidez óptica real.
                   </p>
                 </div>
 
-                {/* Card 2: Técnicas e Colorações (deslocamento vertical sm:even:mt-6) */}
-                <div className="bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300 sm:mt-6">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mb-3.5">
-                    <FlaskConical className="w-5 h-5" />
+                {/* Card 2: Técnicas e Colorações (deslocamento vertical) */}
+                <div className="bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300 mt-4 sm:mt-6">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mb-2.5 sm:mb-3.5">
+                    <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 text-sm mb-1">
+                  <h3 className="font-semibold text-slate-900 text-xs sm:text-sm mb-1">
                     Técnicas e Colorações
                   </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
                     Preparações em H&E, desgastes ósseos e colorações especiais.
                   </p>
                 </div>
 
                 {/* Card 3: Pinos Morfológicos */}
-                <div className="bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mb-3.5">
-                    <Compass className="w-5 h-5" />
+                <div className="bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mb-2.5 sm:mb-3.5">
+                    <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 text-sm mb-1">
+                  <h3 className="font-semibold text-slate-900 text-xs sm:text-sm mb-1">
                     Pinos Morfológicos
                   </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
                     Marcações interativas com critérios precisos de identificação.
                   </p>
                 </div>
 
-                {/* Card 4: Acervo Universitário (deslocamento vertical sm:even:mt-6) */}
-                <div className="bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300 sm:mt-6">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mb-3.5">
-                    <GraduationCap className="w-5 h-5" />
+                {/* Card 4: Acervo Universitário (deslocamento vertical) */}
+                <div className="bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300 mt-4 sm:mt-6">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mb-2.5 sm:mb-3.5">
+                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 text-sm mb-1">
+                  <h3 className="font-semibold text-slate-900 text-xs sm:text-sm mb-1">
                     Acervo Universitário
                   </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
                     Iniciativa acadêmica aberta e gratuita para estudo morfológico.
                   </p>
                 </div>
@@ -604,19 +567,19 @@ export default function HomePage() {
                   </div>
 
                   {/* Botões de Ação */}
-                  <div className="relative z-10 flex flex-wrap gap-3.5 items-center justify-start w-full mt-5">
+                  <div className="relative z-10 grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-3.5 items-center justify-start w-full mt-4 sm:mt-5">
                     <Link
-                      href="/histologia"
+                      href="/disciplinas/osseo"
                       id="btnHeroPrimary"
-                      className="bg-slate-900 hover:bg-black text-white rounded-xl px-6 py-3.5 transition-all duration-200 flex items-center justify-center gap-2.5 group cursor-pointer text-xs font-semibold tracking-wide shadow-sm hover:shadow active:scale-95 no-underline"
+                      className="bg-slate-900 hover:bg-black text-white rounded-xl px-4 sm:px-6 py-3 sm:py-3.5 min-h-[44px] lg:min-h-0 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer text-xs font-semibold tracking-wide shadow-sm hover:shadow active:scale-95 no-underline whitespace-nowrap"
                     >
                       <span>Explorar Lâminas</span>
-                      <ArrowRight className="w-4 h-4 text-[#d4af37] group-hover:translate-x-0.5 transition-transform duration-150" />
+                      <ArrowRight className="w-4 h-4 text-[#d4af37] group-hover:translate-x-0.5 transition-transform duration-150 shrink-0" />
                     </Link>
 
                     <Link
-                      href="/sobre"
-                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-semibold shadow-xs no-underline active:scale-95"
+                      href="/sobre.html"
+                      className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 min-h-[44px] lg:min-h-0 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-semibold shadow-xs no-underline active:scale-95 whitespace-nowrap"
                     >
                       Sobre o Projeto
                     </Link>
@@ -628,26 +591,26 @@ export default function HomePage() {
                       ATALHOS:
                     </span>
                     <Link
-                      href="/histologia"
-                      className="px-2.5 py-1 rounded-lg bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-700 border border-slate-200/90 transition-colors text-xs font-medium shadow-2xs no-underline"
+                      href="/disciplinas/osseo"
+                      className="px-3 py-2 sm:px-2.5 sm:py-1 min-h-[38px] sm:min-h-0 inline-flex items-center rounded-lg bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-700 border border-slate-200/90 transition-colors text-xs font-medium shadow-2xs no-underline"
                     >
                       Histologia
                     </Link>
                     <Link
-                      href="/patologia"
-                      className="px-2.5 py-1 rounded-lg bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200/90 transition-colors text-xs font-medium shadow-2xs no-underline"
+                      href="/index.html?frente=patologia"
+                      className="px-3 py-2 sm:px-2.5 sm:py-1 min-h-[38px] sm:min-h-0 inline-flex items-center rounded-lg bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200/90 transition-colors text-xs font-medium shadow-2xs no-underline"
                     >
                       Patologia
                     </Link>
                     <Link
-                      href="/parasitologia"
-                      className="px-2.5 py-1 rounded-lg bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200/90 transition-colors text-xs font-medium shadow-2xs no-underline"
+                      href="/index.html?frente=parasitologia"
+                      className="px-3 py-2 sm:px-2.5 sm:py-1 min-h-[38px] sm:min-h-0 inline-flex items-center rounded-lg bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200/90 transition-colors text-xs font-medium shadow-2xs no-underline"
                     >
                       Parasitologia
                     </Link>
                     <Link
-                      href="/microbiologia"
-                      className="px-2.5 py-1 rounded-lg bg-white hover:bg-violet-50 text-slate-600 hover:text-violet-700 border border-slate-200/90 transition-colors text-xs font-medium shadow-2xs no-underline"
+                      href="/index.html?frente=microbiologia"
+                      className="px-3 py-2 sm:px-2.5 sm:py-1 min-h-[38px] sm:min-h-0 inline-flex items-center rounded-lg bg-white hover:bg-violet-50 text-slate-600 hover:text-violet-700 border border-slate-200/90 transition-colors text-xs font-medium shadow-2xs no-underline"
                     >
                       Microbiologia
                     </Link>
@@ -659,7 +622,7 @@ export default function HomePage() {
                 <div className="lg:col-span-6 w-full">
                   <div
                     id="heroSlideShowcase"
-                    className="group/showcase relative z-20 w-full aspect-[4/3] sm:aspect-[16/10] rounded-2xl overflow-hidden bg-[#060608] border border-slate-200/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.22)] flex flex-col justify-between p-5 sm:p-7 select-none"
+                    className="group/showcase relative z-20 w-full aspect-[4/3] sm:aspect-[16/10] max-h-[68vh] sm:max-h-none rounded-2xl overflow-hidden bg-[#060608] border border-slate-200/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.22)] flex flex-col justify-between p-4 sm:p-7 select-none"
                   >
                     {/* Imagem de Microscopia com Zoom Suave */}
                     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -715,31 +678,31 @@ export default function HomePage() {
                       </div>
 
                       {/* Rodapé da Vitrine: Link Direto e Paginação Discreta */}
-                      <div className="pt-2.5 border-t border-white/15 flex items-center justify-between gap-4">
+                      <div className="pt-2.5 border-t border-white/15 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
                         <Link
                           id="vitrineActionBtn"
                           href={currentSlide.link}
-                          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-white hover:text-sky-300 transition-colors duration-150 group/link no-underline"
+                          className="inline-flex items-center gap-1.5 sm:gap-2 min-h-[44px] sm:min-h-0 text-xs sm:text-sm font-semibold text-white hover:text-sky-300 transition-colors duration-150 group/link no-underline whitespace-nowrap"
                         >
                           <span>Abrir no Microscópio</span>
-                          <ArrowRight className="w-4 h-4 text-sky-400 group-hover/link:translate-x-1 transition-transform duration-200" />
+                          <ArrowRight className="w-4 h-4 text-sky-400 group-hover/link:translate-x-1 transition-transform duration-200 shrink-0" />
                         </Link>
 
-                        <div className="flex items-center gap-1 text-xs text-white select-none bg-black/60 border border-white/15 backdrop-blur-md rounded-full px-2 py-0.5">
+                        <div className="flex items-center gap-0.5 sm:gap-1 text-xs text-white select-none bg-black/60 border border-white/15 backdrop-blur-md rounded-full px-1.5 sm:px-2 py-0.5 shrink-0">
                           <button
                             type="button"
                             id="vitrinePrevBtn"
                             onClick={handlePrevSlide}
-                            className="text-white/80 hover:text-white transition-all duration-200 p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
+                            className="text-white/80 hover:text-white transition-all duration-200 w-9 h-9 sm:w-auto sm:h-auto sm:p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
                             aria-label="Lâmina anterior"
                             title="Lâmina anterior"
                           >
-                            <ChevronLeft className="w-3.5 h-3.5" />
+                            <ChevronLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                           </button>
 
                           <span
                             id="vitrineCounter"
-                            className="text-[11px] tracking-wider text-white font-semibold px-2"
+                            className="text-[11px] tracking-wider text-white font-semibold px-1.5 sm:px-2 whitespace-nowrap"
                           >
                             {String(currentSlideIdx + 1).padStart(2, '0')} / {String(totalSlides).padStart(2, '0')}
                           </span>
@@ -748,11 +711,11 @@ export default function HomePage() {
                             type="button"
                             id="vitrineNextBtn"
                             onClick={handleNextSlide}
-                            className="text-white/80 hover:text-white transition-all duration-200 p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
+                            className="text-white/80 hover:text-white transition-all duration-200 w-9 h-9 sm:w-auto sm:h-auto sm:p-1 rounded-full hover:bg-white/15 cursor-pointer focus:outline-none flex items-center justify-center active:scale-90"
                             aria-label="Próxima lâmina"
                             title="Próxima lâmina"
                           >
-                            <ChevronRight className="w-3.5 h-3.5" />
+                            <ChevronRight className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                           </button>
                         </div>
                       </div>
@@ -799,7 +762,7 @@ export default function HomePage() {
                 </div>
 
                 <Link
-                  href="/histologia"
+                  href="/disciplinas/osseo"
                   className="inline-flex items-center gap-2 text-xs font-semibold text-teal-300 hover:text-white transition-colors shrink-0 group/link no-underline"
                 >
                   <span>Acessar Módulo</span>
@@ -836,7 +799,7 @@ export default function HomePage() {
             
             {/* Patologia */}
             <Link
-              href="/patologia"
+              href="/index.html?frente=patologia"
               className="group bg-white border border-slate-200/90 rounded-2xl p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:border-teal-700/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between no-underline"
             >
               <div>
@@ -855,7 +818,7 @@ export default function HomePage() {
 
             {/* Parasitologia */}
             <Link
-              href="/parasitologia"
+              href="/index.html?frente=parasitologia"
               className="group bg-white border border-slate-200/90 rounded-2xl p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:border-teal-700/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between no-underline"
             >
               <div>
@@ -874,7 +837,7 @@ export default function HomePage() {
 
             {/* Microbiologia */}
             <Link
-              href="/microbiologia"
+              href="/index.html?frente=microbiologia"
               className="group bg-white border border-slate-200/90 rounded-2xl p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:border-teal-700/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between no-underline"
             >
               <div>
@@ -947,7 +910,7 @@ export default function HomePage() {
                     </h3>
                     <p className="text-xs text-slate-500 leading-relaxed font-sans">
                       {slide.stain?.includes('Desgaste')
-                        ? 'Técnica de descalcificação e desgaste'
+                        ? 'Corte por desgaste em matriz mineralizada'
                         : slide.stain?.includes('H&E')
                         ? 'Coloração H&E de rotina'
                         : 'Espécime microscópico catalogado'}
@@ -1093,7 +1056,7 @@ export default function HomePage() {
               Integramos a teoria morfológica à rotina prática do laboratório acadêmico.
             </p>
             <Link
-              href="/sobre"
+              href="/sobre.html"
               className="text-xs font-semibold text-teal-800 hover:text-teal-950 transition-colors inline-flex items-center gap-1.5 no-underline group"
             >
               <span>Conhecer o projeto e a equipe</span>

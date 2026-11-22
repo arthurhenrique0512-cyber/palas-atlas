@@ -136,6 +136,17 @@ exports.handler = async function(event) {
     };
   }
 
+  // 5.1 Vínculo criptográfico entre o ticket de sessão e a pasta *_files solicitada
+  const tileSlugMatch = normalizedPath.match(/^([a-zA-Z0-9._ -]+)_files\//);
+  const requestedSlideSlug = tileSlugMatch ? tileSlugMatch[1] : '';
+  if (!requestedSlideSlug || verification.laminaId.toLowerCase() !== requestedSlideSlug.toLowerCase()) {
+    return {
+      statusCode: 403,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Ticket de sessão não corresponde à lâmina solicitada.' })
+    };
+  }
+
   // 6. Resolução do Arquivo do Azulejo (Local no pacote ou Supabase Storage Privado)
   const localRoot = path.resolve('assets/histologia');
   const localFilePath = path.resolve(localRoot, normalizedPath);
@@ -164,13 +175,16 @@ exports.handler = async function(event) {
   }
 
   if (SUPABASE_URL && SERVICE_ROLE_KEY) {
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
     try {
       const storageUrl = `${SUPABASE_URL}/storage/v1/object/laminas-dzi/${normalizedPath}`;
       const res = await fetch(storageUrl, {
         headers: {
           'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
           'apikey': SERVICE_ROLE_KEY
-        }
+        },
+        signal: controller ? controller.signal : undefined
       });
 
       if (res.ok) {
@@ -193,6 +207,8 @@ exports.handler = async function(event) {
       }
     } catch (err) {
       console.error('[TileProxy] Erro ao buscar azulejo no Supabase Storage:', err);
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
     }
   }
 

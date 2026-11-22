@@ -6,7 +6,7 @@
 const listeners = new Set();
 
 const state = {
-  frenteAtiva: null // Valores aceitos: 'anatomia' | 'histologia' | null
+  frenteAtiva: null // Valores aceitos: 'histologia' | 'patologia' | 'parasitologia' | 'microbiologia' | 'dashboard' | null
 };
 
 /**
@@ -37,7 +37,7 @@ function notify() {
 
 /**
  * Altera a frente ativa no sistema e dispara os eventos de notificação.
- * @param {string|null} frente - Identificador da frente ('anatomia', 'histologia' ou null).
+ * @param {string|null} frente - Identificador da frente ('histologia', 'patologia', 'parasitologia', 'microbiologia', 'dashboard' ou null).
  */
 export function setFrenteAtiva(frente) {
   if (state.frenteAtiva === frente) return;

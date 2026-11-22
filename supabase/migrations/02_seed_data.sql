@@ -2,14 +2,13 @@
 -- PALAS ATLAS — CARGA INICIAL DE DADOS CANÔNICOS (SEED)
 -- ============================================================================
 
--- 1. Inserir Disciplinas
+-- 1. Inserir Disciplinas Ativas
 INSERT INTO public.disciplinas (id, nome, slug, descricao, bibliografia, ordem)
 VALUES
     ('histologia', 'Histologia', 'histologia', 'Estudo microscópico dos tecidos e sua organização funcional nos órgãos.', 'Junqueira & Carneiro - Histologia Básica', 1),
-    ('anatomia', 'Anatomia Macroscópica', 'anatomia', 'Morfologia dos sistemas orgânicos, dissecção e topografia anatômica.', 'Dangelo & Fattini - Anatomia Humana', 2),
-    ('patologia', 'Patologia Geral', 'patologia', 'Mecanismos celulares e teciduais de lesão, inflamação e neoplasias.', 'Robbins & Cotran - Bases Patológicas das Doenças', 3),
-    ('parasitologia', 'Parasitologia Médica', 'parasitologia', 'Protozoários, helmintos e artrópodes de importância clínica.', 'Neves - Parasitologia Humana', 4),
-    ('microbiologia', 'Microbiologia e Micologia', 'microbiologia', 'Morfologia de bactérias, fungos filamentosos e leveduras.', 'Murray - Microbiologia Médica', 5)
+    ('patologia', 'Patologia Geral', 'patologia', 'Mecanismos celulares e teciduais de lesão, inflamação e neoplasias.', 'Robbins & Cotran - Bases Patológicas das Doenças', 2),
+    ('parasitologia', 'Parasitologia Médica', 'parasitologia', 'Protozoários, helmintos e artrópodes de importância clínica.', 'Neves - Parasitologia Humana', 3),
+    ('microbiologia', 'Microbiologia e Micologia', 'microbiologia', 'Morfologia de bactérias, fungos filamentosos e leveduras.', 'Murray - Microbiologia Médica', 4)
 ON CONFLICT (id) DO UPDATE SET
     nome = EXCLUDED.nome,
     descricao = EXCLUDED.descricao,
@@ -30,80 +29,85 @@ ON CONFLICT (id) DO UPDATE SET
     titulo = EXCLUDED.titulo,
     resumo = EXCLUDED.resumo;
 
--- 3. Inserir Lâminas Canônicas do Acervo
+-- 3. Inserir as 4 Lâminas Canônicas Oficiais do Acervo
 INSERT INTO public.laminas (
     id, disciplina_id, topico_id, nome, slug, coloracao, specimen, max_magnification, mpp, default_center, status, dzi_url, preview_image, thumbnail_url, descricao_html
 )
 VALUES
     (
+        'lamina-real1',
+        'histologia',
+        'epitelial',
+        'Pele Espessa',
+        'pele-espessa',
+        'Hematoxilina e Eosina (H&E) • 40x',
+        'Corte Histológico H&E',
+        40,
+        0.1560,
+        '{"x": 0.5, "y": 0.7}'::jsonb,
+        'ativa',
+        'assets/histologia/lamina-real1.dzi',
+        'assets/histologia/lamina-real1-preview.jpg',
+        'assets/histologia/lamina-real1-preview.jpg',
+        '<div class="prose-atlas"><h3>Pele Espessa — Epiderme e Derme</h3><p>Preparação histológica corada em H&amp;E evidenciando epitélio estratificado pavimentoso queratinizado com camada córnea espessa, cristas epidérmicas e papilas dérmicas.</p></div>'
+    ),
+    (
         'osso_maduro_desgaste_ct',
         'histologia',
         'osseo',
-        'Osso Maduro (Lamelar) por Desgaste',
+        'Osso Maduro',
         'osso-maduro-desgaste',
         'Desgaste • 40x',
         'Corte Transversal por Desgaste',
         40,
-        0.25,
+        0.1560,
         '{"x": 0.65, "y": 0.525}'::jsonb,
         'ativa',
         'assets/histologia/osso_maduro_desgaste_ct.dzi',
         'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
         'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
-        '<div class="prose-atlas"><h3>Tecido Ósseo Maduro — Corte Transversal por Desgaste</h3><p>Esta preparação histológica por desgaste exibe a arquitetura do <strong>tecido ósseo compacto maduro (lamelar)</strong>, preservando a matriz mineralizada rica em hidroxiapatita sem coloração química. A unidade estrutural predominante é o <strong>Sistema de Havers (ósteon)</strong>, caracterizado por cilindros concêntricos paralelos ao eixo longitudinal da diáfise. No centro de cada sistema localiza-se o <strong>canal de Havers</strong>, por onde trafegavam vasos sanguíneos e nervos in vivo.</p><p>Circundando os canais dispõem-se as <strong>lamelas concêntricas</strong>, formadas por fibras colágenas mineralizadas. Entre e no interior das lamelas evidenciam-se as <strong>lacunas dos osteócitos</strong>, que alojavam as células maduras. Emergindo radialmente das lacunas, uma intrincada rede de <strong>canalículos</strong> anastomosa-se em toda a matriz, permitindo a difusão de nutrientes e comunicação celular via junções comunicantes.</p><p>Nos espaços entre ósteons adjacentes encontram-se as <strong>lamelas intersticiais</strong>, remanescentes de sistemas de Havers reabsorvidos durante a remodelação óssea. Canais transversais ou oblíquos (<strong>canais de Volkmann</strong>) comunicam os canais de Havers entre si, com a cavidade medular e com a superfície perióstica externa.</p></div>'
+        '<div class="prose-atlas"><h3>Tecido Ósseo Maduro — Corte Transversal por Desgaste</h3><p>Esta preparação histológica por desgaste exibe a arquitetura do <strong>tecido ósseo compacto maduro (lamelar)</strong>, preservando a matriz mineralizada rica em hidroxiapatita sem coloração química. A unidade estrutural predominante é o <strong>Sistema de Havers (ósteon)</strong>, caracterizado por cilindros concêntricos paralelos ao eixo longitudinal da diáfise.</p></div>'
     ),
     (
-        'medula-espinal-he',
+        'osso_maduro_desgaste_ct_2.0',
         'histologia',
-        'nervoso',
-        'Medula Espinal (Corte Transversal)',
-        'medula-espinal',
-        'Hematoxilina e Eosina (H&E)',
-        'Corte Transversal',
-        40,
-        0.25,
+        'osseo',
+        'Osso Maduro 10x',
+        'osso-maduro-desgaste-10x',
+        'Desgaste • 10x Mapeamento 2x5',
+        'Corte Transversal por Desgaste (Mapeamento 10x)',
+        10,
+        0.6250,
         '{"x": 0.5, "y": 0.5}'::jsonb,
         'ativa',
-        'assets/histologia/medula-espinal-he.png',
-        'assets/histologia/medula-espinal-he.png',
-        'assets/histologia/medula-espinal-he.png',
-        '<p>Corte transversal de medula espinal exibindo substância cinzenta central em forma de "H" com motoneurônios no corno anterior e substância branca periférica contendo tratos mielinizados.</p>'
+        'assets/histologia/osso_maduro_desgaste_ct_2.0.dzi',
+        'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+        'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+        '<div class="prose-atlas"><h3>Tecido Ósseo Maduro — Visão Panorâmica 10x</h3><p>Preparação histológica mapeada em objetiva de 10x com escaneamento em grade snake 2×5 (15% de sobreposição) e costura contínua, evidenciando a topografia cortical panorâmica do osso compacto.</p></div>'
     ),
     (
-        'epitelio-simples-escamoso',
+        'osso_maduro_desgaste_ct_3.0',
         'histologia',
-        'epitelial',
-        'Epitélio Pavimentoso Simples',
-        'epitelio-pavimentoso-simples',
-        'Hematoxilina e Eosina (H&E)',
-        'Camada Única',
+        'osseo',
+        'Osso Maduro 40x',
+        'osso-maduro-desgaste-40x',
+        'Desgaste • 40x Mapeamento 6x8',
+        'Corte Transversal por Desgaste (Mapeamento 40x)',
         40,
-        0.25,
+        0.1560,
         '{"x": 0.5, "y": 0.5}'::jsonb,
         'ativa',
-        'assets/histologia/epitelio-simples-escamoso.dzi',
-        'assets/histologia/epitelio-simples-escamoso-preview.jpg',
-        'assets/histologia/epitelio-simples-escamoso-preview.jpg',
-        '<p>Camada única de células epiteliais pavimentosas (achatadas) com núcleos elípticos proeminentes, adaptadas para transporte passivo e difusão de solutos.</p>'
-    ),
-    (
-        'muscular-esqueletico-he',
-        'histologia',
-        'muscular',
-        'Tecido Muscular Estriado Esquelético',
-        'muscular-esqueletico',
-        'Hematoxilina e Eosina (H&E)',
-        'Corte Longitudinal',
-        40,
-        0.25,
-        '{"x": 0.5, "y": 0.5}'::jsonb,
-        'ativa',
-        'assets/histologia/muscular-esqueletico-he.jpg',
-        'assets/histologia/muscular-esqueletico-he.jpg',
-        'assets/histologia/muscular-esqueletico-he.jpg',
-        '<p>Corte longitudinal de músculo estriado esquelético. Fibras musculares multinucleadas com núcleos periféricos achatados e estriações transversais de actina e miosina.</p>'
+        'assets/histologia/osso_maduro_desgaste_ct_3.0.dzi',
+        'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
+        'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
+        '<div class="prose-atlas"><h3>Tecido Ósseo Maduro — Mapeamento de Alta Resolução 40x</h3><p>Mapeamento histológico contínuo em 40x (grade 6×8) com definição detalhada de canais de Havers, lamelas concêntricas, lacunas de osteócitos e rede canalicular.</p></div>'
     )
 ON CONFLICT (id) DO UPDATE SET
     nome = EXCLUDED.nome,
     coloracao = EXCLUDED.coloracao,
+    max_magnification = EXCLUDED.max_magnification,
+    mpp = EXCLUDED.mpp,
+    dzi_url = EXCLUDED.dzi_url,
+    preview_image = EXCLUDED.preview_image,
+    thumbnail_url = EXCLUDED.thumbnail_url,
     descricao_html = EXCLUDED.descricao_html;

@@ -4,13 +4,11 @@
  * ============================================================================
  * Atributos:
  *   is-home   : 'true' | 'false' (padrão: 'false')
- *               true  → emblema dourado/colorido (exclusivo da Home Page)
- *               false → emblema monocromático
+ *               Ativa a coreografia de entrada na Home Page.
  *
- *   theme     : 'dark-bg' (padrão) | 'light-bg'
- *               Controla a cor monocromática do texto quando is-home='false'.
- *               dark-bg  → texto em branco/slate claro (para fundos escuros)
- *               light-bg → texto em slate escuro (para fundos claros)
+ *   theme     : 'light-bg' (padrão) | 'pure-white'
+ *               light-bg   → slate-900 + azul-petróleo #0369A1 (padrão institucional)
+ *               pure-white → branco monocromático (sobre fundos escuros)
  *
  *   size      : 'sm' | 'md' (padrão) | 'lg'
  *               Escala proporcionalmente o emblema e o texto.
@@ -63,7 +61,7 @@ class BrandLogo extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['is-home', 'theme', 'size', 'show-subtitle', 'variant', 'compact'];
+    return ['is-home', 'theme', 'size', 'show-subtitle', 'compact'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -81,14 +79,13 @@ class BrandLogo extends HTMLElement {
   updateCompactState(isCompact) {
     const owlWrapper = this.querySelector('.brand-owl-wrapper');
     if (owlWrapper) {
-      const isGlobalDark = document.documentElement.getAttribute('data-theme') === 'dark';
       owlWrapper.style.maxWidth = isCompact ? '0px' : '56px';
       owlWrapper.style.opacity = isCompact ? '0' : '1';
       owlWrapper.style.transform = isCompact ? 'scale(0.72) translateY(-1px)' : 'scale(1) translateY(0)';
       owlWrapper.style.marginRight = isCompact ? '-10px' : '0px';
       owlWrapper.style.filter = isCompact
         ? 'blur(1px)'
-        : (isGlobalDark ? 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.25))' : 'drop-shadow(0 0 4px rgba(3, 105, 161, 0.22))');
+        : 'drop-shadow(0 0 4px rgba(3, 105, 161, 0.22))';
       owlWrapper.style.pointerEvents = isCompact ? 'none' : 'auto';
     }
 
@@ -103,21 +100,11 @@ class BrandLogo extends HTMLElement {
 
   render() {
     // ─── Atributos ──────────────────────────────────────────────────────────
-    const isHome       = this.getAttribute('is-home') === 'true'
-                         // retrocompatibilidade: variant="dark" sem is-home → monocromático escuro
-                         || false;
+    const isHome       = this.getAttribute('is-home') === 'true';
     const isCompact    = this.getAttribute('compact') === 'true';
-    const rawTheme     = this.getAttribute('theme') || 'dark-bg';
+    const theme        = this.getAttribute('theme') || 'light-bg';
     const size         = this.getAttribute('size') || 'md';
     const showSubtitle = (this.getAttribute('show-subtitle') !== 'false') && !isCompact;
-    // Retrocompatibilidade com o atributo legado "variant"
-    const legacyVariant = this.getAttribute('variant'); // 'dark' | 'light' | null
-
-    // ─── Resolução de tema ──────────────────────────────────────────────────
-    // Prioridade: is-home > theme > variant legado
-    let theme = rawTheme;
-    if (legacyVariant === 'light') theme = 'light-bg';
-    if (legacyVariant === 'dark')  theme = 'dark-bg';
 
     // ─── Tamanhos (escala proporcional) ────────────────────────────────────
     const sizes = {
@@ -151,26 +138,17 @@ class BrandLogo extends HTMLElement {
     };
     const s = sizes[size] || sizes.md;
 
-    // ─── Paleta de Cores (Sincronizada com Tema Claro / Tema Escuro Global) ──
+    // ─── Paleta de Cores (Light Mode Oficial) ───────────────────────────────
     let palasStyle    = '';
     let atlasStyle    = '';
     let subtitleStyle = '';
     let imgStyle      = '';
-
-    const globalTheme = document.documentElement.getAttribute('data-theme');
-    const isGlobalDark = globalTheme ? (globalTheme === 'dark') : (theme === 'dark-bg');
 
     if (theme === 'pure-white') {
       palasStyle    = 'color: #ffffff;';
       atlasStyle    = 'color: #ffffff;';
       subtitleStyle = 'color: #ffffff;';
       imgStyle      = 'filter: brightness(0) invert(1);';
-    } else if (isGlobalDark) {
-      // TEMA ESCURO (Preto Ônix & Dourado Clássico): Marfim (#F4F2ED) + Ouro-Champanhe (#D4AF37)
-      palasStyle    = 'color: #f4f2ed;';
-      atlasStyle    = 'color: #d4af37;';
-      subtitleStyle = 'color: #a1a1aa;';
-      imgStyle      = 'color: #d4af37;';
     } else {
       // TEMA CLARO (Branco Frio & Azul-Petróleo): Slate-900 + Azul-Petróleo (#0369A1)
       palasStyle    = 'color: #0f172a;';

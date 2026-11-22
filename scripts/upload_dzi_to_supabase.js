@@ -106,9 +106,7 @@ async function uploadDziToStorage(baseName) {
     console.log(`\n✓ Todos os azulejos enviados com sucesso!`);
   }
 
-  const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${baseName}.dzi`;
-  console.log(`\n🎉 URL Pública Global no Supabase:`);
-  console.log(publicUrl);
+  console.log(`\n🎉 DZI enviado ao bucket privado '${BUCKET}'. Use o caminho relativo 'assets/histologia/${baseName}.dzi' (servido via /api/tile).`);
 }
 
 async function main() {

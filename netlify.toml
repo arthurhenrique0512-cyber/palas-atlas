@@ -9,8 +9,7 @@
     "assets/histologia/lamina-real1_files/**",
     "assets/histologia/osso_maduro_desgaste_ct_files/**",
     "assets/histologia/osso_maduro_desgaste_ct_2.0_files/**",
-    "assets/histologia/osso_maduro_desgaste_ct_3.0_files/**",
-    "assets/histologia/epitelio-simples-escamoso_files/**"
+    "assets/histologia/osso_maduro_desgaste_ct_3.0_files/**"
   ]
 
 # Catálogo Sanitizado de Lâminas (Oculta caminhos físicos brutos)
@@ -157,6 +156,12 @@
   force = true
 
 [[redirects]]
+  from = "/lib/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
   from = "/camera-guide-mac/*"
   to = "/404.html"
   status = 403
@@ -200,6 +205,18 @@
 
 [[redirects]]
   from = "/tsconfig.tsbuildinfo"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/out/*"
+  to = "/404.html"
+  status = 403
+  force = true
+
+[[redirects]]
+  from = "/css/input.css"
   to = "/404.html"
   status = 403
   force = true

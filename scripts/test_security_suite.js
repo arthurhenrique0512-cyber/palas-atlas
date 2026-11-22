@@ -87,7 +87,7 @@ async function runPenetrationSuite() {
 
   // 1.4 Teste HTTP direto ao Supabase Storage (tentativa de download público)
   console.log('\n--- GRUPO 2: Tentativa de Bypass via URL Direta do Storage ---');
-  const directStorageUrl = `${SUPABASE_URL}/storage/v1/object/public/laminas-dzi/epitelio-simples-escamoso_files/10/0_0.jpg`;
+  const directStorageUrl = `${SUPABASE_URL}/storage/v1/object/public/laminas-dzi/lamina-real1_files/10/0_0.jpg`;
   try {
     const directRes = await fetch(directStorageUrl);
     const directBlocked = directRes.status === 400 || directRes.status === 403 || directRes.status === 404;
@@ -106,7 +106,7 @@ async function runPenetrationSuite() {
   for (const scraper of scrapers) {
     const res = await tileProxy.handler({
       httpMethod: 'GET',
-      queryStringParameters: { path: 'epitelio-simples-escamoso_files/10/0_0.jpg', token: 'dummy' },
+      queryStringParameters: { path: 'lamina-real1_files/10/0_0.jpg', token: 'dummy' },
       headers: { 'user-agent': scraper, 'client-ip': '189.40.10.5' }
     });
     assert(res.statusCode === 403, 
@@ -122,7 +122,7 @@ async function runPenetrationSuite() {
   // 4.1 Requisição sem nenhum token
   const noTokenRes = await tileProxy.handler({
     httpMethod: 'GET',
-    queryStringParameters: { path: 'epitelio-simples-escamoso_files/10/0_0.jpg' },
+    queryStringParameters: { path: 'lamina-real1_files/10/0_0.jpg' },
     headers: { 'client-ip': '189.40.10.5', 'user-agent': 'Mozilla/5.0' }
   });
   assert(noTokenRes.statusCode === 401, 'Download sem token rejeitado com 401', noTokenRes.body);
@@ -130,7 +130,7 @@ async function runPenetrationSuite() {
   // 4.2 Token com assinatura adulterada
   const authRes = await tileAuth.handler({
     httpMethod: 'GET',
-    queryStringParameters: { id: 'epitelio-simples-escamoso' },
+    queryStringParameters: { id: 'lamina-real1' },
     headers: { 'client-ip': '189.40.10.5' }
   });
   const validToken = JSON.parse(authRes.body).token;
@@ -139,10 +139,18 @@ async function runPenetrationSuite() {
   const tamperedToken = validToken.slice(0, -3) + 'xyz';
   const tamperedRes = await tileProxy.handler({
     httpMethod: 'GET',
-    queryStringParameters: { path: 'epitelio-simples-escamoso_files/10/0_0.jpg', token: tamperedToken },
+    queryStringParameters: { path: 'lamina-real1_files/10/0_0.jpg', token: tamperedToken },
     headers: { 'client-ip': '189.40.10.5', 'user-agent': 'Mozilla/5.0' }
   });
   assert(tamperedRes.statusCode === 401, 'Token adulterado rejeitado com 401', tamperedRes.body);
+
+  // 4.3 Token válido de uma lâmina tentando acessar azulejo de outra lâmina (cross-slide)
+  const crossSlideRes = await tileProxy.handler({
+    httpMethod: 'GET',
+    queryStringParameters: { path: 'osso_maduro_desgaste_ct_3.0_files/10/0_0.jpeg', token: validToken },
+    headers: { 'client-ip': '189.40.10.5', 'user-agent': 'Mozilla/5.0' }
+  });
+  assert(crossSlideRes.statusCode === 403, 'Token de outra lâmina rejeitado com 403 (vínculo estrito)', crossSlideRes.body);
 
   // --------------------------------------------------------------------------
   // GRUPO 5: TESTE DE RATE LIMITING (DEFESA CONTRA DOWNLOAD EM RAJADA)
@@ -153,7 +161,7 @@ async function runPenetrationSuite() {
   for (let i = 1; i <= 90; i++) {
     const res = await tileProxy.handler({
       httpMethod: 'GET',
-      queryStringParameters: { path: 'epitelio-simples-escamoso_files/10/0_0.jpg', token: validToken },
+      queryStringParameters: { path: 'lamina-real1_files/10/0_0.jpg', token: validToken },
       headers: { 'client-ip': testIp, 'user-agent': 'Mozilla/5.0' }
     });
     if (res.statusCode === 429) {
@@ -171,7 +179,7 @@ async function runPenetrationSuite() {
   console.log('\n--- GRUPO 6: Fluxo Legítimo de Navegação no Microscópio ---');
   const validRes = await tileProxy.handler({
     httpMethod: 'GET',
-    queryStringParameters: { path: 'epitelio-simples-escamoso_files/10/0_0.jpg', token: validToken },
+    queryStringParameters: { path: 'lamina-real1_files/10/0_0.jpg', token: validToken },
     headers: { 'client-ip': '189.40.10.5', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)' }
   });
   assert(validRes.statusCode === 200, 'Azulejo entregue com sucesso para usuário legítimo', `Status 200 OK`);

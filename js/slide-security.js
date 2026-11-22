@@ -24,16 +24,26 @@ class SlideSecurityEngine {
     this.gatewayAvailable = null;
     this.viewerElement = null;
     this.watermarkCanvas = null;
-    this.watermarkAnimFrame = null;
     this.currentSlideId = null;
     this.currentUserIdentifier = null;
     this.driftOffsetX = 0;
     this.driftOffsetY = 0;
-    this.driftDirection = 1;
-    this.lastDriftUpdate = 0;
     this.hardenedEventsBound = false;
     this.authListenerBound = false;
-    this.themeObserver = null;
+  }
+
+  /**
+   * Extrai o identificador canônico da pirâmide DZI (ex.: "osso_maduro_desgaste_ct_3.0")
+   * a partir de uma URL/caminho .dzi, pasta *_files ou slug direto.
+   */
+  extrairSlugDzi(sourceOrId) {
+    if (!sourceOrId || typeof sourceOrId !== 'string') return null;
+    const clean = sourceOrId.split('?')[0].split('#')[0].trim();
+    const dziMatch = clean.match(/([^/\\]+)\.dzi$/i);
+    if (dziMatch) return dziMatch[1];
+    const filesMatch = clean.match(/([^/\\]+)_files(?:\/|$)/i);
+    if (filesMatch) return filesMatch[1];
+    return clean.replace(/^\/+/, '');
   }
 
   /**
@@ -46,7 +56,7 @@ class SlideSecurityEngine {
   init(options = {}) {
     this.viewerElement = options.viewerElement || document.getElementById('osd-viewer');
     if (options.slideId) {
-      this.currentSlideId = options.slideId;
+      this.currentSlideId = this.extrairSlugDzi(options.slideId) || options.slideId;
     }
     this.currentUserIdentifier = options.userEmail || this._obterIdentificadorSessao();
 
@@ -55,13 +65,11 @@ class SlideSecurityEngine {
       return;
     }
 
-    // 1. Blindagem do DOM, tema e redimensionamento (executado uma única vez)
+    // 1. Blindagem do DOM e redimensionamento (executado uma única vez)
     if (!this.hardenedEventsBound) {
       this._aplicarBlindagemCliente();
       this._protegerCanvasAPI();
       window.addEventListener('resize', () => this._redimensionarMarcaDagua());
-      this.themeObserver = new MutationObserver(() => this._redimensionarMarcaDagua());
-      this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
       this.hardenedEventsBound = true;
     }
 
@@ -101,10 +109,18 @@ class SlideSecurityEngine {
    * Atualiza a lâmina em foco e renova os parâmetros da marca d'água
    */
   setSlide(slideId, userEmail = null) {
-    this.currentSlideId = slideId;
+    this.currentSlideId = this.extrairSlugDzi(slideId) || slideId;
     if (userEmail) this.currentUserIdentifier = userEmail;
-    this.renovarTicketSessao(slideId);
+    this.renovarTicketSessao(this.currentSlideId);
     this._desenharMarcaDagua();
+  }
+
+  /**
+   * Avança o deslocamento estocástico da marca d'água sob demanda (apenas em capturas/prints)
+   */
+  _avancarDeriva() {
+    this.driftOffsetX = (this.driftOffsetX + 37) % 180;
+    this.driftOffsetY = (this.driftOffsetY + 23) % 180;
   }
 
   /**
@@ -173,9 +189,6 @@ class SlideSecurityEngine {
     this.watermarkCanvas = canvas;
     this.targetHost = host;
     this._redimensionarMarcaDagua();
-
-    // Loop de micro-deriva estocástica para quebrar filtros medianos de remoção algorítmica
-    this._iniciarAnimacaoDeriva();
   }
 
   /**
@@ -184,6 +197,7 @@ class SlideSecurityEngine {
    */
   dispararMarcaDaguaCaptura(durationMs = 4500) {
     if (!this.watermarkCanvas) return;
+    this._avancarDeriva();
     this._desenharMarcaDagua();
     this.watermarkCanvas.style.opacity = '1';
 
@@ -205,24 +219,8 @@ class SlideSecurityEngine {
     this._desenharMarcaDagua();
   }
 
-  _iniciarAnimacaoDeriva() {
-    if (this.watermarkAnimFrame) cancelAnimationFrame(this.watermarkAnimFrame);
-
-    const loop = (timestamp) => {
-      // Atualiza a posição a cada 45 segundos de forma suave
-      if (!this.lastDriftUpdate || timestamp - this.lastDriftUpdate > 45000) {
-        this.lastDriftUpdate = timestamp;
-        this.driftOffsetX = (this.driftOffsetX + 37) % 180;
-        this.driftOffsetY = (this.driftOffsetY + 23) % 180;
-        this._desenharMarcaDagua();
-      }
-      this.watermarkAnimFrame = requestAnimationFrame(loop);
-    };
-    this.watermarkAnimFrame = requestAnimationFrame(loop);
-  }
-
   /**
-   * Renderiza a matriz diagonal da marca d'água de alta fidelidade
+   * Renderiza a matriz diagonal da marca d'água de alta fidelidade (Light Mode exclusivo)
    */
   _desenharMarcaDagua() {
     if (!this.watermarkCanvas) return;
@@ -235,12 +233,7 @@ class SlideSecurityEngine {
 
     ctx.clearRect(0, 0, width, height);
 
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    // Contraste elevado para estampar com nitidez no momento exato da captura/print
-    const watermarkColor = isLight 
-      ? 'rgba(15, 23, 42, 0.38)' 
-      : 'rgba(212, 175, 55, 0.42)';
-
+    const watermarkColor = 'rgba(15, 23, 42, 0.38)';
     const textoMarca = 'PALAS ATLAS';
 
     ctx.save();
@@ -255,7 +248,7 @@ class SlideSecurityEngine {
 
     ctx.font = `800 ${15 * dpr}px 'Inter', system-ui, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.shadowColor = isLight ? 'rgba(255, 255, 255, 0.45)' : 'rgba(0, 0, 0, 0.65)';
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.45)';
     ctx.shadowBlur = 3 * dpr;
 
     for (let x = startX; x < endX; x += stepX) {
@@ -266,15 +259,6 @@ class SlideSecurityEngine {
     }
 
     ctx.restore();
-  }
-
-  _ofuscarEmail(email) {
-    const partes = email.split('@');
-    if (partes.length !== 2) return email;
-    const user = partes[0];
-    const dominio = partes[1];
-    const visivel = user.length <= 3 ? user[0] + '**' : user.substring(0, 2) + '***' + user.slice(-1);
-    return `${visivel}@${dominio}`;
   }
 
   /**
@@ -320,6 +304,7 @@ class SlideSecurityEngine {
     // Ativamos a marca d'água no blur para que qualquer print ou recorte capture a imagem com PALAS ATLAS!
     window.addEventListener('blur', () => {
       if (this.watermarkCanvas) {
+        this._avancarDeriva();
         this._desenharMarcaDagua();
         this.watermarkCanvas.style.opacity = '1';
       }
@@ -339,6 +324,7 @@ class SlideSecurityEngine {
     // 5. Suporte a caixas de diálogo de impressão nativa
     window.addEventListener('beforeprint', () => {
       if (this.watermarkCanvas) {
+        this._avancarDeriva();
         this._desenharMarcaDagua();
         this.watermarkCanvas.style.opacity = '1';
       }
@@ -494,11 +480,15 @@ class SlideSecurityEngine {
     cleanPath = cleanPath.split('?')[0].replace(/^\/+/, '');
     cleanPath = cleanPath.replace(/^assets\/histologia\//, '');
 
-    if (!this.sessionTicket) {
-      if (this.currentSlideId) {
-        this.renovarTicketSessao(this.currentSlideId);
+    const tileSlug = this.extrairSlugDzi(cleanPath);
+    if (!this.sessionTicket || (tileSlug && this.ticketSlideId && this.ticketSlideId.toLowerCase() !== tileSlug.toLowerCase())) {
+      const targetId = tileSlug || this.currentSlideId;
+      if (targetId) {
+        this.renovarTicketSessao(targetId);
       }
-      return `/api/tile?p=${encodeURIComponent(cleanPath)}`;
+      if (!this.sessionTicket) {
+        return `/api/tile?p=${encodeURIComponent(cleanPath)}`;
+      }
     }
 
     return `/api/tile?p=${encodeURIComponent(cleanPath)}&t=${encodeURIComponent(this.sessionTicket)}`;

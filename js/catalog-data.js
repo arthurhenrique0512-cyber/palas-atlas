@@ -31,7 +31,6 @@ export const catalogData = {
             disciplina: "histologia",
             topico: "epitelial",
             maxMagnification: 40,
-            zoom4xRatio: 0.65,
             defaultCenter: { x: 0.5, y: 0.70 },
             dziUrl: "assets/histologia/lamina-real1.dzi",
             imageUrl: "assets/histologia/lamina-real1.dzi",
@@ -85,7 +84,6 @@ export const catalogData = {
             disciplina: "histologia",
             topico: "osseo",
             maxMagnification: 40,
-            zoom4xRatio: 0.28,
             defaultCenter: { x: 0.5, y: 0.5 },
             dziUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
             imageUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
@@ -99,7 +97,6 @@ export const catalogData = {
             disciplina: "histologia",
             topico: "osseo",
             maxMagnification: 10,
-            zoom4xRatio: 0.35,
             defaultCenter: { x: 0.5, y: 0.5 },
             dziUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
             imageUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
@@ -113,7 +110,6 @@ export const catalogData = {
             disciplina: "histologia",
             topico: "osseo",
             maxMagnification: 40,
-            zoom4xRatio: 0.28,
             defaultCenter: { x: 0.65, y: 0.525 },
             dziUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
             imageUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
@@ -136,25 +132,6 @@ export const catalogData = {
         id: "circulatorio",
         titulo: "Sistema Circulatório e Microvascularização",
         resumo: "Sistema estruturado em vasos sanguíneos cuja parede padrão é formada por três túnicas: Íntima (endotélio plano simples e camada subendotelial), Média (músculo liso e lâminas elásticas) e Adventícia (tecido conjuntivo com vasa vasorum em grandes vasos). A Microvascularização compreende arteríolas, capilares e vênulas pós-capilares. Os capilares contêm apenas endotélio e lâmina basal, subdividindo-se em: Contínuos (junções oclusivas seladas, sem poros; ex: músculo e SNC), Fenestrados (poros perfurados na parede endotelial; ex: rins e intestinos) e Sinusoides/Descontínuos (trajeto tortuoso, amplas fenestras e lâmina basal descontínua; ex: fígado, baço e medula óssea)."
-      }
-    ]
-  },
-  anatomia: {
-    tituloDisciplina: "Anatomia Macroscópica",
-    bibliografia: "Gray's Anatomia - Base Anatômica da Prática Clínica",
-    caminhoBase: "/assets/anatomia/",
-    corDestaque: "border-slate-600 bg-slate-50 text-slate-800",
-    corPino: "bg-slate-600",
-    topicos: [
-      {
-        id: "esqueletico",
-        titulo: "Osteologia e Sistema Articular",
-        resumo: "Estudo das estruturas ósseas, cartilagens e articulações que formam o arcabouço de sustentação do corpo humano. Em desenvolvimento ativo para inclusão de peças 3D e pranchas fotográficas fotorealistas."
-      },
-      {
-        id: "nervoso",
-        titulo: "Neuroanatomia Topográfica",
-        resumo: "Análise das divisões estruturais do Sistema Nervoso Central (Encéfalo e Medula Espinal) e Sistema Nervoso Periférico. Inclui configuração externa do tronco encefálico, sulcos corticais e vascularização do polígono de Willis."
       }
     ]
   },
@@ -251,36 +228,3 @@ export const catalogData = {
     ]
   }
 };
-
-/**
- * Retorna todos os tópicos integrados em formato unificado para catálogos interativos.
- */
-export function getAllTopics() {
-  const todos = [];
-  Object.keys(catalogData).forEach((key) => {
-    const d = catalogData[key];
-    d.topicos.forEach((topico) => {
-      todos.push({
-        disciplina: key,
-        tituloDisciplina: d.tituloDisciplina,
-        caminhoBase: d.caminhoBase,
-        corDestaque: d.corDestaque,
-        ...topico
-      });
-    });
-  });
-  return todos;
-}
-
-/**
- * Compatibilidade legada: o acervo personalizado em produção reside no Firestore,
- * não em localStorage local. Mantido como no-op seguro para chamadores existentes.
- */
-export function sincronizarAcervoPersonalizado() {
-  // No-op: lâminas personalizadas são carregadas exclusivamente do Firestore.
-}
-
-if (typeof window !== "undefined") {
-  window.App = window.App || {};
-  window.App.sincronizarAcervoPersonalizado = sincronizarAcervoPersonalizado;
-}

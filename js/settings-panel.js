@@ -11,7 +11,6 @@ class SettingsPanel extends HTMLElement {
     
     // Definições padrão
     this.settings = {
-      theme: 'light', // 'light' (padrão institucional) ou 'dark'
       typography: 'medium', // 'small', 'medium', 'large'
       density: 'comfortable', // 'compact', 'comfortable'
       reduceMotion: false // boolean
@@ -25,6 +24,17 @@ class SettingsPanel extends HTMLElement {
     this.render();
     this.attachEvents();
     this.applySettingsGlobally();
+  }
+
+  disconnectedCallback() {
+    if (this._onOpenSettings) {
+      window.removeEventListener('open-settings-panel', this._onOpenSettings);
+      this._onOpenSettings = null;
+    }
+    if (this._onKeyDown) {
+      document.removeEventListener('keydown', this._onKeyDown);
+      this._onKeyDown = null;
+    }
   }
 
   loadSettings() {
@@ -82,21 +92,7 @@ class SettingsPanel extends HTMLElement {
       root.classList.remove('reduce-motion');
     }
 
-    // 3. Tema Clínico Institucional (Light Mode Oficial)
-    this.settings.theme = 'light';
-    root.setAttribute('data-theme', 'light');
-    root.classList.remove('dark');
-    try {
-      localStorage.setItem('palas_theme', 'light');
-    } catch (e) {}
-    document.querySelectorAll('brand-logo').forEach(el => {
-      if (el.getAttribute('theme') !== 'dark-bg') {
-        el.setAttribute('theme', 'light-bg');
-      }
-      if (typeof el.render === 'function') el.render();
-    });
-
-    // 4. Densidade
+    // 3. Densidade
     if (this.settings.density === 'compact') {
       root.classList.add('density-compact');
     } else {
@@ -176,7 +172,7 @@ class SettingsPanel extends HTMLElement {
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+        <div class="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-thin">
           
           <!-- Tipografia -->
           <div class="space-y-3">
@@ -242,16 +238,18 @@ class SettingsPanel extends HTMLElement {
     }
 
     // Escuta evento global disparado pelo botão do header
-    window.addEventListener('open-settings-panel', () => {
+    this._onOpenSettings = () => {
       this.togglePanel();
-    });
+    };
+    window.addEventListener('open-settings-panel', this._onOpenSettings);
 
     // Fecha com a tecla Escape quando aberto
-    document.addEventListener('keydown', (e) => {
+    this._onKeyDown = (e) => {
       if (e.key === 'Escape' && this.isOpen) {
         this.togglePanel();
       }
-    });
+    };
+    document.addEventListener('keydown', this._onKeyDown);
   }
 }
 

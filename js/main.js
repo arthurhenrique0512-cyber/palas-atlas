@@ -2,7 +2,6 @@
  * Roteador e Controlador Principal do Palas Atlas
  * Responsável por gerenciar a navegação, transições de tela e vinculação de estado.
  */
-import { db } from "./firebase-config.js";
 import { setFrenteAtiva, subscribe, getState } from "./state.js";
 import { initGlobalSearch } from "./search-engine.js";
 import {
@@ -96,7 +95,7 @@ function init() {
   }
   if (frenteParam && topicoParam) {
     abrirTopico(topicoParam, frenteParam, true);
-  } else if (frenteParam && ["anatomia", "histologia", "patologia", "parasitologia", "microbiologia"].includes(frenteParam)) {
+  } else if (frenteParam && ["histologia", "patologia", "parasitologia", "microbiologia"].includes(frenteParam)) {
     renderView(getState());
     abrirDisciplinaHome(frenteParam, true);
   } else if (frenteParam === "dashboard") {
@@ -150,7 +149,6 @@ function renderView(state) {
   }
 
   const logoLink = document.getElementById("headerBrandLink");
-  const desktopNav = document.getElementById("headerDesktopNav");
 
   const mainContainer = document.getElementById("mainRouterContainer");
   if (mainContainer) {
@@ -215,8 +213,6 @@ function renderView(state) {
 
   // Garante que o menu lateral seja fechado em transições de tela
   fecharMenuLateral();
-
-  const minimalHeader = document.getElementById("palasMinimalHeader");
   
   // Encerra listeners e instâncias do CMS se não estiver no dashboard
   if (state.frenteAtiva !== "dashboard" && window.App && typeof window.App.encerrarPainelCms === "function") {
@@ -230,13 +226,11 @@ function renderView(state) {
   // Renderização do Hub de Acesso (Home)
   if (!state.frenteAtiva) {
     if (elements.pgHome) elements.pgHome.classList.remove("hidden");
-    if (minimalHeader) minimalHeader.classList.remove("hidden"); // Header global sempre visível
     return;
   }
 
   // Renderização das disciplinas e módulos ativos
-  if (minimalHeader) minimalHeader.classList.remove("hidden");
-  if (["anatomia", "histologia", "patologia", "parasitologia", "microbiologia"].includes(state.frenteAtiva)) {
+  if (["histologia", "patologia", "parasitologia", "microbiologia"].includes(state.frenteAtiva)) {
     if (elements.pgHistologia) elements.pgHistologia.classList.remove("hidden");
     const subCatalog = document.getElementById("histoSubCatalog");
     const isTopicOpen = subCatalog && !subCatalog.classList.contains("hidden");
@@ -264,11 +258,11 @@ function renderView(state) {
 /**
  * Aciona o seletor de frentes no store reativo com suporte a History API.
  * Para frentes do ciclo básico, agora expande o accordion diretamente na Home sem página intermediária.
- * @param {string} frente - Identificador ('anatomia', 'histologia', etc.).
+ * @param {string} frente - Identificador ('histologia', 'patologia', 'parasitologia', 'microbiologia').
  * @param {boolean} skipHistory - Impede o pushState se a chamada vier de um evento popstate.
  */
 function selecionarFrente(frente, skipHistory = false) {
-  if (["anatomia", "histologia", "patologia", "parasitologia", "microbiologia"].includes(frente)) {
+  if (["histologia", "patologia", "parasitologia", "microbiologia"].includes(frente)) {
     if (window.App && typeof window.App.abrirDisciplinaHome === "function") {
       window.App.abrirDisciplinaHome(frente);
       return;

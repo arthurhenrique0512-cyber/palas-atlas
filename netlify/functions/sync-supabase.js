@@ -193,7 +193,7 @@ exports.handler = async function(event) {
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: 'Erro interno ao sincronizar dados com o Supabase.' })
     };
   }
 };

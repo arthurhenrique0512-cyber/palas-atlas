@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -24,24 +24,6 @@
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-
-  <!-- Estúdio de Microscopia: Padronizado no Design Clínico Institucional (Light Mode) -->
-  <script>
-    (function() {
-      var root = document.documentElement;
-      root.setAttribute('data-theme', 'light');
-      root.classList.remove('dark');
-      try {
-        localStorage.setItem('palas_theme', 'light');
-      } catch (e) {}
-      document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('brand-logo').forEach(function(el) {
-          el.setAttribute('theme', 'light-bg');
-          if (typeof el.render === 'function') el.render();
-        });
-      });
-    })();
-  </script>
 
   <link rel="stylesheet" href="css/tailwind.min.css?v=20261118v4">
   <link rel="stylesheet" href="css/styles.css?v=20261118v4">
@@ -552,7 +534,7 @@
         <!-- Display do Zoom Dinâmico em Tempo Real -->
         <div class="flex items-center gap-1.5 px-2.5 py-1.5 lg:py-1 rounded-xl bg-sky-50 border border-sky-200 shrink-0 min-h-[38px] sm:min-h-[40px] lg:min-h-0">
           <span class="w-1.5 h-1.5 rounded-full bg-[#0284c7] animate-pulse"></span>
-          <span class="text-[#0369a1] font-bold text-xs" id="zoomIndicatorDisplay">4.0x</span>
+          <span class="text-[#0369a1] font-bold text-xs" id="zoomIndicatorDisplay">4x</span>
         </div>
       </div>
 
@@ -721,7 +703,6 @@
 
   </div><!-- /workspace -->
 
-  <script type="module" src="js/firebase-config.js?v=20261118v4"></script>
   <script type="module" src="js/slide-security.js?v=20261118v4"></script>
   <script type="module" src="js/microscope-engine.js?v=20261118v4"></script>
 

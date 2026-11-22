@@ -6,40 +6,19 @@ import { useParams } from 'next/navigation';
 import {
   ArrowLeft,
   BookOpen,
-  Microscope,
-  Layers,
-  ChevronRight,
-  ExternalLink,
-  Info,
-  Sparkles,
 } from 'lucide-react';
 
-export interface SummaryPoint {
-  label: string;
-  text: string;
-}
+import type {
+  SummaryPoint,
+  ModuloData,
+  SlideCardData,
+  WindowWithFirebase,
+  FirestoreDocSnapshot,
+  FirestoreQuerySnapshot,
+  FirestoreQueryDocSnapshot,
+} from '@/lib/types/atlas';
 
-export interface ModuloData {
-  id: string;
-  title: string;
-  category: string;
-  summaryPoints: SummaryPoint[];
-  bibliographicReference: string;
-  associatedSlides: string[];
-  updatedAt?: any;
-}
-
-export interface SlideCardData {
-  id: string;
-  nome: string;
-  coloracao?: string;
-  thumbnailUrl?: string;
-  topico?: string;
-  disciplina?: string;
-  maxMagnification?: string;
-  dziUrl?: string;
-  imagemUrl?: string;
-}
+export type { SummaryPoint, ModuloData, SlideCardData };
 
 // Lista Curricular de Tópicos para a Sidebar Lateral
 const TOPICOS_SIDEBAR = [
@@ -225,36 +204,43 @@ const SINTESE_CURADA: Record<string, { title: string; points: SummaryPoint[] }> 
   },
 };
 
-// Lâminas padrão associadas para contingência
+// Lâminas padrão associadas para contingência (apenas lâminas oficiais do acervo)
 const LAMINAS_PADRAO: Record<string, SlideCardData[]> = {
   osseo: [
     {
       id: 'cw3XGCgUwN71XdlwkUe5',
       nome: 'Osso Maduro 40x',
-      coloracao: 'Desgaste Natural • Mapeamento 6x8',
+      coloracao: 'Desgaste • Mapeamento 6x8',
       thumbnailUrl: '/assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
       maxMagnification: '40x',
       topico: 'osseo',
       disciplina: 'Histologia',
     },
-  ],
-  conjuntivo: [
     {
-      id: 'conjuntivo_frouxo_01',
-      nome: 'Tecido Conjuntivo Frouxo e Denso',
-      coloracao: 'H&E (Hematoxilina & Eosina) • 40x',
-      thumbnailUrl: '/assets/histologia/lamina-real1-preview.jpg',
+      id: 'FFGk5d9kOAct5HIDdjQ7',
+      nome: 'Osso Maduro 10x',
+      coloracao: 'Desgaste • Mapeamento 2x5',
+      thumbnailUrl: '/assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+      maxMagnification: '10x',
+      topico: 'osseo',
+      disciplina: 'Histologia',
+    },
+    {
+      id: '96ZYqoM2SV8p4fB2QgeM',
+      nome: 'Osso Maduro',
+      coloracao: 'Desgaste • 40x',
+      thumbnailUrl: '/assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
       maxMagnification: '40x',
-      topico: 'conjuntivo',
+      topico: 'osseo',
       disciplina: 'Histologia',
     },
   ],
   epitelial: [
     {
-      id: 'epitelio_simples_01',
-      nome: 'Epitélio Simples Escamoso e Cúbico',
-      coloracao: 'H&E • 40x',
-      thumbnailUrl: '/assets/histologia/epitelio-simples-escamoso-preview.jpg',
+      id: 'a3oRvXvJpMKAtU2RE85q',
+      nome: 'Pele Espessa',
+      coloracao: 'H&E (Hematoxilina & Eosina) • 40x',
+      thumbnailUrl: '/assets/histologia/lamina-real1-preview.jpg',
       maxMagnification: '40x',
       topico: 'epitelial',
       disciplina: 'Histologia',
@@ -313,7 +299,7 @@ export default function DisciplinaDetalhePage() {
     });
     setSlides(LAMINAS_PADRAO[topicId] || []);
 
-    const fb = (window as any).firebase;
+    const fb = (window as WindowWithFirebase).firebase;
     if (fb && fb.firestore) {
       const db = fb.firestore();
       setIsLiveSync(true);
@@ -321,11 +307,11 @@ export default function DisciplinaDetalhePage() {
       // Ouvinte em tempo real no documento do módulo na coleção 'modulos'
       const unsubModulo = db
         .collection('modulos')
-        .doc(topicId)
+        .doc<Partial<ModuloData>>(topicId)
         .onSnapshot(
-          (docSnap: any) => {
-            if (docSnap.exists) {
-              const data = docSnap.data();
+          (docSnap: FirestoreDocSnapshot<Partial<ModuloData>>) => {
+            const data = docSnap.data();
+            if (docSnap.exists && data) {
               setModulo({
                 id: topicId,
                 title: data.title || fallback.title,
@@ -341,7 +327,7 @@ export default function DisciplinaDetalhePage() {
               });
             }
           },
-          (err: any) => {
+          (err: unknown) => {
             console.warn('[Next.js Firestore] Erro no listener do módulo:', err);
           }
         );
@@ -349,11 +335,11 @@ export default function DisciplinaDetalhePage() {
       // Ouvinte em tempo real na coleção 'laminas' com status == 'ativa'
       const unsubLaminas = db
         .collection('laminas')
-        .where('status', '==', 'ativa')
+        .where<Omit<SlideCardData, 'id'>>('status', '==', 'ativa')
         .onSnapshot(
-          (querySnap: any) => {
+          (querySnap: FirestoreQuerySnapshot<Omit<SlideCardData, 'id'>>) => {
             const list: SlideCardData[] = [];
-            querySnap.forEach((doc: any) => {
+            querySnap.forEach((doc: FirestoreQueryDocSnapshot<Omit<SlideCardData, 'id'>>) => {
               const d = doc.data();
               const topicoL = (d.topico || '').toLowerCase().trim();
               if (topicoL === topicId || topicoL.includes(topicId)) {
@@ -365,7 +351,7 @@ export default function DisciplinaDetalhePage() {
               setSlides(list);
             }
           },
-          (err: any) => {
+          (err: unknown) => {
             console.warn('[Next.js Firestore] Erro no listener de lâminas:', err);
           }
         );
@@ -382,25 +368,25 @@ export default function DisciplinaDetalhePage() {
   }, [topicId, fallback]);
 
   return (
-    <div className="min-h-screen bg-[#fafaf9] dark:bg-[#060608] text-slate-800 dark:text-zinc-200 antialiased font-sans">
+    <div className="min-h-screen bg-[#fafaf9] text-slate-800 antialiased font-sans">
       {/* Header Institucional Superior */}
-      <header className="w-full bg-white dark:bg-[#0c0c0f] border-b border-slate-200/80 dark:border-white/10 sticky top-0 z-30 shadow-sm backdrop-blur-md">
+      <header className="w-full bg-white border-b border-slate-200/80 sticky top-0 z-30 shadow-sm backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Lado Esquerdo: Voltar + Divisor Vertical + Logotipo Oficial Agrupados */}
           <div className="flex items-center gap-4 shrink-0">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-xl transition-all no-underline shrink-0"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-xl transition-all no-underline shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Voltar ao Atlas</span>
             </Link>
-            <span className="h-5 w-px bg-slate-200 dark:bg-white/10 shrink-0"></span>
+            <span className="h-5 w-px bg-slate-200 shrink-0"></span>
             <Link href="/" className="flex items-center gap-2 group no-underline shrink-0">
-              <span className="text-lg font-serif font-bold text-slate-950 dark:text-[#f4f2ed] tracking-[0.16em]">
+              <span className="text-lg font-serif font-bold text-slate-950 tracking-[0.16em]">
                 PALAS
               </span>
-              <span className="text-lg font-serif font-bold text-teal-800 dark:text-[#d4af37] tracking-[0.16em]">
+              <span className="text-lg font-serif font-bold text-teal-800 tracking-[0.16em]">
                 ATLAS
               </span>
             </Link>
@@ -409,25 +395,25 @@ export default function DisciplinaDetalhePage() {
           {/* Lado Direito: Links Desktop Alinhados à Direita sem Colisão */}
           <div className="flex items-center gap-6 shrink-0">
             {isLiveSync && (
-              <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Firestore Live Sync
               </span>
             )}
             <nav className="hidden lg:flex items-center gap-6 shrink-0">
-              <Link href="/#secaoDisciplinas" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+              <Link href="/#secaoDisciplinas" className="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors no-underline">
                 Disciplinas
               </Link>
-              <Link href="/#secaoLaminasPopulares" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+              <Link href="/#secaoLaminasPopulares" className="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors no-underline">
                 Lâminas
               </Link>
-              <Link href="/#secaoComoUsar" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+              <Link href="/#secaoComoUsar" className="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors no-underline">
                 Como Usar
               </Link>
-              <Link href="/#secaoFAQ" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+              <Link href="/#secaoFAQ" className="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors no-underline">
                 Dúvidas
               </Link>
-              <Link href="/sobre" className="text-sm font-medium text-slate-600 hover:text-sky-800 dark:text-zinc-400 dark:hover:text-teal-400 transition-colors no-underline">
+              <Link href="/sobre.html" className="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors no-underline">
                 Sobre Nós
               </Link>
             </nav>
@@ -436,14 +422,14 @@ export default function DisciplinaDetalhePage() {
       </header>
 
       {/* Conteúdo Principal (2 Colunas: Sidebar + Área Central) */}
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6 md:gap-10 items-start">
-          {/* SIDEBAR ESQUERDA - ÍNDICE CURRICULAR */}
-          <aside className="w-full space-y-4">
-            <div className="bg-white dark:bg-[#0c0c0f] border border-slate-200/90 dark:border-white/10 rounded-2xl p-5 shadow-sm">
-              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-100 dark:border-white/5">
-                <BookOpen className="w-4 h-4 text-teal-800 dark:text-teal-400 shrink-0" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-zinc-300 font-mono">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8 pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6 lg:gap-10 items-start">
+          {/* SIDEBAR ESQUERDA - ÍNDICE CURRICULAR (Desktop lg+) */}
+          <aside className="hidden lg:block w-full space-y-4">
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-100">
+                <BookOpen className="w-4 h-4 text-teal-800 shrink-0" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 font-mono">
                   Módulos de Histologia
                 </h3>
               </div>
@@ -456,8 +442,8 @@ export default function DisciplinaDetalhePage() {
                       href={`/disciplinas/${t.id}`}
                       className={`block text-xs py-2 px-3 rounded-xl transition-all leading-snug no-underline ${
                         isActive
-                          ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-950 dark:text-teal-200 font-semibold border-l-2 border-teal-700 dark:border-teal-400 pl-3.5'
-                          : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'
+                          ? 'bg-teal-50 text-teal-950 font-semibold border-l-2 border-teal-700 pl-3.5'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                       }`}
                     >
                       {t.nome}
@@ -470,42 +456,61 @@ export default function DisciplinaDetalhePage() {
 
           {/* COLUNA DA DIREITA - DETALHAMENTO & RESUMO MORFOLÓGICO */}
           <section className="w-full min-w-0">
+            {/* FAIXA HORIZONTAL DE MÓDULOS (Mobile e Tablet: lg:hidden) */}
+            <div className="lg:hidden mb-5 overflow-x-auto no-scrollbar flex items-center gap-2 pb-1">
+              {TOPICOS_SIDEBAR.map((t) => {
+                const isActive = t.id === topicId;
+                return (
+                  <Link
+                    key={t.id}
+                    href={`/disciplinas/${t.id}`}
+                    className={`shrink-0 whitespace-nowrap px-3 py-2 min-h-[38px] inline-flex items-center rounded-xl border text-xs transition-colors no-underline ${
+                      isActive
+                        ? 'bg-teal-900 text-white border-teal-900 font-semibold'
+                        : 'bg-white text-slate-600 border-slate-200/90 hover:text-slate-900'
+                    }`}
+                  >
+                    {t.nome}
+                  </Link>
+                );
+              })}
+            </div>
             {/* MIGALHAS DE PÃO (BREADCRUMBS) */}
             <nav
               aria-label="Navegação estrutural"
-              className="flex items-center gap-2 text-xs font-sans text-slate-500 dark:text-zinc-400 mb-5 flex-wrap"
+              className="flex items-center gap-2 text-xs font-sans text-slate-500 mb-5 flex-wrap"
             >
               <Link
                 href="/"
-                className="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline"
+                className="text-slate-500 hover:text-slate-900 transition-colors no-underline"
               >
                 Início
               </Link>
-              <span className="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-              <span className="text-slate-500 dark:text-zinc-400">
+              <span className="text-slate-300 select-none">&rsaquo;</span>
+              <span className="text-slate-500">
                 {modulo.category}
               </span>
-              <span className="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-              <span className="text-slate-900 dark:text-white font-medium pointer-events-none">
+              <span className="text-slate-300 select-none">&rsaquo;</span>
+              <span className="text-slate-900 font-medium pointer-events-none">
                 {modulo.title}
               </span>
             </nav>
 
             {/* TÍTULO DO MÓDULO */}
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-950 dark:text-white tracking-tight mb-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight mb-4">
               {modulo.title}
             </h1>
 
             {/* CARD DE RESUMO MORFOLÓGICO ACADÊMICO */}
-            <div className="bg-white dark:bg-[#0c0c0f] border border-slate-200/90 dark:border-white/10 rounded-2xl p-6 sm:p-7 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-8">
-              <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100 dark:border-white/5">
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-8">
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-4 rounded-full bg-teal-700"></span>
-                  <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                  <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                     Resumo Morfológico
                   </h2>
                 </div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-teal-700 dark:text-teal-400 font-semibold bg-teal-50 dark:bg-teal-950/50 px-2.5 py-0.5 rounded-full border border-teal-200/60 dark:border-teal-700/40">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-teal-700 font-semibold bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/60">
                   Curadoria Ativa
                 </span>
               </div>
@@ -514,12 +519,12 @@ export default function DisciplinaDetalhePage() {
               <ul className="space-y-4">
                 {modulo.summaryPoints.map((point, index) => (
                   <li key={index} className="flex items-start gap-3 leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400 shrink-0"></span>
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-600 shrink-0"></span>
                     <div className="text-xs sm:text-sm">
-                      <strong className="font-semibold text-slate-950 dark:text-white">
+                      <strong className="font-semibold text-slate-950">
                         {point.label}:
                       </strong>
-                      <span className="text-slate-600 dark:text-zinc-300 ml-1.5">
+                      <span className="text-slate-600 ml-1.5">
                         {point.text}
                       </span>
                     </div>
@@ -528,11 +533,11 @@ export default function DisciplinaDetalhePage() {
               </ul>
 
               {/* Rodapé com Citação Bibliográfica */}
-              <div className="mt-6 pt-3.5 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-400 dark:text-zinc-500">
-                <span className="italic font-sans text-[11px] text-slate-500 dark:text-zinc-400">
+              <div className="mt-6 pt-3.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-400">
+                <span className="italic font-sans text-[11px] text-slate-500">
                   Baseado em {modulo.bibliographicReference}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-zinc-600">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
                   Referência Acadêmica
                 </span>
               </div>
@@ -541,23 +546,23 @@ export default function DisciplinaDetalhePage() {
             {/* SEÇÃO DE LÂMINAS DE MICROSCOPIA ASSOCIADAS */}
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                <h2 className="text-xl font-bold text-slate-900">
                   Lâminas de Microscopia Associadas
                 </h2>
-                <span className="text-xs font-mono text-slate-500 dark:text-zinc-400">
+                <span className="text-xs font-mono text-slate-500">
                   {slides.length} {slides.length === 1 ? 'espécime' : 'espécimes'}
                 </span>
               </div>
 
               {slides.length === 0 ? (
-                <div className="bg-white dark:bg-[#0c0c0f] border border-dashed border-slate-200 dark:border-white/10 rounded-2xl p-8 sm:p-10 text-center text-slate-500">
-                  <span className="text-xs font-mono text-slate-400 dark:text-zinc-500 font-semibold block uppercase tracking-wider mb-1.5">
+                <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-8 sm:p-10 text-center text-slate-500">
+                  <span className="text-xs font-mono text-slate-400 font-semibold block uppercase tracking-wider mb-1.5">
                     Acervo em Digitalização
                   </span>
-                  <h4 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white font-serif">
+                  <h4 className="text-base sm:text-lg font-semibold text-slate-900 font-serif">
                     Espécimes para {modulo.title} em fase de captura e catalogação.
                   </h4>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-2 max-w-md mx-auto leading-relaxed">
+                  <p className="text-xs text-slate-500 font-sans mt-2 max-w-md mx-auto leading-relaxed">
                     Novas lâminas de alta resolução para este módulo estão sendo preparadas pelo laboratório de microscopia digital.
                   </p>
                 </div>
@@ -573,7 +578,7 @@ export default function DisciplinaDetalhePage() {
                     return (
                       <div
                         key={lamina.id}
-                        className="group bg-white dark:bg-[#0c0c0f] border border-slate-200/80 dark:border-white/10 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between"
+                        className="group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between"
                       >
                         <div>
                           <div className="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
@@ -601,10 +606,10 @@ export default function DisciplinaDetalhePage() {
                           </div>
 
                           <div className="p-5">
-                            <h3 className="font-serif font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-teal-900 dark:group-hover:text-teal-300 transition-colors leading-snug mb-1">
+                            <h3 className="font-serif font-bold text-base sm:text-lg text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1">
                               {lamina.nome}
                             </h3>
-                            <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed font-sans">
+                            <p className="text-xs text-slate-500 leading-relaxed font-sans">
                               {stain}
                             </p>
                           </div>
@@ -614,7 +619,7 @@ export default function DisciplinaDetalhePage() {
                         <div className="p-5 pt-0 mt-auto">
                           <a
                             href={`/microscopio.html?id=${lamina.id}`}
-                            className="w-full py-2.5 text-xs font-semibold text-slate-700 dark:text-zinc-200 bg-slate-50 dark:bg-white/5 hover:bg-teal-900 hover:text-white dark:hover:bg-teal-700 dark:hover:text-white border border-slate-200 dark:border-white/10 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline"
+                            className="w-full py-2.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-teal-900 hover:text-white border border-slate-200 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline"
                           >
                             <span>Examinar Lâmina</span>
                             <span className="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">

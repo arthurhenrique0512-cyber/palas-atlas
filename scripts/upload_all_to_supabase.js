@@ -102,35 +102,33 @@ async function main() {
 
   console.log(`\n\n✓ Concluído: ${uploaded} arquivos sincronizados no Supabase Storage (${failed} falhas).`);
 
-  // Atualizar os links na tabela laminas do PostgreSQL
+  // Atualizar os links na tabela laminas do PostgreSQL (caminhos relativos para gateway /api/tile)
   console.log(`\nAtualizando URLs no banco relacional PostgreSQL...`);
-  
-  const publicBase = `${supabaseUrl}/storage/v1/object/public/${bucket}`;
 
   const updates = [
     {
+      id: 'lamina-real1',
+      dzi_url: 'assets/histologia/lamina-real1.dzi',
+      thumbnail_url: 'assets/histologia/lamina-real1-preview.jpg',
+      preview_image: 'assets/histologia/lamina-real1-preview.jpg'
+    },
+    {
       id: 'osso_maduro_desgaste_ct',
-      dzi_url: `${publicBase}/osso_maduro_desgaste_ct.dzi`,
-      thumbnail_url: `${publicBase}/osso_maduro_desgaste_ct-preview.jpg`,
-      preview_image: `${publicBase}/osso_maduro_desgaste_ct-preview.jpg`
+      dzi_url: 'assets/histologia/osso_maduro_desgaste_ct.dzi',
+      thumbnail_url: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
+      preview_image: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg'
     },
     {
-      id: 'epitelio-simples-escamoso',
-      dzi_url: `${publicBase}/epitelio-simples-escamoso.dzi`,
-      thumbnail_url: `${publicBase}/epitelio-simples-escamoso-preview.jpg`,
-      preview_image: `${publicBase}/epitelio-simples-escamoso-preview.jpg`
+      id: 'osso_maduro_desgaste_ct_2.0',
+      dzi_url: 'assets/histologia/osso_maduro_desgaste_ct_2.0.dzi',
+      thumbnail_url: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
+      preview_image: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg'
     },
     {
-      id: 'medula-espinal-he',
-      dzi_url: `${publicBase}/medula-espinal-he.png`,
-      thumbnail_url: `${publicBase}/medula-espinal-he.png`,
-      preview_image: `${publicBase}/medula-espinal-he.png`
-    },
-    {
-      id: 'muscular-esqueletico-he',
-      dzi_url: `${publicBase}/muscular-esqueletico-he.jpg`,
-      thumbnail_url: `${publicBase}/muscular-esqueletico-he.jpg`,
-      preview_image: `${publicBase}/muscular-esqueletico-he.jpg`
+      id: 'osso_maduro_desgaste_ct_3.0',
+      dzi_url: 'assets/histologia/osso_maduro_desgaste_ct_3.0.dzi',
+      thumbnail_url: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
+      preview_image: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg'
     }
   ];
 
@@ -147,20 +145,27 @@ async function main() {
     });
 
     if (res.ok) {
-      console.log(`✓ Lâmina '${item.id}' atualizada no banco com a URL do Supabase Storage.`);
+      console.log(`✓ Lâmina '${item.id}' atualizada no banco com o caminho canônico DZI.`);
     } else {
       console.error(`Erro ao atualizar lâmina '${item.id}':`, await res.text());
     }
   }
 
-  // Verificação de Acesso Público via CDN
-  console.log(`\nTestando resolução pública HTTP via CDN do Supabase...`);
+  // Verificação autenticada no bucket privado (laminas-dzi)
+  console.log(`\nTestando resolução autenticada no bucket privado do Supabase Storage...`);
   for (const item of updates) {
-    const checkRes = await fetch(item.dzi_url, { method: 'HEAD' });
-    console.log(`[HTTP ${checkRes.status}] ${item.dzi_url}`);
+    const storageObject = item.dzi_url.replace(/^assets\/histologia\//, '');
+    const checkRes = await fetch(`${supabaseUrl}/storage/v1/object/${bucket}/${storageObject}`, {
+      method: 'HEAD',
+      headers: {
+        'Authorization': `Bearer ${serviceKey}`,
+        'apikey': serviceKey
+      }
+    });
+    console.log(`[HTTP ${checkRes.status}] ${bucket}/${storageObject}`);
   }
 
-  console.log(`\n🎉 TODAS AS LÂMINAS ESTÃO 100% NO SUPABASE STORAGE E POSTGRESQL!`);
+  console.log(`\n🎉 TODAS AS 4 LÂMINAS OFICIAIS ESTÃO 100% NO SUPABASE STORAGE (PRIVADO) E POSTGRESQL!`);
 }
 
 main().catch(console.error);

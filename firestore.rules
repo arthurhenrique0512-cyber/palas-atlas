@@ -1,25 +1,45 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && (
+          request.auth.token.admin == true
+          || request.auth.token.email != null
+        );
+    }
+
     // Coleção oficial de lâminas e espécimes do Palas Atlas
     match /laminas/{laminaId} {
       // Leitura permitida para lâminas com status 'ativa' aos estudantes e visitantes,
-      // ou qualquer status para administradores autenticados no painel CMS.
-      allow read: if resource == null || resource.data.status == 'ativa' || request.auth != null;
-      
+      // ou qualquer status para editores autenticados no painel CMS.
+      allow read: if resource == null || resource.data.status == 'ativa' || isAdmin();
+
       // Criação, atualização e exclusão restritas exclusivamente a administradores autenticados
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // Coleção de módulos curriculares e resumos morfológicos editáveis no CMS
+    match /modulos/{moduloId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     // Coleção de auditoria forense e monitoramento anti-raspagem
     match /laminas_access_audit/{auditId} {
-      // Registro de telemetria de visualização permitido
-      allow create: if true;
+      // Registro de telemetria validado contra abuso de payload
+      allow create: if request.resource.data.keys().hasAll(['laminaId'])
+        && request.resource.data.keys().size() <= 10
+        && request.resource.data.laminaId is string
+        && request.resource.data.laminaId.size() > 0
+        && request.resource.data.laminaId.size() <= 128;
+
       // Leitura e edição restritas exclusivamente a administradores
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
-    
+
     // Regra padrão de segurança: nega qualquer acesso a coleções não declaradas
     match /{document=**} {
       allow read, write: if false;

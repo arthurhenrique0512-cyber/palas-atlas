@@ -18,7 +18,6 @@ tmp/
 # OS metadata
 Thumbs.db
 .env*.local
-.env.local
 
 # Estúdio de Produção de Mídia Palas Atlas
 context/

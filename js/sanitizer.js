@@ -102,9 +102,9 @@ export function sanitizarHTMLDescricao(html) {
  * Remove classes legadas de texto claro ou baixa opacidade (como text-neutral-300, text-slate-400).
  * Separa a introdução/visão geral em parágrafos confortáveis e estrutura linhas iniciadas
  * por marcador (•, -, *) contendo dois pontos (:) em tópicos acadêmicos organizados:
- * - Marcador: text-teal-700 dark:text-teal-400 font-bold
- * - Nome da estrutura (antes de :): font-semibold text-slate-900 dark:text-teal-100
- * - Explicação (após :): text-slate-700 dark:text-slate-300 font-normal mb-3
+ * - Marcador: text-teal-700 font-bold
+ * - Nome da estrutura (antes de :): font-semibold text-slate-900
+ * - Explicação (após :): text-slate-700 font-normal mb-3
  * Preserva integralmente hiperlinks de pinos (.pin-link, data-pin-id).
  *
  * @param {string} rawInput - Texto ou HTML bruto da descrição
@@ -138,7 +138,7 @@ export function formatarDescricaoMorfolgica(rawInput) {
     // Preserva títulos se existirem (<h[1-6] ...>Conteúdo</h[1-6]>)
     const matchH = linhaBruta.match(/^<h([1-6])[^>]*>([\s\S]*?)(?:<\/h\1>)?$/i);
     if (matchH) {
-      blocos.push(`<h3 class="text-base font-serif font-bold text-slate-900 dark:text-white mb-3 mt-1 leading-snug">${matchH[2]}</h3>`);
+      blocos.push(`<h3 class="text-base font-serif font-bold text-slate-900 mb-3 mt-1 leading-snug">${matchH[2]}</h3>`);
       continue;
     }
 
@@ -173,10 +173,10 @@ export function formatarDescricaoMorfolgica(rawInput) {
 
         blocos.push(
           `<div class="flex items-start gap-2 mb-3 text-sm leading-relaxed">\n` +
-          `  <span class="text-teal-700 dark:text-teal-400 font-bold shrink-0 select-none leading-relaxed">•</span>\n` +
+          `  <span class="text-teal-700 font-bold shrink-0 select-none leading-relaxed">•</span>\n` +
           `  <div>\n` +
-          `    <span class="font-semibold text-slate-900 dark:text-teal-100">${termo}:</span>\n` +
-          `    <span class="text-slate-700 dark:text-slate-300 font-normal leading-relaxed">${explicacao ? " " + explicacao : ""}</span>\n` +
+          `    <span class="font-semibold text-slate-900">${termo}:</span>\n` +
+          `    <span class="text-slate-700 font-normal leading-relaxed">${explicacao ? " " + explicacao : ""}</span>\n` +
           `  </div>\n` +
           `</div>`
         );
@@ -185,8 +185,8 @@ export function formatarDescricaoMorfolgica(rawInput) {
         // Tópico com marcador mas sem ':'
         blocos.push(
           `<div class="flex items-start gap-2 mb-3 text-sm leading-relaxed">\n` +
-          `  <span class="text-teal-700 dark:text-teal-400 font-bold shrink-0 select-none leading-relaxed">•</span>\n` +
-          `  <span class="text-slate-700 dark:text-slate-300 font-normal leading-relaxed">${conteudo}</span>\n` +
+          `  <span class="text-teal-700 font-bold shrink-0 select-none leading-relaxed">•</span>\n` +
+          `  <span class="text-slate-700 font-normal leading-relaxed">${conteudo}</span>\n` +
           `</div>`
         );
         continue;
@@ -196,10 +196,10 @@ export function formatarDescricaoMorfolgica(rawInput) {
       let explicacao = matchForte[2].trim();
       blocos.push(
         `<div class="flex items-start gap-2 mb-3 text-sm leading-relaxed">\n` +
-        `  <span class="text-teal-700 dark:text-teal-400 font-bold shrink-0 select-none leading-relaxed">•</span>\n` +
+        `  <span class="text-teal-700 font-bold shrink-0 select-none leading-relaxed">•</span>\n` +
         `  <div>\n` +
-        `    <span class="font-semibold text-slate-900 dark:text-teal-100">${termo}:</span>\n` +
-        `    <span class="text-slate-700 dark:text-slate-300 font-normal leading-relaxed">${explicacao ? " " + explicacao : ""}</span>\n` +
+        `    <span class="font-semibold text-slate-900">${termo}:</span>\n` +
+        `    <span class="text-slate-700 font-normal leading-relaxed">${explicacao ? " " + explicacao : ""}</span>\n` +
         `  </div>\n` +
         `</div>`
       );
@@ -207,11 +207,13 @@ export function formatarDescricaoMorfolgica(rawInput) {
     }
 
     // Parágrafo comum (introdução, visão geral, parágrafos finais)
-    blocos.push(`<p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-4">${linha}</p>`);
+    blocos.push(`<p class="text-slate-700 text-sm leading-relaxed mb-4">${linha}</p>`);
   }
 
   return blocos.join("\n");
 }
+
+export { formatarDescricaoMorfolgica as formatarDescricaoMorfologica };
 
 if (typeof window !== "undefined") {
   window.escaparHTML = escaparHTML;

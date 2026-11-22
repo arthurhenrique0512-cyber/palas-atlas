@@ -39,7 +39,7 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
         htmlItens += `
           <button
             type="button"
-            class="bg-teal-50 text-teal-950 dark:bg-teal-950/40 dark:text-teal-200 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left leading-snug break-words text-xs block transition-colors"
+            class="bg-teal-50 text-teal-950 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left leading-snug break-words text-xs block transition-colors"
             title="${topico.titulo}">
             ${topico.titulo}
           </button>`;
@@ -48,7 +48,7 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
           <button
             type="button"
             onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
-            class="text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/[0.04] py-1.5 px-3 block transition-colors w-full text-left leading-snug break-words cursor-pointer border-l-2 border-transparent"
+            class="text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 py-1.5 px-3 block transition-colors w-full text-left leading-snug break-words cursor-pointer border-l-2 border-transparent"
             title="${topico.titulo}">
             ${topico.titulo}
           </button>`;
@@ -59,8 +59,8 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   const navItem = (id, label, dotClass) => {
     const isAtivo = disciplinaAtual === id;
     const btnClass = isAtivo
-      ? "bg-teal-50 text-teal-950 dark:bg-teal-950/40 dark:text-teal-200 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left flex items-center gap-2.5 transition-colors"
-      : "text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/[0.04] py-1.5 px-3 block transition-colors w-full text-left flex items-center gap-2.5 border-l-2 border-transparent cursor-pointer";
+      ? "bg-teal-50 text-teal-950 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left flex items-center gap-2.5 transition-colors"
+      : "text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 py-1.5 px-3 block transition-colors w-full text-left flex items-center gap-2.5 border-l-2 border-transparent cursor-pointer";
     return `
       <button type="button" onclick="window.App.selecionarFrente('${id}')" class="${btnClass}">
         <span class="w-2 h-2 rounded-full ${dotClass} shrink-0"></span>
@@ -78,9 +78,9 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   const tituloTopicos = mapNomenclatura[disciplinaAtual] || "Tópicos";
 
   return `
-    <aside class="space-y-6 text-xs font-sans text-slate-600 dark:text-zinc-400 border-r border-slate-200/80 dark:border-white/10 pr-6 hidden lg:block">
+    <aside class="space-y-6 text-xs font-sans text-slate-600 border-r border-slate-200/80 pr-6 hidden lg:block">
       <div>
-        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-zinc-500 font-semibold mb-2.5 block">Disciplinas</span>
+        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-2.5 block">Disciplinas</span>
         <div class="space-y-1">
           ${navItem('histologia', 'Histologia', 'bg-sky-600')}
           ${navItem('patologia', 'Patologia', 'bg-rose-600')}
@@ -91,7 +91,7 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
       
       ${htmlItens ? `
       <div>
-        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-zinc-500 font-semibold mb-2.5 block">${tituloTopicos}</span>
+        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-2.5 block">${tituloTopicos}</span>
         <div class="space-y-1">
           ${htmlItens}
         </div>
@@ -107,17 +107,17 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
  */
 function gerarBarraDisciplinasTopo() {
   const lista = [
-    { id: "histologia", label: "Histologia", dot: "bg-sky-600", activeBorder: "border-slate-900 dark:border-[#d4af37] text-slate-950 dark:text-white bg-slate-100 dark:bg-white/10" },
-    { id: "patologia", label: "Patologia", dot: "bg-rose-600", activeBorder: "border-rose-600 text-rose-800 dark:text-rose-300 bg-rose-50/70 dark:bg-rose-950/30" },
-    { id: "parasitologia", label: "Parasitologia", dot: "bg-emerald-600", activeBorder: "border-emerald-600 text-emerald-800 dark:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/30" },
-    { id: "microbiologia", label: "Microbiologia", dot: "bg-violet-600", activeBorder: "border-violet-600 text-violet-800 dark:text-violet-300 bg-violet-50/70 dark:bg-violet-950/30" }
+    { id: "histologia", label: "Histologia", dot: "bg-sky-600", activeBorder: "border-slate-900 text-slate-950 bg-slate-100" },
+    { id: "patologia", label: "Patologia", dot: "bg-rose-600", activeBorder: "border-rose-600 text-rose-800 bg-rose-50/70" },
+    { id: "parasitologia", label: "Parasitologia", dot: "bg-emerald-600", activeBorder: "border-emerald-600 text-emerald-800 bg-emerald-50/70" },
+    { id: "microbiologia", label: "Microbiologia", dot: "bg-violet-600", activeBorder: "border-violet-600 text-violet-800 bg-violet-50/70" }
   ];
 
   const chipsHtml = lista.map((item) => {
     const isAtivo = disciplinaAtual === item.id;
     const classes = isAtivo
       ? `${item.activeBorder} font-semibold shadow-2xs`
-      : "bg-white dark:bg-[#101013] text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 border-slate-200/90 dark:border-white/10";
+      : "bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200/90";
     return `
       <button
         type="button"
@@ -146,7 +146,7 @@ function gerarBarraTopicosMobile(modulo, topicoAtivoId, disc) {
     const isAtivo = topico.id === topicoAtivoId;
     const cls = isAtivo
       ? "bg-teal-900 text-white border-teal-900 font-semibold shadow-xs"
-      : "bg-white dark:bg-[#101013] text-slate-600 dark:text-zinc-400 hover:text-slate-900 hover:bg-slate-50 border-slate-200/90 dark:border-white/10";
+      : "bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200/90";
     return `
       <button
         type="button"
@@ -507,10 +507,10 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
     const itensHtml = pontos.map(p => `
       <li class="flex items-start gap-3 leading-relaxed">
-        <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400 shrink-0"></span>
+        <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-teal-600 shrink-0"></span>
         <div class="text-xs sm:text-sm">
-          <strong class="font-semibold text-slate-950 dark:text-white">${escaparHTML(p.label)}:</strong>
-          <span class="text-slate-600 dark:text-zinc-300 ml-1">${escaparHTML(p.desc)}</span>
+          <strong class="font-semibold text-slate-950">${escaparHTML(p.label)}:</strong>
+          <span class="text-slate-600 ml-1">${escaparHTML(p.desc)}</span>
         </div>
       </li>
     `).join("");
@@ -518,17 +518,17 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     const refBib = moduloItem.bibliografia || moduloItem.bibliographicReference || "Junqueira & Carneiro — Histologia Básica";
 
     return `
-      <div class="bg-white dark:bg-[#0c0c0f] border border-slate-200/90 dark:border-white/10 rounded-2xl p-4 sm:p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-6 sm:mb-8">
-        <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100 dark:border-white/5">
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-6 sm:mb-8">
+        <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100">
           <span class="w-1.5 h-4 rounded-full bg-teal-700"></span>
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">Resumo Morfológico</h2>
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Resumo Morfológico</h2>
         </div>
         <ul class="space-y-3 sm:space-y-3.5">
           ${itensHtml}
         </ul>
-        <div class="mt-5 pt-3.5 border-t border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 dark:text-zinc-500">
-          <span class="italic font-sans text-[11px] text-slate-500 dark:text-zinc-400">Baseado em ${escaparHTML(refBib)}</span>
-          <span class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-zinc-600">Referência Acadêmica</span>
+        <div class="mt-5 pt-3.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+          <span class="italic font-sans text-[11px] text-slate-500">Baseado em ${escaparHTML(refBib)}</span>
+          <span class="font-mono text-[10px] uppercase tracking-wider text-slate-400">Referência Acadêmica</span>
         </div>
       </div>
     `;
@@ -582,15 +582,15 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     const slideUrl = `microscopio.html?id=${encodeURIComponent(slideIdStr)}`;
 
     return `
-      <div data-open-slide-url="${escaparHTML(slideUrl)}" class="group bg-white dark:bg-[#0c0c0f] border border-slate-200/80 dark:border-white/10 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
+      <div data-open-slide-url="${escaparHTML(slideUrl)}" class="group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
         <div>
-          <div class="relative w-full aspect-[4/3] bg-slate-950 overflow-hidden">
+          <div class="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden">
             <!-- Placeholder exibido quando a imagem falha -->
-            <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden bg-[#060608]">
-              <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden bg-slate-100">
+              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5M12 3v1.5M6.75 4.5l.75 1.3M17.25 4.5l-.75 1.3"/>
               </svg>
-              <span class="text-xs text-slate-300 font-serif">Sem pré-visualização</span>
+              <span class="text-xs text-slate-500 font-serif">Sem pré-visualização</span>
             </div>
 
             <img
@@ -618,10 +618,10 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
           <!-- Título anatômico em destaque e coloração -->
           <div class="p-4 sm:p-5">
-            <h3 class="font-serif font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-teal-900 dark:group-hover:text-teal-300 transition-colors leading-snug mb-1">
+            <h3 class="font-serif font-bold text-base sm:text-lg text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1">
               ${escaparHTML(nomeLamina)}
             </h3>
-            <p class="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed font-sans">
+            <p class="text-xs text-slate-500 leading-relaxed font-sans">
               ${escaparHTML(coloracaoNome)}
             </p>
           </div>
@@ -631,7 +631,7 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
         <div class="p-4 pt-0 sm:p-5 sm:pt-0 mt-auto">
           <a
             href="${escaparHTML(slideUrl)}"
-            class="w-full py-2.5 min-h-[44px] lg:min-h-0 text-xs font-semibold text-slate-700 dark:text-zinc-200 bg-slate-50 dark:bg-white/5 hover:bg-teal-900 hover:text-white dark:hover:bg-teal-700 dark:hover:text-white border border-slate-200 dark:border-white/10 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline">
+            class="w-full py-2.5 min-h-[44px] lg:min-h-0 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-teal-900 hover:text-white border border-slate-200 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline">
             <span>Examinar Lâmina</span>
             <span class="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
           </a>
@@ -667,16 +667,16 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
         </div>
       
         <!-- MIGALHAS DE PÃO (BREADCRUMBS) -->
-        <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-500 dark:text-zinc-400 mb-6 flex-wrap">
-          <a href="#" onclick="window.App.goHome(); return false;" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">Início</a>
-          <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-          <a href="#" onclick="window.App.voltarParaDisciplinaHome('${discKey}'); return false;" id="breadcrumbDisciplina" class="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-teal-400 transition-colors no-underline">${escaparHTML(modulo.tituloDisciplina)}</a>
-          <span class="text-slate-300 dark:text-zinc-700 select-none">&rsaquo;</span>
-          <span id="breadcrumbTopico" class="text-slate-900 dark:text-white font-medium pointer-events-none">${escaparHTML(topico.titulo)}</span>
+        <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-500 mb-6 flex-wrap">
+          <a href="#" onclick="window.App.goHome(); return false;" class="text-slate-500 hover:text-slate-900 transition-colors no-underline">Início</a>
+          <span class="text-slate-300 select-none">&rsaquo;</span>
+          <a href="#" onclick="window.App.voltarParaDisciplinaHome('${discKey}'); return false;" id="breadcrumbDisciplina" class="text-slate-500 hover:text-slate-900 transition-colors no-underline">${escaparHTML(modulo.tituloDisciplina)}</a>
+          <span class="text-slate-300 select-none">&rsaquo;</span>
+          <span id="breadcrumbTopico" class="text-slate-900 font-medium pointer-events-none">${escaparHTML(topico.titulo)}</span>
         </nav>
 
         <!-- TÍTULO DO TÓPICO -->
-        <h1 id="tituloTopicoH1" class="text-2xl lg:text-3xl font-bold text-slate-950 dark:text-white tracking-tight mb-4">
+        <h1 id="tituloTopicoH1" class="text-2xl lg:text-3xl font-bold text-slate-950 tracking-tight mb-4">
           ${escaparHTML(topico.titulo)}
         </h1>
 
@@ -687,7 +687,7 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
         <!-- SEÇÃO DE LÂMINAS DE MICROSCOPIA ASSOCIADAS -->
         <div class="mt-8 mb-4">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">
+          <h2 class="text-xl font-bold text-slate-900 mb-6">
             Lâminas de Microscopia Associadas
           </h2>
           <div id="gridCatalogoLaminas" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
@@ -758,10 +758,10 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
   // Listener em Tempo Real (onSnapshot) na coleção 'laminas' apenas com status == 'ativa'
   const renderEmptyState = (container) => {
     container.innerHTML = `
-      <div class="col-span-full bg-white dark:bg-[#0c0c0f] border border-dashed border-slate-200 dark:border-white/10 rounded-2xl p-8 sm:p-10 text-center text-slate-500">
-        <span class="text-xs font-mono text-slate-400 dark:text-zinc-500 font-semibold block uppercase tracking-wider mb-1.5">Acervo em Digitalização</span>
-        <h4 class="text-base sm:text-lg font-semibold text-slate-900 dark:text-white font-serif">Espécimes para ${escaparHTML(topico.titulo)} em fase de captura e catalogação.</h4>
-        <p class="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-2 max-w-md mx-auto leading-relaxed">Novas lâminas de alta resolução para este módulo estão sendo preparadas pelo laboratório de microscopia digital.</p>
+      <div class="col-span-full bg-white border border-dashed border-slate-200 rounded-2xl p-8 sm:p-10 text-center text-slate-500">
+        <span class="text-xs font-mono text-slate-400 font-semibold block uppercase tracking-wider mb-1.5">Acervo em Digitalização</span>
+        <h4 class="text-base sm:text-lg font-semibold text-slate-900 font-serif">Espécimes para ${escaparHTML(topico.titulo)} em fase de captura e catalogação.</h4>
+        <p class="text-xs text-slate-500 font-sans mt-2 max-w-md mx-auto leading-relaxed">Novas lâminas de alta resolução para este módulo estão sendo preparadas pelo laboratório de microscopia digital.</p>
       </div>
     `;
   };
@@ -786,10 +786,6 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
   const iniciaisEstaticas = mesclarLaminasComEstaticas([]);
   if (iniciaisEstaticas.length > 0) {
     const gridInicial = document.getElementById("gridCatalogoLaminas");
-    const badgeInicial = document.getElementById("contadorLaminasBadge");
-    if (badgeInicial) {
-      badgeInicial.textContent = `${iniciaisEstaticas.length} ${iniciaisEstaticas.length === 1 ? 'Lâmina' : 'Lâminas'}`;
-    }
     if (gridInicial) {
       gridInicial.innerHTML = iniciaisEstaticas.map(gerarCardLaminaAcademico).join("");
     }
@@ -818,12 +814,6 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
         const laminasDoTopico = mesclarLaminasComEstaticas(docsFirestore);
 
         const containerGrid = document.getElementById("gridCatalogoLaminas");
-        const contadorTxt = document.getElementById("contadorLaminasBadge");
-
-        if (contadorTxt) {
-          contadorTxt.textContent = `${laminasDoTopico.length} ${laminasDoTopico.length === 1 ? 'Lâmina' : 'Lâminas'}`;
-        }
-
         if (!containerGrid) return;
 
         if (laminasDoTopico.length === 0) {
@@ -1073,7 +1063,7 @@ export function voltarParaDisciplinaHome(disciplina = 'histologia') {
 
 // Reativo: se frente mudar no state
 subscribe((state) => {
-  if (["anatomia", "histologia", "patologia", "parasitologia", "microbiologia"].includes(state.frenteAtiva)) {
+  if (["histologia", "patologia", "parasitologia", "microbiologia"].includes(state.frenteAtiva)) {
     const c2 = document.getElementById("histoSubCatalog");
     const isTopicOpen = c2 && !c2.classList.contains("hidden");
     if (!isTopicOpen) {

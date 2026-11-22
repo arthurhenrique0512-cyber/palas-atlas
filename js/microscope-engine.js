@@ -18,12 +18,15 @@
 
 import { db } from "./firebase-config.js";
 import {
-  removerConteudoPerigoso,
   sanitizarHTMLDescricao,
   formatarDescricaoMorfolgica,
   escaparHTML
 } from "./sanitizer.js";
-import { emitirCertidaoOptica, formatarComprimento } from "./optics-calibration.js?v=20261118v3";
+import {
+  emitirCertidaoOptica,
+  formatarComprimento,
+  objetivaDisponivel
+} from "./optics-calibration.js?v=20261118v3";
 
 // ---------------------------------------------------------------------------
 // Estado do modulo
@@ -43,6 +46,7 @@ let homeZoomRef             = null; // Zoom de referencia para enquadramento ger
 let _delegacaoPinosRegistrada = false;
 let abaAtivaPainel          = "descricao";
 const debounceTimersRespostas = {};
+const _respostasPendentes   = new Map();
 
 // Estado da Régua Morfométrica Interativa (µm / mm)
 let modoReguaAtivo          = false;
@@ -60,17 +64,18 @@ let _pendingUrlPinId        = null;
 let _atalhosRegistrados     = false;
 let _fullscreenRegistrado   = false;
 let _popstateRegistrado     = false;
+let _pagehideRegistrado     = false;
 let _catalogoLaminasSwitcher = [];
 
 // Controle de concorrência e temporizadores do visualizador
 let _loadEpoch              = 0;
 let _viewerInstanceSeq      = 0;
 let _activeOpenTimer        = null;
+let _styleSyncTimer         = null;
+let _stageResizeObserver    = null;
 
 // Certidão Óptica: ampliação real comprovada da lâmina (ver js/optics-calibration.js)
 let certidaoOpticaAtual     = null;
-let manifestoOpticoAtual    = null;
-let perfilOpticoAtual       = null;
 
 function isSafeSlideUrl(rawUrl) {
   const val = String(rawUrl || "").trim();
@@ -259,7 +264,11 @@ function iniciarSidebarRetratil() {
   // O palco redimensiona durante a transição CSS: mantém o OpenSeadragon ajustado quadro a quadro.
   const palco = document.getElementById("viewerStage");
   if (palco && typeof ResizeObserver === "function") {
-    new ResizeObserver(() => sincronizarTamanhoDoViewer()).observe(palco);
+    if (_stageResizeObserver) {
+      try { _stageResizeObserver.disconnect(); } catch (e) {}
+    }
+    _stageResizeObserver = new ResizeObserver(() => sincronizarTamanhoDoViewer());
+    _stageResizeObserver.observe(palco);
   }
 }
 
@@ -269,13 +278,13 @@ function iniciarSidebarRetratil() {
 const fallbackLaminas = {
   'a3oRvXvJpMKAtU2RE85q': {
     id: 'a3oRvXvJpMKAtU2RE85q',
+    firestoreId: 'a3oRvXvJpMKAtU2RE85q',
     aliases: ['lamina-real1', 'lamina-real-1', 'pele_espessa', 'pele-espessa', 'pele', 'matriz', 'teste'],
     nome: 'Pele Espessa',
     disciplina: 'histologia',
     coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
     maxMagnification: 40,
     objetivaCaptura: 40,
-    zoom4xRatio: 0.65,
     mpp: 0.156,
     metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     defaultCenter: { x: 0.5, y: 0.70 },
@@ -351,13 +360,13 @@ const fallbackLaminas = {
   },
   'osso_maduro_desgaste_ct': {
     id: 'osso_maduro_desgaste_ct',
+    firestoreId: '96ZYqoM2SV8p4fB2QgeM',
     aliases: ['96ZYqoM2SV8p4fB2QgeM', 'osso-maduro', 'osso_maduro', 'osso-maduro-desgaste', 'osso-desgaste', 'osso_compacto_dzi', 'osso-compacto'],
     nome: 'Osso Maduro',
     disciplina: 'histologia',
     coloracao: 'Desgaste • 40x',
     maxMagnification: 40,
     objetivaCaptura: 40,
-    zoom4xRatio: 0.28,
     mpp: 0.156,
     metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     defaultCenter: { x: 0.65, y: 0.525 },
@@ -397,13 +406,13 @@ const fallbackLaminas = {
   },
   'osso_maduro_desgaste_ct_2.0': {
     id: 'osso_maduro_desgaste_ct_2.0',
-    aliases: ['osso_maduro_desgaste_ct_2', 'osso_2.0', 'osso-2.0', 'osso_desgaste_2', 'osso-maduro-2'],
+    firestoreId: 'FFGk5d9kOAct5HIDdjQ7',
+    aliases: ['FFGk5d9kOAct5HIDdjQ7', 'osso_maduro_desgaste_ct_2', 'osso_2.0', 'osso-2.0', 'osso_desgaste_2', 'osso-maduro-2'],
     nome: 'Osso Maduro 10x',
     disciplina: 'histologia',
     coloracao: 'Corte por Desgaste • 10x (Mapeamento 2x5)',
     maxMagnification: 10,
     objetivaCaptura: 10,
-    zoom4xRatio: 0.35,
     mpp: 0.625,
     metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     defaultCenter: { x: 0.5, y: 0.5 },
@@ -423,13 +432,13 @@ const fallbackLaminas = {
   },
   'osso_maduro_desgaste_ct_3.0': {
     id: 'osso_maduro_desgaste_ct_3.0',
-    aliases: ['osso_maduro_desgaste_ct_3', 'osso_3.0', 'osso-3.0', 'osso_desgaste_3', 'osso-maduro-3'],
+    firestoreId: 'cw3XGCgUwN71XdlwkUe5',
+    aliases: ['cw3XGCgUwN71XdlwkUe5', 'osso_maduro_desgaste_ct_3', 'osso_3.0', 'osso-3.0', 'osso_desgaste_3', 'osso-maduro-3'],
     nome: 'Osso Maduro 40x',
     disciplina: 'histologia',
     coloracao: 'Corte por Desgaste • 40x (Mapeamento 6x8 • 48 Fotos)',
     maxMagnification: 40,
     objetivaCaptura: 40,
-    zoom4xRatio: 0.28,
     mpp: 0.156,
     metodoCalibracao: 'referencia_biologica_hemacia_7.5um',
     defaultCenter: { x: 0.5, y: 0.5 },
@@ -473,6 +482,10 @@ function iniciarMicroscopio() {
   registrarAtalhosTecladoMicroscopio();
   registrarControleFullscreenMicroscopio();
   registrarPopstateMicroscopio();
+  if (!_pagehideRegistrado) {
+    _pagehideRegistrado = true;
+    window.addEventListener("pagehide", destruirMicroscopio);
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const dziParam  = urlParams.get("dzi") || urlParams.get("file");
@@ -504,21 +517,7 @@ function iniciarMicroscopio() {
     if (isPele) {
       defaultNome = "Pele Espessa (Epiderme e Derme)";
       defaultColor = "Hematoxilina e Eosina (H&E) • 40x";
-      defaultDesc = `
-        <div class="prose-atlas">
-          <h3>Pele Espessa — Epiderme e Derme (H&E • 40x)</h3>
-          <p>Esta preparação histológica exibe a morfologia clássica da <strong>pele espessa</strong> (região palmar ou plantar). Destaca-se a exuberante epiderme formada por um <strong>epitélio estratificado pavimentoso queratinizado</strong>, adaptado a forças de atrito mecânico constante.</p>
-          <p><strong>Estratificação Epidérmica (da profundidade para a superfície):</strong></p>
-          <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-700">
-            <li><strong>Camada Basal (Germinativa):</strong> Fileira única de células cúbicas a prismáticas com alta atividade mitótica sobre a lâmina basal.</li>
-            <li><strong>Camada Espinhosa:</strong> Múltiplas camadas de queratinócitos poliédricos unidos por densos desmossomos ("espinhos").</li>
-            <li><strong>Camada Granulosa:</strong> Células achatadas com volumosos grânulos basofílicos de querato-hialina no citoplasma.</li>
-            <li><strong>Camada Lúcida:</strong> Fita homogênea, clara e eosinofílica refringente, característica exclusiva da pele espessa.</li>
-            <li><strong>Camada Córnea:</strong> Camada superficial densa de escamas anucleadas de queratina pura (barreira impermeável).</li>
-          </ul>
-          <p>Na interface dermo-epidérmica observam-se as <strong>papilas dérmicas</strong> que se interdigitam com as cristas epidérmicas, garantindo forte adesão mecânica e nutrição vascular ao epitélio.</p>
-        </div>
-      `;
+      defaultDesc = fallbackLaminas['a3oRvXvJpMKAtU2RE85q']?.descricaoHTML || defaultDesc;
       questoes = [
         {
           id: "q-pele-1",
@@ -660,22 +659,23 @@ async function carregarLaminaNoMicroscopio(laminaId) {
     // Sincroniza em background: textos e pinos editados no CMS (Firestore)
     // têm prioridade sobre os valores padrão do acervo local.
     if (typeof db !== "undefined" && db) {
-      const candidatos = [idBuscado, fallback.id, ...(Array.isArray(fallback.aliases) ? fallback.aliases : [])]
-        .filter((v, i, arr) => v && arr.indexOf(v) === i);
+      const primaryId = fallback.firestoreId || fallback.id;
 
       (async () => {
         try {
-          const docSnapshots = await Promise.all(
-            candidatos.map((cid) =>
-              db.collection("laminas").doc(cid).get().catch((err) => {
-                console.warn("[Palas Atlas] Falha ao sincronizar lâmina do Firestore:", cid, err);
-                return null;
-              })
-            )
-          );
+          let docRef = await db.collection("laminas").doc(primaryId).get().catch((err) => {
+            console.warn("[Palas Atlas] Falha ao sincronizar lâmina do Firestore:", primaryId, err);
+            return null;
+          });
           if (myEpoch !== _loadEpoch) return;
-          const docRef = docSnapshots.find((d) => d && d.exists);
-          if (!docRef) return;
+          if ((!docRef || !docRef.exists) && idBuscado && idBuscado !== primaryId) {
+            docRef = await db.collection("laminas").doc(idBuscado).get().catch((err) => {
+              console.warn("[Palas Atlas] Falha ao sincronizar lâmina do Firestore:", idBuscado, err);
+              return null;
+            });
+            if (myEpoch !== _loadEpoch) return;
+          }
+          if (!docRef || !docRef.exists) return;
 
           const dados = docRef.data() || {};
           const textoValido = (v) => typeof v === "string" && v.replace(/<[^>]*>/g, "").trim().length > 0;
@@ -705,8 +705,7 @@ async function carregarLaminaNoMicroscopio(laminaId) {
             atualizarBadgeContadorQuestoes();
           }
           if (dados.maxMagnification) {
-            const isPele = (dados.nome && dados.nome.toLowerCase().includes("pele")) || idBuscado === "a3oRvXvJpMKAtU2RE85q" || idBuscado === "pele_espessa";
-            laminaAtualData.maxMagnification = isPele ? 40 : (Number(dados.maxMagnification) || 40);
+            laminaAtualData.maxMagnification = Number(dados.maxMagnification) || 40;
           }
           // Metadados ópticos cadastrados no CMS (objetiva, MPP, perfil, método)
           ["objetivaCaptura", "mpp", "perfilOptico", "metodoCalibracao", "opticsUrl"].forEach((campo) => {
@@ -985,11 +984,13 @@ function salvarRespostaEstudante(laminaId, questaoId, texto) {
     statusEl.classList.add("text-teal-700");
   }
 
+  _respostasPendentes.set(idSeguro, { laminaId, questaoId: idSeguro, texto });
   clearTimeout(debounceTimersRespostas[idSeguro]);
   debounceTimersRespostas[idSeguro] = setTimeout(() => {
     try {
       const chave = `palasAtlas.respostas.${laminaId}.${idSeguro}`;
       localStorage.setItem(chave, texto);
+      _respostasPendentes.delete(idSeguro);
       if (statusEl) {
         statusEl.textContent = "Salvo localmente";
         statusEl.classList.remove("text-teal-700");
@@ -1007,6 +1008,7 @@ function salvarRespostaEstudante(laminaId, questaoId, texto) {
 function salvarRespostaImediato(laminaId, questaoId, texto) {
   const idSeguro = String(questaoId);
   clearTimeout(debounceTimersRespostas[idSeguro]);
+  _respostasPendentes.delete(idSeguro);
   try {
     const chave = `palasAtlas.respostas.${laminaId}.${idSeguro}`;
     localStorage.setItem(chave, texto);
@@ -1019,6 +1021,17 @@ function salvarRespostaImediato(laminaId, questaoId, texto) {
   } catch (e) {
     console.warn("[Palas Atlas] Erro ao persistir resposta imediata no localStorage:", e);
   }
+}
+
+function flushRespostasPendentes() {
+  if (_respostasPendentes.size === 0) return;
+  for (const [idSeguro, entry] of _respostasPendentes.entries()) {
+    clearTimeout(debounceTimersRespostas[idSeguro]);
+    try {
+      localStorage.setItem(`palasAtlas.respostas.${entry.laminaId}.${idSeguro}`, entry.texto);
+    } catch (e) {}
+  }
+  _respostasPendentes.clear();
 }
 
 /**
@@ -1246,6 +1259,73 @@ function destacarPinoNaSidebar(pinId) {
 // ---------------------------------------------------------------------------
 // 5. Inicializa o OpenSeadragon com constraints de trava e escalas corretas
 // ---------------------------------------------------------------------------
+function protegerFonteAzulejos(item) {
+  try {
+    if (item && item.source && typeof item.source.getTileUrl === "function" && !item.source._palasProtected) {
+      const origGetTileUrl = item.source.getTileUrl.bind(item.source);
+      item.source.getTileUrl = function(level, x, y) {
+        const rawUrl = origGetTileUrl(level, x, y);
+        return window.slideSecurity ? window.slideSecurity.obterUrlAzulejoProtegida(rawUrl) : rawUrl;
+      };
+      item.source._palasProtected = true;
+    }
+  } catch (secErr) {
+    console.warn("[Palas Security] Hook de proteção em getTileUrl:", secErr);
+  }
+}
+
+function destruirInstanciaViewer() {
+  if (_activeOpenTimer) {
+    clearTimeout(_activeOpenTimer);
+    _activeOpenTimer = null;
+  }
+  if (_styleSyncTimer) {
+    clearTimeout(_styleSyncTimer);
+    _styleSyncTimer = null;
+  }
+  if (_pinAutoHideTimer) {
+    clearTimeout(_pinAutoHideTimer);
+    _pinAutoHideTimer = null;
+  }
+  if (_viewerToastTimer) {
+    clearTimeout(_viewerToastTimer);
+    _viewerToastTimer = null;
+  }
+
+  limparMedicaoRegua();
+  if (modoReguaAtivo) {
+    toggleReguaMorfometrica(false);
+  }
+  if (_reguaPointerHost && _reguaPointerMoveHandler) {
+    try { _reguaPointerHost.removeEventListener("pointermove", _reguaPointerMoveHandler); } catch (e) {}
+    _reguaPointerHost = null;
+    _reguaPointerMoveHandler = null;
+  }
+
+  limparMarcacoesPinosViewer();
+  if (overlayQuestaoAtiva) {
+    removerOverlayComSeguranca(overlayQuestaoAtiva);
+    overlayQuestaoAtiva = null;
+  }
+
+  if (viewer && typeof viewer.destroy === "function") {
+    try {
+      viewer.destroy();
+    } catch (e) {}
+  }
+  viewer = null;
+  window.viewer = null;
+}
+
+export function destruirMicroscopio() {
+  flushRespostasPendentes();
+  destruirInstanciaViewer();
+  if (_stageResizeObserver) {
+    try { _stageResizeObserver.disconnect(); } catch (e) {}
+    _stageResizeObserver = null;
+  }
+}
+
 async function inicializarOpenSeadragon() {
   if (!laminaAtualData) return;
   const containerId = "osd-viewer";
@@ -1272,30 +1352,7 @@ async function inicializarOpenSeadragon() {
   const rawFallback = laminaAtualData.previewImage || laminaAtualData.thumbnailUrl || "";
   const previewFallback = isSafeSlideUrl(rawFallback) ? String(rawFallback).trim() : "";
 
-  if (_activeOpenTimer) {
-    clearTimeout(_activeOpenTimer);
-    _activeOpenTimer = null;
-  }
-
-  limparMedicaoRegua();
-  if (modoReguaAtivo) {
-    toggleReguaMorfometrica(false);
-  }
-  if (_reguaPointerHost && _reguaPointerMoveHandler) {
-    try { _reguaPointerHost.removeEventListener("pointermove", _reguaPointerMoveHandler); } catch (e) {}
-    _reguaPointerHost = null;
-    _reguaPointerMoveHandler = null;
-  }
-
-  if (_pinAutoHideTimer) {
-    clearTimeout(_pinAutoHideTimer);
-    _pinAutoHideTimer = null;
-  }
-  limparMarcacoesPinosViewer();
-  if (overlayQuestaoAtiva) {
-    removerOverlayComSeguranca(overlayQuestaoAtiva);
-    overlayQuestaoAtiva = null;
-  }
+  destruirInstanciaViewer();
   marcacoesVisiveis = false;
   pinAtivo = null;
   questaoAtivaId = null;
@@ -1303,21 +1360,20 @@ async function inicializarOpenSeadragon() {
   certidaoOpticaAtual = null;
   laminaAtualData._usingPreviewFallback = false;
 
-  if (viewer && typeof viewer.destroy === "function") {
-    try {
-      viewer.destroy();
-    } catch (e) {}
-    viewer = null;
-    window.viewer = null;
-  }
-
   const mySeq = ++_viewerInstanceSeq;
   const isDzi = imagemUrl.endsWith(".dzi") || imagemUrl.includes(".dzi?");
   const tileSourcesConfig = isDzi ? imagemUrl : { type: "image", url: imagemUrl };
 
+  const dziSlug =
+    (window.slideSecurity && typeof window.slideSecurity.extrairSlugDzi === "function"
+      ? window.slideSecurity.extrairSlugDzi(imagemUrl)
+      : null) ||
+    laminaAtualData.id ||
+    "lamina-ativa";
+
   // Garante o ticket HMAC assinado ANTES da abertura do DZI para nenhum azulejo sair sem autorização
   if (isDzi && window.slideSecurity && typeof window.slideSecurity.renovarTicketSessao === "function") {
-    await window.slideSecurity.renovarTicketSessao(laminaAtualData.id || "lamina-ativa");
+    await window.slideSecurity.renovarTicketSessao(dziSlug);
   }
   if (mySeq !== _viewerInstanceSeq) return;
 
@@ -1335,9 +1391,6 @@ async function inicializarOpenSeadragon() {
   container.style.touchAction = "none";
   container.style.userSelect = "none";
   container.style.webkitUserSelect = "none";
-
-  // Registra o tempo de início do carregamento da imagem
-  window.__microscopeStartTime = Date.now();
 
   let hasFailed = false;
   let fallbackAttempted = false;
@@ -1371,7 +1424,7 @@ async function inicializarOpenSeadragon() {
       // Motor de Ampliação e Navegação Totalmente Ativo
       mouseNavEnabled:          true,
 
-      // Pan livre e navegacao sem travas, permitindo visao distante com espacos em preto
+      // Pan livre e navegacao sem travas, permitindo visao distante no campo panorâmico
       panHorizontal:            true,
       panVertical:              true,
       constrainDuringPan:       true,
@@ -1398,6 +1451,10 @@ async function inicializarOpenSeadragon() {
     });
     window.viewer = viewer;
 
+    if (viewer.world && typeof viewer.world.addHandler === "function") {
+      viewer.world.addHandler("add-item", (ev) => protegerFonteAzulejos(ev?.item));
+    }
+
     // Garante touch-action: none e user-select: none nos elementos canvas e container do OSD
     if (viewer.canvas) {
       viewer.canvas.style.touchAction = "none";
@@ -1414,7 +1471,7 @@ async function inicializarOpenSeadragon() {
     if (window.slideSecurity) {
       window.slideSecurity.init({
         viewerElement: container,
-        slideId: laminaAtualData.id || "lamina-ativa",
+        slideId: dziSlug,
         userEmail: window.__palasCurrentUser?.email || null
       });
     }
@@ -1448,15 +1505,7 @@ async function inicializarOpenSeadragon() {
       }
     }
     hasFailed = true;
-    if (_activeOpenTimer) {
-      clearTimeout(_activeOpenTimer);
-      _activeOpenTimer = null;
-    }
-    if (viewer && typeof viewer.destroy === "function") {
-      try { viewer.destroy(); } catch (e) {}
-    }
-    viewer = null;
-    window.viewer = null;
+    destruirInstanciaViewer();
     exibirErroMicroscopio(`Não foi possível carregar o arquivo da lâmina digital. Verifique sua conexão ou tente novamente.`);
   };
 
@@ -1507,17 +1556,11 @@ async function inicializarOpenSeadragon() {
     // Vincula o gancho de proteção de URLs de azulejos DZI e atualiza lâmina ativa
     try {
       if (window.slideSecurity) {
-        window.slideSecurity.setSlide(laminaAtualData?.id || 'lamina-ativa');
+        window.slideSecurity.setSlide(dziSlug);
       }
-      if (item && item.source && typeof item.source.getTileUrl === "function") {
-        const origGetTileUrl = item.source.getTileUrl.bind(item.source);
-        item.source.getTileUrl = function(level, x, y) {
-          const rawUrl = origGetTileUrl(level, x, y);
-          return window.slideSecurity ? window.slideSecurity.obterUrlAzulejoProtegida(rawUrl) : rawUrl;
-        };
-      }
+      protegerFonteAzulejos(item);
     } catch (secErr) {
-      console.warn("[Palas Security] Hook de proteção em getTileUrl:", secErr);
+      console.warn("[Palas Security] Hook de proteção em setSlide:", secErr);
     }
 
     if (item) {
@@ -1586,7 +1629,10 @@ async function inicializarOpenSeadragon() {
       }
     }
 
-    setTimeout(() => {
+    if (_styleSyncTimer) clearTimeout(_styleSyncTimer);
+    _styleSyncTimer = setTimeout(() => {
+      _styleSyncTimer = null;
+      if (mySeq !== _viewerInstanceSeq || !viewer) return;
       const navParent = document.querySelector(".openseadragon-navigator");
       if (navParent) {
         Object.assign(navParent.style, {
@@ -1626,11 +1672,7 @@ async function inicializarOpenSeadragon() {
     if (skeleton && skeleton.style.display !== "none" && !skeleton.classList.contains("hidden")) {
       if (!viewer || !viewer.isOpen()) {
         hasFailed = true;
-        if (viewer && typeof viewer.destroy === "function") {
-          try { viewer.destroy(); } catch (e) {}
-        }
-        viewer = null;
-        window.viewer = null;
+        destruirInstanciaViewer();
         exibirErroMicroscopio("Tempo limite excedido ao carregar a lâmina. Tente recarregar a página.");
       } else {
         skeleton.style.opacity = '0';
@@ -1643,7 +1685,6 @@ async function inicializarOpenSeadragon() {
     }
   }, 4500);
 
-  viewer.addHandler("open", updateZoomDisplay);
   viewer.addHandler("animation", updateZoomDisplay);
   viewer.addHandler("animation-finish", updateZoomDisplay);
   viewer.addHandler("zoom", updateZoomDisplay);
@@ -1701,8 +1742,8 @@ export function recalcularCertidaoOptica() {
 
   certidaoOpticaAtual = emitirCertidaoOptica({
     lamina: laminaAtualData,
-    manifesto: manifestoOpticoAtual,
-    perfil: perfilOpticoAtual || PERFIL_OPTICO_PADRAO,
+    manifesto: null,
+    perfil: PERFIL_OPTICO_PADRAO,
     dimensoesDzi
   });
 
@@ -1804,7 +1845,7 @@ export function analisarProporcoesOpticasDzi(tiledImage, maxMagNominal) {
       `%c[Palas Atlas • Calibração Óptica DZI]%c ${laminaAtualData?.nome || 'Lâmina'}\n` +
       `• Resolução DZI: ${imgWidth} × ${imgHeight} px (${proporcoes.megapixels} MP, Proporção: ${proporcoes.aspectRatio})\n` +
       `• Objetiva Máxima: ${maxMag}x (100% resolução nativa 1:1 = zoom ${nativeZoom.toFixed(3)})\n` +
-      `• Visão Panorâmica 4x: zoom ${z4x.toFixed(3)} (Margens pretas calibradas)\n` +
+      `• Visão Panorâmica 4x: zoom ${z4x.toFixed(3)} (Campo panorâmico calibrado)\n` +
       `• Objetiva 10x: zoom ${z10x.toFixed(3)}\n` +
       `• Objetiva 40x: zoom ${z40x.toFixed(3)}`,
       "color: #c8ad5f; font-weight: bold;",
@@ -1893,12 +1934,12 @@ export function calcularMagnificacaoOtica(osdZoom) {
   // Relação ótica linear direta: Magnificação = 4 * (zoomAtual / zoom4x)
   const magRaw = 4 * (currentZoom / z4);
 
-  // Snap suave para valores nominais se muito próximo (dentro de margem imperceptível)
+  // Snap suave para valores nominais se muito próximo (respeitando teto real maxMag)
   if (Math.abs(magRaw - 4) < 0.35) return 4;
-  if (Math.abs(magRaw - 10) < 0.8) return 10;
-  if (Math.abs(magRaw - 40) < 2.5) return 40;
-  if (Math.abs(magRaw - 60) < 3.0) return 60;
-  if (Math.abs(magRaw - 100) < 4.5) return 100;
+  if (maxMag >= 10 && Math.abs(magRaw - 10) < 0.8) return 10;
+  if (maxMag >= 40 && Math.abs(magRaw - 40) < 2.5) return 40;
+  if (maxMag >= 60 && Math.abs(magRaw - 60) < 3.0) return 60;
+  if (maxMag >= 100 && Math.abs(magRaw - 100) < 4.5) return 100;
 
   // O valor exibido NUNCA ultrapassa maxMag (impede exibição de 50x quando maxMag for 40x)
   return Math.max(4, Math.min(maxMag, Math.round(magRaw * 10) / 10));
@@ -1969,7 +2010,7 @@ function aplicarBloqueioObjetivas(maxMag) {
   const limiteMag = Number(maxMag) || 40;
   document.querySelectorAll(".lens-btn").forEach(btn => {
     const magBotao = Number(btn.getAttribute("data-mag")) || 4;
-    if (magBotao > limiteMag) {
+    if (!objetivaDisponivel(magBotao, limiteMag)) {
       btn.disabled = true;
       btn.className = "lens-btn text-slate-300 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono cursor-not-allowed opacity-50 min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
       btn.title = `Objetiva não disponível (Máx: ${limiteMag}x)`;
@@ -2246,8 +2287,6 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
     const angleRad = Math.atan2(y2 - y1, x2 - x1);
     const angleDeg = angleRad * (180 / Math.PI);
     const headSize = isAtivo ? 22 : 18;
-    const tipAnchorX = (22 / 24) * headSize;
-    const tipAnchorY = headSize / 2;
 
     const dirX = Math.cos(angleRad);
     const dirY = Math.sin(angleRad);
@@ -2396,10 +2435,12 @@ export function renderizarTodasMarcacoesNoViewer() {
  * próxima ao cabeçalho ou fora do palco visível, evitando corte do rótulo.
  */
 function atualizarPosicaoLabelsCirculos() {
+  const labels = document.querySelectorAll('[data-pin-hit="circle-label"]');
+  if (labels.length === 0) return;
   const stage = document.getElementById("viewerStage");
   if (!stage) return;
   const stageRect = stage.getBoundingClientRect();
-  document.querySelectorAll('[data-pin-hit="circle-label"]').forEach((labelEl) => {
+  labels.forEach((labelEl) => {
     const root = labelEl.closest(".viewer-marker-root");
     if (!root) return;
     const rect = root.getBoundingClientRect();
@@ -2514,7 +2555,7 @@ export function focarPinoNoViewer(pinIdRaw, { permitirToggle = false } = {}) {
       r *= contentSize.x;
     }
     targetPoint = converterPontoParaViewport(pino.x, pino.y, contentSize);
-    targetZoom = homeZoom * Math.min(5.5, Math.max(2.2, 1400 / (r * 2)));
+    targetZoom = homeZoom * Math.min(5.5, Math.max(2.2, 1400 / (Math.max(1, r) * 2)));
   } else if (pino.type === "arrow") {
     const rawEndX = pino.endX != null ? pino.endX : pino.end_x;
     const rawEndY = pino.endY != null ? pino.endY : pino.end_y;

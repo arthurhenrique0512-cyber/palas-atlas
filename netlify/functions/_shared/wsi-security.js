@@ -76,8 +76,7 @@ function getAllowedCorsOrigin(headers) {
   if (DEFAULT_ALLOWED_ORIGINS.includes(origin)) {
     return origin;
   }
-  if (/^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.netlify\.app$/i.test(origin) ||
-      /^https:\/\/[a-z0-9-]+\.netlify\.app$/i.test(origin)) {
+  if (/^https:\/\/([a-z0-9-]+--)?palasatlas\.netlify\.app$/i.test(origin)) {
     return origin;
   }
   if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) {

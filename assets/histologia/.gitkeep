@@ -1,1 +1,0 @@
-# Diretório reservado para armazenar as imagens de Histologia. No banco (Firestore) salvar apenas os caminhos relativos (ex: /assets/histologia/laminar01.jpg).
