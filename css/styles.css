@@ -158,6 +158,86 @@ body {
     0 16px 34px -12px rgba(15, 118, 110, 0.12);
 }
 
+/* Matizes minerais editoriais + filete superior para os 4 cards da abertura na Home */
+.palas-hero-card {
+  position: relative;
+  overflow: hidden;
+}
+.palas-hero-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--hero-accent, rgba(15, 118, 110, 0.45));
+  pointer-events: none;
+}
+
+.palas-card-tactile.palas-hero-tint-sky {
+  --hero-accent: rgba(3, 105, 161, 0.58);
+  background-color: #f4f9fd;
+  background-image:
+    var(--palas-grain-subtle),
+    linear-gradient(180deg, #f9fcff 0%, #f0f6fc 100%);
+  border-color: rgba(3, 105, 161, 0.15);
+}
+.palas-card-interactive.palas-hero-tint-sky:hover {
+  border-color: rgba(3, 105, 161, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 4px 10px -2px rgba(3, 105, 161, 0.06),
+    0 16px 34px -12px rgba(3, 105, 161, 0.12);
+}
+
+.palas-card-tactile.palas-hero-tint-slate {
+  --hero-accent: rgba(51, 65, 85, 0.48);
+  background-color: #f5f7fa;
+  background-image:
+    var(--palas-grain-subtle),
+    linear-gradient(180deg, #fafbfc 0%, #f1f5f9 100%);
+  border-color: rgba(71, 85, 105, 0.15);
+}
+.palas-card-interactive.palas-hero-tint-slate:hover {
+  border-color: rgba(51, 65, 85, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 4px 10px -2px rgba(51, 65, 85, 0.06),
+    0 16px 34px -12px rgba(51, 65, 85, 0.12);
+}
+
+.palas-card-tactile.palas-hero-tint-teal {
+  --hero-accent: rgba(15, 118, 110, 0.58);
+  background-color: #f2faf7;
+  background-image:
+    var(--palas-grain-subtle),
+    linear-gradient(180deg, #f7fcfa 0%, #ecf6f4 100%);
+  border-color: rgba(15, 118, 110, 0.15);
+}
+.palas-card-interactive.palas-hero-tint-teal:hover {
+  border-color: rgba(15, 118, 110, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 4px 10px -2px rgba(15, 118, 110, 0.06),
+    0 16px 34px -12px rgba(15, 118, 110, 0.12);
+}
+
+.palas-card-tactile.palas-hero-tint-gold {
+  --hero-accent: rgba(180, 142, 54, 0.62);
+  background-color: #faf6eb;
+  background-image:
+    var(--palas-grain-subtle),
+    linear-gradient(180deg, #fdfcf9 0%, #f6f1e4 100%);
+  border-color: rgba(161, 128, 52, 0.18);
+}
+.palas-card-interactive.palas-hero-tint-gold:hover {
+  border-color: rgba(161, 128, 52, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 4px 10px -2px rgba(161, 128, 52, 0.06),
+    0 16px 34px -12px rgba(161, 128, 52, 0.13);
+}
+
 /* Painéis de console e leitura editorial (SEM overflow: hidden para preservar dropdowns) */
 .palas-console-panel {
   background-color: #ffffff;

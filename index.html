@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palas Atlas | Atlas Morfológico Digital</title>
-  <meta name="description" content="Plataforma de ensino morfológico focado em Histologia, Patologia, Parasitologia e Microbiologia para o ciclo básico." />
+  <meta name="description" content="Acervo digital de lâminas reais de laboratório para o estudo prático de Histologia e ciências morfológicas." />
   <link rel="canonical" href="https://palasatlas.netlify.app/" />
   <meta name="theme-color" content="#f8fafc" />
 
@@ -12,13 +12,13 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://palasatlas.netlify.app/" />
   <meta property="og:title" content="Palas Atlas | Atlas Morfológico Digital" />
-  <meta property="og:description" content="Explore lâminas microscópicas reais em alta definição com navegação óptica interativa." />
+  <meta property="og:description" content="Acervo digital de lâminas reais de laboratório para o estudo prático de Histologia e ciências morfológicas." />
   <meta property="og:image" content="https://palasatlas.netlify.app/og-preview.png" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Palas Atlas | Atlas Morfológico Digital" />
-  <meta name="twitter:description" content="Explore lâminas microscópicas reais em alta definição com navegação óptica interativa." />
+  <meta name="twitter:description" content="Acervo digital de lâminas reais de laboratório para o estudo prático de Histologia e ciências morfológicas." />
   <meta name="twitter:image" content="https://palasatlas.netlify.app/og-preview.png" />
 
   <!-- Favicon & PWA Oficial Palas Atlas -->
@@ -34,8 +34,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Folha de Estilos Tailwind Compilada + Estilos Customizados -->
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261122v2">
-  <link rel="stylesheet" href="css/styles.css?v=20261121v5">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261122v4">
+  <link rel="stylesheet" href="css/styles.css?v=20261122v4">
   <link rel="stylesheet" href="css/splash.css?v=20261121v5">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js" defer></script>
@@ -158,10 +158,6 @@
         <a href="#secaoComoUsar" class="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline">Como Usar</a>
         <a href="#secaoFAQ" class="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline">Dúvidas</a>
         <a href="sobre.html" class="text-sm font-medium text-slate-600 hover:text-sky-800 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sky-700 hover:after:w-full after:transition-all after:duration-200 no-underline">Sobre Nós</a>
-        <a href="admin.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono tracking-wider uppercase text-slate-600 hover:text-slate-950 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition-all no-underline shadow-2xs" title="Painel do Desenvolvedor / CMS">
-          <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
-          <span>CMS</span>
-        </a>
       </nav>
 
       <!-- Lado Direito: Controle Discreto de Menu (Apenas Mobile/Tablet) -->
@@ -277,7 +273,7 @@
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
-                <span>Lâminas Populares</span>
+                <span>Lâminas em Destaque</span>
               </button>
             </div>
           </div>
@@ -286,7 +282,7 @@
           <div class="pt-5 border-t border-slate-200/80">
             <span class="text-[10px] tracking-[0.25em] font-mono font-semibold text-slate-400 uppercase mb-3 px-3 block">Sobre Nós</span>
             <p class="font-sans text-xs text-slate-500 leading-relaxed font-normal text-left lg:text-justify px-3 mb-4">
-              O Palas Atlas nasce da iniciativa de estudantes de Medicina para integrar a Morfologia, a Histopatologia e a Microbiologia em um acervo acadêmico aberto e acessível.
+              Iniciativa de estudantes de Medicina com orientação docente para reunir lâminas reais de laboratório em um acervo acadêmico aberto.
             </p>
 
             <div class="space-y-1">
@@ -309,16 +305,6 @@
                 </svg>
                 <span>Equipe Curadora</span>
               </a>
-
-              <button
-                type="button"
-                onclick="window.App.toggleDashboard(); window.App.fecharMenuLateral();"
-                class="flex items-center gap-3 group text-slate-600 hover:text-sky-700 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left">
-                <svg class="w-4 h-4 text-slate-400 group-hover:text-sky-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                </svg>
-                <span>Painel do Desenvolvedor</span>
-              </button>
             </div>
           </div>
         </div>
@@ -357,25 +343,25 @@
             <!-- Pílula superior com fundo branco elevado -->
             <div class="palas-pill-tactile inline-flex items-center gap-2 bg-white/90 border border-teal-900/10 shadow-sm text-teal-950 text-[10px] sm:text-[11px] font-semibold tracking-widest uppercase px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full mb-3.5 sm:mb-6">
               <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
-              <span>Atlas Morfológico Digital</span>
+              <span>Acervo Acadêmico de Microscopia</span>
             </div>
 
             <!-- Título Principal com alto impacto tipográfico e Ciências Morfológicas em fonte serifada -->
             <h1 class="text-[30px] sm:text-4xl lg:text-[42px] xl:text-[54px] font-bold tracking-tight text-slate-950 leading-[1.08] sm:leading-[1.08] lg:leading-[1.08] text-left">
-              Atlas Integrado de <br />
+              Atlas de <br />
               <span class="font-serif text-teal-900 font-bold">Ciências Morfológicas</span>
             </h1>
 
             <!-- Subtítulo Limpo -->
             <p class="text-slate-600 text-sm sm:text-lg font-sans font-normal leading-relaxed max-w-xl text-left mt-3 sm:mt-5">
-              Explore lâminas microscópicas reais em alta definição com navegação óptica interativa.
+              Lâminas reais digitalizadas da rotina de laboratório para apoiar o estudo diário, preservando a morfologia que o estudante encontra ao microscópio.
             </p>
 
             <!-- Rodapé institucional discreto separado por linha fina -->
             <div class="mt-5 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-200/80 flex flex-wrap items-center gap-x-3 sm:gap-x-5 gap-y-1.5 text-[11px] sm:text-xs font-medium text-slate-500">
-              <span>Ensino Morfológico Universitário</span>
-              <span class="inline-flex items-center gap-2 sm:gap-3"><span class="text-slate-300">&bull;</span><span>Acesso 100% Aberto</span></span>
-              <span class="inline-flex items-center gap-2 sm:gap-3"><span class="text-slate-300">&bull;</span><span>Navegação Óptica Interativa</span></span>
+              <span>Acesso aberto e gratuito</span>
+              <span class="inline-flex items-center gap-2 sm:gap-3"><span class="text-slate-300">&bull;</span><span>Revisão docente e estudantil</span></span>
+              <span class="inline-flex items-center gap-2 sm:gap-3"><span class="text-slate-300">&bull;</span><span>Escala calibrada em &micro;m</span></span>
             </div>
           </div>
 
@@ -383,64 +369,64 @@
           <div class="lg:col-span-6 w-full">
             <div class="grid grid-cols-2 gap-2.5 sm:gap-4 lg:gap-5 items-start">
               
-              <!-- Card 1: Alta Definição -->
-              <div class="palas-card-tactile palas-card-interactive bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-teal-50 text-teal-800 border border-teal-800/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] flex items-center justify-center mb-2.5 sm:mb-3.5">
+              <!-- Card 1: Lâminas de bancada -->
+              <div class="palas-card-tactile palas-card-interactive palas-hero-card palas-hero-tint-sky backdrop-blur-sm border rounded-xl sm:rounded-2xl p-3.5 sm:p-5 transition-all duration-300">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-sky-50/90 text-[#0369a1] border border-sky-700/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] flex items-center justify-center mb-2.5 sm:mb-3.5">
                   <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                   </svg>
                 </div>
                 <h3 class="font-semibold text-slate-900 text-xs sm:text-sm mb-1">
-                  Alta Definição
+                  Lâminas de bancada
                 </h3>
-                <p class="text-[11px] sm:text-xs text-slate-500 leading-snug sm:leading-relaxed">
-                  Cortes histológicos digitalizados com nitidez óptica real.
+                <p class="text-[11px] sm:text-xs text-slate-600 leading-snug sm:leading-relaxed">
+                  Preparações digitalizadas integralmente, preservando a arquitetura tecidual como ela aparece na prática.
                 </p>
               </div>
 
-              <!-- Card 2: Técnicas e Colorações (deslocamento vertical escalonado) -->
-              <div class="palas-card-tactile palas-card-interactive bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300 mt-3 sm:mt-6">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-teal-50 text-teal-800 border border-teal-800/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] flex items-center justify-center mb-2.5 sm:mb-3.5">
+              <!-- Card 2: Preparações clássicas (deslocamento vertical escalonado) -->
+              <div class="palas-card-tactile palas-card-interactive palas-hero-card palas-hero-tint-slate backdrop-blur-sm border rounded-xl sm:rounded-2xl p-3.5 sm:p-5 transition-all duration-300 mt-3 sm:mt-6">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-slate-100/90 text-slate-700 border border-slate-700/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] flex items-center justify-center mb-2.5 sm:mb-3.5">
                   <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
                   </svg>
                 </div>
                 <h3 class="font-semibold text-slate-900 text-xs sm:text-sm mb-1">
-                  Técnicas e Colorações
+                  Preparações clássicas
                 </h3>
-                <p class="text-[11px] sm:text-xs text-slate-500 leading-snug sm:leading-relaxed">
-                  Preparações em H&E, desgastes ósseos e colorações especiais.
+                <p class="text-[11px] sm:text-xs text-slate-600 leading-snug sm:leading-relaxed">
+                  Cortes em H&amp;E, desgastes ósseos e colorações especiais usados na rotina do laboratório.
                 </p>
               </div>
 
-              <!-- Card 3: Pinos Morfológicos -->
-              <div class="palas-card-tactile palas-card-interactive bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-teal-50 text-teal-800 border border-teal-800/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] flex items-center justify-center mb-2.5 sm:mb-3.5">
+              <!-- Card 3: Estudo orientado -->
+              <div class="palas-card-tactile palas-card-interactive palas-hero-card palas-hero-tint-teal backdrop-blur-sm border rounded-xl sm:rounded-2xl p-3.5 sm:p-5 transition-all duration-300">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-teal-50/90 text-[#0f766e] border border-teal-700/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] flex items-center justify-center mb-2.5 sm:mb-3.5">
                   <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
                   </svg>
                 </div>
                 <h3 class="font-semibold text-slate-900 text-xs sm:text-sm mb-1">
-                  Pinos Morfológicos
+                  Estudo orientado
                 </h3>
-                <p class="text-[11px] sm:text-xs text-slate-500 leading-snug sm:leading-relaxed">
-                  Marcações interativas com critérios precisos de identificação.
+                <p class="text-[11px] sm:text-xs text-slate-600 leading-snug sm:leading-relaxed">
+                  Marcações sobre o corte conectadas ao texto descritivo para localizar cada estrutura sem interromper a leitura.
                 </p>
               </div>
 
-              <!-- Card 4: Acervo Universitário (deslocamento vertical escalonado) -->
-              <div class="palas-card-tactile palas-card-interactive bg-white/95 backdrop-blur-sm border border-slate-200/80 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgb(15,23,42,0.04)] hover:shadow-[0_12px_36px_rgb(13,148,136,0.08)] hover:-translate-y-0.5 hover:border-teal-700/30 transition-all duration-300 mt-3 sm:mt-6">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-teal-50 text-teal-800 border border-teal-800/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] flex items-center justify-center mb-2.5 sm:mb-3.5">
+              <!-- Card 4: Construído na graduação (deslocamento vertical escalonado) -->
+              <div class="palas-card-tactile palas-card-interactive palas-hero-card palas-hero-tint-gold backdrop-blur-sm border rounded-xl sm:rounded-2xl p-3.5 sm:p-5 transition-all duration-300 mt-3 sm:mt-6">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#f5eedc] text-[#8a6a1f] border border-[#b48e36]/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] flex items-center justify-center mb-2.5 sm:mb-3.5">
                   <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5"/>
                   </svg>
                 </div>
                 <h3 class="font-semibold text-slate-900 text-xs sm:text-sm mb-1">
-                  Acervo Universitário
+                  Construído na graduação
                 </h3>
-                <p class="text-[11px] sm:text-xs text-slate-500 leading-snug sm:leading-relaxed">
-                  Iniciativa acadêmica aberta e gratuita para estudo morfológico.
+                <p class="text-[11px] sm:text-xs text-slate-600 leading-snug sm:leading-relaxed">
+                  Iniciativa de estudantes de Medicina sob orientação docente, aberta a quem estuda e ensina morfologia.
                 </p>
               </div>
 
@@ -453,7 +439,7 @@
       <!-- Pílula Divisória Centralizada sobre a Linha Divisória (100% visível, fora de overflow-hidden) -->
       <div class="relative z-20 -my-3.5 flex justify-center pointer-events-none">
         <span class="palas-pill-tactile pointer-events-auto bg-white border border-slate-200/90 shadow-sm text-[11px] font-medium text-slate-500 px-4 py-1.5 rounded-full inline-flex items-center gap-1.5 select-none">
-          <span>&darr;</span> Role para pesquisar e explorar as lâminas
+          <span>&darr;</span> Pesquisar no acervo
         </span>
       </div>
 
@@ -479,7 +465,7 @@
 
                 <!-- a) Título sóbrio sem etiquetas em caixa alta acima -->
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-3 sm:mb-4">
-                  Pesquise no Acervo Morfológico
+                  Buscar no acervo
                 </h2>
 
                 <!-- b) Barra de Busca Integrada -->
@@ -487,7 +473,7 @@
                   <div class="absolute inset-y-0 left-3.5 sm:left-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-sky-700 transition-colors z-20">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                   </div>
-                  <input type="text" id="global-search-input" name="palas_atlas_search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="palas-input-recessed w-full bg-white border border-slate-200/90 focus:border-sky-600 rounded-xl py-3.5 sm:py-4 pl-11 sm:pl-12 pr-11 sm:pr-12 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all relative z-10 shadow-sm focus:shadow-[0_14px_32px_-6px_rgba(3,105,161,0.15)]" placeholder="Buscar tecidos, órgãos ou lâminas...">
+                  <input type="text" id="global-search-input" name="palas_atlas_search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="palas-input-recessed w-full bg-white border border-slate-200/90 focus:border-sky-600 rounded-xl py-3.5 sm:py-4 pl-11 sm:pl-12 pr-11 sm:pr-12 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all relative z-10 shadow-sm focus:shadow-[0_14px_32px_-6px_rgba(3,105,161,0.15)]" placeholder="Ex.: osso maduro, pele espessa, canalículos...">
                   
                   <!-- Botão de limpar -->
                   <button type="button" id="global-search-clear" class="absolute inset-y-0 right-4 hidden items-center text-slate-400 hover:text-slate-800 transition-colors cursor-pointer z-20">
@@ -510,11 +496,11 @@
                 <!-- Botões de Ação -->
                 <div class="relative z-10 grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-3.5 items-center justify-start w-full mt-4 sm:mt-5">
                   <button id="btnHeroPrimary" type="button" onclick="window.App.abrirAccordionHero('histologia')" class="bg-slate-900 hover:bg-black text-white rounded-xl px-3 sm:px-6 py-3 sm:py-3.5 min-h-[44px] sm:min-h-0 transition-all duration-200 flex items-center justify-center gap-2 sm:gap-2.5 group cursor-pointer text-xs font-sans font-semibold tracking-wide shadow-sm hover:shadow active:scale-95 whitespace-nowrap">
-                    <span>Explorar Lâminas</span>
+                    <span>Explorar acervo</span>
                     <svg class="w-4 h-4 text-[#d4af37] group-hover:translate-x-0.5 transition-transform duration-150 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                   </button>
                   <a href="sobre.html" class="inline-flex items-center justify-center gap-2 px-3 sm:px-6 py-3 sm:py-3.5 min-h-[44px] sm:min-h-0 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-sans font-semibold shadow-xs no-underline active:scale-95 whitespace-nowrap">
-                    Sobre o Projeto
+                    Sobre o projeto
                   </a>
                 </div>
 
@@ -572,7 +558,7 @@
                         href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5"
                         class="inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-sans font-semibold text-white hover:text-sky-300 transition-colors duration-150 group/link no-underline whitespace-nowrap shrink-0"
                       >
-                        <span>Abrir no Microscópio</span>
+                        <span>Abrir no microscópio</span>
                         <svg class="w-4 h-4 text-sky-400 group-hover/link:translate-x-1 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
@@ -971,7 +957,7 @@
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-slate-200/80">
           <div>
             <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-[-0.02em]">Disciplinas</h2>
-            <p class="text-sm text-slate-600 mt-1">Selecione uma área para acessar os módulos e lâminas.</p>
+            <p class="text-sm text-slate-600 mt-1">Escolha uma área para consultar os módulos e as lâminas disponíveis.</p>
           </div>
         </div>
 
@@ -981,11 +967,11 @@
           <div class="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-4 sm:gap-6">
             <div class="max-w-2xl">
               <h3 class="text-white font-serif text-2xl sm:text-3xl font-bold tracking-tight">Histologia</h3>
-              <p class="mt-1.5 sm:mt-2 text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed font-sans">Tecidos fundamentais e sistemas orgânicos em microscopia óptica de alta definição.</p>
+              <p class="mt-1.5 sm:mt-2 text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed font-sans">Organização microscópica dos tecidos fundamentais e sistemas orgânicos, da arquitetura do corte ao detalhe celular.</p>
             </div>
 
             <div class="inline-flex items-center gap-2 text-xs font-semibold text-teal-300 group-hover:text-white transition-colors shrink-0">
-              <span id="btnTxtHistologia">Acessar Módulo</span>
+              <span id="btnTxtHistologia">Ver módulos</span>
               <span id="arrowIconHistologia" class="transition-transform duration-300 group-hover:translate-x-0.5">&rarr;</span>
             </div>
           </div>
@@ -1114,10 +1100,10 @@
           <div onclick="window.App.toggleAccordionDisciplinas('patologia')" class="palas-card-tactile palas-card-interactive group bg-white border border-slate-200/90 rounded-2xl p-5 lg:p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:border-teal-700/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between cursor-pointer select-none">
             <div>
               <h4 class="text-lg font-bold text-slate-900 mb-1 group-hover:text-teal-900 transition-colors font-serif">Patologia</h4>
-              <p class="text-xs text-slate-600 leading-relaxed mb-4 lg:mb-6 font-sans">Lesões celulares elementares, processos inflamatórios, distúrbios hemodinâmicos e neoplasias.</p>
+              <p class="text-xs text-slate-600 leading-relaxed mb-4 lg:mb-6 font-sans">Lesões celulares, processos inflamatórios, distúrbios hemodinâmicos e neoplasias.</p>
             </div>
             <div class="text-xs font-semibold text-teal-800 flex items-center gap-1 group-hover:text-teal-950 transition-colors">
-              <span>Acessar disciplina</span>
+              <span>Ver módulos</span>
               <span class="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
             </div>
           </div>
@@ -1126,10 +1112,10 @@
           <div onclick="window.App.toggleAccordionDisciplinas('parasitologia')" class="palas-card-tactile palas-card-interactive group bg-white border border-slate-200/90 rounded-2xl p-5 lg:p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:border-teal-700/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between cursor-pointer select-none">
             <div>
               <h4 class="text-lg font-bold text-slate-900 mb-1 group-hover:text-teal-900 transition-colors font-serif">Parasitologia</h4>
-              <p class="text-xs text-slate-600 leading-relaxed mb-4 lg:mb-6 font-sans">Identificação morfológica de protozoários, helmintos, trofozoítos, cistos, ovos e larvas de interesse clínico.</p>
+              <p class="text-xs text-slate-600 leading-relaxed mb-4 lg:mb-6 font-sans">Protozoários, helmintos, trofozoítos, cistos, ovos e larvas de relevância clínica.</p>
             </div>
             <div class="text-xs font-semibold text-teal-800 flex items-center gap-1 group-hover:text-teal-950 transition-colors">
-              <span>Acessar disciplina</span>
+              <span>Ver módulos</span>
               <span class="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
             </div>
           </div>
@@ -1141,7 +1127,7 @@
               <p class="text-xs text-slate-600 leading-relaxed mb-4 lg:mb-6 font-sans">Bacterioscopia por Gram, colorações de Ziehl-Neelsen e estruturas fúngicas filamentosas e leveduriformes.</p>
             </div>
             <div class="text-xs font-semibold text-teal-800 flex items-center gap-1 group-hover:text-teal-950 transition-colors">
-              <span>Acessar disciplina</span>
+              <span>Ver módulos</span>
               <span class="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
             </div>
           </div>
@@ -1162,10 +1148,10 @@
         
         <div class="mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-slate-200/80 text-left">
           <h2 class="text-2xl lg:text-3xl font-bold text-slate-950 tracking-tight">
-            Lâminas Populares
+            Lâminas em Destaque
           </h2>
           <p class="text-sm text-slate-600 mt-1">
-            Cortes histológicos de referência para estudo prático.
+            Preparações disponíveis para estudo imediato no microscópio.
           </p>
         </div>
 
@@ -1197,7 +1183,7 @@
                   Osso Maduro 40x
                 </h3>
                 <p class="text-xs text-slate-500 leading-relaxed font-sans">
-                  Corte por desgaste em matriz mineralizada
+                  Ósteons, canalículos e linhas cimentantes em 40x.
                 </p>
               </div>
             </div>
@@ -1206,7 +1192,7 @@
               <a 
                 href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5" 
                 class="w-full py-2.5 min-h-[44px] lg:min-h-0 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-teal-900 hover:text-white border border-slate-200 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline">
-                <span>Examinar Lâmina</span>
+                <span>Abrir lâmina</span>
                 <span class="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
               </a>
             </div>
@@ -1238,7 +1224,7 @@
                   Osso Maduro 10x
                 </h3>
                 <p class="text-xs text-slate-500 leading-relaxed font-sans">
-                  Visão panorâmica e topografia cortical
+                  Visão panorâmica do tecido ósseo compacto cortical.
                 </p>
               </div>
             </div>
@@ -1247,7 +1233,7 @@
               <a 
                 href="microscopio.html?id=FFGk5d9kOAct5HIDdjQ7" 
                 class="w-full py-2.5 min-h-[44px] lg:min-h-0 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-teal-900 hover:text-white border border-slate-200 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline">
-                <span>Examinar Lâmina</span>
+                <span>Abrir lâmina</span>
                 <span class="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
               </a>
             </div>
@@ -1279,7 +1265,7 @@
                   Osso Maduro
                 </h3>
                 <p class="text-xs text-slate-500 leading-relaxed font-sans">
-                  Sistemas de Havers e canalículos
+                  Sistemas de Havers, lacunas osteocitárias e canais de Volkmann.
                 </p>
               </div>
             </div>
@@ -1288,7 +1274,7 @@
               <a 
                 href="microscopio.html?id=96ZYqoM2SV8p4fB2QgeM" 
                 class="w-full py-2.5 min-h-[44px] lg:min-h-0 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-teal-900 hover:text-white border border-slate-200 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline">
-                <span>Examinar Lâmina</span>
+                <span>Abrir lâmina</span>
                 <span class="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
               </a>
             </div>
@@ -1320,7 +1306,7 @@
                   Pele Espessa
                 </h3>
                 <p class="text-xs text-slate-500 leading-relaxed font-sans">
-                  Coloração H&E de rotina
+                  Epiderme estratificada queratinizada e derme papilar.
                 </p>
               </div>
             </div>
@@ -1329,7 +1315,7 @@
               <a 
                 href="microscopio.html?id=a3oRvXvJpMKAtU2RE85q" 
                 class="w-full py-2.5 min-h-[44px] lg:min-h-0 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-teal-900 hover:text-white border border-slate-200 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline">
-                <span>Examinar Lâmina</span>
+                <span>Abrir lâmina</span>
                 <span class="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
               </a>
             </div>
@@ -1348,13 +1334,13 @@
             <!-- Coluna Esquerda (lg:col-span-4 — Fixa/Editorial) -->
             <div class="lg:col-span-4 flex flex-col items-start text-left">
               <h2 class="text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight">
-                Navegação no Microscópio
+                Como estudar no microscópio
               </h2>
               <p class="mt-2.5 sm:mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
-                As lâminas são digitalizadas integralmente para permitir o estudo progressivo do corte &mdash; da arquitetura geral do órgão ao detalhe celular.
+                Cada lâmina é digitalizada em múltiplas escalas para acompanhar a rotina do laboratório, da arquitetura geral do tecido até o detalhe celular.
               </p>
               <div class="mt-4 sm:mt-6 pt-4 sm:pt-5 border-t border-slate-200/80 text-xs text-slate-500 leading-relaxed">
-                Dica de estudo: inicie sempre pelo menor aumento para reconhecer as camadas teciduais antes de aproximar o campo.
+                Comece sempre pela menor objetiva (4x) para reconhecer o arranjo do tecido antes de aproximar uma estrutura específica.
               </div>
             </div>
 
@@ -1362,33 +1348,33 @@
             <div class="lg:col-span-8 w-full">
               <div class="palas-console-panel bg-white rounded-2xl border border-slate-200/90 divide-y divide-slate-200/80 shadow-[0_4px_20px_rgb(15,23,42,0.03)]">
                 
-                <!-- Faixa 1: Varredura da Lâmina -->
+                <!-- Faixa 1: Varredura da lâmina -->
                 <div class="p-4 sm:p-7 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 sm:gap-4">
                   <h3 class="sm:w-1/3 font-semibold text-slate-900 text-base">
-                    <span class="font-mono text-[11px] text-teal-700/80 mr-2 font-semibold">01</span>Varredura da Lâmina
+                    <span class="font-mono text-[11px] text-teal-700/80 mr-2 font-semibold">01</span>Varredura da lâmina
                   </h3>
                   <p class="sm:w-2/3 text-sm text-slate-600 leading-relaxed">
-                    Percorra toda a extensão da peça arrastando o campo com o mouse ou com o toque. A aproximação é contínua pelo scroll ou gesto de pinça, sem perda de definição entre os campos.
+                    Mova a lâmina arrastando com o mouse ou com o dedo, e ajuste o zoom pelo scroll ou gesto de pinça para percorrer todo o corte.
                   </p>
                 </div>
 
-                <!-- Faixa 2: Escala de Aumentos -->
+                <!-- Faixa 2: Objetivas e régua -->
                 <div class="p-4 sm:p-7 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 sm:gap-4">
                   <h3 class="sm:w-1/3 font-semibold text-slate-900 text-base">
-                    <span class="font-mono text-[11px] text-teal-700/80 mr-2 font-semibold">02</span>Escala de Aumentos
+                    <span class="font-mono text-[11px] text-teal-700/80 mr-2 font-semibold">02</span>Objetivas e régua
                   </h3>
                   <p class="sm:w-2/3 text-sm text-slate-600 leading-relaxed">
-                    Alterne rapidamente entre as referências de 4&times; (visão panorâmica e topografia), 10&times;, 40&times; e 100&times; pelo seletor no canto inferior da tela, seguindo a mesma progressão do microscópio óptico.
+                    Alterne entre as objetivas disponíveis para cada captura (como 4x, 10x e 40x) no painel inferior e use a régua calibrada em micrômetros para medir estruturas diretamente sobre o corte.
                   </p>
                 </div>
 
-                <!-- Faixa 3: Marcações e Critérios -->
+                <!-- Faixa 3: Texto e marcações -->
                 <div class="p-4 sm:p-7 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 sm:gap-4">
                   <h3 class="sm:w-1/3 font-semibold text-slate-900 text-base">
-                    <span class="font-mono text-[11px] text-teal-700/80 mr-2 font-semibold">03</span>Marcações e Critérios
+                    <span class="font-mono text-[11px] text-teal-700/80 mr-2 font-semibold">03</span>Texto e marcações
                   </h3>
                   <p class="sm:w-2/3 text-sm text-slate-600 leading-relaxed">
-                    Acione os pinos sobre o corte para abrir a descrição morfológica de cada estrutura, revisar as relações entre os tecidos ou ocultar as marcações durante a revisão prática.
+                    Clique nos termos destacados no texto descritivo para localizar cada estrutura na lâmina sem perder o ponto de leitura, ou oculte as marcações para treinar identificação.
                   </p>
                 </div>
 
@@ -1409,7 +1395,7 @@
             Perguntas Frequentes
           </h2>
           <p class="text-sm text-slate-600 text-center mt-1 mb-7 sm:mb-10">
-            Esclarecimentos sobre o acesso ao acervo, navegação e uso das lâminas.
+            Dúvidas comuns sobre o acervo, as lâminas e o uso acadêmico.
           </p>
         </div>
 
@@ -1429,7 +1415,7 @@
               </svg>
             </button>
             <div class="faq-content hidden pt-3 text-xs sm:text-sm text-slate-600 font-sans leading-relaxed border-t border-slate-100 mt-3">
-              Sim. O Palas Atlas é um projeto universitário de acesso aberto, mantido para apoio ao ensino prático e monitorias de saúde. Todo o acervo e ferramentas estão disponíveis sem mensalidades ou cadastros obrigatórios.
+              Sim. O Palas Atlas é um projeto acadêmico sem fins lucrativos, feito para apoiar aulas práticas, monitorias e o estudo individual. Todo o acervo fica aberto, sem cadastro nem cobrança.
             </div>
           </div>
 
@@ -1440,14 +1426,14 @@
               onclick="window.App.toggleFaqItem(this)"
               class="w-full text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none min-h-[44px] sm:min-h-0">
               <span class="font-medium text-slate-900 text-sm sm:text-base leading-snug">
-                O microscópio funciona em dispositivos móveis?
+                Funciona no celular ou tablet?
               </span>
               <svg class="faq-icon w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
             <div class="faq-content hidden pt-3 text-xs sm:text-sm text-slate-600 font-sans leading-relaxed border-t border-slate-100 mt-3">
-              Sim. A interface do microscópio se adapta automaticamente a celulares, tablets e notebooks, com suporte nativo a gestos de toque (arraste pelo corte e gesto de pinça para aproximação).
+              Sim. Você pode navegar pelas lâminas no celular, no tablet ou no computador usando gestos de arraste e pinça para aproximar e afastar o campo.
             </div>
           </div>
 
@@ -1458,14 +1444,14 @@
               onclick="window.App.toggleFaqItem(this)"
               class="w-full text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none min-h-[44px] sm:min-h-0">
               <span class="font-medium text-slate-900 text-sm sm:text-base leading-snug">
-                As lâminas do acervo são de espécimes reais?
+                As lâminas são de preparações reais?
               </span>
               <svg class="faq-icon w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
             <div class="faq-content hidden pt-3 text-xs sm:text-sm text-slate-600 font-sans leading-relaxed border-t border-slate-100 mt-3">
-              Sim. 100% das lâminas foram digitalizadas a partir de preparações reais sob colorações clássicas de rotina (como Hematoxilina &amp; Eosina, impregnação argêntica e desgastes) utilizadas em laboratórios de patologia e histologia humana.
+              Sim. Todas as imagens vêm de lâminas reais de laboratório, digitalizadas a partir de preparações de rotina como Hematoxilina e Eosina (H&amp;E) e cortes por desgaste, sem ilustrações artificiais.
             </div>
           </div>
 
@@ -1476,14 +1462,14 @@
               onclick="window.App.toggleFaqItem(this)"
               class="w-full text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none min-h-[44px] sm:min-h-0">
               <span class="font-medium text-slate-900 text-sm sm:text-base leading-snug">
-                Posso utilizar as capturas em aulas, seminários ou relatórios?
+                Posso usar as imagens em aulas, seminários ou relatórios?
               </span>
               <svg class="faq-icon w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
             <div class="faq-content hidden pt-3 text-xs sm:text-sm text-slate-600 font-sans leading-relaxed border-t border-slate-100 mt-3">
-              Sim. O uso didático e científico é incentivado para estudantes e docentes. Ao incluir capturas de tela em apresentações ou trabalhos acadêmicos, solicitamos apenas a citação do Palas Atlas como fonte de consulta.
+              Pode sim. Professores, monitores e estudantes podem usar as capturas em aulas, apresentações e trabalhos acadêmicos, apenas citando o Palas Atlas como fonte.
             </div>
           </div>
 
@@ -1494,14 +1480,14 @@
               onclick="window.App.toggleFaqItem(this)"
               class="w-full text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none min-h-[44px] sm:min-h-0">
               <span class="font-medium text-slate-900 text-sm sm:text-base leading-snug">
-                Como relatar uma correção ou sugerir novas lâminas?
+                Encontrei um erro ou quero sugerir uma lâmina. Como falo com vocês?
               </span>
               <svg class="faq-icon w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
             <div class="faq-content hidden pt-3 text-xs sm:text-sm text-slate-600 font-sans leading-relaxed border-t border-slate-100 mt-3">
-              Caso observe qualquer divergência anatômica ou queira propor novos cortes para digitalização, consulte as informações de contato na página <a href="sobre.html" class="text-teal-700 underline font-semibold">Sobre Nós</a> ou envie sua observação para a equipe de monitoria.
+              Se notar qualquer imprecisão na descrição, em uma marcação ou quiser sugerir novos cortes, escreva para <a href="mailto:contato@palasatlas.com" class="text-teal-700 underline font-semibold">contato@palasatlas.com</a> ou acesse a página <a href="sobre.html" class="text-teal-700 underline font-semibold">Sobre Nós</a> para falar com a equipe.
             </div>
           </div>
 
@@ -1510,14 +1496,14 @@
         <!-- BLOCO FINAL: ASSINATURA INSTITUCIONAL DE ENCERRAMENTO -->
         <div class="mt-10 sm:mt-16 pt-8 sm:pt-10 border-t border-slate-200/80 text-center max-w-xl mx-auto">
           <h3 class="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-2">
-            Feito por estudantes para estudantes.
+            Feito na bancada, por quem estuda e ensina morfologia.
           </h3>
           <p class="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4 font-sans">
-            Integramos a teoria morfológica à rotina prática do laboratório acadêmico.
+            O Palas Atlas nasce do trabalho conjunto de estudantes de Medicina e orientação docente, com o cuidado de levar para fora do laboratório a mesma experiência real do microscópio.
           </p>
           <a href="sobre.html" 
              class="text-xs font-semibold text-teal-800 hover:text-teal-950 transition-colors inline-flex items-center gap-1.5 no-underline group">
-            <span>Conhecer o projeto e a equipe</span>
+            <span>Conhecer a história e a equipe</span>
             <span class="transition-transform group-hover:translate-x-0.5">&rarr;</span>
           </a>
         </div>
@@ -2359,7 +2345,7 @@
             <span class="text-lg font-bold text-sky-700 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">ATLAS</span>
           </div>
           <p class="text-xs leading-relaxed max-w-xs text-slate-500">
-            Integração científica e prática laboratorial para estudantes da área da saúde.
+            Acervo digital de lâminas reais para o estudo prático das ciências morfológicas.
           </p>
         </div>
 
@@ -2419,7 +2405,7 @@
       <div class="flex items-start justify-between pb-4 sm:pb-5 border-b border-slate-200/80 shrink-0">
         <div class="space-y-1">
           <h3 class="text-lg sm:text-2xl font-bold text-slate-900 font-serif tracking-tight">Como Usar o Palas Atlas</h3>
-          <p class="text-xs text-slate-500 font-sans">Orientações essenciais para explorar lâminas em alta definição e recursos interativos.</p>
+          <p class="text-xs text-slate-500 font-sans">Orientações rápidas para navegar pelas lâminas e usar os recursos do microscópio.</p>
         </div>
         <button
           type="button"
@@ -2445,7 +2431,7 @@
               Zoom e Navegação na Lâmina
             </h4>
             <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
-              Utilize o <strong class="text-slate-900 font-semibold">scroll do mouse</strong> ou gestos de <strong class="text-slate-900 font-semibold">pinça no celular</strong> para transitar continuamente da visão panorâmica até o detalhamento celular em alta resolução. Clique e arraste (<em class="text-slate-800">pan</em>) para percorrer todos os quadrantes da lâmina.
+              Use o <strong class="text-slate-900 font-semibold">scroll do mouse</strong> ou o gesto de <strong class="text-slate-900 font-semibold">pinça no celular</strong> para aproximar da visão panorâmica até o detalhe celular. Clique e arraste para percorrer todo o corte.
             </p>
           </div>
         </div>
@@ -2460,7 +2446,7 @@
               Pontos de Interesse e Anotações
             </h4>
             <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
-              Clique nos <strong class="text-slate-900 font-semibold">pinos marcadores</strong> sobre a lâmina. O painel lateral exibirá instantaneamente a nomenclatura estrutural, critérios de reconhecimento e notas de correlação clínica.
+              Clique nos <strong class="text-slate-900 font-semibold">termos destacados no texto</strong> ou nos <strong class="text-slate-900 font-semibold">pinos sobre a lâmina</strong> para localizar cada estrutura, ler a descrição morfológica e acompanhar os critérios de identificação.
             </p>
           </div>
         </div>
@@ -2475,22 +2461,22 @@
               Alternância Entre Disciplinas
             </h4>
             <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
-              Alterne a qualquer instante entre as disciplinas — <strong class="text-slate-900 font-semibold">Histologia</strong>, <strong class="text-slate-900 font-semibold">Patologia</strong>, <strong class="text-slate-900 font-semibold">Parasitologia</strong> e <strong class="text-slate-900 font-semibold">Microbiologia</strong> — abrindo o menu lateral ou pelos atalhos na tela inicial.
+              Alterne entre <strong class="text-slate-900 font-semibold">Histologia</strong>, <strong class="text-slate-900 font-semibold">Patologia</strong>, <strong class="text-slate-900 font-semibold">Parasitologia</strong> e <strong class="text-slate-900 font-semibold">Microbiologia</strong> pelo menu lateral ou pelos atalhos da página inicial.
             </p>
           </div>
         </div>
 
-        <!-- Passo 4: Objetivas & Tela Cheia -->
+        <!-- Passo 4: Objetivas, régua e tela cheia -->
         <div class="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-sky-500/40 transition-all duration-200">
           <div class="w-8 h-8 rounded-full bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center font-mono font-bold text-xs shrink-0 mt-0.5">
             04
           </div>
           <div class="space-y-1 min-w-0">
             <h4 class="text-sm font-semibold text-slate-900 tracking-wide">
-              Objetivas e Tela Cheia
+              Objetivas, régua e tela cheia
             </h4>
             <p class="font-sans text-xs text-slate-600 leading-relaxed break-words">
-              No microscópio digital, selecione aumentos padronizados (<strong class="text-slate-900 font-semibold">4x, 10x, 40x e 100x</strong>) no seletor de objetivas. Ative o modo <strong class="text-slate-900 font-semibold">Tela Cheia</strong> para sessões imersivas de estudo ou projeções em salas de aula.
+              Use o seletor inferior para alternar entre as objetivas disponíveis em cada lâmina, ative a <strong class="text-slate-900 font-semibold">régua em micrômetros</strong> para medir estruturas e use o <strong class="text-slate-900 font-semibold">Modo Bancada</strong> ou a <strong class="text-slate-900 font-semibold">Tela Cheia</strong> quando quiser focar apenas no corte.
             </p>
           </div>
         </div>
@@ -2520,10 +2506,10 @@
   
   <!-- Módulos JS Locais com Cache Busting -->
   <script type="module" src="js/slide-security.js?v=20261121v5"></script>
-  <script type="module" src="js/main.js?v=20261121v5"></script>
+  <script type="module" src="js/main.js?v=20261122v2"></script>
   <!-- COOKIE CONSENT BANNER -->
   <div id="cookieBanner" class="palas-glass-instrument fixed bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 md:left-auto md:right-4 md:max-w-md z-[9999] bg-white/95 backdrop-blur-md border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-[0_20px_50px_rgba(15,23,42,0.16)] text-slate-600 text-xs leading-relaxed hidden">
-    <p>Utilizamos cookies essenciais para otimizar sua experiência de estudo no visualizador morfológico. Ao continuar navegando, você concorda com nossa Política de Privacidade.</p>
+    <p>Usamos apenas armazenamento local essencial para lembrar preferências do visualizador e suas anotações de estudo. Ao continuar, você concorda com nossa Política de Privacidade.</p>
     <button id="btnAcceptCookies" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2.5 min-h-[44px] sm:min-h-0 rounded-xl transition-all duration-200 cursor-pointer w-full mt-3 shadow-sm">Aceitar e Continuar</button>
   </div>
 

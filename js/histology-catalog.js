@@ -910,7 +910,7 @@ function toggleAccordionDisciplinas(disciplina = 'histologia') {
       }, 60);
     } else {
       containerHisto.classList.add('hidden');
-      if (btnTxtHisto) btnTxtHisto.textContent = 'Acessar Módulo';
+      if (btnTxtHisto) btnTxtHisto.textContent = 'Ver módulos';
       if (arrowIconHisto) arrowIconHisto.classList.remove('rotate-180');
     }
   } else {
@@ -918,7 +918,7 @@ function toggleAccordionDisciplinas(disciplina = 'histologia') {
     if (!containerOutras) return;
     if (containerHisto) {
       containerHisto.classList.add('hidden');
-      if (btnTxtHisto) btnTxtHisto.textContent = 'Acessar Módulo';
+      if (btnTxtHisto) btnTxtHisto.textContent = 'Ver módulos';
       if (arrowIconHisto) arrowIconHisto.classList.remove('rotate-180');
     }
 
