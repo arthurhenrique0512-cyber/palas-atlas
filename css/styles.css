@@ -276,14 +276,53 @@ body {
     0 6px 14px -6px rgba(15, 23, 42, 0.07);
 }
 
+/* Tipografia técnica tabular para telemetria óptica e índices do microscópio */
+.palas-mono-tech {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Bancada óptica de microscopia de campo claro (atrás do canvas OpenSeadragon) */
 .palas-stage-optical {
-  background-color: #e9eff4;
+  background-color: #e3eaf1;
   background-image:
     var(--palas-grain-subtle),
     var(--palas-micro-dots),
-    radial-gradient(ellipse 68% 68% at 50% 50%, rgba(255, 255, 255, 0.65) 0%, rgba(238, 242, 246, 0.2) 55%, rgba(15, 23, 42, 0.045) 100%);
+    radial-gradient(ellipse 68% 68% at 50% 50%, rgba(255, 255, 255, 0.55) 0%, rgba(227, 234, 241, 0.25) 55%, rgba(15, 23, 42, 0.055) 100%);
   background-size: 180px 180px, 22px 22px, 100% 100%;
+  transition: background-color 0.25s ease;
+}
+
+.palas-stage-optical[data-stage-tone="bright"] {
+  background-color: #f6f9fc;
+  background-image:
+    var(--palas-grain-subtle),
+    var(--palas-micro-dots),
+    radial-gradient(ellipse 72% 72% at 50% 50%, rgba(255, 255, 255, 0.92) 0%, rgba(246, 249, 252, 0.45) 60%, rgba(15, 23, 42, 0.03) 100%);
+  background-size: 180px 180px, 22px 22px, 100% 100%;
+}
+
+/* Acabamento editorial do Minimapa (OpenSeadragon Navigator) */
+#viewerStage .navigator,
+.openseadragon-navigator {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(14px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(135%) !important;
+  border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 12px 28px -8px rgba(15, 23, 42, 0.16),
+    0 2px 6px rgba(15, 23, 42, 0.05) !important;
+  overflow: hidden !important;
+  opacity: 1 !important;
+}
+
+#viewerStage .navigator .displayregion,
+.openseadragon-navigator .displayregion {
+  border: 2px solid #0369a1 !important;
+  background-color: rgba(3, 105, 161, 0.12) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Painel lateral de análise morfológica em papel editorial */
@@ -858,22 +897,27 @@ input#global-search-input:-webkit-autofill:active {
 
 /* Pontos de Interesse no microscopio (Paleta Clínica Institucional Light) */
 .pin-item-btn {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .pin-item-btn:hover {
   background-color: #f0fdfa;
-  border-color: rgba(13, 148, 136, 0.45);
+  border-color: rgba(13, 148, 136, 0.42);
+  transform: translateX(1px);
 }
 .pin-item-btn.pin-active {
   background-color: #f0f9ff !important;
   border: 1px solid #0284c7 !important;
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.16), 0 4px 12px rgba(3, 105, 161, 0.08) !important;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.14), 0 4px 12px rgba(3, 105, 161, 0.08) !important;
 }
 .pin-item-btn.pin-active .pin-label {
   color: #0c4a6e !important;
   font-weight: 600 !important;
+}
+.pin-item-btn.pin-active .pin-index {
+  color: #0369a1 !important;
 }
 .pin-item-btn.pin-active .pin-indicator {
   background-color: #0284c7 !important;
@@ -968,41 +1012,47 @@ input#global-search-input:-webkit-autofill:active {
 }
 
 .btn-marcacoes-toggle.is-on {
-  background-color: #f0fdfa;
+  background-color: #ffffff;
   color: #0f766e;
-  border-color: #5eead4;
+  border-color: rgba(20, 184, 166, 0.55);
+  box-shadow: 0 1px 3px rgba(15, 118, 110, 0.12);
 }
 .btn-marcacoes-toggle.is-on:hover {
-  background-color: #ccfbf1;
-  border-color: #14b8a6;
+  background-color: #f0fdfa;
+  border-color: #0d9488;
 }
 .btn-marcacoes-toggle.is-off {
-  background-color: #f1f5f9;
+  background-color: transparent;
   color: #475569;
-  border-color: #cbd5e1;
+  border-color: transparent;
 }
 .btn-marcacoes-toggle.is-off:hover {
-  background-color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.78);
   color: #0f172a;
 }
 
 .btn-regua-toggle.is-on {
-  background-color: #f0f9ff;
+  background-color: #ffffff;
   color: #0369a1;
-  border-color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 1px 3px rgba(3, 105, 161, 0.12);
 }
 .btn-regua-toggle.is-on:hover {
-  background-color: #e0f2fe;
+  background-color: #f0f9ff;
   border-color: #0284c7;
 }
 .btn-regua-toggle.is-off {
-  background-color: #f1f5f9;
+  background-color: transparent;
   color: #475569;
-  border-color: #cbd5e1;
+  border-color: transparent;
 }
 .btn-regua-toggle.is-off:hover {
-  background-color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.78);
   color: #0f172a;
+}
+#btnReguaMobileContext.btn-regua-toggle.is-off {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
 }
 .btn-regua-toggle:disabled {
   opacity: 0.45;

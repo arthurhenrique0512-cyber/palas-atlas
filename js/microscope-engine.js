@@ -24,8 +24,10 @@ import {
 } from "./sanitizer.js";
 import {
   emitirCertidaoOptica,
+  calcularCampoDeVisaoUm,
   formatarComprimento,
-  objetivaDisponivel
+  objetivaDisponivel,
+  ROTULOS_SELO
 } from "./optics-calibration.js?v=20261118v3";
 
 // ---------------------------------------------------------------------------
@@ -74,8 +76,17 @@ let _activeOpenTimer        = null;
 let _styleSyncTimer         = null;
 let _stageResizeObserver    = null;
 
+// Estado editorial e controles de bancada
+let modoBancadaAtivo        = false;
+let stageToneAtual          = "neutral";
+let minimapRecolhido        = false;
+let _popoversRegistrados    = false;
+
 // Certidão Óptica: ampliação real comprovada da lâmina (ver js/optics-calibration.js)
 let certidaoOpticaAtual     = null;
+
+const STAGE_TONE_STORAGE_KEY = "palasAtlas.stageTone";
+const MINIMAP_STORAGE_KEY    = "palasAtlas.minimapCollapsed";
 
 function isSafeSlideUrl(rawUrl) {
   const val = String(rawUrl || "").trim();
@@ -90,26 +101,90 @@ function isSafeSlideUrl(rawUrl) {
   return true;
 }
 
+function isColoracaoGenerica(val) {
+  const s = String(val || "").trim().toLowerCase();
+  return !s || s === "outra" || s === "outro" || s === "outros" || s === "n/a" || s === "-";
+}
+
 function atualizarScalebarOpenSeadragon(targetViewer, mppVal) {
-  if (!targetViewer || typeof targetViewer.scalebar !== "function" || !window.OpenSeadragon?.ScalebarType) return;
-  const ppm = mppVal && Number(mppVal) > 0 ? Math.round(1e6 / Number(mppVal)) : 0;
-  try {
-    targetViewer.scalebar({
-      type:            window.OpenSeadragon.ScalebarType.MICROSCOPE,
-      location:        window.OpenSeadragon.ScalebarLocation.TOP_RIGHT,
-      pixelsPerMeter:  ppm,
-      color:           "#0f172a",
-      backgroundColor: "rgba(255, 255, 255, 0.92)",
-      fontFamily:      "'JetBrains Mono', monospace",
-      barThickness:    2,
-      xOffset:         16,
-      yOffset:         16
-    });
-  } catch (e) {}
-  const sb = document.querySelector(".openseadragon-scalebar");
-  if (sb) {
-    sb.style.display = ppm > 0 ? "" : "none";
+  const legacySb = document.querySelector(".openseadragon-scalebar");
+  if (legacySb) legacySb.style.display = "none";
+  atualizarScalebarEditorial();
+}
+
+const SCALEBAR_STEPS_UM = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000];
+
+function formatarRotuloScalebar(um) {
+  if (!Number.isFinite(um) || um <= 0) return "—";
+  if (um >= 1000) {
+    const mm = um / 1000;
+    return `${Number.isInteger(mm) ? mm : mm.toFixed(1).replace(".", ",")} mm`;
   }
+  return `${um} µm`;
+}
+
+export function atualizarScalebarEditorial() {
+  const box   = document.getElementById("palasScalebar");
+  const label = document.getElementById("palasScalebarLabel");
+  const bar   = document.getElementById("palasScalebarBar");
+  if (!box || !label || !bar) return;
+
+  const mpp = obterMppAtivo();
+  if (!mpp || !viewer || !viewer.viewport || !viewer.world || viewer.world.getItemCount() === 0) {
+    box.classList.add("hidden");
+    box.classList.remove("flex");
+    return;
+  }
+
+  const currentZoom = viewer.viewport.getZoom(true);
+  const nativeZoom  = getNativeZoomRef();
+  if (!currentZoom || !nativeZoom || currentZoom <= 0 || nativeZoom <= 0) {
+    box.classList.add("hidden");
+    box.classList.remove("flex");
+    return;
+  }
+
+  const umPerScreenPx = (nativeZoom / currentZoom) * mpp;
+  if (!Number.isFinite(umPerScreenPx) || umPerScreenPx <= 0) {
+    box.classList.add("hidden");
+    box.classList.remove("flex");
+    return;
+  }
+
+  const targetPx = window.innerWidth < 640 ? 74 : 96;
+  let bestStep = SCALEBAR_STEPS_UM[0];
+  let bestWidth = bestStep / umPerScreenPx;
+  let bestDist = Infinity;
+
+  for (const step of SCALEBAR_STEPS_UM) {
+    const wPx = step / umPerScreenPx;
+    if (wPx >= 46 && wPx <= 152) {
+      const dist = Math.abs(wPx - targetPx);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestStep = step;
+        bestWidth = wPx;
+      }
+    }
+  }
+
+  if (bestDist === Infinity) {
+    for (const step of SCALEBAR_STEPS_UM) {
+      const wPx = step / umPerScreenPx;
+      const dist = Math.abs(wPx - targetPx);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestStep = step;
+        bestWidth = wPx;
+      }
+    }
+  }
+
+  const clampedWidth = Math.max(36, Math.min(168, Math.round(bestWidth)));
+  label.textContent = formatarRotuloScalebar(bestStep);
+  bar.style.width = `${clampedWidth}px`;
+  box.classList.remove("hidden");
+  box.classList.add("flex");
 }
 
 // ---------------------------------------------------------------------------
@@ -118,11 +193,15 @@ function atualizarScalebarOpenSeadragon(targetViewer, mppVal) {
 const SIDEBAR_STORAGE_KEY = "palasAtlas.sidebarCollapsed";
 
 function sincronizarTamanhoDoViewer() {
+  if (window.slideSecurity && typeof window.slideSecurity._redimensionarMarcaDagua === "function") {
+    try { window.slideSecurity._redimensionarMarcaDagua(); } catch (e) {}
+  }
   if (!viewer || !viewer.viewport) return;
   try {
     if (typeof viewer.forceResize === "function") viewer.forceResize();
     else viewer.viewport.resize(viewer.viewport.getContainerSize(), false);
     viewer.forceRedraw();
+    atualizarScalebarEditorial();
   } catch (e) { /* viewer em transição: ignora */ }
 }
 
@@ -138,11 +217,11 @@ function aplicarEstadoSidebar(recolhida, persistir) {
 
   const isDrawerMode = isMobileOrLandscapeDrawer();
 
-  sidebar.classList.toggle("w-[85vw]", !recolhida);
-  sidebar.classList.toggle("sm:w-[360px]", !recolhida);
-  sidebar.classList.toggle("lg:w-[320px]", !recolhida);
-  sidebar.classList.toggle("xl:w-[380px]", !recolhida);
-  sidebar.classList.toggle("max-w-[380px]", !recolhida);
+  sidebar.classList.toggle("w-[88vw]", !recolhida);
+  sidebar.classList.toggle("sm:w-[370px]", !recolhida);
+  sidebar.classList.toggle("lg:w-[340px]", !recolhida);
+  sidebar.classList.toggle("xl:w-[396px]", !recolhida);
+  sidebar.classList.toggle("max-w-[396px]", !recolhida);
   sidebar.classList.toggle("opacity-100", !recolhida);
   sidebar.classList.toggle("pointer-events-auto", !recolhida);
   sidebar.classList.toggle("w-0", recolhida);
@@ -281,8 +360,10 @@ const fallbackLaminas = {
     firestoreId: 'a3oRvXvJpMKAtU2RE85q',
     aliases: ['lamina-real1', 'lamina-real-1', 'pele_espessa', 'pele-espessa', 'pele', 'matriz', 'teste'],
     nome: 'Pele Espessa',
+    subtitulo: 'Epiderme queratinizada e Derme papilar',
     disciplina: 'histologia',
-    coloracao: 'Hematoxilina e Eosina (H&E) • 40x',
+    topicoTitulo: 'Tecido Epitelial de Revestimento e Glandular',
+    coloracao: 'Hematoxilina e Eosina (H&E)',
     maxMagnification: 40,
     objetivaCaptura: 40,
     mpp: 0.156,
@@ -363,8 +444,10 @@ const fallbackLaminas = {
     firestoreId: '96ZYqoM2SV8p4fB2QgeM',
     aliases: ['96ZYqoM2SV8p4fB2QgeM', 'osso-maduro', 'osso_maduro', 'osso-maduro-desgaste', 'osso-desgaste', 'osso_compacto_dzi', 'osso-compacto'],
     nome: 'Osso Maduro',
+    subtitulo: 'Sistemas de Havers e canalículos',
     disciplina: 'histologia',
-    coloracao: 'Desgaste • 40x',
+    topicoTitulo: 'Tecido Ósseo Compacto e Esponjoso',
+    coloracao: 'Corte por Desgaste',
     maxMagnification: 40,
     objetivaCaptura: 40,
     mpp: 0.156,
@@ -409,8 +492,10 @@ const fallbackLaminas = {
     firestoreId: 'FFGk5d9kOAct5HIDdjQ7',
     aliases: ['FFGk5d9kOAct5HIDdjQ7', 'osso_maduro_desgaste_ct_2', 'osso_2.0', 'osso-2.0', 'osso_desgaste_2', 'osso-maduro-2'],
     nome: 'Osso Maduro 10x',
+    subtitulo: 'Visão panorâmica e topografia cortical',
     disciplina: 'histologia',
-    coloracao: 'Corte por Desgaste • 10x (Mapeamento 2x5)',
+    topicoTitulo: 'Tecido Ósseo Compacto e Esponjoso',
+    coloracao: 'Corte por Desgaste',
     maxMagnification: 10,
     objetivaCaptura: 10,
     mpp: 0.625,
@@ -422,10 +507,10 @@ const fallbackLaminas = {
     dziUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0.dzi',
     descricaoHTML: `
       <div class="prose-atlas">
-        <h3>Tecido Ósseo Maduro — Corte Transversal por Desgaste (v2.0)</h3>
-        <p>Esta preparação histológica foi <strong>mapeada em 10x</strong> com escaneamento em grade snake (2×5 tiles, 15% de sobreposição) e costura em alta resolução via Fiji Stitching, preservando todo o campo morfológico contínuo do osso compacto.</p>
-        <p>A preparação por desgaste exibe com nitidez a matriz mineralizada rica em hidroxiapatita sem descalcificação: destacam-se os <strong>Sistemas de Havers (ósteons)</strong> centrados pelos <strong>Canais de Havers</strong>, circundados por <strong>lamelas concêntricas</strong>, <strong>lacunas osteocitárias</strong> e a densa arborização dos <strong>canalículos</strong> que intercomunicavam os osteócitos.</p>
-        <p>Entre os ósteons, evidenciam-se as <strong>lamelas intersticiais</strong> remanescentes de ciclos de remodelação óssea prévios e os <strong>Canais de Volkmann</strong> que cruzam a matriz comunicando os canais vasculares.</p>
+        <h3>Tecido Ósseo Maduro — Corte Transversal por Desgaste (10x)</h3>
+        <p>Visão panorâmica em objetiva de 10x do tecido ósseo compacto preparado por desgaste, preservando a arquitetura mineralizada sem descalcificação.</p>
+        <p>Destacam-se os <strong>Sistemas de Havers (ósteons)</strong> centrados pelos <strong>Canais de Havers</strong>, circundados por <strong>lamelas concêntricas</strong>, <strong>lacunas osteocitárias</strong> e pela rede de <strong>canalículos</strong> que interliga os osteócitos.</p>
+        <p>Entre os ósteons observam-se as <strong>lamelas intersticiais</strong>, remanescentes da remodelação óssea, e os <strong>Canais de Volkmann</strong> que comunicam os canais vasculares entre si.</p>
       </div>
     `,
     pinos: []
@@ -435,8 +520,10 @@ const fallbackLaminas = {
     firestoreId: 'cw3XGCgUwN71XdlwkUe5',
     aliases: ['cw3XGCgUwN71XdlwkUe5', 'osso_maduro_desgaste_ct_3', 'osso_3.0', 'osso-3.0', 'osso_desgaste_3', 'osso-maduro-3'],
     nome: 'Osso Maduro 40x',
+    subtitulo: 'Ósteons, canalículos e linhas cimentantes',
     disciplina: 'histologia',
-    coloracao: 'Corte por Desgaste • 40x (Mapeamento 6x8 • 48 Fotos)',
+    topicoTitulo: 'Tecido Ósseo Compacto e Esponjoso',
+    coloracao: 'Corte por Desgaste',
     maxMagnification: 40,
     objetivaCaptura: 40,
     mpp: 0.156,
@@ -448,14 +535,14 @@ const fallbackLaminas = {
     dziUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0.dzi',
     descricaoHTML: `
       <div class="prose-atlas">
-        <h3>Tecido Ósseo Maduro — Alta Resolução 40x (v3.0 Panorama 6×8)</h3>
-        <p>Varredura panorâmica ultradetalhada de <strong>48 fotos em objetiva de 40x</strong> montada em grade snake contínua (6 colunas × 8 linhas, 15% de sobreposição) via Fiji Stitching com recorte retangular limpo (sem rebarbas), totalizando <strong>6430 × 5630 pixels (~36.2 MP)</strong>.</p>
-        <p>A ampliação de 40x permite observar com riqueza ultraestrutural:</p>
+        <h3>Tecido Ósseo Maduro — Corte Transversal por Desgaste (40x)</h3>
+        <p>Preparação de osso compacto obtida por desgaste e digitalizada em objetiva de 40x, evidenciando a organização lamelar da matriz mineralizada.</p>
+        <p>Estruturas observáveis neste corte:</p>
         <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-700">
-          <li><strong>Canais de Havers:</strong> lúmen vascular central nítido circundado por lamelas cilíndricas concêntricas.</li>
-          <li><strong>Lacunas de Osteócitos:</strong> cavidades elípticas escuras na matriz óssea mineralizada.</li>
-          <li><strong>Rede de Canalículos:</strong> filamentos microvasculares e comunicantes que irradiam das lacunas através da matriz sólida.</li>
-          <li><strong>Linhas Cimentantes:</strong> limites externos de refringência que demarcam cada ósteon individual das lamelas intersticiais vizinhas.</li>
+          <li><strong>Canais de Havers:</strong> lúmen vascular central circundado por lamelas cilíndricas concêntricas.</li>
+          <li><strong>Lacunas de Osteócitos:</strong> cavidades elípticas distribuídas entre e no interior das lamelas.</li>
+          <li><strong>Rede de Canalículos:</strong> finos canais radiados que conectam as lacunas entre si e ao canal central.</li>
+          <li><strong>Linhas Cimentantes:</strong> limites refringentes que separam cada ósteon das lamelas intersticiais vizinhas.</li>
         </ul>
       </div>
     `,
@@ -476,9 +563,13 @@ fallbackLaminas['cw3XGCgUwN71XdlwkUe5'] = fallbackLaminas['osso_maduro_desgaste_
 function iniciarMicroscopio() {
   if (!document.getElementById("osd-viewer")) return;
   iniciarSidebarRetratil();
+  inicializarTomPlatina();
+  inicializarMinimapControle();
+  inicializarModoBancada();
   inicializarSeletorRapidoLaminas();
   registrarDelegacaoGlobalDePinos();
   registrarControleAjudaMicroscopio();
+  registrarControlesPopoversHeader();
   registrarAtalhosTecladoMicroscopio();
   registrarControleFullscreenMicroscopio();
   registrarPopstateMicroscopio();
@@ -584,14 +675,13 @@ function iniciarMicroscopio() {
 function toggleAjudaMicroscopio(forcar) {
   const popover = document.getElementById("popoverAjudaMicroscopio");
   if (!popover) return;
-  if (typeof forcar === "boolean") {
-    if (forcar) {
-      popover.classList.remove("hidden");
-    } else {
-      popover.classList.add("hidden");
-    }
+  const abrir = typeof forcar === "boolean" ? forcar : popover.classList.contains("hidden");
+  if (abrir) {
+    if (typeof toggleLaminarioRapido === "function") toggleLaminarioRapido(false);
+    if (typeof toggleMobileMoreMenu === "function") toggleMobileMoreMenu(false);
+    popover.classList.remove("hidden");
   } else {
-    popover.classList.toggle("hidden");
+    popover.classList.add("hidden");
   }
 }
 
@@ -681,8 +771,12 @@ async function carregarLaminaNoMicroscopio(laminaId) {
           const textoValido = (v) => typeof v === "string" && v.replace(/<[^>]*>/g, "").trim().length > 0;
 
           if (textoValido(dados.nome)) laminaAtualData.nome = dados.nome;
-          if (textoValido(dados.coloracao)) laminaAtualData.coloracao = dados.coloracao;
+          if (textoValido(dados.coloracao) && !isColoracaoGenerica(dados.coloracao)) {
+            laminaAtualData.coloracao = dados.coloracao;
+          }
           if (textoValido(dados.disciplina)) laminaAtualData.disciplina = dados.disciplina;
+          if (textoValido(dados.topicoTitulo)) laminaAtualData.topicoTitulo = dados.topicoTitulo;
+          if (textoValido(dados.subtitulo)) laminaAtualData.subtitulo = dados.subtitulo;
           if (textoValido(dados.descricaoHTML)) laminaAtualData.descricaoHTML = dados.descricaoHTML;
           else if (textoValido(dados.descricao)) laminaAtualData.descricaoHTML = dados.descricao;
           if (Array.isArray(dados.pinos) && dados.pinos.length > 0) {
@@ -802,34 +896,105 @@ async function carregarLaminaNoMicroscopio(laminaId) {
 // ---------------------------------------------------------------------------
 // 3. Injeta metadados no cabecalho da pagina
 // ---------------------------------------------------------------------------
+function formatarNomeDisciplina(slug) {
+  const mapa = {
+    histologia: "Histologia",
+    patologia: "Patologia",
+    parasitologia: "Parasitologia",
+    microbiologia: "Microbiologia"
+  };
+  const key = String(slug || "histologia").trim().toLowerCase();
+  return mapa[key] || (key.charAt(0).toUpperCase() + key.slice(1));
+}
+
+function obterCatalogoEntryAtual() {
+  if (!laminaAtualData) return null;
+  const idAtual = resolverIdCanonicoSwitcher(laminaAtualData.id);
+  return _catalogoLaminasSwitcher.find(item => item.id === idAtual) || null;
+}
+
 function renderizarMetadadosDaLamina() {
   if (!laminaAtualData) return;
-  const tituloEl    = document.getElementById("slideTitle");
-  const disciplinaEl = document.getElementById("slideDisciplina");
-  const coloracaoEl = document.getElementById("slideColoracao");
-  const breadcrumb  = document.getElementById("viewerBreadcrumb");
-  const docTitle    = document.querySelector("title");
+  const tituloEl      = document.getElementById("slideTitle");
+  const disciplinaEl  = document.getElementById("slideDisciplina");
+  const topicoEl      = document.getElementById("slideTopicoMeta");
+  const coloracaoEl   = document.getElementById("slideColoracao");
+  const stainDotEl    = document.getElementById("slideStainDot");
+  const breadcrumb    = document.getElementById("viewerBreadcrumb");
+  const breadcrumbDisc = document.getElementById("viewerBreadcrumbDisc");
+  const breadcrumbTopic = document.getElementById("viewerBreadcrumbTopic");
+  const docTitle      = document.querySelector("title");
 
-  let tituloLimpo = laminaAtualData.nome || "Peca Morfologica";
+  const entryCatalogo = obterCatalogoEntryAtual();
+
+  let tituloLimpo = laminaAtualData.nome || "Peça Morfológica";
   tituloLimpo = tituloLimpo.replace(/\sHE$|\sH&E$/i, '');
 
-  if (tituloEl)     tituloEl.textContent    = tituloLimpo;
-  if (disciplinaEl) disciplinaEl.textContent = (laminaAtualData.disciplina || "histologia").toUpperCase();
-  if (coloracaoEl)  coloracaoEl.textContent = laminaAtualData.coloracao || "Hematoxilina e Eosina (H&E)";
-  if (breadcrumb)   { breadcrumb.textContent = tituloLimpo; breadcrumb.classList.remove("hidden"); }
-  if (docTitle)     docTitle.textContent    = `${tituloLimpo} - Palas Atlas`;
+  const discSlug = String(laminaAtualData.disciplina || "histologia").trim().toLowerCase();
+  const discNome = formatarNomeDisciplina(discSlug);
+  const topicoTexto = laminaAtualData.topicoTitulo || entryCatalogo?.topicoTitulo || "Análise Morfológica";
+
+  const rawColor = laminaAtualData.coloracao;
+  const coloracaoLimpa = !isColoracaoGenerica(rawColor)
+    ? rawColor
+    : (entryCatalogo?.meta || "Preparação Histológica");
+
+  if (tituloEl)     tituloEl.textContent     = tituloLimpo;
+  if (disciplinaEl) disciplinaEl.textContent = discNome.toUpperCase();
+  if (topicoEl)     topicoEl.textContent     = topicoTexto;
+  if (coloracaoEl)  coloracaoEl.textContent  = coloracaoLimpa;
+
+  if (stainDotEl) {
+    const isDesgaste = /desgaste/i.test(coloracaoLimpa);
+    stainDotEl.className = isDesgaste
+      ? "w-1.5 h-1.5 rounded-full bg-amber-600 shrink-0"
+      : "w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0";
+  }
+
+  if (breadcrumb) {
+    breadcrumb.textContent = tituloLimpo;
+    breadcrumb.classList.remove("hidden");
+  }
+  if (breadcrumbDisc) {
+    breadcrumbDisc.textContent = discNome;
+    breadcrumbDisc.href = `index.html?frente=${encodeURIComponent(discSlug)}`;
+  }
+  if (breadcrumbTopic) {
+    breadcrumbTopic.textContent = topicoTexto;
+  }
+  if (docTitle) docTitle.textContent = `${tituloLimpo} — Palas Atlas`;
+
+  const thumbUrl = laminaAtualData.previewImage || laminaAtualData.thumbnailUrl || entryCatalogo?.previewImage || "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg";
+  ["laminarioThumbAtual", "laminarioThumbMobile"].forEach((id) => {
+    const imgEl = document.getElementById(id);
+    if (imgEl && isSafeSlideUrl(thumbUrl)) imgEl.src = thumbUrl;
+  });
+  ["laminarioNomeAtual", "laminarioNomeMobile"].forEach((id) => {
+    const spanEl = document.getElementById(id);
+    if (spanEl) spanEl.textContent = tituloLimpo;
+  });
+
+  const reportLink = document.getElementById("linkReportarErroLamina");
+  if (reportLink) {
+    reportLink.href = `mailto:contato@palasatlas.com?subject=${encodeURIComponent("Correção sugerida na peça: " + tituloLimpo)}`;
+  }
 
   const seloTextoEl = document.getElementById("slideSeloOpticoTexto");
   const maxMag = Number(laminaAtualData.maxMagnification || laminaAtualData.maxMag || 40);
   const mpp = Number(laminaAtualData.mpp) || (40 / maxMag) * 0.156;
   if (seloTextoEl) {
-    seloTextoEl.textContent = `${maxMag}x Nativa (${mpp.toFixed(2)} µm/px)`;
+    seloTextoEl.textContent = `${maxMag}x · ${mpp.toFixed(2).replace(".", ",")} µm/px`;
     const seloEl = document.getElementById("slideSeloOptico");
     if (seloEl) {
-      seloEl.title = `Calibração Óptica: ${maxMag}x Nativa • ${mpp.toFixed(3)} µm/px • Referência Biológica (Hemácia 7.5 µm) • Trava física 1:1 ativa (sem ampliação vazia)`;
+      seloEl.title = `Objetiva ${maxMag}x · ${mpp.toFixed(3).replace(".", ",")} µm/px`;
       seloEl.classList.remove("hidden");
     }
   }
+
+  atualizarCertidaoOpticaUI();
+  atualizarNavegacaoRodapeSidebar();
+  renderizarListaLaminarioRapido();
+  renderizarAcervoRelacionado();
 }
 
 // Re-exporta sanitizadores para retrocompatibilidade
@@ -843,34 +1008,56 @@ function renderizarDescricaoETextos() {
     return;
   }
 
-  const tituloPeca = document.getElementById("slideTitle")?.textContent || "Lamina Histologica";
   const rawHtml = laminaAtualData.descricaoHTML || laminaAtualData.descricao || "";
   const html = formatarDescricaoMorfolgica(rawHtml);
   const textoHtml = html || `<p class="text-slate-500 italic text-sm font-sans">Nenhum texto descritivo cadastrado para esta lâmina.</p>`;
 
-  // Pontos de Interesse como lista clicavel abaixo do texto
+  // Pontos de Interesse com Tour Guiado e numeração editorial
   let secaoPinos = "";
   if (listaPinosAtual.length > 0) {
+    const totalPinos = listaPinosAtual.length;
     secaoPinos = `
-      <div class="mt-8 border-t border-slate-200 pt-6">
-        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 font-mono">
-          Pontos de Interesse
-        </h4>
+      <div class="mt-7 border-t border-slate-200/90 pt-5">
+        <div class="flex items-center justify-between gap-2 mb-3.5">
+          <h4 class="palas-mono-tech text-[10px] font-bold text-slate-500 uppercase tracking-[0.18em]">
+            Pontos de Interesse
+          </h4>
+          <div class="inline-flex items-center gap-1 rounded-lg bg-slate-100/90 border border-slate-200/80 p-0.5 select-none">
+            <button
+              type="button"
+              onclick="window.navegarPinoAdjacente && window.navegarPinoAdjacente(-1)"
+              class="w-6 h-6 rounded-md flex items-center justify-center text-slate-600 hover:text-slate-950 hover:bg-white transition-colors cursor-pointer text-xs"
+              title="Estrutura anterior (Seta esquerda)"
+              aria-label="Ponto de interesse anterior"
+            >&larr;</button>
+            <span id="pinTourCounter" class="palas-mono-tech px-1.5 text-[10.5px] font-semibold text-slate-600">0 / ${totalPinos}</span>
+            <button
+              type="button"
+              onclick="window.navegarPinoAdjacente && window.navegarPinoAdjacente(1)"
+              class="w-6 h-6 rounded-md flex items-center justify-center text-slate-600 hover:text-slate-950 hover:bg-white transition-colors cursor-pointer text-xs"
+              title="Próxima estrutura (Seta direita)"
+              aria-label="Próximo ponto de interesse"
+            >&rarr;</button>
+          </div>
+        </div>
         <div class="flex flex-col gap-2">
           ${listaPinosAtual.map((pin, idx) => {
             const pinIdSafe = escaparHTML(String(pin.id ?? idx + 1));
+            const numIdx = String(idx + 1).padStart(2, "0");
             return `
             <button
               type="button"
               id="btn-pino-${pinIdSafe}"
               data-btn-pin-id="${pinIdSafe}"
-              class="pin-item-btn w-full flex items-center justify-between p-3 rounded-xl text-left transition-all group cursor-pointer"
+              class="pin-item-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all group cursor-pointer"
             >
-              <div class="flex items-center gap-2.5 min-w-0 pr-2 pl-0.5">
+              <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                <span class="pin-index palas-mono-tech text-[11px] font-bold text-slate-400 group-hover:text-teal-700 shrink-0">${numIdx}</span>
+                <span class="h-3.5 w-px bg-slate-200 shrink-0"></span>
                 <span class="pin-indicator w-2 h-2 rounded-full bg-teal-600 shrink-0 transition-transform"></span>
-                <span class="pin-label text-sm font-medium text-slate-800 group-hover:text-teal-950 transition-colors truncate">${escaparHTML(pin.rotulo || "Estrutura")}</span>
+                <span class="pin-label text-[13px] font-medium text-slate-800 group-hover:text-teal-950 transition-colors truncate">${escaparHTML(pin.rotulo || "Estrutura")}</span>
               </div>
-              <span class="pin-action text-xs text-slate-500 group-hover:text-teal-700 shrink-0 transition-colors">Focar &rarr;</span>
+              <span class="pin-action text-[11px] font-medium text-slate-500 group-hover:text-teal-700 shrink-0 transition-colors">Focar &rarr;</span>
             </button>
           `;
           }).join('')}
@@ -884,16 +1071,6 @@ function renderizarDescricaoETextos() {
       ${textoHtml}
     </div>
     ${secaoPinos}
-    <a
-      href="mailto:contato@palasatlas.com?subject=Correção sugerida na peça: ${encodeURIComponent(tituloPeca)}"
-      class="text-xs text-slate-500 hover:text-teal-700 transition-colors flex items-center gap-1 cursor-pointer mt-6 border-t border-slate-200 pt-4 w-fit"
-    >
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
-      </svg>
-      Reportar Erro nesta Lâmina
-    </a>
   `;
 
   if (!container.__pinClickDelegated) {
@@ -911,6 +1088,8 @@ function renderizarDescricaoETextos() {
     el.className = "pin-link cursor-pointer transition-all";
   });
 
+  atualizarCertidaoOpticaUI();
+
   if (pinAtivo) {
     destacarPinoNaSidebar(pinAtivo);
   }
@@ -920,12 +1099,6 @@ function renderizarDescricaoETextos() {
 // 4.5 Abas do Painel Lateral e Questões Práticas de Bancada
 // ---------------------------------------------------------------------------
 
-/**
- * Alterna a visualização entre a aba de Descrição Morfológica e a aba de Questões de Bancada.
- * Atualiza classes dos botões (ativo vs inativo) e a visibilidade dos containers.
- *
- * @param {'descricao' | 'questoes'} aba
- */
 export function alternarAbaPainel(aba) {
   const containerDesc  = document.getElementById("slideDescriptionContainer");
   const containerQuest = document.getElementById("slideQuestionsContainer");
@@ -935,28 +1108,24 @@ export function alternarAbaPainel(aba) {
   const abaAlvo = (aba === "questoes") ? "questoes" : "descricao";
   abaAtivaPainel = abaAlvo;
 
-  const estiloAtivo   = "tab-btn-ativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer bg-teal-700 text-white border border-teal-700 shadow-sm touch-manipulation flex items-center justify-center";
-  const estiloInativo = "tab-btn-inativo min-h-[36px] px-3.5 py-1.5 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 border border-transparent touch-manipulation flex items-center justify-center";
+  const estiloAtivo   = "tab-btn-ativo relative py-3 text-xs font-semibold tracking-wide transition-colors duration-150 cursor-pointer border-b-2 border-[#0369a1] text-slate-950 touch-manipulation flex items-center justify-center";
+  const estiloInativo = "tab-btn-inativo relative py-3 text-xs font-medium tracking-wide transition-colors duration-150 cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 touch-manipulation flex items-center justify-center";
 
   if (abaAlvo === "descricao") {
     if (containerDesc) containerDesc.classList.remove("hidden");
     if (containerQuest) containerQuest.classList.add("hidden");
 
     if (btnDesc)  btnDesc.className = estiloAtivo;
-    if (btnQuest) btnQuest.className = `${estiloInativo} flex items-center gap-1.5`;
+    if (btnQuest) btnQuest.className = `${estiloInativo} gap-1.5`;
   } else {
     if (containerDesc) containerDesc.classList.add("hidden");
     if (containerQuest) containerQuest.classList.remove("hidden");
 
     if (btnDesc)  btnDesc.className = estiloInativo;
-    if (btnQuest) btnQuest.className = `${estiloAtivo} flex items-center gap-1.5`;
+    if (btnQuest) btnQuest.className = `${estiloAtivo} gap-1.5`;
   }
 }
 
-/**
- * Atualiza o badge contador da aba de questões.
- * Destaque sutil com cor petróleo se houver questões, ou neutro se 0.
- */
 function atualizarBadgeContadorQuestoes() {
   const badge = document.getElementById("badgeContadorQuestoes");
   if (!badge) return;
@@ -965,16 +1134,36 @@ function atualizarBadgeContadorQuestoes() {
   badge.textContent = String(total);
 
   if (total > 0) {
-    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-teal-50 text-teal-800 border border-teal-200 font-mono font-medium";
+    badge.className = "palas-mono-tech px-1.5 py-0.5 rounded-full text-[10px] bg-sky-50 text-sky-800 border border-sky-200 font-semibold";
   } else {
-    badge.className = "px-1.5 py-0.5 rounded-full text-[10px] bg-slate-200 text-slate-700 font-mono border border-transparent";
+    badge.className = "palas-mono-tech px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600 border border-slate-200/80 font-medium";
   }
 }
 
-/**
- * Persiste a anotação/resposta diagnóstica do estudante com debounce no localStorage.
- * Chave de armazenamento: palasAtlas.respostas.${laminaId}.${questaoId}
- */
+function atualizarProgressoQuestoes() {
+  const txtEl = document.getElementById("questoesProgressoTexto");
+  const barEl = document.getElementById("questoesProgressoBarra");
+  if (!txtEl && !barEl) return;
+
+  const total = Array.isArray(listaQuestoesAtual) ? listaQuestoesAtual.length : 0;
+  if (total === 0) return;
+
+  const laminaId = laminaAtualData?.id || "default";
+  let respondidas = 0;
+  listaQuestoesAtual.forEach((q, idx) => {
+    const qIdRaw = q.id ? String(q.id) : `q_${idx + 1}`;
+    const ta = document.getElementById(`resposta-${qIdRaw}`);
+    let val = ta ? ta.value : "";
+    if (!ta) {
+      try { val = localStorage.getItem(`palasAtlas.respostas.${laminaId}.${qIdRaw}`) || ""; } catch (e) {}
+    }
+    if (String(val).trim().length > 0) respondidas++;
+  });
+
+  if (txtEl) txtEl.textContent = `${respondidas} de ${total} respondidas`;
+  if (barEl) barEl.style.width = `${Math.round((respondidas / total) * 100)}%`;
+}
+
 function salvarRespostaEstudante(laminaId, questaoId, texto) {
   const idSeguro = String(questaoId);
   const statusEl = document.getElementById(`statusSalvo-${idSeguro}`);
@@ -983,6 +1172,7 @@ function salvarRespostaEstudante(laminaId, questaoId, texto) {
     statusEl.classList.remove("text-slate-500");
     statusEl.classList.add("text-teal-700");
   }
+  atualizarProgressoQuestoes();
 
   _respostasPendentes.set(idSeguro, { laminaId, questaoId: idSeguro, texto });
   clearTimeout(debounceTimersRespostas[idSeguro]);
@@ -992,19 +1182,17 @@ function salvarRespostaEstudante(laminaId, questaoId, texto) {
       localStorage.setItem(chave, texto);
       _respostasPendentes.delete(idSeguro);
       if (statusEl) {
-        statusEl.textContent = "Salvo localmente";
+        statusEl.textContent = texto.trim() ? "Salvo localmente" : "";
         statusEl.classList.remove("text-teal-700");
         statusEl.classList.add("text-slate-500");
       }
+      atualizarProgressoQuestoes();
     } catch (e) {
       console.warn("[Palas Atlas] Erro ao persistir resposta no localStorage:", e);
     }
   }, 400);
 }
 
-/**
- * Persistência imediata da anotação ao perder foco (evento blur).
- */
 function salvarRespostaImediato(laminaId, questaoId, texto) {
   const idSeguro = String(questaoId);
   clearTimeout(debounceTimersRespostas[idSeguro]);
@@ -1014,10 +1202,11 @@ function salvarRespostaImediato(laminaId, questaoId, texto) {
     localStorage.setItem(chave, texto);
     const statusEl = document.getElementById(`statusSalvo-${idSeguro}`);
     if (statusEl) {
-      statusEl.textContent = "Salvo localmente";
+      statusEl.textContent = texto.trim() ? "Salvo localmente" : "";
       statusEl.classList.remove("text-teal-700");
       statusEl.classList.add("text-slate-500");
     }
+    atualizarProgressoQuestoes();
   } catch (e) {
     console.warn("[Palas Atlas] Erro ao persistir resposta imediata no localStorage:", e);
   }
@@ -1034,14 +1223,55 @@ function flushRespostasPendentes() {
   _respostasPendentes.clear();
 }
 
-/**
- * Renderiza a lista de questões na aba do painel lateral.
- * Atende estritamente à diretriz de ausência de gabarito/correção automática:
- * o estudante possui um campo de anotação limpo e persistente. O professor discute
- * os diagnósticos e estruturas em sala de aula.
- *
- * @param {Array} questoes - Array de objetos de questão
- */
+export async function copiarAnotacoesQuestoes() {
+  if (!Array.isArray(listaQuestoesAtual) || listaQuestoesAtual.length === 0) {
+    exibirToastViewer("Nenhuma questão cadastrada nesta lâmina.");
+    return;
+  }
+  const laminaId = laminaAtualData?.id || "default";
+  const nomeLamina = laminaAtualData?.nome || "Lâmina";
+  const linhas = [`PALAS ATLAS — Caderno de Bancada`, `Lâmina: ${nomeLamina}`, ""];
+
+  listaQuestoesAtual.forEach((q, idx) => {
+    const qIdRaw = q.id ? String(q.id) : `q_${idx + 1}`;
+    const num = q.numero !== undefined && q.numero !== null ? q.numero : idx + 1;
+    const titulo = q.titulo || q.pergunta || `Questão ${num}`;
+    let resp = "";
+    const ta = document.getElementById(`resposta-${qIdRaw}`);
+    if (ta) resp = ta.value;
+    else {
+      try { resp = localStorage.getItem(`palasAtlas.respostas.${laminaId}.${qIdRaw}`) || ""; } catch (e) {}
+    }
+    linhas.push(`Q${num} — ${titulo}`);
+    if (q.enunciado && q.enunciado !== titulo) linhas.push(`Enunciado: ${q.enunciado}`);
+    linhas.push(`Resposta: ${resp.trim() || "(sem anotação)"}`);
+    linhas.push("");
+  });
+
+  const payload = linhas.join("\n");
+  let copied = false;
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      await navigator.clipboard.writeText(payload);
+      copied = true;
+    }
+  } catch (e) {}
+  if (!copied) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = payload;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      copied = document.execCommand("copy");
+      document.body.removeChild(ta);
+    } catch (e) {}
+  }
+  exibirToastViewer(copied ? "Anotações copiadas para a área de transferência" : "Não foi possível copiar as anotações");
+}
+
 export function renderizarQuestoesNaSidebar(questoes) {
   const container = document.getElementById("slideQuestionsContainer");
   if (!container) {
@@ -1060,11 +1290,8 @@ export function renderizarQuestoesNaSidebar(questoes) {
           </svg>
         </div>
         <p class="text-xs text-slate-500 font-sans leading-relaxed max-w-xs mx-auto">
-          Nenhuma questão de bancada cadastrada para esta lâmina pelo professor.
+          Nenhuma questão cadastrada para esta lâmina.
         </p>
-        <span class="inline-block text-[10px] font-mono text-slate-400 tracking-wider uppercase">
-          Atividades Práticas de Laboratório
-        </span>
       </div>
     `;
     return;
@@ -1096,7 +1323,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
       <div
         id="card-questao-${qIdSafe}"
         data-questao-id="${qIdSafe}"
-        class="card-questao rounded-xl border border-slate-200 bg-slate-50 p-4 transition-all duration-200 hover:border-slate-300 space-y-3"
+        class="card-questao palas-card-tactile rounded-xl border border-slate-200/90 bg-white p-4 transition-all duration-200 hover:border-slate-300 space-y-3"
       >
         <!-- Cabeçalho Clicável da Questão -->
         <button
@@ -1106,17 +1333,17 @@ export function renderizarQuestoesNaSidebar(questoes) {
           title="Focar localização da questão no microscópio"
         >
           <div class="flex items-start gap-2.5 min-w-0">
-            <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200 shrink-0 mt-0.5">
+            <span class="palas-mono-tech px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-50 text-sky-800 border border-sky-200 shrink-0 mt-0.5">
               Q${numeroQSafe}
             </span>
             <div class="min-w-0">
-              <h4 class="text-xs font-semibold text-slate-800 tracking-wide font-sans group-hover:text-teal-700 transition-colors leading-snug">
+              <h4 class="text-xs font-semibold text-slate-900 tracking-wide font-sans group-hover:text-sky-800 transition-colors leading-snug">
                 ${escaparHTML(tituloQ)}
               </h4>
             </div>
           </div>
           ${temCoordenadas ? `
-            <div class="flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-slate-500 group-hover:text-teal-700 shrink-0 transition-colors pt-0.5">
+            <div class="flex items-center gap-1 text-[10px] palas-mono-tech uppercase tracking-wider text-slate-500 group-hover:text-sky-700 shrink-0 transition-colors pt-0.5">
               <span>Focar</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -1125,16 +1352,14 @@ export function renderizarQuestoesNaSidebar(questoes) {
           ` : ''}
         </button>
 
-        <!-- Enunciado e Orientação Diagnóstica -->
         ${enunciadoQ ? `
-          <div class="text-xs text-slate-700 font-sans leading-relaxed border-l-2 border-slate-300 ml-1 pl-2.5">
+          <div class="text-xs text-slate-700 font-sans leading-relaxed border-l-2 border-slate-200 ml-1 pl-2.5">
             ${escaparHTML(enunciadoQ)}
           </div>
         ` : ''}
 
-        <!-- Área de Anotação / Resposta do Estudante (sem gabarito) -->
         <div class="space-y-1.5 pt-1">
-          <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">
+          <div class="flex items-center justify-between text-[10px] palas-mono-tech uppercase tracking-wider">
             <span class="text-slate-500">Resposta / Diagnóstico</span>
             <span id="statusSalvo-${qIdSafe}" class="text-slate-500 transition-colors">
               ${respostaSalva ? "Salvo localmente" : ""}
@@ -1146,7 +1371,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
             rows="3"
             placeholder="Sua anotação / resposta diagnóstica..."
             style="resize:vertical; min-height:72px;"
-            class="w-full bg-white border border-slate-300 focus:border-teal-600 focus:ring-1 focus:ring-teal-600/30 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 font-sans leading-relaxed outline-none transition-all"
+            class="palas-input-recessed w-full bg-white border border-slate-300 focus:border-sky-600 focus:ring-1 focus:ring-sky-600/25 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 font-sans leading-relaxed outline-none transition-all"
           >${escaparHTML(respostaSalva)}</textarea>
         </div>
       </div>
@@ -1155,19 +1380,40 @@ export function renderizarQuestoesNaSidebar(questoes) {
 
   container.innerHTML = `
     <div class="space-y-3 pt-1">
-      <div class="flex items-center justify-between px-0.5 pb-1">
-        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500">
-          Caderno de Bancada
-        </span>
-        <span class="text-[10px] font-mono text-slate-500">
-          ${questoes.length} ${questoes.length === 1 ? 'questão' : 'questões'}
-        </span>
+      <div class="space-y-2 pb-1">
+        <div class="flex items-center justify-between gap-2 px-0.5">
+          <div>
+            <span class="text-[10px] palas-mono-tech uppercase tracking-wider text-slate-500 block">
+              Caderno de Bancada
+            </span>
+            <span id="questoesProgressoTexto" class="palas-mono-tech text-[11px] font-semibold text-slate-800">
+              0 de ${questoes.length} respondidas
+            </span>
+          </div>
+          <button
+            id="btnCopiarAnotacoes"
+            type="button"
+            onclick="window.copiarAnotacoesQuestoes && window.copiarAnotacoesQuestoes()"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-[11px] font-medium text-slate-700 hover:text-slate-950 transition-colors cursor-pointer shrink-0 shadow-2xs"
+            title="Copiar todas as anotações para a área de transferência"
+          >
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.85">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <span>Copiar</span>
+          </button>
+        </div>
+        <div class="w-full h-1 rounded-full bg-slate-200/80 overflow-hidden">
+          <div id="questoesProgressoBarra" class="h-full bg-teal-600 transition-all duration-300" style="width: 0%;"></div>
+        </div>
       </div>
       ${cardsHtml}
     </div>
   `;
 
-  // Anexa listeners de clique, input e blur usando delegação de eventos estável
+  atualizarProgressoQuestoes();
+
   if (!container.__eventosRespostasVinculados) {
     container.__eventosRespostasVinculados = true;
     container.addEventListener("click", (evento) => {
@@ -1193,36 +1439,39 @@ export function renderizarQuestoesNaSidebar(questoes) {
   }
 }
 
-/**
- * Aplica destaque visual ao card da questão ativa na barra lateral.
- *
- * @param {string} qId - ID da questão
- */
 function destacarCardQuestaoNaSidebar(qId) {
   const idBuscado = String(qId);
   document.querySelectorAll(".card-questao").forEach((card) => {
     const cardQId = card.getAttribute("data-questao-id");
     const isAtivo = String(cardQId) === idBuscado;
     if (isAtivo) {
-      card.classList.add("border-teal-600", "bg-teal-50/70", "ring-1", "ring-teal-600/30", "shadow-sm");
-      card.classList.remove("border-slate-200", "bg-slate-50");
+      card.classList.add("border-sky-600", "bg-sky-50/50", "ring-1", "ring-sky-600/25", "shadow-sm");
+      card.classList.remove("border-slate-200/90", "bg-white");
       card.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
-      card.classList.remove("border-teal-600", "bg-teal-50/70", "ring-1", "ring-teal-600/30", "shadow-sm");
-      card.classList.add("border-slate-200", "bg-slate-50");
+      card.classList.remove("border-sky-600", "bg-sky-50/50", "ring-1", "ring-sky-600/25", "shadow-sm");
+      card.classList.add("border-slate-200/90", "bg-white");
     }
   });
 }
 
-/**
- * Aplica destaque visual ao botão do pino correspondente na lista lateral.
- *
- * @param {string} pinId - ID do pino ativo
- */
 function destacarPinoNaSidebar(pinId) {
   const idBuscado = String(pinId || "").trim().toLowerCase();
   const norm = (val) => String(val || "").replace(/^(pin[-_]|p)/i, "").trim().toLowerCase();
   const buscadoNorm = norm(idBuscado);
+
+  let activeIdx = -1;
+  if (idBuscado && Array.isArray(listaPinosAtual)) {
+    activeIdx = listaPinosAtual.findIndex((p, idx) => {
+      const pId = String(p.id || idx + 1).trim().toLowerCase();
+      return pId === idBuscado || (buscadoNorm && norm(pId) === buscadoNorm);
+    });
+  }
+
+  const counterEl = document.getElementById("pinTourCounter");
+  if (counterEl && Array.isArray(listaPinosAtual)) {
+    counterEl.textContent = `${activeIdx >= 0 ? activeIdx + 1 : 0} / ${listaPinosAtual.length}`;
+  }
 
   document.querySelectorAll("[data-btn-pin-id]").forEach((btn) => {
     const btnPinId = String(btn.getAttribute("data-btn-pin-id") || "").trim().toLowerCase();
@@ -1234,14 +1483,10 @@ function destacarPinoNaSidebar(pinId) {
 
     btn.classList.toggle("pin-active", isAtivo);
     if (action) {
-      action.innerHTML = isAtivo ? "Ocultar &times;" : "Focar &rarr;";
-    }
-    if (isAtivo) {
-      btn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      action.innerHTML = isAtivo ? "Em foco &times;" : "Focar &rarr;";
     }
   });
 
-  // Destaca também os links inline correspondentes no texto descritivo
   const descContainer = document.getElementById("slideDescriptionContainer");
   if (descContainer) {
     descContainer.querySelectorAll(".pin-link, [data-pin-id], [data-pin]").forEach((el) => {
@@ -1411,7 +1656,7 @@ async function inicializarOpenSeadragon() {
       navigatorHeight:          "90px",
       navigatorBackground:      "rgba(255,255,255,0.92)",
       navigatorBorderColor:     "rgba(3,105,161,0.5)",
-      navigatorAutoFade:        true,
+      navigatorAutoFade:        false,
       showReferenceStrip:       false,
       animationTime:            0.45,
       blendTime:                0.1,
@@ -1511,7 +1756,7 @@ async function inicializarOpenSeadragon() {
 
   viewer.addHandler("open-failed", onOpenFailed);
 
-  // Função unificada de Indicador Dinâmico de Zoom com cálculo de magnificação ótica real
+  // Função unificada de Indicador Dinâmico de Zoom + Telemetria de Campo + Scalebar Editorial
   const updateZoomDisplay = () => {
     if (!viewer || !viewer.viewport || !homeZoomRef) return;
     const mag = calcularMagnificacaoOtica();
@@ -1519,6 +1764,18 @@ async function inicializarOpenSeadragon() {
     if (display) {
       display.textContent = formatarMagnificacaoOtica(mag);
     }
+
+    const fovDisplay = document.getElementById("fovIndicatorDisplay");
+    if (fovDisplay) {
+      const mpp = obterMppAtivo();
+      const cs = viewer.viewport.getContainerSize();
+      const fovUm = mpp
+        ? calcularCampoDeVisaoUm(cs?.x, viewer.viewport.getZoom(true), getNativeZoomRef(), mpp)
+        : null;
+      fovDisplay.textContent = fovUm ? formatarComprimento(fovUm) : "—";
+    }
+
+    atualizarScalebarEditorial();
     atualizarLenteBotaoAtivo();
   };
 
@@ -1610,6 +1867,7 @@ async function inicializarOpenSeadragon() {
     updateZoomDisplay();
     atualizarBotaoMarcacoes();
     atualizarBotaoRegua();
+    aplicarEstadoMinimap(minimapRecolhido, false);
     renderizarTodasMarcacoesNoViewer();
 
     const pinUrlParam = new URLSearchParams(window.location.search).get("pin");
@@ -1633,30 +1891,10 @@ async function inicializarOpenSeadragon() {
     _styleSyncTimer = setTimeout(() => {
       _styleSyncTimer = null;
       if (mySeq !== _viewerInstanceSeq || !viewer) return;
-      const navParent = document.querySelector(".openseadragon-navigator");
-      if (navParent) {
-        Object.assign(navParent.style, {
-          overflow:     "hidden",
-          borderRadius: "10px",
-          border:       "1px solid #cbd5e1",
-          boxShadow:    "0 8px 24px rgba(15,23,42,0.12)"
-        });
-      }
-
-      const scalebarEl = document.querySelector(".openseadragon-scalebar");
-      if (scalebarEl) {
-        Object.assign(scalebarEl.style, {
-          borderRadius: "8px",
-          padding:      "4px 12px",
-          backdropFilter: "blur(8px)",
-          border:       "1px solid #cbd5e1",
-          boxShadow:    "0 4px 12px rgba(15,23,42,0.08)",
-          fontSize:     "10px",
-          fontWeight:   "600"
-        });
-        scalebarEl.style.display = laminaAtualData?._usingPreviewFallback ? "none" : "";
-      }
-    }, 400);
+      const legacySb = document.querySelector(".openseadragon-scalebar");
+      if (legacySb) legacySb.style.display = "none";
+      atualizarScalebarEditorial();
+    }, 350);
   };
 
   viewer.addHandler("open", onOpenSuccess);
@@ -1964,12 +2202,14 @@ export function formatarMagnificacaoOtica(mag) {
 // ---------------------------------------------------------------------------
 // 6. Atualiza destaque do botão de lente conforme zoom atual
 // ---------------------------------------------------------------------------
+const LENS_BTN_ACTIVE_CLS = "lens-btn palas-mono-tech bg-[#0369a1] text-white font-bold shadow-sm shadow-sky-900/20 px-2.5 sm:px-3 py-1.5 lg:py-1 rounded-xl text-xs transition-all active-lens cursor-pointer touch-manipulation min-w-[40px] min-h-[36px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+const LENS_BTN_IDLE_CLS   = "lens-btn palas-mono-tech text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 py-1.5 lg:py-1 rounded-xl text-xs transition-all duration-200 cursor-pointer touch-manipulation min-w-[40px] min-h-[36px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+
 function atualizarLenteBotaoAtivo() {
   if (!viewer || !viewer.viewport || !homeZoomRef) return;
   const mag = calcularMagnificacaoOtica();
   const maxMag = Number(laminaAtualData?.maxMagnification || laminaAtualData?.maxZoomLevel || laminaAtualData?.maxMag) || 40;
 
-  // Mapeamento proporcional para os botões de objetiva: 4x, 10x, 40x, 60x, 100x
   let objetivo = "4x";
   if (maxMag >= 100 && mag >= 80) {
     objetivo = "100x";
@@ -1982,17 +2222,13 @@ function atualizarLenteBotaoAtivo() {
   }
 
   document.querySelectorAll(".lens-btn").forEach(btn => {
-    // Pula botões bloqueados (disabled) para não sobrescrever classes
     if (btn.disabled) return;
 
     const magAttr = btn.getAttribute("data-mag");
     const isAtivo = magAttr ? `${magAttr}x` === objetivo : btn.textContent.trim() === objetivo;
-    btn.className = isAtivo
-      ? "lens-btn bg-[#0369a1] text-white font-bold shadow-sm shadow-sky-900/20 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all active-lens cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
-      : "lens-btn text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+    btn.className = isAtivo ? LENS_BTN_ACTIVE_CLS : LENS_BTN_IDLE_CLS;
   });
 
-  // Em telas compactas, centraliza suavemente o botão da objetiva ativa no revólver sem rolar a janela
   const activeBtn = document.querySelector(".lens-btn.active-lens");
   if (activeBtn) {
     const panel = document.getElementById("viewerLensPanel");
@@ -2004,7 +2240,7 @@ function atualizarLenteBotaoAtivo() {
 }
 
 // ---------------------------------------------------------------------------
-// 6.5 Bloqueia botões de lente acima da capacidade física da lâmina (Req 2)
+// 6.5 Oculta/desabilita objetivas acima da capacidade física da lâmina
 // ---------------------------------------------------------------------------
 function aplicarBloqueioObjetivas(maxMag) {
   const limiteMag = Number(maxMag) || 40;
@@ -2012,11 +2248,14 @@ function aplicarBloqueioObjetivas(maxMag) {
     const magBotao = Number(btn.getAttribute("data-mag")) || 4;
     if (!objetivaDisponivel(magBotao, limiteMag)) {
       btn.disabled = true;
-      btn.className = "lens-btn text-slate-300 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono cursor-not-allowed opacity-50 min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+      btn.className = "lens-btn hidden";
+      btn.setAttribute("aria-hidden", "true");
       btn.title = `Objetiva não disponível (Máx: ${limiteMag}x)`;
     } else {
       btn.disabled = false;
-      btn.title = `Lente ${magBotao}x`;
+      btn.removeAttribute("aria-hidden");
+      btn.className = LENS_BTN_IDLE_CLS;
+      btn.title = `Objetiva ${magBotao}x`;
     }
   });
   atualizarLenteBotaoAtivo();
@@ -2774,11 +3013,11 @@ export function trocarLente(objetivaDesejada, btnElement) {
 
   document.querySelectorAll(".lens-btn").forEach(l => {
     if (l.disabled) return;
-    l.className = "lens-btn text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all duration-200 cursor-pointer touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+    l.className = LENS_BTN_IDLE_CLS;
   });
 
   if (targetBtn && !targetBtn.disabled) {
-    targetBtn.className = "lens-btn bg-[#0369a1] text-white font-bold shadow-sm shadow-sky-900/20 px-2.5 sm:px-3 lg:px-2.5 py-1.5 lg:py-1 rounded-xl text-xs font-mono transition-all cursor-pointer active-lens touch-manipulation min-w-[42px] min-h-[38px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+    targetBtn.className = LENS_BTN_ACTIVE_CLS;
   }
 
   // Em telas compactas, centraliza suavemente o botão da objetiva ativada no revólver sem rolar a janela
@@ -2867,24 +3106,30 @@ function obterMppAtivo() {
 }
 
 function atualizarBotaoRegua() {
-  const btn = document.getElementById("btnToggleRegua");
-  if (!btn) return;
+  const btns = [
+    document.getElementById("btnToggleRegua"),
+    document.getElementById("btnReguaMobileContext")
+  ].filter(Boolean);
+  if (btns.length === 0) return;
+
   const mpp = obterMppAtivo();
-  if (!mpp) {
-    btn.disabled = true;
-    btn.classList.remove("is-on");
-    btn.classList.add("is-off");
-    btn.setAttribute("aria-pressed", "false");
-    btn.title = "Régua indisponível sem calibração óptica";
-    return;
-  }
-  btn.disabled = false;
-  btn.classList.toggle("is-on", modoReguaAtivo);
-  btn.classList.toggle("is-off", !modoReguaAtivo);
-  btn.setAttribute("aria-pressed", String(modoReguaAtivo));
-  btn.title = modoReguaAtivo
-    ? "Desativar régua morfométrica (D)"
-    : "Régua morfométrica em micrômetros (D)";
+  btns.forEach((btn) => {
+    if (!mpp) {
+      btn.disabled = true;
+      btn.classList.remove("is-on");
+      btn.classList.add("is-off");
+      btn.setAttribute("aria-pressed", "false");
+      btn.title = "Régua indisponível sem calibração óptica";
+      return;
+    }
+    btn.disabled = false;
+    btn.classList.toggle("is-on", modoReguaAtivo);
+    btn.classList.toggle("is-off", !modoReguaAtivo);
+    btn.setAttribute("aria-pressed", String(modoReguaAtivo));
+    btn.title = modoReguaAtivo
+      ? "Desativar régua morfométrica (D)"
+      : "Régua morfométrica em micrômetros (D)";
+  });
 }
 
 function atualizarBannerRegua(texto, mostrarLimpar = false) {
@@ -3207,6 +3452,222 @@ function registrarControleFullscreenMicroscopio() {
   document.addEventListener("webkitfullscreenchange", onFsChange);
 }
 
+export function navegarPinoAdjacente(direcao = 1) {
+  if (!Array.isArray(listaPinosAtual) || listaPinosAtual.length === 0) return;
+  const dir = direcao >= 0 ? 1 : -1;
+  const currentIdx = pinAtivo
+    ? listaPinosAtual.findIndex(p => String(p.id || "").toLowerCase() === String(pinAtivo).toLowerCase())
+    : -1;
+  const nextIdx = currentIdx === -1
+    ? (dir === 1 ? 0 : listaPinosAtual.length - 1)
+    : (currentIdx + dir + listaPinosAtual.length) % listaPinosAtual.length;
+  const targetPin = listaPinosAtual[nextIdx];
+  if (targetPin) {
+    if (abaAtivaPainel !== "descricao") alternarAbaPainel("descricao");
+    focarPinoNoViewer(targetPin.id || nextIdx + 1);
+  }
+}
+
+export function definirTomPlatina(tone, persistir = true) {
+  const proximo = tone === "bright" ? "bright" : "neutral";
+  stageToneAtual = proximo;
+  const stage = document.getElementById("viewerStage");
+  if (stage) stage.setAttribute("data-stage-tone", proximo);
+
+  document.querySelectorAll("[data-stage-tone-btn]").forEach((btn) => {
+    const val = btn.getAttribute("data-stage-tone-btn");
+    const ativo = val === proximo;
+    btn.classList.toggle("bg-white", ativo);
+    btn.classList.toggle("text-slate-900", ativo);
+    btn.classList.toggle("font-semibold", ativo);
+    btn.classList.toggle("shadow-2xs", ativo);
+    btn.classList.toggle("text-slate-600", !ativo);
+    btn.classList.toggle("font-medium", !ativo);
+    btn.setAttribute("aria-pressed", String(ativo));
+  });
+
+  if (persistir) {
+    try { localStorage.setItem(STAGE_TONE_STORAGE_KEY, proximo); } catch (e) {}
+  }
+}
+
+function inicializarTomPlatina() {
+  let salvo = "neutral";
+  try {
+    const raw = localStorage.getItem(STAGE_TONE_STORAGE_KEY);
+    if (raw === "bright" || raw === "neutral") salvo = raw;
+  } catch (e) {}
+  definirTomPlatina(salvo, false);
+}
+
+function aplicarEstadoMinimap(recolhido, persistir = true) {
+  minimapRecolhido = Boolean(recolhido);
+  const stage = document.getElementById("viewerStage");
+  const btn = document.getElementById("btnToggleMinimap");
+  const label = document.getElementById("minimapToggleLabel");
+  if (stage) stage.setAttribute("data-minimap-collapsed", String(minimapRecolhido));
+  if (btn) btn.setAttribute("aria-expanded", String(!minimapRecolhido));
+  if (label) label.textContent = minimapRecolhido ? "Mostrar Mapa" : "Mapa";
+
+  const navElem = viewer?.navigator?.element;
+  if (navElem) {
+    navElem.style.display = minimapRecolhido ? "none" : "inline-block";
+    if (!minimapRecolhido && viewer?.navigator) {
+      requestAnimationFrame(() => {
+        try {
+          if (typeof viewer.navigator.updateSize === "function") viewer.navigator.updateSize();
+          if (typeof viewer.navigator.update === "function" && viewer.viewport) {
+            viewer.navigator.update(viewer.viewport);
+          }
+          if (typeof viewer.forceRedraw === "function") viewer.forceRedraw();
+        } catch (e) {}
+      });
+    }
+  }
+
+  if (persistir) {
+    try { localStorage.setItem(MINIMAP_STORAGE_KEY, minimapRecolhido ? "1" : "0"); } catch (e) {}
+  }
+}
+
+export function toggleMinimap(forcar) {
+  const proximo = typeof forcar === "boolean" ? forcar : !minimapRecolhido;
+  aplicarEstadoMinimap(proximo, true);
+}
+
+function inicializarMinimapControle() {
+  let recolhido = window.innerWidth < 640;
+  try {
+    const salvo = localStorage.getItem(MINIMAP_STORAGE_KEY);
+    if (salvo === "1" || salvo === "0") {
+      recolhido = salvo === "1";
+    }
+  } catch (e) {}
+  aplicarEstadoMinimap(recolhido, false);
+}
+
+export function toggleModoBancada(forcar) {
+  const proximo = typeof forcar === "boolean" ? forcar : !modoBancadaAtivo;
+  modoBancadaAtivo = proximo;
+
+  document.documentElement.classList.toggle("bancada-mode", proximo);
+  document.body.classList.toggle("bancada-mode", proximo);
+
+  const btnDesk = document.getElementById("btnModoBancada");
+  const lblDesk = document.getElementById("btnModoBancadaLabel");
+  const btnMob  = document.getElementById("btnBancadaMobileContext");
+  const lblMore = document.getElementById("mobileMenuBancadaLabel");
+
+  if (btnDesk) {
+    btnDesk.setAttribute("aria-pressed", String(proximo));
+    btnDesk.classList.toggle("bg-slate-900", proximo);
+    btnDesk.classList.toggle("text-white", proximo);
+    btnDesk.classList.toggle("border-slate-900", proximo);
+    btnDesk.classList.toggle("bg-slate-100/90", !proximo);
+    btnDesk.classList.toggle("text-slate-700", !proximo);
+    btnDesk.classList.toggle("border-slate-200/90", !proximo);
+  }
+  if (lblDesk) lblDesk.textContent = proximo ? "Sair da Bancada" : "Modo Bancada";
+  if (btnMob) {
+    btnMob.setAttribute("aria-pressed", String(proximo));
+    btnMob.classList.toggle("bg-slate-900", proximo);
+    btnMob.classList.toggle("text-white", proximo);
+    btnMob.classList.toggle("border-slate-900", proximo);
+    btnMob.classList.toggle("bg-slate-100", !proximo);
+    btnMob.classList.toggle("text-slate-700", !proximo);
+  }
+  if (lblMore) lblMore.textContent = proximo ? "Sair do Modo Bancada" : "Modo Bancada";
+
+  setTimeout(sincronizarTamanhoDoViewer, 40);
+}
+
+function inicializarModoBancada() {
+  const params = new URLSearchParams(window.location.search);
+  const bancadaParam = params.get("bancada") === "1";
+  toggleModoBancada(bancadaParam);
+}
+
+export function toggleLaminarioRapido(forcar, anchorEl) {
+  const popover = document.getElementById("popoverLaminarioRapido");
+  const btnDesk = document.getElementById("btnLaminarioRapido");
+  const chevron = document.getElementById("laminarioChevron");
+  if (!popover) return;
+
+  const isHidden = popover.classList.contains("hidden");
+  const abrir = typeof forcar === "boolean" ? forcar : isHidden;
+
+  if (!abrir) {
+    popover.classList.add("hidden");
+    if (btnDesk) btnDesk.setAttribute("aria-expanded", "false");
+    if (chevron) chevron.classList.remove("rotate-180");
+    return;
+  }
+
+  toggleMobileMoreMenu(false);
+  toggleAjudaMicroscopio(false);
+  renderizarListaLaminarioRapido();
+
+  const refEl = anchorEl || (window.innerWidth >= 768 ? btnDesk : document.getElementById("btnLaminarioMobile"));
+  if (refEl) {
+    const rect = refEl.getBoundingClientRect();
+    const popWidth = Math.min(356, window.innerWidth - 24);
+    const left = Math.max(12, Math.min(rect.left, window.innerWidth - popWidth - 12));
+    const top = Math.min(rect.bottom + 8, window.innerHeight - 160);
+    popover.style.left = `${Math.round(left)}px`;
+    popover.style.top = `${Math.round(top)}px`;
+    popover.style.width = `${Math.round(popWidth)}px`;
+  }
+
+  popover.classList.remove("hidden");
+  if (btnDesk) btnDesk.setAttribute("aria-expanded", "true");
+  if (chevron) chevron.classList.add("rotate-180");
+}
+
+export function toggleMobileMoreMenu(forcar) {
+  const popover = document.getElementById("popoverMobileMore");
+  const btn = document.getElementById("btnMobileMore");
+  if (!popover) return;
+  const abrir = typeof forcar === "boolean" ? forcar : popover.classList.contains("hidden");
+  if (abrir) {
+    toggleLaminarioRapido(false);
+    toggleAjudaMicroscopio(false);
+    popover.classList.remove("hidden");
+    if (btn) btn.setAttribute("aria-expanded", "true");
+  } else {
+    popover.classList.add("hidden");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  }
+}
+
+function registrarControlesPopoversHeader() {
+  if (_popoversRegistrados) return;
+  _popoversRegistrados = true;
+
+  document.addEventListener("click", (e) => {
+    const popLam = document.getElementById("popoverLaminarioRapido");
+    if (popLam && !popLam.classList.contains("hidden")) {
+      const btnDesk = document.getElementById("btnLaminarioRapido");
+      const btnMob  = document.getElementById("btnLaminarioMobile");
+      if (!popLam.contains(e.target) && !btnDesk?.contains(e.target) && !btnMob?.contains(e.target)) {
+        toggleLaminarioRapido(false);
+      }
+    }
+
+    const contMore = document.getElementById("containerMobileMore");
+    const popMore  = document.getElementById("popoverMobileMore");
+    if (contMore && popMore && !popMore.classList.contains("hidden") && !contMore.contains(e.target)) {
+      toggleMobileMoreMenu(false);
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      toggleLaminarioRapido(false);
+      toggleMobileMoreMenu(false);
+    }
+  });
+}
+
 function registrarAtalhosTecladoMicroscopio() {
   if (_atalhosRegistrados) return;
   _atalhosRegistrados = true;
@@ -3267,6 +3728,16 @@ function registrarAtalhosTecladoMicroscopio() {
       if (sidebar) aplicarEstadoSidebar(!sidebar.classList.contains("w-0"), true);
       return;
     }
+    if (lower === "b") {
+      e.preventDefault();
+      toggleModoBancada();
+      return;
+    }
+    if (lower === "n") {
+      e.preventDefault();
+      toggleMinimap();
+      return;
+    }
     if (lower === "f") {
       e.preventDefault();
       toggleTelaCheiaMicroscopio();
@@ -3275,18 +3746,7 @@ function registrarAtalhosTecladoMicroscopio() {
     if (key === "ArrowRight" || key === "ArrowLeft") {
       if (Array.isArray(listaPinosAtual) && listaPinosAtual.length > 0) {
         e.preventDefault();
-        const dir = key === "ArrowRight" ? 1 : -1;
-        const currentIdx = pinAtivo
-          ? listaPinosAtual.findIndex(p => String(p.id || "").toLowerCase() === String(pinAtivo).toLowerCase())
-          : -1;
-        const nextIdx = currentIdx === -1
-          ? (dir === 1 ? 0 : listaPinosAtual.length - 1)
-          : (currentIdx + dir + listaPinosAtual.length) % listaPinosAtual.length;
-        const targetPin = listaPinosAtual[nextIdx];
-        if (targetPin) {
-          if (abaAtivaPainel !== "descricao") alternarAbaPainel("descricao");
-          focarPinoNoViewer(targetPin.id || nextIdx + 1);
-        }
+        navegarPinoAdjacente(key === "ArrowRight" ? 1 : -1);
       }
       return;
     }
@@ -3301,10 +3761,46 @@ function registrarAtalhosTecladoMicroscopio() {
 }
 
 const CATALOGO_BASE_SWITCHER = [
-  { id: "cw3XGCgUwN71XdlwkUe5", nome: "Osso Maduro 40x", meta: "Desgaste • 40x", aliases: ["osso_maduro_desgaste_ct_3.0", "osso_3.0", "osso-3.0"] },
-  { id: "FFGk5d9kOAct5HIDdjQ7", nome: "Osso Maduro 10x", meta: "Desgaste • 10x", aliases: ["osso_maduro_desgaste_ct_2.0", "osso_2.0", "osso-2.0"] },
-  { id: "96ZYqoM2SV8p4fB2QgeM", nome: "Osso Maduro", meta: "Desgaste • 40x", aliases: ["osso_maduro_desgaste_ct", "osso-maduro", "osso_maduro"] },
-  { id: "a3oRvXvJpMKAtU2RE85q", nome: "Pele Espessa", meta: "H&E • 40x", aliases: ["lamina-real1", "lamina-real-1", "pele_espessa", "pele-espessa"] }
+  {
+    id: "cw3XGCgUwN71XdlwkUe5",
+    nome: "Osso Maduro 40x",
+    subtitulo: "Ósteons, canalículos e linhas cimentantes",
+    topicoTitulo: "Tecido Ósseo Compacto e Esponjoso",
+    meta: "Desgaste • 40x",
+    maxMag: 40,
+    previewImage: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg",
+    aliases: ["osso_maduro_desgaste_ct_3.0", "osso_3.0", "osso-3.0"]
+  },
+  {
+    id: "FFGk5d9kOAct5HIDdjQ7",
+    nome: "Osso Maduro 10x",
+    subtitulo: "Visão panorâmica e topografia cortical",
+    topicoTitulo: "Tecido Ósseo Compacto e Esponjoso",
+    meta: "Desgaste • 10x",
+    maxMag: 10,
+    previewImage: "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg",
+    aliases: ["osso_maduro_desgaste_ct_2.0", "osso_2.0", "osso-2.0"]
+  },
+  {
+    id: "96ZYqoM2SV8p4fB2QgeM",
+    nome: "Osso Maduro",
+    subtitulo: "Sistemas de Havers e canalículos",
+    topicoTitulo: "Tecido Ósseo Compacto e Esponjoso",
+    meta: "Desgaste • 40x",
+    maxMag: 40,
+    previewImage: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg",
+    aliases: ["osso_maduro_desgaste_ct", "osso-maduro", "osso_maduro"]
+  },
+  {
+    id: "a3oRvXvJpMKAtU2RE85q",
+    nome: "Pele Espessa",
+    subtitulo: "Epiderme queratinizada e Derme papilar",
+    topicoTitulo: "Tecido Epitelial de Revestimento e Glandular",
+    meta: "H&E • 40x",
+    maxMag: 40,
+    previewImage: "assets/histologia/lamina-real1-preview.jpg",
+    aliases: ["lamina-real1", "lamina-real-1", "pele_espessa", "pele-espessa"]
+  }
 ];
 
 function resolverIdCanonicoSwitcher(slideId) {
@@ -3317,7 +3813,218 @@ function resolverIdCanonicoSwitcher(slideId) {
   return match ? match.id : String(slideId).trim();
 }
 
+function formatarBadgeTecnica(rawMeta, maxMag) {
+  const base = String(rawMeta || "").trim() || "Histologia";
+  const magNum = Number(maxMag) || 40;
+  if (/\b\d+x\b/i.test(base)) return base;
+  return `${base} • ${magNum}x`;
+}
+
+function renderizarListaLaminarioRapido() {
+  const listEl = document.getElementById("laminarioListaOpcoes");
+  const totalEl = document.getElementById("laminarioTotalBadge");
+  if (!listEl) return;
+
+  const activeId = resolverIdCanonicoSwitcher(laminaAtualData?.id || "");
+  if (totalEl) {
+    const n = _catalogoLaminasSwitcher.length;
+    totalEl.textContent = `${n} ${n === 1 ? "lâmina" : "lâminas"}`;
+  }
+
+  listEl.innerHTML = _catalogoLaminasSwitcher.map((item) => {
+    const isAtiva = item.id === activeId;
+    const thumb = isSafeSlideUrl(item.previewImage) ? item.previewImage : "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg";
+    const idSafe = escaparHTML(item.id);
+    const nomeSafe = escaparHTML(item.nome);
+    const metaSafe = escaparHTML(formatarBadgeTecnica(item.meta, item.maxMag));
+    const subSafe = escaparHTML(item.subtitulo || item.topicoTitulo || "Histologia");
+
+    return `
+      <button
+        type="button"
+        data-laminario-id="${idSafe}"
+        class="w-full flex items-center gap-3 p-2 rounded-xl border text-left transition-all cursor-pointer ${
+          isAtiva
+            ? "bg-sky-50/90 border-sky-300 shadow-2xs"
+            : "bg-white hover:bg-slate-50 border-slate-200/80 hover:border-slate-300"
+        }"
+      >
+        <img src="${escaparHTML(thumb)}" alt="${nomeSafe}" class="w-14 h-10 rounded-lg object-cover border border-slate-200 shrink-0 bg-slate-100" />
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold ${isAtiva ? "text-sky-950" : "text-slate-900"} truncate">${nomeSafe}</span>
+            <span class="palas-mono-tech text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200/80 shrink-0">${metaSafe}</span>
+          </div>
+          <p class="text-[11px] text-slate-500 truncate mt-0.5">${subSafe}</p>
+        </div>
+        ${isAtiva ? `
+          <span class="w-2 h-2 rounded-full bg-[#0369a1] shrink-0" title="Em visualização"></span>
+        ` : ""}
+      </button>
+    `;
+  }).join("");
+
+  if (!listEl.__bound) {
+    listEl.__bound = true;
+    listEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-laminario-id]");
+      if (!btn) return;
+      const targetId = btn.getAttribute("data-laminario-id");
+      toggleLaminarioRapido(false);
+      if (targetId) trocarLaminaNoViewer(targetId);
+    });
+  }
+}
+
+function atualizarNavegacaoRodapeSidebar() {
+  const prevBtn  = document.getElementById("btnLaminaAnterior");
+  const prevName = document.getElementById("btnLaminaAnteriorNome");
+  const nextBtn  = document.getElementById("btnLaminaProxima");
+  const nextName = document.getElementById("btnLaminaProximaNome");
+  if (!prevBtn && !nextBtn) return;
+
+  const pool = _catalogoLaminasSwitcher;
+  if (!pool || pool.length < 2) return;
+
+  const activeId = resolverIdCanonicoSwitcher(laminaAtualData?.id || "");
+  const idx = pool.findIndex(item => item.id === activeId);
+  const currentIdx = idx >= 0 ? idx : 0;
+  const prevItem = pool[(currentIdx - 1 + pool.length) % pool.length];
+  const nextItem = pool[(currentIdx + 1) % pool.length];
+
+  if (prevName && prevItem) prevName.textContent = prevItem.nome;
+  if (nextName && nextItem) nextName.textContent = nextItem.nome;
+}
+
+export function navegarLaminaAdjacente(direcao = 1) {
+  const pool = _catalogoLaminasSwitcher;
+  if (!pool || pool.length < 2) return;
+  const activeId = resolverIdCanonicoSwitcher(laminaAtualData?.id || "");
+  const idx = pool.findIndex(item => item.id === activeId);
+  const currentIdx = idx >= 0 ? idx : 0;
+  const step = direcao >= 0 ? 1 : -1;
+  const target = pool[(currentIdx + step + pool.length) % pool.length];
+  if (target && target.id) {
+    trocarLaminaNoViewer(target.id);
+  }
+}
+
+function atualizarCertidaoOpticaUI() {
+  if (!laminaAtualData) return;
+  const cert = certidaoOpticaAtual || laminaAtualData.certidaoOptica;
+  const maxMag = Number(cert?.ampliacaoMaxima || laminaAtualData.maxMagnification || laminaAtualData.maxMag || 40);
+  const mpp = Number(cert?.mppEfetivo || laminaAtualData.mpp || (40 / maxMag) * 0.156);
+  const dims = getDziDimensions();
+
+  let areaTexto = "—";
+  let dimTexto = "Pirâmide DZI multiescala";
+  if (dims && dims.largura > 0 && dims.altura > 0) {
+    const largMm = ((dims.largura * mpp) / 1000).toFixed(2).replace(".", ",");
+    const altMm  = ((dims.altura * mpp) / 1000).toFixed(2).replace(".", ",");
+    const mp     = ((dims.largura * dims.altura) / 1e6).toFixed(1).replace(".", ",");
+    areaTexto = `${largMm} × ${altMm} mm`;
+    dimTexto  = `${dims.largura.toLocaleString("pt-BR")} × ${dims.altura.toLocaleString("pt-BR")} px (${mp} MP)`;
+  }
+
+  const entryCatalogo = obterCatalogoEntryAtual();
+  const rawColor = laminaAtualData.coloracao;
+  const tecnicaTexto = !isColoracaoGenerica(rawColor)
+    ? rawColor
+    : (entryCatalogo?.meta || "Preparação Histológica");
+
+  const objTexto = `${maxMag}x`;
+  const resTexto = `${mpp.toFixed(3).replace(".", ",")} µm/px`;
+  const metodo = String(cert?.metodo || laminaAtualData?.metodoCalibracao || "").toLowerCase();
+  let seloRotulo = "Calibração óptica";
+  if (cert?.selo === "verificada" || cert?.selo === "estimada") {
+    seloRotulo = ROTULOS_SELO[cert.selo] || "Calibração óptica";
+  }
+
+  // Cards da Seção Inferior
+  const setTxt = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
+  setTxt("certObjValor", objTexto);
+  setTxt("certObjDetalhe", "Captura em resolução nativa");
+  setTxt("certResValor", resTexto);
+  setTxt("certResDetalhe", metodo.includes("hemacia") ? "Calibração por hemácia (7,5 µm)" : seloRotulo);
+  setTxt("certAreaValor", areaTexto);
+  setTxt("certAreaDetalhe", dimTexto);
+  setTxt("certTecValor", tecnicaTexto);
+}
+
+function renderizarAcervoRelacionado() {
+  const grid = document.getElementById("acervoRelacionadoGrid");
+  if (!grid) return;
+
+  const activeId = resolverIdCanonicoSwitcher(laminaAtualData?.id || "");
+  grid.innerHTML = _catalogoLaminasSwitcher.map((item) => {
+    const isAtiva = item.id === activeId;
+    const thumb = isSafeSlideUrl(item.previewImage) ? item.previewImage : "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg";
+    const idSafe = escaparHTML(item.id);
+    const nomeSafe = escaparHTML(item.nome);
+    const metaSafe = escaparHTML(formatarBadgeTecnica(item.meta, item.maxMag));
+    const subSafe = escaparHTML(item.subtitulo || item.topicoTitulo || "");
+
+    return `
+      <button
+        type="button"
+        data-acervo-slide-id="${idSafe}"
+        class="palas-card-tactile palas-card-interactive group rounded-2xl border overflow-hidden text-left flex flex-col cursor-pointer ${
+          isAtiva ? "border-sky-500 ring-1 ring-sky-500/30" : ""
+        }"
+      >
+        <div class="palas-slide-frame relative w-full aspect-[16/10] bg-slate-900 overflow-hidden">
+          <img
+            src="${escaparHTML(thumb)}"
+            alt="${nomeSafe}"
+            loading="lazy"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent"></div>
+          <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+            <span class="palas-mono-tech px-2.5 py-0.5 rounded-full bg-slate-950/70 backdrop-blur-md border border-white/15 text-[10px] font-semibold text-white">
+              ${metaSafe}
+            </span>
+          </div>
+        </div>
+
+        <div class="p-4 flex-1 flex flex-col justify-between gap-2 w-full">
+          <div>
+            <h3 class="text-sm font-serif font-bold text-slate-900 group-hover:text-sky-800 transition-colors">${nomeSafe}</h3>
+            <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">${subSafe}</p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold ${isAtiva ? "text-sky-700" : "text-slate-700 group-hover:text-sky-700"}">
+            <span>${isAtiva ? "Lâmina atual" : "Abrir"}</span>
+            <span class="transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
+          </div>
+        </div>
+      </button>
+    `;
+  }).join("");
+
+  if (!grid.__bound) {
+    grid.__bound = true;
+    grid.addEventListener("click", (e) => {
+      const card = e.target.closest("[data-acervo-slide-id]");
+      if (!card) return;
+      const targetId = card.getAttribute("data-acervo-slide-id");
+      if (!targetId) return;
+      const activeNow = resolverIdCanonicoSwitcher(laminaAtualData?.id || "");
+      if (targetId !== activeNow) {
+        trocarLaminaNoViewer(targetId);
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+}
+
 function renderizarOpcoesSwitcher(selectedId) {
+  renderizarListaLaminarioRapido();
+  atualizarNavegacaoRodapeSidebar();
+  renderizarAcervoRelacionado();
+
   const selects = [
     document.getElementById("viewerSlideSwitcher"),
     document.getElementById("viewerSlideSwitcherMobile")
@@ -3391,8 +4098,18 @@ function inicializarSeletorRapidoLaminas() {
           );
           if (existe) {
             if (data.nome && data.nome.trim()) existe.nome = data.nome.trim();
+            if (data.coloracao && !isColoracaoGenerica(data.coloracao)) existe.meta = data.coloracao.trim();
           } else if (data.nome && data.nome.trim()) {
-            extras.push({ id: doc.id, nome: data.nome.trim(), aliases: [] });
+            extras.push({
+              id: doc.id,
+              nome: data.nome.trim(),
+              subtitulo: data.subtitulo || "Lâmina Histológica Digital",
+              topicoTitulo: data.topicoTitulo || "Histologia",
+              meta: !isColoracaoGenerica(data.coloracao) ? data.coloracao.trim() : `${Number(data.maxMagnification) || 40}x`,
+              maxMag: Number(data.maxMagnification) || 40,
+              previewImage: data.previewImage || data.thumbnailUrl || "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg",
+              aliases: []
+            });
           }
         });
         if (extras.length > 0) {
@@ -3485,7 +4202,16 @@ Object.assign(window.App, {
   toggleReguaMorfometrica,
   limparMedicaoRegua,
   copiarLinkCampoAtual,
-  toggleTelaCheiaMicroscopio
+  toggleTelaCheiaMicroscopio,
+  toggleModoBancada,
+  definirTomPlatina,
+  toggleMinimap,
+  toggleLaminarioRapido,
+  toggleMobileMoreMenu,
+  navegarPinoAdjacente,
+  navegarLaminaAdjacente,
+  copiarAnotacoesQuestoes,
+  atualizarScalebarEditorial
 });
 window.osdViewerAction              = osdViewerAction;
 window.focarPinoNoViewer            = focarPinoNoViewer;
@@ -3516,6 +4242,15 @@ window.toggleReguaMorfometrica      = toggleReguaMorfometrica;
 window.limparMedicaoRegua           = limparMedicaoRegua;
 window.copiarLinkCampoAtual         = copiarLinkCampoAtual;
 window.toggleTelaCheiaMicroscopio   = toggleTelaCheiaMicroscopio;
+window.toggleModoBancada            = toggleModoBancada;
+window.definirTomPlatina            = definirTomPlatina;
+window.toggleMinimap                = toggleMinimap;
+window.toggleLaminarioRapido        = toggleLaminarioRapido;
+window.toggleMobileMoreMenu         = toggleMobileMoreMenu;
+window.navegarPinoAdjacente         = navegarPinoAdjacente;
+window.navegarLaminaAdjacente       = navegarLaminaAdjacente;
+window.copiarAnotacoesQuestoes      = copiarAnotacoesQuestoes;
+window.atualizarScalebarEditorial   = atualizarScalebarEditorial;
 
 export {
   carregarLaminaNoMicroscopio as carregarLaminaPorId,
