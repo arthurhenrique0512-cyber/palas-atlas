@@ -25,8 +25,8 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261118v4">
-  <link rel="stylesheet" href="css/styles.css?v=20261118v4">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261121v5">
+  <link rel="stylesheet" href="css/styles.css?v=20261121v5">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -35,10 +35,10 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
   <!-- Web Component da Marca e Configurações -->
-  <script src="js/brand-logo.js?v=20261118v4"></script>
-  <script src="js/settings-panel.js?v=20261118v4"></script>
+  <script src="js/brand-logo.js?v=20261121v5"></script>
+  <script src="js/settings-panel.js?v=20261121v5"></script>
 
-  <link rel="stylesheet" href="css/splash.css?v=20261118v4">
+  <link rel="stylesheet" href="css/splash.css?v=20261121v5">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
 
@@ -217,6 +217,8 @@
         position: relative !important;
         box-shadow: none !important;
         background-color: #ffffff !important;
+        background-image: var(--palas-grain-subtle) !important;
+        background-size: 180px 180px !important;
         backdrop-filter: none !important;
       }
       #viewerBackdrop {
@@ -241,9 +243,9 @@
   <!-- ════════════════════════════════════════════════════════════════════
        BARRA SUPERIOR DO LEITOR (Design Clínico Institucional Claro)
        ════════════════════════════════════════════════════════════════════ -->
-  <header class="shrink-0 w-full bg-white/95 backdrop-blur-md z-50 relative border-b border-slate-200 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)] overflow-x-hidden">
+  <header class="palas-header-glass shrink-0 w-full bg-white/95 backdrop-blur-md z-50 relative border-b border-slate-200 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.06)] overflow-x-hidden">
     <!-- Filete Superior Institucional (Slate & Azul-Petróleo) -->
-    <div class="h-[2px] w-full bg-gradient-to-r from-slate-900 via-[#0369a1] to-slate-900"></div>
+    <div class="palas-top-rule h-[2px] w-full bg-gradient-to-r from-slate-900 via-[#0369a1] to-slate-900"></div>
 
     <div class="px-2 sm:px-5 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
       <!-- Esquerda: Voltar + Divisor Vertical + Logotipo Oficial Agrupados + Seletor Rápido -->
@@ -394,7 +396,7 @@
   <div class="flex flex-1 overflow-hidden relative">
 
     <!-- Esquerda — Estúdio Óptico Clínico (expande quando o painel lateral é recolhido) -->
-    <main id="viewerStage" class="relative flex-1 min-w-0 h-full bg-[#eef2f6] overflow-hidden flex items-center justify-center">
+    <main id="viewerStage" class="palas-stage-optical relative flex-1 min-w-0 h-full bg-[#eef2f6] overflow-hidden flex items-center justify-center">
 
       <!-- Skeleton / Splash de carregamento Vetorial -->
       <div id="osdSkeleton" class="fixed inset-0 splash-container flex flex-col items-center justify-center z-[99999] select-none">
@@ -434,7 +436,7 @@
       <!-- Banner Discreto da Régua Morfométrica -->
       <div
         id="reguaBanner"
-        class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-[35] flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-sky-200 shadow-[0_8px_24px_rgba(15,23,42,0.12)] text-xs text-slate-700 select-none max-w-[calc(100%-24px)]"
+        class="palas-glass-instrument hidden absolute top-3 left-1/2 -translate-x-1/2 z-[35] flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-sky-200 shadow-[0_8px_24px_rgba(15,23,42,0.12)] text-xs text-slate-700 select-none max-w-[calc(100%-24px)]"
       >
         <span class="w-2 h-2 rounded-full bg-[#0369a1] shrink-0"></span>
         <span id="reguaBannerTexto" class="font-sans font-medium truncate">Clique no ponto inicial na lâmina (Esc para sair)</span>
@@ -462,13 +464,13 @@
 
       <!-- Container Deep Zoom (OpenSeadragon) -->
       <div id="osd-viewer"
-        class="w-full h-full bg-[#eef2f6] relative z-10 overflow-hidden transition-opacity duration-500 opacity-0"
+        class="w-full h-full bg-transparent relative z-10 overflow-hidden transition-opacity duration-500 opacity-0"
       ></div>
 
       <!-- REVÓLVER DE OBJETIVAS + CONTROLES DE ZOOM DINÂMICOS -->
       <div
         id="viewerLensPanel"
-        class="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-36 flex items-center gap-1 sm:gap-1.5 lg:gap-1.5 p-1.5 sm:p-2 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_16px_40px_rgba(15,23,42,0.12)] text-xs font-mono select-none max-w-[calc(100%-16px)] sm:max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
+        class="palas-glass-instrument absolute bottom-2 left-2 sm:bottom-4 sm:left-4 lg:bottom-5 lg:left-5 z-36 flex items-center gap-1 sm:gap-1.5 lg:gap-1.5 p-1.5 sm:p-2 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_16px_40px_rgba(15,23,42,0.12)] text-xs font-mono select-none max-w-[calc(100%-16px)] sm:max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
       >
         <!-- Valores nominais das objetivas -->
         <button
@@ -544,7 +546,7 @@
           type="button"
           id="btnAjudaMicroscopio"
           onclick="window.toggleAjudaMicroscopio()"
-          class="w-10 h-10 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold bg-white/90 hover:bg-white text-slate-700 hover:text-slate-950 border border-slate-200 hover:border-slate-300 shadow-md backdrop-blur-md transition-all cursor-pointer select-none touch-manipulation"
+          class="palas-glass-instrument w-10 h-10 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold bg-white/90 hover:bg-white text-slate-700 hover:text-slate-950 border border-slate-200 hover:border-slate-300 shadow-md backdrop-blur-md transition-all cursor-pointer select-none touch-manipulation"
           aria-label="Atalhos e instruções do microscópio"
           title="Atalhos de navegação"
         >
@@ -553,7 +555,7 @@
         <!-- Popover com Guia Rápido de Gestos e Atalhos -->
         <div
           id="popoverAjudaMicroscopio"
-          class="hidden absolute right-0 top-10 w-72 max-h-[70vh] overflow-y-auto p-3.5 rounded-2xl bg-white/98 backdrop-blur-xl border border-slate-200 shadow-xl text-xs text-slate-700 z-30 transition-all select-none"
+          class="palas-glass-instrument hidden absolute right-0 top-10 w-72 max-h-[70vh] overflow-y-auto p-3.5 rounded-2xl bg-white/98 backdrop-blur-xl border border-slate-200 shadow-xl text-xs text-slate-700 z-30 transition-all select-none"
         >
           <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-100">
             <span class="text-[10px] font-mono uppercase tracking-widest text-teal-700 font-semibold">Navegação e Atalhos</span>
@@ -617,13 +619,13 @@
     <!-- Direita — Painel de Informações (retrátil) -->
     <aside
       id="viewerSidebar"
-      class="h-full bg-white border-l border-slate-200 text-slate-700 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[360px] lg:w-[320px] xl:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
+      class="palas-sidebar-paper h-full bg-white border-l border-slate-200 text-slate-700 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[85vw] sm:w-[360px] lg:w-[320px] xl:w-[380px] max-w-[380px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
       aria-hidden="false"
     >
       <div class="w-[85vw] sm:w-[360px] lg:w-[320px] xl:w-[380px] max-w-[380px] h-full flex flex-col">
 
         <!-- Cabeçalho do Painel: Título e Coloração (Bloco Elevado) -->
-        <div class="px-5 sm:px-7 pt-5 sm:pt-6 pb-4 sm:pb-5 bg-slate-50 border-b border-slate-200 shrink-0 flex items-start justify-between gap-3">
+        <div class="palas-sidebar-header px-5 sm:px-7 pt-5 sm:pt-6 pb-4 sm:pb-5 bg-slate-50 border-b border-slate-200 shrink-0 flex items-start justify-between gap-3">
           <div class="min-w-0 flex-1">
             <div class="md:hidden mb-3">
               <label for="viewerSlideSwitcherMobile" class="sr-only">Trocar lâmina</label>
@@ -659,7 +661,7 @@
         </div>
 
         <!-- Abas de Navegação do Painel Lateral -->
-        <div class="px-5 sm:px-7 py-3 flex items-center gap-2 border-b border-slate-200 bg-slate-100/70 shrink-0">
+        <div class="palas-sidebar-tabs px-5 sm:px-7 py-3 flex items-center gap-2 border-b border-slate-200 bg-slate-100/70 shrink-0">
           <button
             id="btnTabDescricao"
             type="button"
@@ -682,7 +684,7 @@
         <!-- Descrição completa com hiperlinks de pinos -->
         <div
           id="slideDescriptionContainer"
-          class="px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-white text-slate-700"
+          class="px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-transparent text-slate-700"
           style="-webkit-overflow-scrolling:touch;"
         >
           <div class="text-sm text-slate-500 font-sans italic">
@@ -692,7 +694,7 @@
 
         <div
           id="slideQuestionsContainer"
-          class="hidden px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-white space-y-4 text-slate-700"
+          class="hidden px-5 sm:px-7 pt-5 pb-7 flex-1 overflow-y-auto bg-transparent space-y-4 text-slate-700"
           style="-webkit-overflow-scrolling:touch;"
         >
           <!-- Questões renderizadas dinamicamente aqui -->
@@ -703,8 +705,8 @@
 
   </div><!-- /workspace -->
 
-  <script type="module" src="js/slide-security.js?v=20261118v4"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261118v4"></script>
+  <script type="module" src="js/slide-security.js?v=20261121v5"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261121v5"></script>
 
   <!-- Web Component - Painel de Configurações -->
   <settings-panel></settings-panel>

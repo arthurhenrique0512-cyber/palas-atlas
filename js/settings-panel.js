@@ -160,7 +160,7 @@ class SettingsPanel extends HTMLElement {
       <div id="settings-overlay" class="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-[9998] opacity-0 pointer-events-none transition-opacity duration-300"></div>
       
       <!-- Drawer -->
-      <div id="settings-drawer" class="fixed top-0 right-0 h-full w-full max-w-sm bg-white/95 backdrop-blur-xl border-l border-slate-200 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
+      <div id="settings-drawer" class="palas-glass-instrument fixed top-0 right-0 h-full w-full max-w-sm bg-white/95 backdrop-blur-xl border-l border-slate-200 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 flex flex-col">
         
         <div class="flex items-center justify-between p-6 border-b border-slate-200">
           <div class="flex items-center gap-3">

@@ -258,7 +258,7 @@ function renderizarCatalogoHistologia(disciplina) {
       </div>
 
       <!-- LISTA VERTICAL NUMERADA (ESTILO SUMÁRIO DE LIVRO) -->
-      <div class="bg-white rounded-none border border-slate-200/90 shadow-[0_12px_36px_-12px_rgba(15,23,42,0.06)] divide-y divide-slate-200/80 overflow-hidden">
+      <div class="palas-console-panel bg-white rounded-none border border-slate-200/90 shadow-[0_12px_36px_-12px_rgba(15,23,42,0.06)] divide-y divide-slate-200/80 overflow-hidden">
         ${htmlRows}
       </div>
     </div>
@@ -518,7 +518,7 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     const refBib = moduloItem.bibliografia || moduloItem.bibliographicReference || "Junqueira & Carneiro — Histologia Básica";
 
     return `
-      <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-6 sm:mb-8">
+      <div class="palas-console-panel bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-[0_4px_20px_rgb(15,23,42,0.03)] mb-6 sm:mb-8">
         <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100">
           <span class="w-1.5 h-4 rounded-full bg-teal-700"></span>
           <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Resumo Morfológico</h2>
@@ -582,9 +582,9 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     const slideUrl = `microscopio.html?id=${encodeURIComponent(slideIdStr)}`;
 
     return `
-      <div data-open-slide-url="${escaparHTML(slideUrl)}" class="group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
+      <div data-open-slide-url="${escaparHTML(slideUrl)}" class="palas-card-tactile palas-card-interactive group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
         <div>
-          <div class="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden">
+          <div class="palas-slide-frame relative w-full aspect-[4/3] bg-slate-100 overflow-hidden">
             <!-- Placeholder exibido quando a imagem falha -->
             <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden bg-slate-100">
               <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
