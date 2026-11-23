@@ -35,22 +35,28 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   if (exibirSubtopicos && modulo && modulo.topicos) {
     modulo.topicos.forEach((topico) => {
       const isAtivo = topico.id === topicoAtivoId;
+      const qtdLaminas = Array.isArray(topico.laminasEstaticas) ? topico.laminasEstaticas.length : 0;
+      const badgeQtd = qtdLaminas > 0
+        ? `<span class="shrink-0 font-mono tabular-nums text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${isAtivo ? "bg-teal-700 text-white" : "bg-teal-50 text-teal-800 border border-teal-200/80"}">${qtdLaminas}</span>`
+        : "";
       if (isAtivo) {
         htmlItens += `
           <button
             type="button"
-            class="bg-teal-50 text-teal-950 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left leading-snug break-words text-xs block transition-colors"
+            class="bg-teal-50 text-teal-950 font-semibold border-l-2 border-teal-700 pl-3 pr-2 py-1.5 w-full text-left leading-snug break-words text-xs flex items-center justify-between gap-2 transition-colors"
             title="${topico.titulo}">
-            ${topico.titulo}
+            <span class="min-w-0">${topico.titulo}</span>
+            ${badgeQtd}
           </button>`;
       } else {
         htmlItens += `
           <button
             type="button"
             onclick="window.App.abrirTopico('${topico.id}', 'histologia')"
-            class="text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 py-1.5 px-3 block transition-colors w-full text-left leading-snug break-words cursor-pointer border-l-2 border-transparent"
+            class="text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 pl-3 pr-2 py-1.5 transition-colors w-full text-left leading-snug break-words cursor-pointer border-l-2 border-transparent flex items-center justify-between gap-2"
             title="${topico.titulo}">
-            ${topico.titulo}
+            <span class="min-w-0">${topico.titulo}</span>
+            ${badgeQtd}
           </button>`;
       }
     });
@@ -74,10 +80,6 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
       <div>
         <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-2.5 block">Disciplinas</span>
         <div class="space-y-1">
-          <button type="button" onclick="window.App.navegarPara('pgHome')" class="text-xs text-slate-600 hover:text-teal-800 hover:bg-slate-50/80 py-1.5 px-3 block transition-colors w-full text-left flex items-center gap-2 border-l-2 border-transparent cursor-pointer">
-            <span>&larr;</span>
-            <span>Voltar ao início</span>
-          </button>
           <button type="button" onclick="window.App.selecionarFrente('histologia')" class="bg-teal-50 text-teal-950 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left flex items-center gap-2.5 transition-colors cursor-pointer">
             <span class="w-2 h-2 rounded-full bg-teal-600 shrink-0"></span>
             <span class="truncate">Histologia</span>
@@ -160,18 +162,25 @@ function renderizarCatalogoHistologia(disciplina) {
   if (modulo.topicos && modulo.topicos.length > 0) {
     modulo.topicos.forEach((topico, idx) => {
       const numFormatado = String(idx + 1).padStart(2, "0");
+      const qtdLaminas = Array.isArray(topico.laminasEstaticas) ? topico.laminasEstaticas.length : 0;
+      const pillLaminas = qtdLaminas > 0
+        ? `<span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200/80 text-[10.5px] font-mono tabular-nums font-semibold text-teal-800 shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>${qtdLaminas} ${qtdLaminas === 1 ? "lâmina" : "lâminas"}</span>`
+        : "";
       htmlRows += `
         <div 
           onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
           class="px-4 sm:px-8 py-4 sm:py-5 hover:bg-teal-50/50 transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 group">
           <div class="flex items-center gap-3 sm:gap-6 min-w-0">
-            <span class="font-mono text-xs sm:text-sm font-bold text-slate-400 group-hover:text-teal-800 transition-colors w-6 shrink-0 select-none">${numFormatado}</span>
+            <span class="font-mono tabular-nums text-xs sm:text-sm font-bold text-slate-400 group-hover:text-teal-800 transition-colors w-6 shrink-0 select-none">${numFormatado}</span>
             <span class="h-5 w-px bg-slate-200 group-hover:bg-teal-300 transition-colors shrink-0"></span>
             <h3 class="font-serif text-sm sm:text-lg text-slate-900 font-bold tracking-[-0.015em] leading-snug group-hover:text-teal-950 transition-colors">${topico.titulo}</h3>
           </div>
-          <span class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/80 group-hover:border-teal-700 group-hover:bg-teal-700 flex items-center justify-center text-slate-400 group-hover:text-white shrink-0 transition-all group-hover:translate-x-0.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-          </span>
+          <div class="flex items-center gap-2.5 shrink-0">
+            ${pillLaminas}
+            <span class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/80 group-hover:border-teal-700 group-hover:bg-teal-700 flex items-center justify-center text-slate-400 group-hover:text-white shrink-0 transition-all group-hover:translate-x-0.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </span>
+          </div>
         </div>
       `;
       
@@ -507,10 +516,21 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
   const gerarCardLaminaAcademico = (lamina) => {
     const disciplinaNome = lamina.disciplina || disciplinaAtual || "Histologia";
     const coloracaoNome = lamina.coloracao || "Coloração de Rotina";
+    const NOMES_TOPICO_MAP = {
+      epitelial: "Epitelial",
+      conjuntivo: "Conjuntivo",
+      adiposo: "Adiposo",
+      cartilaginoso: "Cartilaginoso",
+      osseo: "Ósseo",
+      nervoso: "Nervoso",
+      muscular: "Muscular",
+      circulatorio: "Circulatório"
+    };
     const nomeLamina = lamina.nome || lamina.title || "Peça Morfológica";
-    const topicoNome = lamina.topico || "Corte Histológico";
+    const topicoKey = String(lamina.topico || "").toLowerCase().trim();
+    const topicoNome = NOMES_TOPICO_MAP[topicoKey] || lamina.topico || "Corte Histológico";
 
-    // Extração concisa do aumento para a tag no canto superior esquerdo
+    // Extração concisa do aumento e técnica para a tag no canto superior esquerdo
     let badgeAumento = "40x";
     if (lamina.maxMagnification) {
       badgeAumento = `${lamina.maxMagnification}x`;
@@ -523,6 +543,11 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     } else if (coloracaoNome.toLowerCase().includes("10x")) {
       badgeAumento = "10x";
     }
+    const corLower = String(coloracaoNome || "").toLowerCase();
+    const tecnicaCurta = corLower.includes("desgaste")
+      ? "Desgaste"
+      : (corLower.includes("h&e") || corLower.includes("hematoxilina") ? "H&E" : "");
+    const badgeSelo = tecnicaCurta ? `${tecnicaCurta} · ${badgeAumento}` : badgeAumento;
 
     const imagemUrl = lamina.imagemUrl || lamina.imageUrl || lamina.caminhoImagemBase || lamina.dziUrl || "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi";
     const sanitizeThumbUrl = (u) => {
@@ -570,17 +595,17 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
             />
             <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
 
-            <!-- Selo limpo de aumento -->
+            <!-- Selo limpo de técnica e aumento -->
             <div class="absolute top-2.5 left-2.5">
               <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10.5px] font-mono tabular-nums font-semibold px-2.5 py-1 rounded-md shadow-sm">
-                ${escaparHTML(badgeAumento)}
+                ${escaparHTML(badgeSelo)}
               </span>
             </div>
           </div>
 
           <!-- Título anatômico em destaque e coloração -->
           <div class="p-4 sm:p-5">
-            <div class="flex items-center justify-between gap-2 text-[10px] font-mono tracking-wider mb-1.5">
+            <div class="flex items-center justify-between gap-2 text-[10px] font-mono tracking-[0.06em] mb-1.5">
               <span class="uppercase text-teal-700 font-semibold">${escaparHTML(String(disciplinaNome))} &middot; ${escaparHTML(String(topicoNome))}</span>
             </div>
             <h3 class="font-serif font-bold text-base sm:text-lg text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1.5">

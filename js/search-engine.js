@@ -30,8 +30,15 @@ export function initGlobalSearch() {
   const resultsList = document.getElementById("global-search-results");
   const emptyState = document.getElementById("global-search-empty");
   const searchContainer = document.getElementById("global-search-container");
+  const searchKbd = document.getElementById("global-search-kbd");
 
   if (!searchInput) return;
+
+  const atualizarKbd = () => {
+    if (!searchKbd) return;
+    const oculto = document.activeElement === searchInput || searchInput.value.trim().length > 0;
+    searchKbd.classList.toggle("opacity-0", oculto);
+  };
 
   // Carrega o cache das lâminas ativas (Firestore + fallback estático do catálogo) ao focar pela primeira vez
   const loadCache = async () => {
@@ -58,10 +65,15 @@ export function initGlobalSearch() {
     slidesCache = Array.from(mapa.values());
   };
 
-  searchInput.addEventListener("focus", loadCache);
+  searchInput.addEventListener("focus", () => {
+    atualizarKbd();
+    loadCache();
+  });
+  searchInput.addEventListener("blur", atualizarKbd);
 
   searchInput.addEventListener("input", (e) => {
     const term = e.target.value.trim();
+    atualizarKbd();
     
     // Toggle botão de clear
     if (term.length > 0) {
@@ -93,6 +105,7 @@ export function initGlobalSearch() {
       searchClear.classList.remove("flex");
       if (dropdown) dropdown.classList.add("hidden");
       searchInput.focus();
+      atualizarKbd();
     });
   }
 
@@ -103,11 +116,35 @@ export function initGlobalSearch() {
     }
   });
 
-  // Fechar com ESC
+  // Atalho '/' para focar busca e 'Escape' para fechar dropdown
   document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const ativo = document.activeElement;
+      const tag = ativo ? ativo.tagName : "";
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || ativo?.isContentEditable) return;
+      const pgHome = document.getElementById("pgHome");
+      if (pgHome && pgHome.classList.contains("hidden")) return;
+      e.preventDefault();
+      const rect = searchInput.getBoundingClientRect();
+      if (rect.top < 80 || rect.bottom > window.innerHeight - 40) {
+        searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => {
+          searchInput.focus({ preventScroll: true });
+          atualizarKbd();
+        }, 120);
+      } else {
+        searchInput.focus();
+        atualizarKbd();
+      }
+      return;
+    }
+
     if (e.key === "Escape") {
       if (dropdown) dropdown.classList.add("hidden");
-      searchInput.blur();
+      if (document.activeElement === searchInput) {
+        searchInput.blur();
+        atualizarKbd();
+      }
     }
   });
 
@@ -146,7 +183,7 @@ export function initGlobalSearch() {
     resultsList.innerHTML = "";
     
     if (matches.length === 0) {
-      emptyState.textContent = `Nenhuma lâmina encontrada para '${term}'`;
+      emptyState.innerHTML = `<p class="text-slate-700 text-sm font-medium">Nenhuma lâmina encontrada para &ldquo;${escaparHTML(term)}&rdquo;</p><p class="text-slate-400 text-xs mt-1">Tente buscar por &ldquo;osso&rdquo;, &ldquo;pele&rdquo; ou &ldquo;H&amp;E&rdquo;.</p>`;
       emptyState.classList.remove("hidden");
       resultsList.classList.add("hidden");
       return;

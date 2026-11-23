@@ -3,12 +3,12 @@
  * Responsável por gerenciar a navegação, transições de tela e vinculação de estado.
  */
 import { setFrenteAtiva, subscribe, getState } from "./state.js";
-import { initGlobalSearch } from "./search-engine.js?v=20261123v1";
+import { initGlobalSearch } from "./search-engine.js?v=20261123v2";
 import {
   abrirTopico,
   abrirDisciplinaHome,
   encerrarListenersCatalogo
-} from "./histology-catalog.js?v=20261123v3";
+} from "./histology-catalog.js?v=20261123v4";
 
 // Lazy loading sob demanda do dashboard-engine para otimizar o bundle do aluno
 let _dashboardEnginePromise = null;

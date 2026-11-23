@@ -25,8 +25,8 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v5">
-  <link rel="stylesheet" href="css/styles.css?v=20261123v5">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v6">
+  <link rel="stylesheet" href="css/styles.css?v=20261123v6">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -278,7 +278,7 @@
         right: 10px !important;
       }
       #viewerStage[data-minimap-collapsed="true"] #minimapToggleWrap {
-        bottom: calc(max(10px, env(safe-area-inset-bottom, 10px)) + 56px) !important;
+        bottom: calc(max(10px, env(safe-area-inset-bottom, 10px)) + 62px) !important;
         right: 10px !important;
       }
       #viewerLensPanel {
@@ -414,7 +414,7 @@
       <!-- Direita: Hierarquia em 3 grupos (Ferramentas da Lâmina | Ações Ghost | Painel & Mais) -->
       <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <!-- Grupo 1: Instrumentos de Análise -->
-        <div class="flex items-center p-0.5 rounded-xl bg-slate-100/90 border border-slate-200/90 gap-0.5">
+        <div class="flex items-center md:p-0.5 md:rounded-xl md:bg-slate-100/90 md:border md:border-slate-200/90 gap-0.5">
           <button
             id="btnToggleRegua"
             type="button"
@@ -438,7 +438,7 @@
             id="btnToggleMarcacoes"
             type="button"
             onclick="window.toggleMarcacoesNoViewer && window.toggleMarcacoesNoViewer()"
-            class="btn-marcacoes-toggle is-off relative min-w-[34px] min-h-[34px] h-[34px] px-2 sm:px-2.5 inline-flex items-center justify-center gap-1.5 rounded-[10px] border border-transparent active:scale-[0.98] transition-all duration-150 cursor-pointer touch-manipulation"
+            class="btn-marcacoes-toggle is-off relative w-9 h-9 md:w-auto md:min-w-[34px] min-h-[34px] md:h-[34px] md:px-2.5 inline-flex items-center justify-center gap-1.5 rounded-xl md:rounded-[10px] border border-transparent active:scale-[0.98] transition-all duration-150 cursor-pointer touch-manipulation"
             aria-pressed="false"
             aria-label="Mostrar ou ocultar marcações na lâmina"
             title="Mostrar todas as marcações na lâmina (M)"
@@ -958,10 +958,10 @@
             aria-label="Enquadramento geral 1 para 1"
           >1:1</button>
 
-          <div class="w-px h-5 lg:h-4 bg-slate-200 shrink-0"></div>
+          <div class="hidden sm:block w-px h-5 lg:h-4 bg-slate-200 shrink-0"></div>
 
           <!-- Display Óptico Contínuo + Largura Real do Campo -->
-          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-teal-50/90 border border-teal-200/80 shrink-0 min-h-[36px] lg:min-h-[28px]" title="Ampliação atual e largura real do campo de visão">
+          <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-teal-50/90 border border-teal-200/80 shrink-0 min-h-[36px] lg:min-h-[28px]" title="Ampliação atual e largura real do campo de visão">
             <span class="w-1.5 h-1.5 rounded-full bg-[#0f766e] shrink-0"></span>
             <span class="palas-mono-tech tabular-nums inline-block min-w-[3.4ch] text-right text-[#0f766e] font-bold text-xs" id="zoomIndicatorDisplay">4x</span>
             <span class="hidden sm:inline text-teal-300 font-normal">&middot;</span>
