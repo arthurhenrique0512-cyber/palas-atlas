@@ -4,10 +4,41 @@
   "private": true,
   "description": "Palas Atlas - Plataforma Morfológica de Alta Fidelidade",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "teaser:audio": "node scripts/generate-teaser-audio.mjs",
+    "teaser:render": "node scripts/render-teaser-reels.mjs",
+    "teaser:render:horizontal": "node scripts/render-teaser-reels.mjs --horizontal",
     "build:css": "tailwindcss -i css/input.css -o css/tailwind.min.css --minify",
-    "watch:css": "tailwindcss -i css/input.css -o css/tailwind.min.css --watch"
+    "watch:css": "tailwindcss -i css/input.css -o css/tailwind.min.css --watch",
+    "studio:reels": "tsx pipelines/capture-reels.ts",
+    "studio:design": "tsx pipelines/render-design.ts",
+    "studio:check": "tsc --noEmit -p pipelines/tsconfig.json"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "framer-motion": "^14.14.0",
+    "lucide-react": "^1.65.0",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "^0.187.0"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.17"
+    "@types/fluent-ffmpeg": "^2.1.28",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
+    "autoprefixer": "^10.6.2",
+    "ffmpeg-static": "^5.3.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "playwright": "^1.65.1",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }
