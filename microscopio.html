@@ -25,8 +25,8 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v6">
-  <link rel="stylesheet" href="css/styles.css?v=20261123v6">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v7">
+  <link rel="stylesheet" href="css/styles.css?v=20261123v7">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -813,6 +813,14 @@
           </div>
         </div>
 
+        <!-- Cantoneiras sutis de retículo óptico na platina (desktop/tablet) -->
+        <div class="hidden sm:block pointer-events-none absolute inset-2.5 z-20" aria-hidden="true">
+          <span class="palas-stage-reticle-corner absolute top-0 left-0 border-t border-l rounded-tl-[2px]"></span>
+          <span class="palas-stage-reticle-corner absolute top-0 right-0 border-t border-r rounded-tr-[2px]"></span>
+          <span class="palas-stage-reticle-corner absolute bottom-0 left-0 border-b border-l rounded-bl-[2px]"></span>
+          <span class="palas-stage-reticle-corner absolute bottom-0 right-0 border-b border-r rounded-br-[2px]"></span>
+        </div>
+
         <!-- Scalebar Editorial Customizado (Canto Superior Esquerdo, discreto e calibrado) -->
         <div
           id="palasScalebar"
@@ -1236,6 +1244,6 @@
   </footer>
 
   <script type="module" src="js/slide-security.js?v=20261123v3"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261123v5"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261123v6"></script>
 </body>
 </html>

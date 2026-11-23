@@ -3996,8 +3996,10 @@ function renderizarAcervoRelacionado() {
             <p class="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">${subSafe}</p>
           </div>
           <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-teal-800 group-hover:text-teal-950 transition-colors">
-            <span>${isAtiva ? "Lâmina atual" : "Abrir no microscópio"}</span>
-            <span class="text-slate-400 group-hover:text-teal-800 transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
+            ${isAtiva
+              ? `<span class="inline-flex items-center gap-1.5 text-teal-800"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-teal-600"></span></span><span>Em visualização</span></span><span class="px-1.5 py-0.5 rounded bg-teal-50 border border-teal-700/15 font-mono text-[10px] tracking-wider uppercase text-teal-800">Ativa</span>`
+              : `<span>Abrir no microscópio</span><span class="text-slate-400 group-hover:text-teal-800 transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>`
+            }
           </div>
         </div>
       </button>
