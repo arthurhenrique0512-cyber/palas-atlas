@@ -25,8 +25,8 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v3">
-  <link rel="stylesheet" href="css/styles.css?v=20261123v3">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v4">
+  <link rel="stylesheet" href="css/styles.css?v=20261123v4">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -203,10 +203,10 @@
       border-bottom-color: #0d9488 !important;
     }
     .prose-atlas .pin-link.pin-link-active {
-      color: #0369a1 !important;
-      background: #e0f2fe !important;
-      border-bottom-color: #0284c7 !important;
-      box-shadow: 0 0 0 1px rgba(2, 132, 199, 0.25) !important;
+      color: #0f766e !important;
+      background: #ccfbf1 !important;
+      border-bottom-color: #0f766e !important;
+      box-shadow: 0 0 0 1px rgba(15, 118, 110, 0.25) !important;
     }
 
     /* Botão de recolher painel: preenchimento do painel indica estado aberto */
@@ -637,7 +637,7 @@
 
             <button type="button" onclick="window.toggleMobileMoreMenu(false); window.toggleReguaMorfometrica();" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left font-medium text-slate-800 cursor-pointer">
               <span>Régua morfométrica</span>
-              <span class="palas-mono-tech text-[10px] text-sky-700 font-semibold">µm</span>
+              <span class="palas-mono-tech text-[10px] text-teal-700 font-semibold">µm</span>
             </button>
 
             <button type="button" onclick="window.toggleMobileMoreMenu(false); window.toggleModoBancada();" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left font-medium text-slate-800 cursor-pointer">
@@ -852,9 +852,9 @@
         <!-- Banner Discreto da Régua Morfométrica -->
         <div
           id="reguaBanner"
-          class="palas-glass-instrument hidden absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-[35] flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-sky-200 shadow-[0_8px_24px_rgba(15,23,42,0.12)] text-xs text-slate-700 select-none max-w-[calc(100%-24px)]"
+          class="palas-glass-instrument hidden absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-[35] flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-teal-200 shadow-[0_8px_24px_rgba(15,23,42,0.12)] text-xs text-slate-700 select-none max-w-[calc(100%-24px)]"
         >
-          <span class="w-2 h-2 rounded-full bg-[#0369a1] shrink-0"></span>
+          <span class="w-2 h-2 rounded-full bg-[#0f766e] shrink-0"></span>
           <span id="reguaBannerTexto" class="font-sans font-medium truncate">Clique no ponto inicial na lâmina (Esc para sair)</span>
           <button
             id="btnLimparRegua"
@@ -1175,7 +1175,7 @@
         <div class="space-y-3.5">
           <div class="flex items-center gap-2">
             <span class="text-lg font-bold text-white tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">PALAS</span>
-            <span class="text-lg font-bold text-sky-400 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">ATLAS</span>
+            <span class="text-lg font-bold text-teal-300 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">ATLAS</span>
           </div>
           <p class="text-xs leading-relaxed max-w-xs text-slate-300">
             Lâminas reais digitalizadas para o estudo prático ao microscópio.
@@ -1223,6 +1223,6 @@
   </footer>
 
   <script type="module" src="js/slide-security.js?v=20261123v3"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261123v3"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261123v4"></script>
 </body>
 </html>

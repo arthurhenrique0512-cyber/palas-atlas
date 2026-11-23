@@ -9,7 +9,7 @@
  * Zero Emojis | Zero Truncamento | Clinical Precision UI
  */
 import { db } from "./firebase-config.js";
-import { catalogData } from "./catalog-data.js?v=20261122v4";
+import { catalogData } from "./catalog-data.js?v=20261123v1";
 import { getState, subscribe, setFrenteAtiva } from "./state.js";
 import { escaparHTML } from "./sanitizer.js";
 

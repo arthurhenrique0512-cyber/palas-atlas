@@ -75,7 +75,7 @@ body {
   background-color: #f3f8f8;
   background-image:
     radial-gradient(ellipse 64% 58% at 14% 12%, rgba(13, 148, 136, 0.065) 0%, transparent 66%),
-    radial-gradient(ellipse 52% 48% at 78% 22%, rgba(3, 105, 161, 0.045) 0%, transparent 68%),
+    radial-gradient(ellipse 52% 48% at 78% 22%, rgba(15, 118, 110, 0.045) 0%, transparent 68%),
     radial-gradient(ellipse 75% 65% at 50% 45%, rgba(255, 255, 255, 0.72) 0%, transparent 74%),
     linear-gradient(180deg, #e8f1f0 0%, #f3f8f8 52%, #ffffff 100%);
   background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
@@ -158,22 +158,6 @@ body {
   height: 2px;
   background: var(--hero-accent, rgba(15, 118, 110, 0.45));
   pointer-events: none;
-}
-
-.palas-card-tactile.palas-hero-tint-sky {
-  --hero-accent: rgba(3, 105, 161, 0.58);
-  background-color: #f4f9fd;
-  background-image:
-    var(--palas-grain-subtle),
-    linear-gradient(180deg, #f9fcff 0%, #f0f6fc 100%);
-  border-color: rgba(3, 105, 161, 0.15);
-}
-.palas-card-interactive.palas-hero-tint-sky:hover {
-  border-color: rgba(3, 105, 161, 0.34);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 4px 10px -2px rgba(3, 105, 161, 0.06),
-    0 16px 34px -12px rgba(3, 105, 161, 0.12);
 }
 
 .palas-card-tactile.palas-hero-tint-slate {
@@ -1019,24 +1003,24 @@ input#global-search-input:-webkit-autofill:active {
   transform: translateX(1px);
 }
 .pin-item-btn.pin-active {
-  background-color: #f0f9ff !important;
-  border: 1px solid #0284c7 !important;
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.14), 0 4px 12px rgba(3, 105, 161, 0.08) !important;
+  background-color: #f0fdfa !important;
+  border: 1px solid #0f766e !important;
+  box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.14), 0 4px 12px rgba(15, 118, 110, 0.08) !important;
 }
 .pin-item-btn.pin-active .pin-label {
-  color: #0c4a6e !important;
+  color: #134e4a !important;
   font-weight: 600 !important;
 }
 .pin-item-btn.pin-active .pin-index {
-  color: #0369a1 !important;
+  color: #0f766e !important;
 }
 .pin-item-btn.pin-active .pin-indicator {
-  background-color: #0284c7 !important;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.24) !important;
+  background-color: #0f766e !important;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.24) !important;
   transform: scale(1.15);
 }
 .pin-item-btn.pin-active .pin-action {
-  color: #0369a1 !important;
+  color: #0f766e !important;
   font-weight: 600 !important;
 }
 
@@ -1048,8 +1032,8 @@ input#global-search-input:-webkit-autofill:active {
 }
 
 @keyframes palasCircleFocusGlow {
-  0%, 100% { filter: drop-shadow(0 0 4px rgba(2, 132, 199, 0.45)); }
-  50% { filter: drop-shadow(0 0 10px rgba(2, 132, 199, 0.75)); }
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(15, 118, 110, 0.45)); }
+  50% { filter: drop-shadow(0 0 10px rgba(15, 118, 110, 0.75)); }
 }
 
 .viewer-marker-radar {
@@ -1093,10 +1077,10 @@ input#global-search-input:-webkit-autofill:active {
 }
 
 .viewer-marker-tag.is-active {
-  background: #0369a1;
+  background: #0f766e;
   color: #ffffff;
   border: 1.5px solid #ffffff;
-  box-shadow: 0 0 0 1.5px #0369a1, 0 6px 18px rgba(3, 105, 161, 0.36);
+  box-shadow: 0 0 0 1.5px #0f766e, 0 6px 18px rgba(15, 118, 110, 0.36);
   font-size: 11.5px;
   font-weight: 600;
   padding: 3.5px 10px;
@@ -1111,7 +1095,7 @@ input#global-search-input:-webkit-autofill:active {
 }
 
 .viewer-marker-tag.is-active .viewer-marker-tag-dot {
-  background-color: #bae6fd;
+  background-color: #99f6e4;
 }
 
 .viewer-marker-tag-close {
@@ -1144,13 +1128,13 @@ input#global-search-input:-webkit-autofill:active {
 
 .btn-regua-toggle.is-on {
   background-color: #ffffff;
-  color: #0369a1;
-  border-color: rgba(56, 189, 248, 0.7);
-  box-shadow: 0 1px 3px rgba(3, 105, 161, 0.12);
+  color: #0f766e;
+  border-color: rgba(20, 184, 166, 0.55);
+  box-shadow: 0 1px 3px rgba(15, 118, 110, 0.12);
 }
 .btn-regua-toggle.is-on:hover {
-  background-color: #f0f9ff;
-  border-color: #0284c7;
+  background-color: #f0fdfa;
+  border-color: #0d9488;
 }
 .btn-regua-toggle.is-off {
   background-color: transparent;
@@ -1173,7 +1157,7 @@ input#global-search-input:-webkit-autofill:active {
 .viewer-ruler-pill {
   background: rgba(15, 23, 42, 0.94);
   color: #f8fafc;
-  border: 1.5px solid #38bdf8;
+  border: 1.5px solid #2dd4bf;
   box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.92), 0 6px 16px rgba(15, 23, 42, 0.34);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 11.5px;

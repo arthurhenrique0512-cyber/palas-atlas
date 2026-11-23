@@ -1655,7 +1655,7 @@ async function inicializarOpenSeadragon() {
       navigatorWidth:           "120px",
       navigatorHeight:          "90px",
       navigatorBackground:      "rgba(255,255,255,0.92)",
-      navigatorBorderColor:     "rgba(3,105,161,0.5)",
+      navigatorBorderColor:     "rgba(15,118,110,0.5)",
       navigatorAutoFade:        false,
       showReferenceStrip:       false,
       animationTime:            0.45,
@@ -2434,8 +2434,8 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
   const rotuloSeguro = escaparHTML(pino.rotulo || "");
   const zIndexVal = isAtivo ? 48 : 40;
   const rootClass = `viewer-marker-root${isAtivo ? " is-active" : ""}`;
-  const strokeCore = isAtivo ? "#0284c7" : "#0d9488";
-  const fillSoft = isAtivo ? "rgba(2, 132, 199, 0.12)" : "rgba(13, 148, 136, 0.06)";
+  const strokeCore = isAtivo ? "#0f766e" : "#0d9488";
+  const fillSoft = isAtivo ? "rgba(15, 118, 110, 0.14)" : "rgba(13, 148, 136, 0.06)";
   const tagClass = isAtivo ? "viewer-marker-tag is-active" : "viewer-marker-tag";
   const closeHint = isAtivo ? '<span class="viewer-marker-tag-close" aria-hidden="true">&times;</span>' : "";
   const titleText = isAtivo ? `${pino.rotulo || "Marcação"} — clique para ocultar` : (pino.rotulo || "Clique para focar");
@@ -2553,7 +2553,7 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
 
       <div data-pin-hit="arrow-tip" title="${titleSafe}" style="position:absolute; left:${pctX2}%; top:${pctY2}%; width:28px; height:28px; transform:translate(-50%, -50%); pointer-events:auto; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center;">
         ${isAtivo ? `
-          <div class="viewer-marker-radar" style="position:absolute; inset:-4px; border-radius:9999px; background:rgba(2,132,199,0.26); border:1.5px solid #0284c7; pointer-events:none;"></div>
+          <div class="viewer-marker-radar" style="position:absolute; inset:-4px; border-radius:9999px; background:rgba(15,118,110,0.26); border:1.5px solid #0f766e; pointer-events:none;"></div>
         ` : ""}
         <svg width="${headSize}" height="${headSize}" viewBox="0 0 24 24" style="position:relative; transform:rotate(${angleDeg}deg); overflow:visible; filter:drop-shadow(0 1px 4px rgba(15,23,42,0.5)); pointer-events:none;">
           <path d="M 3 4 L 22 12 L 3 20 L 7.5 12 Z" fill="${strokeCore}" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round" />
@@ -2591,7 +2591,7 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
 
     const dotSize = isAtivo ? 16 : 14;
     const dotShadow = isAtivo
-      ? "0 0 0 3px rgba(2,132,199,0.32), 0 4px 14px rgba(3,105,161,0.45)"
+      ? "0 0 0 3px rgba(15,118,110,0.32), 0 4px 14px rgba(15,118,110,0.45)"
       : "0 0 0 2.5px rgba(13,148,136,0.28), 0 3px 10px rgba(15,23,42,0.35)";
 
     overlayElem = document.createElement("div");
@@ -2602,7 +2602,7 @@ function criarOverlayPino(pino, idx, isAtivo, contentSize) {
       <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; pointer-events:none;">
         <div data-pin-hit="pin-dot" title="${titleSafe}" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:auto; cursor:pointer;">
           ${isAtivo ? `
-            <div class="viewer-marker-radar" style="position:absolute; width:36px; height:36px; border-radius:9999px; background:rgba(2,132,199,0.26); border:1.5px solid #0284c7; pointer-events:none;"></div>
+            <div class="viewer-marker-radar" style="position:absolute; width:36px; height:36px; border-radius:9999px; background:rgba(15,118,110,0.26); border:1.5px solid #0f766e; pointer-events:none;"></div>
           ` : ""}
           <div style="position:relative; width:${dotSize}px; height:${dotSize}px; background:${strokeCore}; border-radius:9999px; border:2.5px solid #ffffff; box-shadow:${dotShadow}; pointer-events:none;"></div>
         </div>
@@ -2912,8 +2912,8 @@ export function focarQuestaoNoViewer(questaoId) {
 
   pinElem.innerHTML = `
     <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
-      <div class="viewer-marker-radar" style="position:absolute; inset:4px; border-radius:9999px; background:rgba(2,132,199,0.28); border:1.5px solid #0284c7; pointer-events:none;"></div>
-      <div style="position:relative; min-width:34px; height:34px; padding:0 8px; background:#0369a1; border-radius:9999px; border:2px solid #ffffff; box-shadow:0 0 0 2px #0369a1, 0 6px 16px rgba(3,105,161,0.45); display:flex; align-items:center; justify-content:center; gap:2px;">
+      <div class="viewer-marker-radar" style="position:absolute; inset:4px; border-radius:9999px; background:rgba(15,118,110,0.28); border:1.5px solid #0f766e; pointer-events:none;"></div>
+      <div style="position:relative; min-width:34px; height:34px; padding:0 8px; background:#0f766e; border-radius:9999px; border:2px solid #ffffff; box-shadow:0 0 0 2px #0f766e, 0 6px 16px rgba(15,118,110,0.45); display:flex; align-items:center; justify-content:center; gap:2px;">
         <span style="font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:800; color:#ffffff; letter-spacing:-0.02em;">Q${numeroQSafe}</span>
       </div>
       <div style="position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%); pointer-events:none;">
@@ -3236,10 +3236,10 @@ function renderizarOverlayRegua(pA, pB, isPreview = false) {
   const html = `
     <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" class="w-full h-full overflow-visible" style="pointer-events:none; filter:drop-shadow(0 1px 3px rgba(15,23,42,0.5));">
       <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#ffffff" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke" ${isPreview ? 'stroke-dasharray="6 4"' : ''} />
-      <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#0369a1" stroke-width="2.5" stroke-linecap="round" vector-effect="non-scaling-stroke" ${isPreview ? 'stroke-dasharray="6 4"' : ''} />
+      <line x1="${svgX1}" y1="${svgY1}" x2="${svgX2}" y2="${svgY2}" stroke="#0f766e" stroke-width="2.5" stroke-linecap="round" vector-effect="non-scaling-stroke" ${isPreview ? 'stroke-dasharray="6 4"' : ''} />
     </svg>
-    <div style="position:absolute; left:${pctX1}%; top:${pctY1}%; transform:translate(-50%, -50%); width:10px; height:10px; border-radius:9999px; background:#0369a1; border:2px solid #ffffff; box-shadow:0 1px 4px rgba(15,23,42,0.5); pointer-events:none;"></div>
-    <div style="position:absolute; left:${pctX2}%; top:${pctY2}%; transform:translate(-50%, -50%); width:10px; height:10px; border-radius:9999px; background:#0369a1; border:2px solid #ffffff; box-shadow:0 1px 4px rgba(15,23,42,0.5); pointer-events:none;"></div>
+    <div style="position:absolute; left:${pctX1}%; top:${pctY1}%; transform:translate(-50%, -50%); width:10px; height:10px; border-radius:9999px; background:#0f766e; border:2px solid #ffffff; box-shadow:0 1px 4px rgba(15,23,42,0.5); pointer-events:none;"></div>
+    <div style="position:absolute; left:${pctX2}%; top:${pctY2}%; transform:translate(-50%, -50%); width:10px; height:10px; border-radius:9999px; background:#0f766e; border:2px solid #ffffff; box-shadow:0 1px 4px rgba(15,23,42,0.5); pointer-events:none;"></div>
     <div style="position:absolute; left:${midPctX}%; top:${midPctY}%; transform:translate(-50%, calc(-100% - 10px)); z-index:4; pointer-events:${isPreview ? 'none' : 'auto'};">
       <div class="viewer-ruler-pill">
         <span>${escaparHTML(label)}</span>

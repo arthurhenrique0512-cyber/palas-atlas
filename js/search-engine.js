@@ -1,6 +1,6 @@
 import { db } from "./firebase-config.js";
 import { escaparHTML } from "./sanitizer.js";
-import { catalogData } from "./catalog-data.js?v=20261122v4";
+import { catalogData } from "./catalog-data.js?v=20261123v1";
 
 let slidesCache = [];
 let isCacheLoaded = false;
@@ -166,10 +166,10 @@ export function initGlobalSearch() {
       li.innerHTML = `
         <div class="flex items-center justify-between">
           <span class="text-slate-900 font-medium text-sm">${escaparHTML(title)}</span>
-          <span class="text-[10px] bg-sky-50 text-sky-700 border border-sky-200/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold">${escaparHTML(topico)}</span>
+          <span class="text-[10px] bg-teal-50 text-teal-800 border border-teal-200/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold">${escaparHTML(topico)}</span>
         </div>
         <div class="text-xs text-slate-500 font-sans flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
           <span>${escaparHTML(coloracao)}</span>
         </div>
       `;

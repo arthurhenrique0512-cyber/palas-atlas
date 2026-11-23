@@ -16,8 +16,8 @@ export const catalogData = {
     tituloDisciplina: "Histologia",
     bibliografia: "Junqueira & Carneiro - Histologia Básica",
     caminhoBase: "/assets/histologia/",
-    corDestaque: "border-sky-600 bg-sky-50 text-slate-900",
-    corPino: "bg-sky-600",
+    corDestaque: "border-teal-700 bg-teal-50 text-slate-900",
+    corPino: "bg-teal-700",
     topicos: [
       {
         id: "epitelial",
