@@ -8,7 +8,7 @@ import {
   abrirTopico,
   abrirDisciplinaHome,
   encerrarListenersCatalogo
-} from "./histology-catalog.js?v=20261123v2";
+} from "./histology-catalog.js?v=20261123v3";
 
 // Lazy loading sob demanda do dashboard-engine para otimizar o bundle do aluno
 let _dashboardEnginePromise = null;

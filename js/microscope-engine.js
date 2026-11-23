@@ -3980,11 +3980,11 @@ function renderizarAcervoRelacionado() {
             src="${escaparHTML(thumb)}"
             alt="${nomeSafe}"
             loading="lazy"
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            class="w-full h-full object-cover transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
           />
           <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
-          <div class="absolute top-3 left-3 flex items-center gap-1.5">
-            <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10px] font-mono font-semibold px-2.5 py-1 rounded-lg shadow-sm">
+          <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+            <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10px] font-mono tabular-nums font-semibold px-2.5 py-1 rounded-md shadow-sm">
               ${metaSafe}
             </span>
           </div>

@@ -564,15 +564,15 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
               src="${escaparHTML(thumbSrc)}"
               data-fallback="${escaparHTML(thumbSrcFallback)}"
               alt="${escaparHTML(nomeLamina)}"
-              class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+              class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
               loading="lazy"
               onerror="if(!this.dataset.fbApplied && this.dataset.fallback){this.dataset.fbApplied='1';this.src=this.dataset.fallback;}else{this.style.display='none';var ph=this.parentElement.querySelector('.thumb-placeholder');if(ph){ph.classList.remove('hidden');ph.classList.add('flex');}}"
             />
             <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
 
             <!-- Selo limpo de aumento -->
-            <div class="absolute top-3 left-3">
-              <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10.5px] font-mono font-semibold px-2.5 py-1 rounded-lg shadow-sm">
+            <div class="absolute top-2.5 left-2.5">
+              <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10.5px] font-mono tabular-nums font-semibold px-2.5 py-1 rounded-md shadow-sm">
                 ${escaparHTML(badgeAumento)}
               </span>
             </div>

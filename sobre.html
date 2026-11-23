@@ -19,14 +19,14 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <!-- Favicon & PWA Oficial Palas Atlas -->
   <link rel="icon" type="image/svg+xml" href="assets/logo-coruja.svg">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v4">
-  <link rel="stylesheet" href="css/styles.css?v=20261123v4">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v5">
+  <link rel="stylesheet" href="css/styles.css?v=20261123v5">
   <script src="js/brand-logo.js?v=20261123v3"></script>
 </head>
 
@@ -38,7 +38,7 @@
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
       <!-- Bloco Esquerdo: Voltar + Divisor Vertical + Logotipo Oficial Agrupados -->
       <div class="flex items-center gap-2.5 sm:gap-4 min-w-0 shrink-0">
-        <a href="index.html" class="min-h-[44px] sm:min-h-[38px] px-2.5 sm:px-3 py-1.5 text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 rounded-xl transition-all text-xs font-sans font-semibold items-center gap-1.5 inline-flex border border-slate-200/90 cursor-pointer no-underline shrink-0" aria-label="Voltar para a página inicial">
+        <a href="index.html" class="min-h-[44px] sm:min-h-[38px] pl-2.5 pr-3.5 py-1.5 text-slate-700 hover:text-slate-950 bg-slate-100/90 hover:bg-slate-200/70 rounded-xl transition-all duration-150 active:scale-[0.98] text-xs font-sans font-semibold items-center gap-1.5 inline-flex border border-slate-200/90 cursor-pointer no-underline shrink-0" aria-label="Voltar para a página inicial">
           <span>&larr;</span>
           <span class="hidden sm:inline">Voltar ao Início</span>
         </a>
@@ -84,7 +84,7 @@
   <div class="min-h-screen pt-8 sm:pt-12 pb-14 sm:pb-20 px-4 sm:px-6 max-w-4xl mx-auto">
 
     <!-- TEXTO EDITORIAL -->
-    <main class="text-slate-600 text-base leading-relaxed space-y-6 mb-8 font-sans">
+    <main class="text-slate-600 text-base leading-relaxed space-y-6 mb-8 font-sans max-w-[68ch]">
       <p>
         O Palas Atlas nasceu de uma iniciativa conjunta entre estudantes e professores movidos pelo desejo de transformar a aprendizagem nas ciências morfológicas. O projeto surgiu de uma constatação simples: a maioria dos acervos digitais atuais disponibiliza apenas lâminas "perfeitas" e altamente selecionadas, que muitas vezes se distanciam da vivência prática real do laboratório acadêmico.
       </p>
@@ -97,7 +97,7 @@
         O objetivo do Palas Atlas é expandir continuamente sua estrutura até alcançar a integralidade de todas as disciplinas e áreas morfológicas, consolidando um ecossistema completo, prático e acessível para a formação nas ciências da saúde.
       </p>
 
-      <blockquote class="palas-card-tactile border-l-4 border-l-teal-800 pl-5 py-4 my-8 italic text-slate-800 font-serif text-lg bg-white border border-slate-200/80 shadow-sm rounded-2xl">
+      <blockquote class="palas-card-tactile relative overflow-hidden px-6 py-5 my-8 italic text-slate-800 font-serif text-lg bg-white border border-slate-200/80 shadow-sm rounded-2xl before:content-[''] before:absolute before:left-0 before:inset-y-0 before:w-1 before:bg-teal-800">
         "Aproximar a tecnologia digital da realidade prática do laboratório é o caminho para transformar o ensino morfológico em uma experiência viva, autêntica e acessível a todos os estudantes."
       </blockquote>
     </main>
@@ -116,7 +116,7 @@
           <div class="h-px bg-slate-200 flex-1"></div>
         </div>
 
-        <div class="palas-card-tactile palas-card-interactive relative overflow-hidden rounded-2xl bg-white border border-slate-200/90 hover:border-teal-700/35 transition-all p-6 sm:p-7 shadow-[0_8px_24px_-6px_rgba(15,23,42,0.06)] group border-l-4 border-l-teal-800">
+        <div class="palas-card-tactile palas-card-interactive relative overflow-hidden rounded-2xl bg-white border border-slate-200/90 hover:border-teal-700/35 transition-all p-6 sm:p-7 pl-7 sm:pl-8 shadow-[0_8px_24px_-6px_rgba(15,23,42,0.06)] group before:content-[''] before:absolute before:left-0 before:inset-y-0 before:w-1 before:bg-teal-800">
           <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6">
             <!-- Foto Avatar -->
             <div class="shrink-0 relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-100 border border-slate-200/80 ring-2 ring-white shadow-xs flex items-center justify-center text-slate-400 overflow-hidden aspect-square">

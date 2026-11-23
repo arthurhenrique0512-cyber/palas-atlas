@@ -25,8 +25,8 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v4">
-  <link rel="stylesheet" href="css/styles.css?v=20261123v4">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v5">
+  <link rel="stylesheet" href="css/styles.css?v=20261123v5">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -134,9 +134,8 @@
     }
     @media (min-width: 1024px) {
       #viewerWorkbench {
-        height: calc(100dvh - 188px);
-        min-height: 500px;
-        max-height: 740px;
+        height: clamp(520px, calc(100dvh - 168px), 900px);
+        max-height: none;
       }
     }
 
@@ -175,8 +174,8 @@
       color: #334155;
     }
     .prose-atlas h3         { color:#0f172a; font-family:'Plus Jakarta Sans','Inter',sans-serif; font-weight:700; font-size:0.95rem; margin-bottom:0.75rem; line-height:1.35; }
-    .prose-atlas p          { color:#334155; line-height:1.72; font-size:0.845rem; margin-bottom:0.9rem; }
-    .prose-atlas li         { color:#334155; line-height:1.68; font-size:0.845rem; }
+    .prose-atlas p          { color:#334155; line-height:1.72; font-size:0.875rem; margin-bottom:0.9rem; text-wrap:pretty; }
+    .prose-atlas li         { color:#334155; line-height:1.68; font-size:0.875rem; text-wrap:pretty; }
     .prose-atlas strong,
     .prose-atlas b          { color:#0f172a; font-weight:600; background: transparent !important; }
     .prose-atlas blockquote { border: none !important; margin: 0 !important; padding: 0 !important; }
@@ -219,7 +218,7 @@
       bottom: 16px;
     }
     #viewerStage[data-minimap-collapsed="false"] #minimapToggleWrap {
-      bottom: 112px;
+      bottom: 110px;
       right: 16px;
     }
     #viewerStage .navigator,
@@ -370,7 +369,7 @@
         <button
           type="button"
           onclick="if(document.referrer){window.history.back();}else{window.location.href='index.html';}"
-          class="min-w-[36px] min-h-[38px] sm:min-h-0 h-9 sm:h-10 px-2 sm:px-3 rounded-xl bg-slate-100/90 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer shrink-0 touch-manipulation"
+          class="min-w-[36px] min-h-[38px] sm:min-h-0 h-9 sm:h-10 px-2 sm:pl-2.5 sm:pr-3.5 rounded-xl bg-slate-100/90 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-white active:scale-[0.98] transition-all duration-150 cursor-pointer shrink-0 touch-manipulation"
           aria-label="Voltar"
         >
           <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,7 +419,7 @@
             id="btnToggleRegua"
             type="button"
             onclick="window.toggleReguaMorfometrica && window.toggleReguaMorfometrica()"
-            class="btn-regua-toggle is-off hidden md:inline-flex min-h-[34px] h-[34px] px-2.5 items-center justify-center gap-1.5 rounded-[10px] border border-transparent active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
+            class="btn-regua-toggle is-off hidden md:inline-flex min-h-[34px] h-[34px] px-2.5 items-center justify-center gap-1.5 rounded-[10px] border border-transparent active:scale-[0.98] transition-all duration-150 cursor-pointer touch-manipulation"
             aria-pressed="false"
             aria-label="Ativar régua morfométrica em micrômetros"
             title="Régua morfométrica (D)"
@@ -439,7 +438,7 @@
             id="btnToggleMarcacoes"
             type="button"
             onclick="window.toggleMarcacoesNoViewer && window.toggleMarcacoesNoViewer()"
-            class="btn-marcacoes-toggle is-off relative min-w-[34px] min-h-[34px] h-[34px] px-2 sm:px-2.5 inline-flex items-center justify-center gap-1.5 rounded-[10px] border border-transparent active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation"
+            class="btn-marcacoes-toggle is-off relative min-w-[34px] min-h-[34px] h-[34px] px-2 sm:px-2.5 inline-flex items-center justify-center gap-1.5 rounded-[10px] border border-transparent active:scale-[0.98] transition-all duration-150 cursor-pointer touch-manipulation"
             aria-pressed="false"
             aria-label="Mostrar ou ocultar marcações na lâmina"
             title="Mostrar todas as marcações na lâmina (M)"
@@ -589,7 +588,7 @@
         <button
           id="btnToggleSidebar"
           type="button"
-          class="viewer-sidebar-toggle min-w-[36px] min-h-[38px] sm:min-h-0 h-9 sm:h-10 px-2.5 sm:px-3.5 flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-slate-700 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer touch-manipulation shadow-2xs"
+          class="viewer-sidebar-toggle min-w-[36px] min-h-[38px] sm:min-h-0 h-9 sm:h-10 px-2.5 sm:px-3.5 flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-slate-700 hover:text-white active:scale-[0.98] transition-all duration-150 cursor-pointer touch-manipulation shadow-2xs"
           aria-label="Recolher painel de informações"
           aria-controls="viewerSidebar"
           aria-expanded="true"
@@ -764,7 +763,7 @@
           onclick="window.toggleModoBancada && window.toggleModoBancada()"
           aria-pressed="false"
           title="Alternar Modo Bancada Imersivo (B)"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100/90 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-[11px] font-semibold text-slate-700 hover:text-white transition-all duration-200 cursor-pointer"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100/90 hover:bg-slate-900 border border-slate-200/90 hover:border-slate-900 text-[11px] font-semibold text-slate-700 hover:text-white active:scale-[0.98] transition-all duration-150 cursor-pointer"
         >
           <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="16" rx="2"/>
@@ -889,7 +888,7 @@
             onclick="window.toggleMinimap && window.toggleMinimap()"
             aria-expanded="true"
             title="Recolher ou expandir minimapa (N)"
-            class="palas-glass-instrument inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-slate-200/85 text-[11px] font-medium text-slate-700 hover:text-slate-950 transition-all cursor-pointer shadow-sm"
+            class="palas-glass-instrument inline-flex items-center gap-1.5 h-7 px-2.5 rounded-xl border border-slate-200/85 text-[11px] font-medium text-slate-700 hover:text-slate-950 active:scale-[0.98] transition-all duration-150 cursor-pointer shadow-sm"
           >
             <svg class="w-3 h-3 text-[#0f766e] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <rect x="3" y="4" width="18" height="16" rx="2"/>
@@ -902,7 +901,7 @@
         <!-- REVÓLVER DE OBJETIVAS + TELEMETRIA DE CAMPO DE VISÃO -->
         <div
           id="viewerLensPanel"
-          class="palas-glass-instrument absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-36 flex items-center gap-1 sm:gap-1.5 p-1.5 sm:p-2 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_16px_40px_rgba(15,23,42,0.12)] text-xs select-none max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
+          class="palas-glass-instrument absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-36 flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-[18px] bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_16px_40px_rgba(15,23,42,0.12)] text-xs select-none max-w-[calc(100%-24px)] overflow-x-auto no-scrollbar scroll-smooth"
         >
           <button
             type="button"
@@ -964,9 +963,9 @@
           <!-- Display Óptico Contínuo + Largura Real do Campo -->
           <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-teal-50/90 border border-teal-200/80 shrink-0 min-h-[36px] lg:min-h-[28px]" title="Ampliação atual e largura real do campo de visão">
             <span class="w-1.5 h-1.5 rounded-full bg-[#0f766e] shrink-0"></span>
-            <span class="palas-mono-tech text-[#0f766e] font-bold text-xs" id="zoomIndicatorDisplay">4x</span>
+            <span class="palas-mono-tech tabular-nums inline-block min-w-[3.4ch] text-right text-[#0f766e] font-bold text-xs" id="zoomIndicatorDisplay">4x</span>
             <span class="hidden sm:inline text-teal-300 font-normal">&middot;</span>
-            <span class="hidden sm:inline palas-mono-tech text-[11px] font-medium text-slate-600" id="fovIndicatorDisplay">—</span>
+            <span class="hidden sm:inline-block palas-mono-tech tabular-nums min-w-[7.2ch] text-right text-[11px] font-medium text-slate-600" id="fovIndicatorDisplay">—</span>
           </div>
         </div>
 
@@ -982,7 +981,7 @@
       <!-- Direita — Painel Editorial de Estudo (Monografia) -->
       <aside
         id="viewerSidebar"
-        class="palas-sidebar-paper h-full bg-white border-l border-slate-200 text-slate-700 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[88vw] sm:w-[370px] lg:w-[340px] xl:w-[396px] max-w-[396px] opacity-100 transition-[width,opacity,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none"
+        class="palas-sidebar-paper h-full bg-white border-l border-slate-200 text-slate-700 text-sm leading-relaxed overflow-hidden shrink-0 z-40 absolute right-0 top-0 bottom-0 lg:relative w-[88vw] sm:w-[370px] lg:w-[340px] xl:w-[396px] max-w-[396px] opacity-100 transition-[width,opacity,transform] duration-200 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] shadow-2xl lg:shadow-none"
         aria-hidden="false"
       >
         <div class="w-[88vw] sm:w-[370px] lg:w-[340px] xl:w-[396px] max-w-[396px] h-full flex flex-col">
@@ -1041,24 +1040,38 @@
             </button>
           </div>
 
-          <!-- Conteúdo: Descrição Morfológica + Tour de Pinos -->
-          <div
-            id="slideDescriptionContainer"
-            class="px-5 sm:px-6 pt-5 pb-6 flex-1 overflow-y-auto bg-transparent text-slate-700 scrollbar-thin"
-            style="-webkit-overflow-scrolling:touch;"
-          >
-            <div class="text-sm text-slate-500 font-sans italic">
-              Carregando descrição...
+          <!-- Área de Rolagem com Skeleton sem CLS e Fade Inferior Suave -->
+          <div class="relative flex-1 min-h-0 flex flex-col">
+            <!-- Conteúdo: Descrição Morfológica + Tour de Pinos -->
+            <div
+              id="slideDescriptionContainer"
+              class="px-5 sm:px-6 pt-5 pb-9 flex-1 overflow-y-auto bg-transparent text-slate-700 scrollbar-thin"
+              style="-webkit-overflow-scrolling:touch;"
+            >
+              <div class="space-y-3 animate-pulse" aria-label="Carregando descrição da lâmina">
+                <div class="h-4 w-3/4 rounded-md bg-slate-200/80"></div>
+                <div class="space-y-2 pt-1">
+                  <div class="h-3 w-full rounded bg-slate-100"></div>
+                  <div class="h-3 w-11/12 rounded bg-slate-100"></div>
+                  <div class="h-3 w-4/5 rounded bg-slate-100"></div>
+                </div>
+                <div class="space-y-2 pt-3">
+                  <div class="h-3 w-full rounded bg-slate-100"></div>
+                  <div class="h-3 w-5/6 rounded bg-slate-100"></div>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <!-- Conteúdo: Caderno de Bancada (Questões) -->
-          <div
-            id="slideQuestionsContainer"
-            class="hidden px-5 sm:px-6 pt-5 pb-6 flex-1 overflow-y-auto bg-transparent space-y-4 text-slate-700 scrollbar-thin"
-            style="-webkit-overflow-scrolling:touch;"
-          >
-            <!-- Questões renderizadas dinamicamente aqui -->
+            <!-- Conteúdo: Caderno de Bancada (Questões) -->
+            <div
+              id="slideQuestionsContainer"
+              class="hidden px-5 sm:px-6 pt-5 pb-9 flex-1 overflow-y-auto bg-transparent space-y-4 text-slate-700 scrollbar-thin"
+              style="-webkit-overflow-scrolling:touch;"
+            >
+              <!-- Questões renderizadas dinamicamente aqui -->
+            </div>
+
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 h-7 bg-gradient-to-t from-white via-white/80 to-transparent z-10" aria-hidden="true"></div>
           </div>
 
           <!-- Rodapé Fixo do Painel: Navegação entre Lâminas + Reportar Erro -->
@@ -1223,6 +1236,6 @@
   </footer>
 
   <script type="module" src="js/slide-security.js?v=20261123v3"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261123v4"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261123v5"></script>
 </body>
 </html>
