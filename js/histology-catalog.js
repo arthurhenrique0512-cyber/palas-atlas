@@ -9,11 +9,49 @@
  * Zero Emojis | Zero Truncamento | Clinical Precision UI
  */
 import { db } from "./firebase-config.js";
-import { catalogData } from "./catalog-data.js?v=20261123v1";
+import { catalogData } from "./catalog-data.js?v=20261123v2";
 import { getState, subscribe, setFrenteAtiva } from "./state.js";
 import { escaparHTML } from "./sanitizer.js";
+import { subscribeActiveSlides, getActiveSlides, isGenericStain } from "./active-slides-store.js?v=20261123v1";
 
 let disciplinaAtual = "histologia";
+
+function contarLaminasAtivasPorTopico(topicoId, disciplina = "histologia") {
+  const slides = getActiveSlides();
+  if (!Array.isArray(slides)) return 0;
+  const alvoTop = String(topicoId || "").toLowerCase().trim();
+  const alvoDisc = String(disciplina || "histologia").toLowerCase().trim();
+  return slides.filter(
+    (s) => (s.disciplina || "histologia") === alvoDisc && s.topico === alvoTop
+  ).length;
+}
+
+function atualizarBadgesContagemCatalogo() {
+  document.querySelectorAll("[data-topic-count-badge]").forEach((el) => {
+    const topicoId = el.getAttribute("data-topic-count-badge");
+    const mode = el.getAttribute("data-badge-mode") || "number";
+    const qtd = contarLaminasAtivasPorTopico(topicoId, disciplinaAtual);
+    if (qtd > 0) {
+      if (mode === "label") {
+        el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>${qtd} ${qtd === 1 ? "lâmina" : "lâminas"}`;
+      } else {
+        el.textContent = String(qtd);
+      }
+      el.classList.remove("hidden");
+    } else {
+      el.classList.add("hidden");
+    }
+  });
+}
+
+let _catalogoStoreInscrito = false;
+function garantirSincronizacaoBadgesCatalogo() {
+  if (_catalogoStoreInscrito) return;
+  _catalogoStoreInscrito = true;
+  subscribeActiveSlides(() => {
+    atualizarBadgesContagemCatalogo();
+  });
+}
 
 /**
  * Encerra listeners ativos do Firestore do catálogo (módulo + lâminas)
@@ -35,10 +73,8 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
   if (exibirSubtopicos && modulo && modulo.topicos) {
     modulo.topicos.forEach((topico) => {
       const isAtivo = topico.id === topicoAtivoId;
-      const qtdLaminas = Array.isArray(topico.laminasEstaticas) ? topico.laminasEstaticas.length : 0;
-      const badgeQtd = qtdLaminas > 0
-        ? `<span class="shrink-0 font-mono tabular-nums text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${isAtivo ? "bg-teal-700 text-white" : "bg-teal-50 text-teal-800 border border-teal-200/80"}">${qtdLaminas}</span>`
-        : "";
+      const qtdLaminas = contarLaminasAtivasPorTopico(topico.id, "histologia");
+      const badgeQtd = `<span data-topic-count-badge="${topico.id}" data-badge-mode="number" class="${qtdLaminas > 0 ? "" : "hidden "}shrink-0 font-mono tabular-nums text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${isAtivo ? "bg-teal-700 text-white" : "bg-teal-50 text-teal-800 border border-teal-200/80"}">${qtdLaminas}</span>`;
       if (isAtivo) {
         htmlItens += `
           <button
@@ -146,6 +182,7 @@ function gerarBarraTopicosMobile(modulo, topicoAtivoId, disc) {
  */
 function renderizarCatalogoHistologia(disciplina) {
   disciplinaAtual = "histologia";
+  garantirSincronizacaoBadgesCatalogo();
 
   const modulo = catalogData.histologia;
   const c1 = document.getElementById("histoCatalog");
@@ -162,10 +199,8 @@ function renderizarCatalogoHistologia(disciplina) {
   if (modulo.topicos && modulo.topicos.length > 0) {
     modulo.topicos.forEach((topico, idx) => {
       const numFormatado = String(idx + 1).padStart(2, "0");
-      const qtdLaminas = Array.isArray(topico.laminasEstaticas) ? topico.laminasEstaticas.length : 0;
-      const pillLaminas = qtdLaminas > 0
-        ? `<span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200/80 text-[10.5px] font-mono tabular-nums font-semibold text-teal-800 shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>${qtdLaminas} ${qtdLaminas === 1 ? "lâmina" : "lâminas"}</span>`
-        : "";
+      const qtdLaminas = contarLaminasAtivasPorTopico(topico.id, "histologia");
+      const pillLaminas = `<span data-topic-count-badge="${topico.id}" data-badge-mode="label" class="${qtdLaminas > 0 ? "hidden sm:inline-flex" : "hidden"} items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200/80 text-[10.5px] font-mono tabular-nums font-semibold text-teal-800 shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>${qtdLaminas} ${qtdLaminas === 1 ? "lâmina" : "lâminas"}</span>`;
       htmlRows += `
         <div 
           onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
@@ -250,6 +285,7 @@ function renderizarCatalogoHistologia(disciplina) {
 export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
   const disc = "histologia";
   disciplinaAtual = disc;
+  garantirSincronizacaoBadgesCatalogo();
   const modulo = catalogData.histologia;
   const topico = modulo.topicos.find((t) => t.id === idTopico);
   if (!topico) return;
@@ -515,7 +551,11 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
    */
   const gerarCardLaminaAcademico = (lamina) => {
     const disciplinaNome = lamina.disciplina || disciplinaAtual || "Histologia";
-    const coloracaoNome = lamina.coloracao || "Coloração de Rotina";
+    const rawColor = String(lamina.coloracao || "").trim();
+    const isPeleId = String(lamina.id || "") === "a3oRvXvJpMKAtU2RE85q";
+    const coloracaoNome = !isGenericStain(rawColor)
+      ? rawColor
+      : (isPeleId ? "Hematoxilina e Eosina (H&E)" : "Coloração de Rotina");
     const NOMES_TOPICO_MAP = {
       epitelial: "Epitelial",
       conjuntivo: "Conjuntivo",
@@ -756,29 +796,14 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     `;
   };
 
-  const mesclarLaminasComEstaticas = (docsFirestore) => {
-    const estaticas = Array.isArray(topico.laminasEstaticas || topico.laminas) ? (topico.laminasEstaticas || topico.laminas) : [];
-    const idsFirestore = new Set(docsFirestore.map((d) => String(d.id || "").toLowerCase()));
-    const urlsFirestore = new Set(
-      docsFirestore
-        .map((d) => String(d.dziUrl || d.imagemUrl || d.imageUrl || "").toLowerCase().trim())
-        .filter(Boolean)
-    );
-    const estaticasExtras = estaticas.filter((est) => {
-      const estId = String(est.id || "").toLowerCase();
-      const estUrl = String(est.dziUrl || est.imagemUrl || est.imageUrl || "").toLowerCase().trim();
-      return !idsFirestore.has(estId) && (!estUrl || !urlsFirestore.has(estUrl));
-    });
-    return [...docsFirestore, ...estaticasExtras];
-  };
-
-  // Exibe imediatamente lâminas estáticas do catálogo enquanto o snapshot ao vivo do Firestore carrega
-  const iniciaisEstaticas = mesclarLaminasComEstaticas([]);
-  if (iniciaisEstaticas.length > 0) {
-    const gridInicial = document.getElementById("gridCatalogoLaminas");
-    if (gridInicial) {
-      gridInicial.innerHTML = iniciaisEstaticas.map(gerarCardLaminaAcademico).join("");
-    }
+  // Exibe carregamento limpo enquanto o Firestore retorna apenas lâminas com status === 'ativa'
+  const gridInicial = document.getElementById("gridCatalogoLaminas");
+  if (gridInicial) {
+    gridInicial.innerHTML = `
+      <div class="col-span-full bg-white border border-slate-200/80 rounded-2xl p-6 text-center text-slate-500 text-xs font-mono">
+        Carregando lâminas ativas do acervo...
+      </div>
+    `;
   }
 
   if (typeof db !== "undefined" && db) {
@@ -792,6 +817,7 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
         snapshot.forEach((doc) => {
           const data = doc.data() || {};
+          if (String(data.status || "").toLowerCase().trim() !== "ativa") return;
           const topicoL = (data.topico || "").toLowerCase().trim();
           const discL = (data.disciplina || "").toLowerCase().trim();
           const discMatch = !discL || discL === targetDisc;
@@ -801,38 +827,28 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
           }
         });
 
-        const laminasDoTopico = mesclarLaminasComEstaticas(docsFirestore);
+        docsFirestore.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
 
         const containerGrid = document.getElementById("gridCatalogoLaminas");
         if (!containerGrid) return;
 
-        if (laminasDoTopico.length === 0) {
+        if (docsFirestore.length === 0) {
           renderEmptyState(containerGrid);
           return;
         }
 
-        containerGrid.innerHTML = laminasDoTopico.map(gerarCardLaminaAcademico).join("");
+        containerGrid.innerHTML = docsFirestore.map(gerarCardLaminaAcademico).join("");
       }, (erroDeConsulta) => {
         console.error("Erro no listener onSnapshot ao buscar lâminas no Firestore:", erroDeConsulta);
         const containerGrid = document.getElementById("gridCatalogoLaminas");
         if (containerGrid) {
-          const estaticas = mesclarLaminasComEstaticas([]);
-          if (estaticas.length > 0) {
-            containerGrid.innerHTML = estaticas.map(gerarCardLaminaAcademico).join("");
-          } else {
-            renderEmptyState(containerGrid);
-          }
+          renderEmptyState(containerGrid);
         }
       });
   } else {
     const containerGrid = document.getElementById("gridCatalogoLaminas");
     if (containerGrid) {
-      const estaticas = mesclarLaminasComEstaticas([]);
-      if (estaticas.length > 0) {
-        containerGrid.innerHTML = estaticas.map(gerarCardLaminaAcademico).join("");
-      } else {
-        renderEmptyState(containerGrid);
-      }
+      renderEmptyState(containerGrid);
     }
   }
 }

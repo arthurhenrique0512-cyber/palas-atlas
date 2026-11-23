@@ -3,12 +3,13 @@
  * Responsável por gerenciar a navegação, transições de tela e vinculação de estado.
  */
 import { setFrenteAtiva, subscribe, getState } from "./state.js";
-import { initGlobalSearch } from "./search-engine.js?v=20261123v2";
+import { initGlobalSearch } from "./search-engine.js?v=20261123v3";
+import { initHomeShowcase } from "./home-showcase.js?v=20261123v1";
 import {
   abrirTopico,
   abrirDisciplinaHome,
   encerrarListenersCatalogo
-} from "./histology-catalog.js?v=20261123v4";
+} from "./histology-catalog.js?v=20261123v5";
 
 // Lazy loading sob demanda do dashboard-engine para otimizar o bundle do aluno
 let _dashboardEnginePromise = null;
@@ -47,8 +48,9 @@ function init() {
   elements.sideDrawer = document.getElementById("sideDrawer");
   elements.drawerBackdrop = document.getElementById("drawerBackdrop");
 
-  // Iniciar motor de busca
+  // Iniciar motor de busca e vitrines reativas da Home
   initGlobalSearch();
+  initHomeShowcase();
 
   if (elements.drawerBackdrop && elements.sideDrawer) {
     // Retira o menu lateral de dentro do pgHome (que pode estar oculto) e o insere no escopo global

@@ -1,26 +1,20 @@
 import { db } from "./firebase-config.js";
 import { escaparHTML } from "./sanitizer.js";
-import { catalogData } from "./catalog-data.js?v=20261123v1";
+import {
+  subscribeActiveSlides,
+  getActiveSlides,
+  isActiveSlidesLoaded,
+  normalizeActiveSlide
+} from "./active-slides-store.js?v=20261123v1";
 
 let slidesCache = [];
 let isCacheLoaded = false;
 let debounceTimer;
+let _unsubStore = null;
 
 export function invalidarCacheBusca() {
-  slidesCache = [];
   isCacheLoaded = false;
-}
-
-function getEstaticasCatalogo() {
-  const lista = [];
-  Object.values(catalogData || {}).forEach((disc) => {
-    (disc.topicos || []).forEach((t) => {
-      (t.laminasEstaticas || t.laminas || []).forEach((lam) => {
-        if (lam && lam.id) lista.push(lam);
-      });
-    });
-  });
-  return lista;
+  slidesCache = getActiveSlides();
 }
 
 export function initGlobalSearch() {
@@ -34,18 +28,36 @@ export function initGlobalSearch() {
 
   if (!searchInput) return;
 
+  if (_unsubStore) {
+    try {
+      _unsubStore();
+    } catch (e) {}
+  }
+  _unsubStore = subscribeActiveSlides(({ slides, loaded }) => {
+    slidesCache = Array.isArray(slides) ? slides : [];
+    if (loaded) isCacheLoaded = true;
+    if (dropdown && !dropdown.classList.contains("hidden")) {
+      const currentTerm = searchInput.value.trim();
+      if (currentTerm.length >= 2) {
+        performSearch(currentTerm);
+      }
+    }
+  });
+
   const atualizarKbd = () => {
     if (!searchKbd) return;
     const oculto = document.activeElement === searchInput || searchInput.value.trim().length > 0;
     searchKbd.classList.toggle("opacity-0", oculto);
   };
 
-  // Carrega o cache das lâminas ativas (Firestore + fallback estático do catálogo) ao focar pela primeira vez
+  // Garante sincronização apenas de lâminas com status === "ativa" no Firestore
   const loadCache = async () => {
+    if (isActiveSlidesLoaded()) {
+      slidesCache = getActiveSlides();
+      isCacheLoaded = true;
+      return;
+    }
     if (isCacheLoaded) return;
-    const estaticas = getEstaticasCatalogo();
-    const mapa = new Map();
-    estaticas.forEach((s) => mapa.set(String(s.id), s));
 
     if (typeof db !== "undefined" && db) {
       try {
@@ -53,16 +65,22 @@ export function initGlobalSearch() {
           db.collection("laminas").where("status", "==", "ativa").get(),
           new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 4000))
         ]);
-        snapshot.docs.forEach((doc) => mapa.set(String(doc.id), { id: doc.id, ...doc.data() }));
+        const list = [];
+        snapshot.docs.forEach((doc) => {
+          const item = normalizeActiveSlide(doc.id, doc.data());
+          if (item) list.push(item);
+        });
+        slidesCache = list;
         isCacheLoaded = true;
       } catch (e) {
+        slidesCache = getActiveSlides();
         isCacheLoaded = true;
-        console.warn("[SearchEngine] Usando fallback estático para busca:", e.message || e);
+        console.warn("[SearchEngine] Falha ao consultar lâminas ativas:", e.message || e);
       }
     } else {
+      slidesCache = getActiveSlides();
       isCacheLoaded = true;
     }
-    slidesCache = Array.from(mapa.values());
   };
 
   searchInput.addEventListener("focus", () => {
@@ -74,8 +92,7 @@ export function initGlobalSearch() {
   searchInput.addEventListener("input", (e) => {
     const term = e.target.value.trim();
     atualizarKbd();
-    
-    // Toggle botão de clear
+
     if (term.length > 0) {
       if (searchClear) {
         searchClear.classList.remove("hidden");
@@ -92,10 +109,9 @@ export function initGlobalSearch() {
 
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async () => {
-      // Se por acaso o usuário digitar rápido demais antes do focus carregar
       if (!isCacheLoaded) await loadCache();
       performSearch(term);
-    }, 300);
+    }, 220);
   });
 
   if (searchClear) {
@@ -109,14 +125,12 @@ export function initGlobalSearch() {
     });
   }
 
-  // Fechar dropdown clicando fora
   document.addEventListener("click", (e) => {
     if (dropdown && searchContainer && !searchContainer.contains(e.target)) {
       dropdown.classList.add("hidden");
     }
   });
 
-  // Atalho '/' para focar busca e 'Escape' para fechar dropdown
   document.addEventListener("keydown", (e) => {
     if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey) {
       const ativo = document.activeElement;
@@ -163,16 +177,18 @@ export function initGlobalSearch() {
     dropdown.classList.remove("hidden");
     const normalizedTerm = removeAccents(term);
 
-    const matches = slidesCache.filter(slide => {
-      const nome = removeAccents(slide.nome || slide.titulo);
-      const topico = removeAccents(slide.topico);
-      const disciplina = removeAccents(slide.disciplina);
-      const coloracao = removeAccents(slide.coloracao);
+    const matches = slidesCache.filter((slide) => {
+      const nome = removeAccents(slide.nome);
+      const topico = removeAccents(slide.topicoLabel || slide.topico);
+      const disciplina = removeAccents(slide.disciplinaLabel || slide.disciplina);
+      const coloracao = removeAccents(slide.stainBadge || slide.coloracao);
 
-      return nome.includes(normalizedTerm) || 
-             topico.includes(normalizedTerm) || 
-             disciplina.includes(normalizedTerm) || 
-             coloracao.includes(normalizedTerm);
+      return (
+        nome.includes(normalizedTerm) ||
+        topico.includes(normalizedTerm) ||
+        disciplina.includes(normalizedTerm) ||
+        coloracao.includes(normalizedTerm)
+      );
     });
 
     renderResults(matches, term);
@@ -181,7 +197,7 @@ export function initGlobalSearch() {
   function renderResults(matches, term) {
     if (!resultsList || !emptyState) return;
     resultsList.innerHTML = "";
-    
+
     if (matches.length === 0) {
       emptyState.innerHTML = `<p class="text-slate-700 text-sm font-medium">Nenhuma lâmina encontrada para &ldquo;${escaparHTML(term)}&rdquo;</p><p class="text-slate-400 text-xs mt-1">Tente buscar por &ldquo;osso&rdquo;, &ldquo;pele&rdquo; ou &ldquo;H&amp;E&rdquo;.</p>`;
       emptyState.classList.remove("hidden");
@@ -192,18 +208,18 @@ export function initGlobalSearch() {
     emptyState.classList.add("hidden");
     resultsList.classList.remove("hidden");
 
-    matches.forEach(slide => {
+    matches.forEach((slide) => {
       const li = document.createElement("li");
       li.className = "px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors flex flex-col gap-1";
-      
-      const title = slide.nome || slide.titulo || "Lâmina Sem Título";
-      const topico = slide.topico || "Geral";
-      const coloracao = slide.coloracao || "H&E";
+
+      const title = slide.nome || "Lâmina";
+      const topico = slide.topicoShort || slide.topicoLabel || slide.topico || "Histologia";
+      const coloracao = slide.stainBadge || slide.coloracao || "Histologia";
 
       li.innerHTML = `
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-2">
           <span class="text-slate-900 font-medium text-sm">${escaparHTML(title)}</span>
-          <span class="text-[10px] bg-teal-50 text-teal-800 border border-teal-200/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold">${escaparHTML(topico)}</span>
+          <span class="text-[10px] bg-teal-50 text-teal-800 border border-teal-200/70 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold shrink-0">${escaparHTML(topico)}</span>
         </div>
         <div class="text-xs text-slate-500 font-sans flex items-center gap-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
@@ -212,7 +228,6 @@ export function initGlobalSearch() {
       `;
 
       li.addEventListener("click", () => {
-        // Redireciona direto para o Microscópio
         window.location.href = `microscopio.html?id=${encodeURIComponent(String(slide.id || ""))}`;
       });
 

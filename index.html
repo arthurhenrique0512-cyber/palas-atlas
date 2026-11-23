@@ -34,8 +34,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Folha de Estilos Tailwind Compilada + Estilos Customizados -->
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v7">
-  <link rel="stylesheet" href="css/styles.css?v=20261123v7">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v8">
+  <link rel="stylesheet" href="css/styles.css?v=20261123v8">
   <link rel="stylesheet" href="css/splash.css?v=20261121v5">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js" defer></script>
@@ -287,6 +287,7 @@
 
               <a
                 href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5"
+                data-default-microscope-link
                 onclick="window.App.fecharMenuLateral();"
                 class="flex items-center gap-3 group text-slate-600 hover:text-teal-800 hover:bg-slate-50 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left no-underline">
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
@@ -357,14 +358,8 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-7 sm:gap-10 lg:gap-10 xl:gap-12 items-center relative z-10">
 
-          <!-- Coluna Esquerda (lg:col-span-6): Tipografia Editorial de Alto Contraste -->
+          <!-- Coluna Esquerda (lg:col-span-6): Tipografia Editorial Direta -->
           <div class="lg:col-span-6 flex flex-col items-start text-left justify-center">
-
-            <!-- Pílula superior -->
-            <div class="palas-pill-tactile inline-flex items-center gap-2 bg-white/90 border border-teal-900/10 shadow-sm text-teal-950 text-[10px] sm:text-[11px] font-semibold tracking-widest uppercase px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full mb-3.5 sm:mb-5">
-              <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
-              <span>Microscopia Óptica &middot; Acervo Acadêmico</span>
-            </div>
 
             <!-- Título Principal Editorial (Sans Geométrica + Serif Itálica) -->
             <h1 class="text-[32px] sm:text-5xl lg:text-[46px] xl:text-[56px] font-serif font-extrabold tracking-[-0.03em] text-slate-950 leading-[1.08] text-left">
@@ -373,50 +368,40 @@
             </h1>
 
             <!-- Subtítulo direto -->
-            <p class="text-slate-600 text-sm sm:text-lg font-sans font-normal leading-relaxed max-w-xl text-left mt-3 sm:mt-4">
-              Lâminas reais fotografadas no laboratório para estudar fora da aula prática &mdash; começando por Histologia, com zoom contínuo, régua em micrômetros e estruturas marcadas no corte.
+            <p class="text-slate-600 text-sm sm:text-lg font-sans font-normal leading-relaxed max-w-xl text-left mt-3.5 sm:mt-5">
+              Lâminas reais de laboratório digitalizadas em alta definição para o estudo prático de Histologia.
             </p>
 
             <!-- CTAs diretos na primeira dobra -->
-            <div class="mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <div class="mt-5 sm:mt-7 flex flex-wrap items-center gap-2.5 sm:gap-3">
               <a href="#secaoLaminasPopulares" class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white rounded-xl pl-4 pr-3.5 py-2.5 min-h-[42px] text-xs font-sans font-semibold tracking-wide shadow-sm hover:shadow active:scale-[0.98] transition-all duration-150 no-underline group">
                 <span>Explorar lâminas</span>
                 <svg class="w-3.5 h-3.5 text-teal-300 group-hover:translate-x-0.5 transition-transform duration-150 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </a>
-              <a href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5" class="inline-flex items-center justify-center gap-2 pl-3.5 pr-4 py-2.5 min-h-[42px] rounded-xl bg-white/95 hover:bg-white border border-slate-200/90 hover:border-teal-700/35 text-slate-800 hover:text-teal-950 text-xs font-sans font-semibold shadow-2xs active:scale-[0.98] transition-all duration-150 no-underline">
+              <a href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5" data-default-microscope-link class="inline-flex items-center justify-center gap-2 pl-3.5 pr-4 py-2.5 min-h-[42px] rounded-xl bg-white/95 hover:bg-white border border-slate-200/90 hover:border-teal-700/35 text-slate-800 hover:text-teal-950 text-xs font-sans font-semibold shadow-2xs active:scale-[0.98] transition-all duration-150 no-underline">
                 <svg class="w-3.5 h-3.5 text-teal-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <circle cx="11" cy="11" r="7"/>
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
                 </svg>
-                <span>Abrir microscópio 40x</span>
+                <span>Abrir microscópio</span>
               </a>
-            </div>
-
-            <!-- Linha de metadados -->
-            <div class="w-full max-w-xl mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-slate-200/80 flex flex-wrap items-center gap-x-3 sm:gap-x-5 gap-y-1.5 text-[11px] sm:text-xs font-medium text-slate-500 tabular-nums">
-              <span>Acesso gratuito</span>
-              <span class="inline-flex items-center gap-2 sm:gap-3"><span class="text-slate-300">&bull;</span><span>4 lâminas digitalizadas</span></span>
-              <span class="inline-flex items-center gap-2 sm:gap-3"><span class="hidden sm:inline text-slate-300" aria-hidden="true">&bull;</span><span>Escala calibrada em &micro;m</span></span>
             </div>
           </div>
 
-          <!-- Coluna Direita (lg:col-span-6): Prancha Óptica Interativa com Lupa -->
+          <!-- Coluna Direita (lg:col-span-6): Prancha Óptica Limpa (Rotação Horária + Lupa 2.4x) -->
           <div class="lg:col-span-6 w-full">
             <div id="heroOpticalStage" class="bg-white rounded-[22px] sm:rounded-[24px] p-2 sm:p-2.5 border border-slate-900/[0.08] shadow-[0_2px_4px_rgba(15,23,42,0.03),0_24px_56px_-18px_rgba(15,23,42,0.16)]">
 
-              <!-- Janela da Lâmina Real com Retículos e Lupa 2.4x -->
-              <div id="heroOpticalWindow" class="relative w-full aspect-[4/3] sm:aspect-[16/11] rounded-[14px] overflow-hidden bg-[#122029] select-none lg:cursor-crosshair">
+              <!-- Janela da Lâmina Real (sem marcações) -->
+              <div id="heroOpticalWindow" class="relative w-full aspect-[4/3] sm:aspect-[16/11] rounded-[14px] overflow-hidden bg-[#122029] select-none cursor-pointer lg:cursor-crosshair">
                 <img
                   id="heroSpecimenImg"
-                  src="assets/histologia/lamina-real1-preview.jpg"
-                  alt="Pele Espessa — Corte histológico real em H&amp;E (40x)"
-                  class="w-full h-full object-cover transition-opacity duration-300"
+                  alt="Lâmina histológica em destaque"
+                  class="hidden w-full h-full object-cover transition-opacity duration-300 opacity-0"
                   fetchpriority="high"
                 />
 
-                <!-- Vinhetas sutis para contraste contínuo dos overlays -->
-                <div class="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-slate-950/45 to-transparent"></div>
-                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-950/45 to-transparent"></div>
+                <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/10 rounded-[14px]"></div>
 
                 <!-- 4 Cantoneiras Ópticas de Retículo -->
                 <span class="palas-reticle-corner absolute top-2.5 left-2.5 border-t border-l rounded-tl-[2px]" aria-hidden="true"></span>
@@ -424,65 +409,11 @@
                 <span class="palas-reticle-corner absolute bottom-2.5 left-2.5 border-b border-l rounded-bl-[2px]" aria-hidden="true"></span>
                 <span class="palas-reticle-corner absolute bottom-2.5 right-2.5 border-b border-r rounded-br-[2px]" aria-hidden="true"></span>
 
-                <!-- Faixa Superior da Prancha -->
-                <div class="absolute top-3 inset-x-3 z-20 flex items-center justify-between gap-2 pointer-events-none">
-                  <span id="heroSpecimenBadge" class="bg-slate-950/75 backdrop-blur-md border border-white/15 text-white text-[10px] font-mono tabular-nums uppercase tracking-[0.14em] px-2.5 py-1 rounded-full">
-                    PRANCHA 01 &middot; H&amp;E &middot; 40X
-                  </span>
-                  <span id="heroSpecimenRes" class="bg-white/95 backdrop-blur-md border border-slate-900/10 text-slate-900 text-[10px] font-mono tabular-nums font-semibold px-2.5 py-1 rounded-full shadow-xs">
-                    0,16 &micro;m/px
-                  </span>
-                </div>
-
-                <!-- Pino Interativo 1 -->
-                <button
-                  id="heroHotspot1"
-                  type="button"
-                  aria-pressed="false"
-                  class="hero-hotspot-btn absolute z-20 inline-flex items-center gap-1.5 group cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
-                  style="top: 30%; left: 16%;"
-                >
-                  <span class="relative flex items-center justify-center w-3.5 h-3.5 shrink-0">
-                    <span class="hero-hotspot-ring absolute inset-0 rounded-full bg-teal-400"></span>
-                    <span class="relative w-2.5 h-2.5 rounded-full bg-teal-600 border-2 border-white shadow-sm"></span>
-                  </span>
-                  <span class="hero-hotspot-label bg-white/95 backdrop-blur-md text-slate-900 border border-slate-900/10 group-hover:border-teal-600 shadow-[0_6px_18px_rgba(15,23,42,0.22)] rounded-full px-2.5 py-1 text-[10.5px] font-sans font-semibold leading-none whitespace-nowrap transition-colors">
-                    Epiderme &middot; Camada Granulosa
-                  </span>
-                </button>
-
-                <!-- Pino Interativo 2 (ancorado à direita para evitar overflow no mobile) -->
-                <button
-                  id="heroHotspot2"
-                  type="button"
-                  aria-pressed="false"
-                  class="hero-hotspot-btn absolute z-20 inline-flex flex-row-reverse items-center gap-1.5 group cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
-                  style="bottom: 22%; right: 10%;"
-                >
-                  <span class="relative flex items-center justify-center w-3.5 h-3.5 shrink-0">
-                    <span class="hero-hotspot-ring absolute inset-0 rounded-full bg-teal-400"></span>
-                    <span class="relative w-2.5 h-2.5 rounded-full bg-teal-600 border-2 border-white shadow-sm"></span>
-                  </span>
-                  <span class="hero-hotspot-label bg-white/95 backdrop-blur-md text-slate-900 border border-slate-900/10 group-hover:border-teal-600 shadow-[0_6px_18px_rgba(15,23,42,0.22)] rounded-full px-2.5 py-1 text-[10.5px] font-sans font-semibold leading-none whitespace-nowrap transition-colors">
-                    Derme Papilar
-                  </span>
-                </button>
-
-                <!-- Dica Discreta da Lupa no Desktop -->
-                <div class="hidden lg:inline-flex items-center gap-1.5 absolute bottom-3 left-3 z-20 px-2.5 py-1 rounded-full bg-slate-950/65 backdrop-blur-md border border-white/15 text-[10px] font-mono text-white/90 pointer-events-none">
-                  <svg class="w-3 h-3 text-teal-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="11" cy="11" r="7"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
-                  </svg>
-                  <span>Passe o cursor &middot; Lupa 2.4&times;</span>
-                </div>
-
                 <!-- Lupa Circular Óptica 2.4x (Desktop) -->
                 <div
                   id="heroOpticalLoupe"
                   aria-hidden="true"
                   class="hidden lg:block pointer-events-none absolute top-0 left-0 z-30"
-                  style="background-image: url('assets/histologia/lamina-real1-preview.jpg');"
                 >
                   <span class="absolute bottom-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded bg-slate-950/75 text-white font-mono tabular-nums text-[9px] font-semibold tracking-wider leading-none border border-white/20">
                     2.4&times;
@@ -490,212 +421,38 @@
                 </div>
               </div>
 
-              <!-- Rodapé de Controles da Prancha -->
-              <div class="px-1.5 pt-2.5 pb-1 flex flex-wrap items-center justify-between gap-2">
-                <div class="inline-flex items-center p-0.5 rounded-xl bg-slate-100/90 border border-slate-200/80 gap-0.5" role="group" aria-label="Selecionar lâmina de demonstração">
-                  <button
-                    type="button"
-                    data-hero-specimen="pele"
-                    aria-pressed="true"
-                    class="hero-specimen-tab px-2.5 py-1.5 rounded-[9px] text-[11px] font-sans font-semibold bg-white text-slate-900 shadow-2xs transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    Pele Espessa &middot; H&amp;E
-                  </button>
-                  <button
-                    type="button"
-                    data-hero-specimen="osso"
-                    aria-pressed="false"
-                    class="hero-specimen-tab px-2.5 py-1.5 rounded-[9px] text-[11px] font-sans font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    Osso Maduro &middot; 40x
-                  </button>
+              <!-- Rodapé Sobriamente Informativo (Lâmina em Exposição Horária) -->
+              <div class="px-2 pt-2.5 pb-1 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                  <span id="heroSpecimenTitle" class="block text-xs sm:text-[13px] font-serif font-bold text-slate-900 truncate leading-snug">
+                    Acervo em sincronização
+                  </span>
+                  <span id="heroSpecimenMeta" class="block text-[10.5px] font-mono text-slate-500 truncate">
+                    Histologia &middot; Seleção horária
+                  </span>
                 </div>
 
-                <a
-                  id="heroSpecimenLink"
-                  href="microscopio.html?id=a3oRvXvJpMKAtU2RE85q"
-                  class="inline-flex items-center gap-1 text-xs font-sans font-semibold text-teal-800 hover:text-teal-950 transition-colors no-underline px-1.5 py-1 group whitespace-nowrap"
-                >
-                  <span>Inspecionar corte</span>
-                  <span class="transition-transform duration-150 group-hover:translate-x-0.5">&rarr;</span>
-                </a>
+                <div class="shrink-0 flex items-center gap-3">
+                  <span class="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                    <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
+                    <span>Destaque da hora</span>
+                  </span>
+                  <a
+                    id="heroSpecimenLink"
+                    href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5"
+                    class="inline-flex items-center gap-1 text-xs font-sans font-semibold text-teal-800 hover:text-teal-950 transition-colors no-underline px-1 py-1 group whitespace-nowrap"
+                  >
+                    <span>Abrir corte</span>
+                    <span class="transition-transform duration-150 group-hover:translate-x-0.5">&rarr;</span>
+                  </a>
+                </div>
               </div>
 
             </div>
           </div>
 
         </div>
-
-        <!-- Faixa Editorial de Especificações (4 Diferenciais em Tipografia Pura) -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div class="mt-8 sm:mt-9 pt-5 sm:pt-6 border-t border-slate-900/[0.08] grid grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-8 gap-y-4 text-left">
-            <div>
-              <span class="font-mono tabular-nums text-[10px] font-semibold text-teal-700/90 tracking-[0.16em]">01</span>
-              <h3 class="font-semibold text-slate-900 text-xs sm:text-[13px] mt-1">Cortes inteiros</h3>
-              <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed mt-0.5">Captura campo a campo para percorrer a lâmina completa, não apenas recortes isolados.</p>
-            </div>
-            <div>
-              <span class="font-mono tabular-nums text-[10px] font-semibold text-teal-700/90 tracking-[0.16em]">02</span>
-              <h3 class="font-semibold text-slate-900 text-xs sm:text-[13px] mt-1">Técnicas de rotina</h3>
-              <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed mt-0.5">Coloração em H&amp;E e desgaste ósseo fiéis ao repertório das aulas práticas.</p>
-            </div>
-            <div>
-              <span class="font-mono tabular-nums text-[10px] font-semibold text-teal-700/90 tracking-[0.16em]">03</span>
-              <h3 class="font-semibold text-slate-900 text-xs sm:text-[13px] mt-1">Marcações no corte</h3>
-              <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed mt-0.5">Clique nos termos do texto para focar estruturas ou oculte os pinos para treinar.</p>
-            </div>
-            <div>
-              <span class="font-mono tabular-nums text-[10px] font-semibold text-teal-700/90 tracking-[0.16em]">04</span>
-              <h3 class="font-semibold text-slate-900 text-xs sm:text-[13px] mt-1">Curadoria acadêmica</h3>
-              <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed mt-0.5">Construído na graduação em Medicina com orientação docente e acesso livre.</p>
-            </div>
-          </div>
-        </div>
       </section>
-
-      <!-- Script do Palco Óptico do Hero + Barra de Progresso de Leitura -->
-      <script>
-        (function() {
-          const HERO_SPECIMENS = {
-            pele: {
-              src: 'assets/histologia/lamina-real1-preview.jpg',
-              alt: 'Pele Espessa — Corte histológico real em H&E (40x)',
-              badge: 'PRANCHA 01 \u00b7 H&E \u00b7 40X',
-              res: '0,16 \u00b5m/px',
-              href: 'microscopio.html?id=a3oRvXvJpMKAtU2RE85q',
-              pin1: { label: 'Epiderme \u00b7 Camada Granulosa', top: '30%', left: '16%' },
-              pin2: { label: 'Derme Papilar', top: '', bottom: '22%', right: '10%' }
-            },
-            osso: {
-              src: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
-              alt: 'Osso Maduro 40x — Corte por desgaste de tecido ósseo compacto',
-              badge: 'PRANCHA 02 \u00b7 DESGASTE \u00b7 40X',
-              res: '0,16 \u00b5m/px',
-              href: 'microscopio.html?id=cw3XGCgUwN71XdlwkUe5',
-              pin1: { label: 'Sistema de Havers (\u00d3steon)', top: '34%', left: '18%' },
-              pin2: { label: 'Lacunas de Oste\u00f3citos', top: '', bottom: '22%', right: '12%' }
-            }
-          };
-
-          document.addEventListener('DOMContentLoaded', () => {
-            const win = document.getElementById('heroOpticalWindow');
-            const img = document.getElementById('heroSpecimenImg');
-            const badge = document.getElementById('heroSpecimenBadge');
-            const res = document.getElementById('heroSpecimenRes');
-            const link = document.getElementById('heroSpecimenLink');
-            const pin1 = document.getElementById('heroHotspot1');
-            const pin2 = document.getElementById('heroHotspot2');
-            const loupe = document.getElementById('heroOpticalLoupe');
-            const tabs = document.querySelectorAll('[data-hero-specimen]');
-
-            function applyHeroSpecimen(key) {
-              const spec = HERO_SPECIMENS[key];
-              if (!spec || !img) return;
-              img.src = spec.src;
-              img.alt = spec.alt;
-              if (badge) badge.textContent = spec.badge;
-              if (res) res.textContent = spec.res;
-              if (link) link.setAttribute('href', spec.href);
-              if (loupe) loupe.style.backgroundImage = "url('" + spec.src + "')";
-
-              if (pin1) {
-                pin1.style.top = spec.pin1.top;
-                pin1.style.left = spec.pin1.left;
-                const l1 = pin1.querySelector('.hero-hotspot-label');
-                if (l1) l1.textContent = spec.pin1.label;
-              }
-              if (pin2) {
-                pin2.style.bottom = spec.pin2.bottom;
-                pin2.style.right = spec.pin2.right;
-                const l2 = pin2.querySelector('.hero-hotspot-label');
-                if (l2) l2.textContent = spec.pin2.label;
-              }
-
-              tabs.forEach(btn => {
-                const active = btn.getAttribute('data-hero-specimen') === key;
-                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-                if (active) {
-                  btn.classList.add('bg-white', 'text-slate-900', 'shadow-2xs', 'font-semibold');
-                  btn.classList.remove('text-slate-600', 'hover:text-slate-900', 'font-medium');
-                } else {
-                  btn.classList.remove('bg-white', 'text-slate-900', 'shadow-2xs', 'font-semibold');
-                  btn.classList.add('text-slate-600', 'hover:text-slate-900', 'font-medium');
-                }
-              });
-            }
-
-            tabs.forEach(btn => {
-              btn.addEventListener('click', () => {
-                applyHeroSpecimen(btn.getAttribute('data-hero-specimen'));
-              });
-            });
-
-            document.querySelectorAll('.hero-hotspot-btn').forEach(btn => {
-              btn.addEventListener('click', () => {
-                const pressed = btn.getAttribute('aria-pressed') === 'true';
-                btn.setAttribute('aria-pressed', pressed ? 'false' : 'true');
-                const pill = btn.querySelector('.hero-hotspot-label');
-                if (pill) {
-                  pill.classList.toggle('border-teal-600', !pressed);
-                  pill.classList.toggle('ring-2', !pressed);
-                  pill.classList.toggle('ring-teal-500/25', !pressed);
-                }
-              });
-            });
-
-            if (win && img && loupe && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-              const ZOOM = 2.4;
-              const LOUPE_RADIUS = 68;
-              win.addEventListener('mousemove', (e) => {
-                if (window.innerWidth < 1024 || e.target.closest('.hero-hotspot-btn')) {
-                  loupe.classList.remove('is-visible');
-                  return;
-                }
-                const rect = win.getBoundingClientRect();
-                const cx = e.clientX - rect.left;
-                const cy = e.clientY - rect.top;
-                const natW = img.naturalWidth || rect.width;
-                const natH = img.naturalHeight || rect.height;
-                const coverScale = Math.max(rect.width / natW, rect.height / natH);
-                const renderedW = natW * coverScale;
-                const renderedH = natH * coverScale;
-                const offsetX = (rect.width - renderedW) / 2;
-                const offsetY = (rect.height - renderedH) / 2;
-                const bgW = renderedW * ZOOM;
-                const bgH = renderedH * ZOOM;
-                const bgX = LOUPE_RADIUS - (cx - offsetX) * ZOOM;
-                const bgY = LOUPE_RADIUS - (cy - offsetY) * ZOOM;
-
-                loupe.style.transform = `translate3d(${cx - LOUPE_RADIUS}px, ${cy - LOUPE_RADIUS}px, 0)`;
-                loupe.style.backgroundSize = `${bgW}px ${bgH}px`;
-                loupe.style.backgroundPosition = `${bgX}px ${bgY}px`;
-                loupe.classList.add('is-visible');
-              });
-              win.addEventListener('mouseleave', () => {
-                loupe.classList.remove('is-visible');
-              });
-            }
-
-            const progressBar = document.getElementById('palasScrollProgress');
-            if (progressBar) {
-              let ticking = false;
-              const updateScrollProgress = () => {
-                const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-                const ratio = Math.min(1, Math.max(0, window.scrollY / max));
-                progressBar.style.transform = `scaleX(${ratio.toFixed(4)})`;
-                ticking = false;
-              };
-              window.addEventListener('scroll', () => {
-                if (!ticking) {
-                  ticking = true;
-                  requestAnimationFrame(updateScrollProgress);
-                }
-              }, { passive: true });
-              updateScrollProgress();
-            }
-          });
-        })();
-      </script>
 
       <!-- ============================================================
            SEGUNDA FAIXA: CONSOLE DE BUSCA + VITRINE DE LÂMINAS
@@ -717,13 +474,9 @@
               <!-- Coluna Esquerda (lg:col-span-6): Busca + Ações + Atalhos de Disciplinas -->
               <div class="lg:col-span-6 flex flex-col items-start text-left justify-center">
 
-                <span class="block font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-700/90 mb-1.5">01 &middot; Acervo &amp; Busca</span>
-                <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 tracking-tight mb-1">
+                <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 tracking-tight mb-4">
                   Buscar no acervo
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-500 mb-4 leading-relaxed">
-                  Encontre lâminas, tecidos ou colorações e abra direto no microscópio.
-                </p>
 
                 <!-- Barra de Busca Integrada -->
                 <div class="w-full max-w-xl relative z-30 group" id="global-search-container">
@@ -755,7 +508,7 @@
                     <span>Explorar acervo</span>
                     <svg class="w-4 h-4 text-[#d4af37] group-hover:translate-x-0.5 transition-transform duration-150 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                   </button>
-                  <a href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5" class="inline-flex items-center justify-center gap-2 px-3 sm:pl-4 sm:pr-5 py-3 sm:py-3.5 min-h-[44px] sm:min-h-0 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 text-slate-700 hover:text-slate-900 transition-[transform,background-color,border-color,color] duration-150 text-xs font-sans font-semibold shadow-2xs no-underline active:scale-[0.98] whitespace-nowrap">
+                  <a href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5" data-default-microscope-link class="inline-flex items-center justify-center gap-2 px-3 sm:pl-4 sm:pr-5 py-3 sm:py-3.5 min-h-[44px] sm:min-h-0 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-slate-300 text-slate-700 hover:text-slate-900 transition-[transform,background-color,border-color,color] duration-150 text-xs font-sans font-semibold shadow-2xs no-underline active:scale-[0.98] whitespace-nowrap">
                     <svg class="w-4 h-4 text-teal-700 shrink-0" fill="none" stroke="currentColor" stroke-width="1.85" viewBox="0 0 24 24">
                       <circle cx="11" cy="11" r="7"/>
                       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
@@ -786,9 +539,8 @@
                   <div class="absolute inset-0 overflow-hidden pointer-events-none">
                     <img
                       id="vitrineImage"
-                      src="assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
-                      alt="Osso Maduro 40x"
-                      class="w-full h-full object-cover will-change-transform"
+                      alt="Vitrine do acervo"
+                      class="hidden w-full h-full object-cover will-change-transform"
                     />
                   </div>
 
@@ -796,9 +548,9 @@
                   <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none"></div>
 
                   <!-- Topo da Vitrine: Tag discreta da técnica -->
-                  <div id="vitrineBadgeWrapper" class="relative z-10 flex items-center justify-start gap-2 transition-opacity duration-300">
+                  <div id="vitrineBadgeWrapper" class="relative z-10 flex items-center justify-start gap-2 transition-opacity duration-300 hidden">
                     <span id="vitrineStainBadge" class="bg-black/60 border border-white/15 backdrop-blur-md px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold tracking-wider text-white shadow-sm">
-                      Desgaste &bull; 40x
+                      Histologia
                     </span>
                   </div>
 
@@ -806,17 +558,18 @@
                   <div class="relative z-10 flex flex-col gap-2.5 mt-auto">
                     <div id="vitrineTextContent" class="space-y-1 text-left transition-opacity duration-300">
                       <span id="vitrineCategory" class="text-[11px] tracking-[0.16em] uppercase text-white/90 font-sans font-semibold">
-                        HISTOLOGIA &bull; ÓSSEO
+                        HISTOLOGIA
                       </span>
 
                       <h3 id="vitrineTitle" class="font-serif font-bold text-xl sm:text-2xl text-white leading-snug tracking-tight drop-shadow-sm">
-                        Osso Maduro 40x
+                        Acervo em sincronização
                       </h3>
                     </div>
 
                     <div class="pt-2.5 border-t border-white/15 flex items-center justify-between gap-2 sm:gap-4">
                       <a
                         id="vitrineActionBtn"
+                        data-default-microscope-link
                         href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5"
                         class="inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-sans font-semibold text-white hover:text-teal-300 transition-colors duration-150 group/link no-underline whitespace-nowrap shrink-0"
                       >
@@ -839,7 +592,7 @@
                           </svg>
                         </button>
 
-                        <span id="vitrineCounter" class="font-mono tabular-nums min-w-[3.6rem] text-center text-[11px] tracking-wider text-white font-semibold px-1.5 whitespace-nowrap">01 / 04</span>
+                        <span id="vitrineCounter" class="font-mono tabular-nums min-w-[3.6rem] text-center text-[11px] tracking-wider text-white font-semibold px-1.5 whitespace-nowrap">00 / 00</span>
 
                         <button
                           type="button"
@@ -865,365 +618,6 @@
         </div>
       </section>
 
-      <!-- Script da Vitrine de Lâminas (Crossfade & Zoom Contínuo 6s) -->
-      <script>
-        (function() {
-          const baseSlides = [
-            {
-              id: 'cw3XGCgUwN71XdlwkUe5',
-              title: 'Osso Maduro 40x',
-              category: 'Histologia • Ósseo',
-              stain: 'Desgaste • 40x',
-              thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg',
-              link: 'microscopio.html?id=cw3XGCgUwN71XdlwkUe5'
-            },
-            {
-              id: 'FFGk5d9kOAct5HIDdjQ7',
-              title: 'Osso Maduro 10x',
-              category: 'Histologia • Ósseo',
-              stain: 'Desgaste • 10x',
-              thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg',
-              link: 'microscopio.html?id=FFGk5d9kOAct5HIDdjQ7'
-            },
-            {
-              id: '96ZYqoM2SV8p4fB2QgeM',
-              title: 'Osso Maduro',
-              category: 'Histologia • Ósseo',
-              stain: 'Desgaste • 40x',
-              thumbnailUrl: 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg',
-              link: 'microscopio.html?id=96ZYqoM2SV8p4fB2QgeM'
-            },
-            {
-              id: 'a3oRvXvJpMKAtU2RE85q',
-              title: 'Pele Espessa',
-              category: 'Histologia • Epitelial',
-              stain: 'H&E • 40x',
-              thumbnailUrl: 'assets/histologia/lamina-real1-preview.jpg',
-              link: 'microscopio.html?id=a3oRvXvJpMKAtU2RE85q'
-            }
-          ];
-
-          let slides = [...baseSlides];
-          let currentIndex = 0;
-          let autoSlideTimer = null;
-          let fbSyncInterval = null;
-          let fbSyncTimeout = null;
-          let isHovered = false;
-          let isTransitioning = false;
-          const AUTO_SLIDE_INTERVAL = 8000;
-
-          function triggerZoomAnimation(imgEl) {
-            if (!imgEl) return;
-            imgEl.style.transition = 'none';
-            imgEl.style.transform = 'scale(1)';
-            imgEl.style.opacity = '0';
-            void imgEl.offsetWidth;
-            imgEl.style.transition = 'opacity 0.6s ease-out, transform 6s cubic-bezier(0.25, 1, 0.5, 1)';
-            imgEl.style.opacity = '1';
-            imgEl.style.transform = 'scale(1.05)';
-          }
-
-          function renderSlide(idx, forceImmediate = false) {
-            if (!slides.length) return;
-            if (isTransitioning && !forceImmediate) return;
-
-            const nextIndex = (idx + slides.length) % slides.length;
-            const slide = slides[nextIndex];
-
-            const imgEl = document.getElementById('vitrineImage');
-            const textContentEl = document.getElementById('vitrineTextContent');
-            const badgeWrapperEl = document.getElementById('vitrineBadgeWrapper');
-            const titleEl = document.getElementById('vitrineTitle');
-            const catEl = document.getElementById('vitrineCategory');
-            const stainEl = document.getElementById('vitrineStainBadge');
-            const actionEl = document.getElementById('vitrineActionBtn');
-            const counterEl = document.getElementById('vitrineCounter');
-
-            const decodificarTexto = (t) => {
-              if (!t) return '';
-              const doc = new DOMParser().parseFromString(t, 'text/html');
-              return doc.body.textContent || '';
-            };
-
-            const applyContent = () => {
-              currentIndex = nextIndex;
-              if (imgEl) {
-                imgEl.src = slide.thumbnailUrl;
-                imgEl.alt = slide.title;
-                imgEl.onerror = function() {
-                  this.onerror = null;
-                  this.src = 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';
-                };
-              }
-              if (titleEl) titleEl.textContent = decodificarTexto(slide.title);
-              if (catEl) {
-                const rawCat = decodificarTexto(slide.category || 'Histologia');
-                catEl.textContent = rawCat.toUpperCase();
-              }
-
-              if (stainEl && badgeWrapperEl) {
-                const rawStain = decodificarTexto(slide.stain || '').trim();
-                const isGeneric = !rawStain || ['outra', 'outro', 'outras', 'geral', 'campo microscópico', 'campo microscopico'].includes(rawStain.toLowerCase());
-                if (isGeneric) {
-                  badgeWrapperEl.classList.add('hidden');
-                } else {
-                  badgeWrapperEl.classList.remove('hidden');
-                  stainEl.textContent = rawStain;
-                }
-              }
-
-              if (actionEl) actionEl.href = slide.link;
-              if (counterEl) {
-                const cur = String(currentIndex + 1).padStart(2, '0');
-                const tot = String(slides.length).padStart(2, '0');
-                counterEl.textContent = cur + ' / ' + tot;
-              }
-            };
-
-            const elementsToFade = [textContentEl, badgeWrapperEl].filter(Boolean);
-
-            if (forceImmediate) {
-              applyContent();
-              if (imgEl) triggerZoomAnimation(imgEl);
-              elementsToFade.forEach(el => {
-                el.classList.remove('opacity-0');
-                el.classList.add('opacity-100');
-                el.style.opacity = '1';
-              });
-              return;
-            }
-
-            isTransitioning = true;
-            if (imgEl) imgEl.style.opacity = '0';
-            elementsToFade.forEach(el => {
-              el.classList.remove('opacity-100');
-              el.classList.add('opacity-0');
-              el.style.opacity = '0';
-            });
-
-            setTimeout(() => {
-              applyContent();
-              if (imgEl) triggerZoomAnimation(imgEl);
-
-              requestAnimationFrame(() => {
-                elementsToFade.forEach(el => {
-                  el.classList.remove('opacity-0');
-                  el.classList.add('opacity-100');
-                  el.style.opacity = '1';
-                });
-
-                setTimeout(() => {
-                  isTransitioning = false;
-                }, 120);
-              });
-            }, 140);
-          }
-
-          function startAutoSlide() {
-            clearInterval(autoSlideTimer);
-            if (!isHovered) {
-              autoSlideTimer = setInterval(() => {
-                renderSlide(currentIndex + 1);
-              }, AUTO_SLIDE_INTERVAL);
-            }
-          }
-
-          function stopAutoSlide() {
-            clearInterval(autoSlideTimer);
-            autoSlideTimer = null;
-          }
-
-          function resetAutoSlide() {
-            stopAutoSlide();
-            startAutoSlide();
-          }
-
-          function carregarLaminasFirestore() {
-            try {
-              if (window._unsubVitrineLaminas) return;
-              if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) return;
-              const db = firebase.firestore();
-              window._unsubVitrineLaminas = db.collection('laminas')
-                .where('status', '==', 'ativa')
-                .onSnapshot(snapshot => {
-                  if (snapshot.empty) return;
-
-                  const firestoreSlides = [];
-                  snapshot.forEach(doc => {
-                    const data = doc.data() || {};
-                    if (data.status === 'ativa') {
-                      const nome = (data.nome || '').trim();
-                      if (!nome) return;
-
-                      let previewImg = data.thumbnailUrl || data.previewImage || data.imagemCapa || data.capaUrl || '';
-                      if (previewImg) previewImg = previewImg.replace(/^\/(?!\/)/, '');
-
-                      let rawSource = data.imagemUrl || data.imageUrl || data.caminhoImagemBase || data.dziUrl || '';
-                      rawSource = rawSource.replace(/^\/(?!\/)/, '');
-
-                      if (!previewImg || previewImg.toLowerCase().endsWith('.dzi')) {
-                        if (rawSource.toLowerCase().endsWith('.dzi')) {
-                          const baseDzi = rawSource.replace(/\.dzi$/i, '');
-                          if (baseDzi.includes('lamina-real1') || baseDzi.includes('pele')) {
-                            previewImg = 'assets/histologia/lamina-real1-preview.jpg';
-                          } else if (baseDzi.includes('osso_maduro_desgaste_ct_3.0')) {
-                            previewImg = 'assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg';
-                          } else if (baseDzi.includes('osso_maduro_desgaste_ct_2.0')) {
-                            previewImg = 'assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg';
-                          } else if (baseDzi.includes('osso_maduro_desgaste_ct')) {
-                            previewImg = 'assets/histologia/osso_maduro_desgaste_ct-preview.jpg';
-                          } else {
-                            previewImg = `${baseDzi}-preview.jpg`;
-                          }
-                        } else {
-                          previewImg = rawSource;
-                        }
-                      }
-
-                      if (!previewImg) return;
-                      const disciplina = data.disciplina
-                        ? data.disciplina.charAt(0).toUpperCase() + data.disciplina.slice(1)
-                        : 'Histologia';
-                      const topico = data.topico
-                        ? data.topico.charAt(0).toUpperCase() + data.topico.slice(1)
-                        : 'Geral';
-
-                      const refBase = baseSlides.find(b => b.id === doc.id);
-                      let rawStainText = (data.coloracao || '').trim();
-                      if (!rawStainText && refBase) {
-                        rawStainText = refBase.stain;
-                      } else if (rawStainText && !/\b\d+x\b/i.test(rawStainText)) {
-                        const magMatch = refBase?.stain?.match(/(\d+x)/i);
-                        const magVal = data.maxMagnification ? `${data.maxMagnification}x` : (magMatch ? magMatch[1] : '');
-                        if (magVal) rawStainText = `${rawStainText} • ${magVal}`;
-                      }
-
-                      firestoreSlides.push({
-                        id: doc.id,
-                        title: nome,
-                        category: `${disciplina} • ${topico}`,
-                        stain: rawStainText,
-                        thumbnailUrl: previewImg,
-                        link: `microscopio.html?id=${encodeURIComponent(doc.id)}`
-                      });
-                    }
-                  });
-
-                  if (firestoreSlides.length > 0) {
-                    const ordemPrioritaria = ['cw3XGCgUwN71XdlwkUe5', 'FFGk5d9kOAct5HIDdjQ7', '96ZYqoM2SV8p4fB2QgeM', 'a3oRvXvJpMKAtU2RE85q'];
-                    firestoreSlides.sort((a, b) => {
-                      const ia = ordemPrioritaria.indexOf(a.id);
-                      const ib = ordemPrioritaria.indexOf(b.id);
-                      if (ia !== -1 && ib !== -1) return ia - ib;
-                      if (ia !== -1) return -1;
-                      if (ib !== -1) return 1;
-                      return a.title.localeCompare(b.title);
-                    });
-
-                    slides = firestoreSlides;
-                    if (currentIndex >= slides.length) currentIndex = 0;
-                    renderSlide(currentIndex, true);
-
-                    firestoreSlides.forEach(fs => {
-                      const cards = document.querySelectorAll(`[data-slide-id="${fs.id}"]`);
-                      cards.forEach(card => {
-                        const tEl = card.querySelector('.popular-slide-title');
-                        if (tEl && fs.title) tEl.textContent = fs.title;
-                        const lEl = card.querySelector('a');
-                        if (lEl) lEl.href = `microscopio.html?id=${encodeURIComponent(fs.id)}`;
-                      });
-                    });
-                  }
-                }, err => {
-                  window._unsubVitrineLaminas = null;
-                  console.warn('[Vitrine] Erro na sincronização com Firestore:', err);
-                });
-            } catch (err) {
-              console.warn('[Vitrine] Não foi possível carregar lâminas do Firestore:', err);
-            }
-          }
-
-          window.addEventListener('pagehide', () => {
-            stopAutoSlide();
-            if (fbSyncInterval) {
-              clearInterval(fbSyncInterval);
-              fbSyncInterval = null;
-            }
-            if (fbSyncTimeout) {
-              clearTimeout(fbSyncTimeout);
-              fbSyncTimeout = null;
-            }
-            if (typeof window._unsubVitrineLaminas === 'function') {
-              try { window._unsubVitrineLaminas(); } catch (e) {}
-              window._unsubVitrineLaminas = null;
-            }
-          });
-
-          document.addEventListener('DOMContentLoaded', () => {
-            const prevBtn = document.getElementById('vitrinePrevBtn');
-            const nextBtn = document.getElementById('vitrineNextBtn');
-            const cardEl = document.getElementById('heroSlideShowcase');
-
-            if (prevBtn) {
-              prevBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                renderSlide(currentIndex - 1);
-                resetAutoSlide();
-              });
-            }
-
-            if (nextBtn) {
-              nextBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                renderSlide(currentIndex + 1);
-                resetAutoSlide();
-              });
-            }
-
-            if (cardEl) {
-              cardEl.addEventListener('mouseenter', () => {
-                isHovered = true;
-                stopAutoSlide();
-              });
-              cardEl.addEventListener('mouseleave', () => {
-                isHovered = false;
-                startAutoSlide();
-              });
-              cardEl.addEventListener('click', (e) => {
-                if (e.target.closest('button, a')) return;
-                const actionBtn = document.getElementById('vitrineActionBtn');
-                const href = actionBtn ? actionBtn.getAttribute('href') : '';
-                if (href) window.location.href = href;
-              });
-            }
-
-            renderSlide(0, true);
-            startAutoSlide();
-
-            carregarLaminasFirestore();
-            window.addEventListener('palas-firebase-ready', carregarLaminasFirestore, { once: true });
-            fbSyncInterval = setInterval(() => {
-              if (window._unsubVitrineLaminas) {
-                clearInterval(fbSyncInterval);
-                fbSyncInterval = null;
-                return;
-              }
-              if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
-                carregarLaminasFirestore();
-                clearInterval(fbSyncInterval);
-                fbSyncInterval = null;
-              }
-            }, 250);
-            fbSyncTimeout = setTimeout(() => {
-              if (fbSyncInterval) {
-                clearInterval(fbSyncInterval);
-                fbSyncInterval = null;
-              }
-            }, 10000);
-          });
-        })();
-      </script>
-
       <!-- ============================================================
            TERCEIRA FAIXA: DISCIPLINAS (FUNDO BRANCO PURO)
       ============================================================ -->
@@ -1232,13 +626,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           <div class="mb-6 sm:mb-8 pb-4 border-b border-slate-200/80">
-            <span class="block font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-700/90 mb-1.5">02 &middot; Disciplinas</span>
             <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-[-0.02em]">
               Disciplinas
             </h2>
-            <p class="text-sm text-slate-600 mt-1">
-              Explore os módulos de Histologia com resumo morfológico e acompanhe as áreas em preparação.
-            </p>
           </div>
 
           <!-- CARD DE DESTAQUE PRINCIPAL: HISTOLOGIA (MONOGRAFIA EDITORIAL LIMPA) -->
@@ -1250,11 +640,11 @@
                   <h3 class="text-white font-serif text-2xl sm:text-3xl font-bold tracking-tight">Histologia</h3>
                   <span class="inline-flex items-center gap-1.5 text-[11px] font-mono text-teal-300/90 font-medium">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    <span>8 módulos &middot; 4 lâminas</span>
+                    <span id="histologiaCountBadge">8 módulos</span>
                   </span>
                 </div>
                 <p class="mt-2 text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed font-sans">
-                  Resumo teórico por tecido e acesso às lâminas digitalizadas de cada módulo.
+                  Resumo morfológico e lâminas digitalizadas por tecido.
                 </p>
               </div>
 
@@ -1266,23 +656,23 @@
               </div>
             </div>
 
-            <!-- Lista limpa em linha dos 8 módulos (botões tipográficos discretos com indicador de acervo pronto) -->
+            <!-- Lista limpa em linha dos 8 módulos (pontos acesos dinamicamente apenas onde há lâmina ativa) -->
             <div class="relative z-10 mt-1 sm:mt-2 lg:mt-4 pt-4 sm:pt-5 border-t border-white/10 text-xs sm:text-sm font-medium leading-relaxed flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-              <button type="button" onclick="event.stopPropagation(); window.App.abrirTopico('epitelial', 'histologia');" class="inline-flex items-center gap-1.5 text-white hover:text-teal-200 px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0" title="Com lâminas digitalizadas"><span class="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Epitelial</span></button>
+              <button type="button" data-home-module-topic="epitelial" onclick="event.stopPropagation(); window.App.abrirTopico('epitelial', 'histologia');" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0"><span data-topic-dot class="hidden w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Epitelial</span></button>
               <span class="text-teal-500/60 select-none" aria-hidden="true">&bull;</span>
-              <button type="button" onclick="event.stopPropagation(); window.App.abrirTopico('conjuntivo', 'histologia');" class="text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0">Conjuntivo</button>
+              <button type="button" data-home-module-topic="conjuntivo" onclick="event.stopPropagation(); window.App.abrirTopico('conjuntivo', 'histologia');" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0"><span data-topic-dot class="hidden w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Conjuntivo</span></button>
               <span class="text-teal-500/60 select-none" aria-hidden="true">&bull;</span>
-              <button type="button" onclick="event.stopPropagation(); window.App.abrirTopico('adiposo', 'histologia');" class="text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0">Adiposo</button>
+              <button type="button" data-home-module-topic="adiposo" onclick="event.stopPropagation(); window.App.abrirTopico('adiposo', 'histologia');" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0"><span data-topic-dot class="hidden w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Adiposo</span></button>
               <span class="text-teal-500/60 select-none" aria-hidden="true">&bull;</span>
-              <button type="button" onclick="event.stopPropagation(); window.App.abrirTopico('cartilaginoso', 'histologia');" class="text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0">Cartilaginoso</button>
+              <button type="button" data-home-module-topic="cartilaginoso" onclick="event.stopPropagation(); window.App.abrirTopico('cartilaginoso', 'histologia');" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0"><span data-topic-dot class="hidden w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Cartilaginoso</span></button>
               <span class="text-teal-500/60 select-none" aria-hidden="true">&bull;</span>
-              <button type="button" onclick="event.stopPropagation(); window.App.abrirTopico('osseo', 'histologia');" class="inline-flex items-center gap-1.5 text-white hover:text-teal-200 px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0" title="Com lâminas digitalizadas"><span class="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Ósseo</span></button>
+              <button type="button" data-home-module-topic="osseo" onclick="event.stopPropagation(); window.App.abrirTopico('osseo', 'histologia');" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0"><span data-topic-dot class="hidden w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Ósseo</span></button>
               <span class="text-teal-500/60 select-none" aria-hidden="true">&bull;</span>
-              <button type="button" onclick="event.stopPropagation(); window.App.abrirTopico('nervoso', 'histologia');" class="text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0">Nervoso</button>
+              <button type="button" data-home-module-topic="nervoso" onclick="event.stopPropagation(); window.App.abrirTopico('nervoso', 'histologia');" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0"><span data-topic-dot class="hidden w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Nervoso</span></button>
               <span class="text-teal-500/60 select-none" aria-hidden="true">&bull;</span>
-              <button type="button" onclick="event.stopPropagation(); window.App.abrirTopico('muscular', 'histologia');" class="text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0">Muscular</button>
+              <button type="button" data-home-module-topic="muscular" onclick="event.stopPropagation(); window.App.abrirTopico('muscular', 'histologia');" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0"><span data-topic-dot class="hidden w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Muscular</span></button>
               <span class="text-teal-500/60 select-none" aria-hidden="true">&bull;</span>
-              <button type="button" onclick="event.stopPropagation(); window.App.abrirTopico('circulatorio', 'histologia');" class="text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0">Circulatório</button>
+              <button type="button" data-home-module-topic="circulatorio" onclick="event.stopPropagation(); window.App.abrirTopico('circulatorio', 'histologia');" class="inline-flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-0.5 -mx-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer bg-transparent border-0"><span data-topic-dot class="hidden w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" aria-hidden="true"></span><span>Circulatório</span></button>
             </div>
 
             <div class="pointer-events-none absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-teal-500/10 blur-2xl"></div>
@@ -1386,48 +776,33 @@
           <div id="cardsOutrasDisciplinas" class="mt-5 sm:mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5">
 
             <!-- Patologia -->
-            <div data-disciplina-card="patologia" class="relative overflow-hidden palas-card-tactile rounded-2xl bg-[#fbfcfd] border border-slate-200/90 p-5 sm:p-6 flex flex-col justify-between gap-2.5 transition-all duration-300">
+            <div data-disciplina-card="patologia" class="relative overflow-hidden palas-card-tactile rounded-2xl bg-[#fbfcfd] border border-slate-200/90 p-5 sm:p-6 flex items-center justify-between gap-3 transition-all duration-300">
               <span class="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-rose-500/35" aria-hidden="true"></span>
-              <div class="flex items-center justify-between gap-3">
-                <h4 class="font-serif text-lg font-bold text-slate-900">Patologia</h4>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-slate-200/80 text-[10px] font-mono uppercase tracking-wider text-slate-500 shrink-0">
-                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                  <span>Em breve</span>
-                </span>
-              </div>
-              <p class="text-xs text-slate-600 leading-relaxed font-sans">
-                Acervo de lâminas patológicas em preparação.
-              </p>
+              <h4 class="font-serif text-lg font-bold text-slate-900">Patologia</h4>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-slate-200/80 text-[10px] font-mono uppercase tracking-wider text-slate-500 shrink-0">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                <span>Em breve</span>
+              </span>
             </div>
 
             <!-- Parasitologia -->
-            <div data-disciplina-card="parasitologia" class="relative overflow-hidden palas-card-tactile rounded-2xl bg-[#fbfcfd] border border-slate-200/90 p-5 sm:p-6 flex flex-col justify-between gap-2.5 transition-all duration-300">
+            <div data-disciplina-card="parasitologia" class="relative overflow-hidden palas-card-tactile rounded-2xl bg-[#fbfcfd] border border-slate-200/90 p-5 sm:p-6 flex items-center justify-between gap-3 transition-all duration-300">
               <span class="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-emerald-500/35" aria-hidden="true"></span>
-              <div class="flex items-center justify-between gap-3">
-                <h4 class="font-serif text-lg font-bold text-slate-900">Parasitologia</h4>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-slate-200/80 text-[10px] font-mono uppercase tracking-wider text-slate-500 shrink-0">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  <span>Em breve</span>
-                </span>
-              </div>
-              <p class="text-xs text-slate-600 leading-relaxed font-sans">
-                Acervo de parasitos de interesse médico em preparação.
-              </p>
+              <h4 class="font-serif text-lg font-bold text-slate-900">Parasitologia</h4>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-slate-200/80 text-[10px] font-mono uppercase tracking-wider text-slate-500 shrink-0">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>Em breve</span>
+              </span>
             </div>
 
             <!-- Microbiologia -->
-            <div data-disciplina-card="microbiologia" class="relative overflow-hidden palas-card-tactile rounded-2xl bg-[#fbfcfd] border border-slate-200/90 p-5 sm:p-6 flex flex-col justify-between gap-2.5 transition-all duration-300">
+            <div data-disciplina-card="microbiologia" class="relative overflow-hidden palas-card-tactile rounded-2xl bg-[#fbfcfd] border border-slate-200/90 p-5 sm:p-6 flex items-center justify-between gap-3 transition-all duration-300">
               <span class="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-violet-500/35" aria-hidden="true"></span>
-              <div class="flex items-center justify-between gap-3">
-                <h4 class="font-serif text-lg font-bold text-slate-900">Microbiologia</h4>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-slate-200/80 text-[10px] font-mono uppercase tracking-wider text-slate-500 shrink-0">
-                  <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
-                  <span>Em breve</span>
-                </span>
-              </div>
-              <p class="text-xs text-slate-600 leading-relaxed font-sans">
-                Acervo de bactérias e fungos em preparação.
-              </p>
+              <h4 class="font-serif text-lg font-bold text-slate-900">Microbiologia</h4>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-slate-200/80 text-[10px] font-mono uppercase tracking-wider text-slate-500 shrink-0">
+                <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
+                <span>Em breve</span>
+              </span>
             </div>
 
           </div>
@@ -1436,7 +811,7 @@
       </section>
 
       <!-- ============================================================
-           QUARTA FAIXA: LÂMINAS DISPONÍVEIS (FUNDO CLARO #f8fafc)
+           QUARTA FAIXA: LÂMINAS POPULARES (MÁX. 4 VISÍVEIS + ROTAÇÃO)
       ============================================================ -->
       <div id="laminas" class="scroll-mt-24"></div>
       <section id="secaoLaminasPopulares" class="w-full bg-[#f8fafc] border-b border-slate-200/80 py-12 sm:py-16 lg:py-20 relative z-10 scroll-mt-24">
@@ -1444,307 +819,54 @@
 
           <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-7 pb-5 border-b border-slate-200/80">
             <div>
-              <span class="block font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-700/90 mb-1.5">03 &middot; Pranchas Disponíveis</span>
               <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-[-0.02em]">
-                Lâminas disponíveis
+                Lâminas populares
               </h2>
-              <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1">
-                <p class="text-sm text-slate-600">
-                  Preparações digitalizadas do acervo para consulta imediata ao microscópio.
-                </p>
-                <span class="hidden sm:inline text-slate-300" aria-hidden="true">&middot;</span>
-                <span id="homeSlidesCountLabel" class="text-xs font-mono tabular-nums text-teal-800/90 font-medium">
-                  4 lâminas no acervo
-                </span>
-              </div>
+              <span id="homeSlidesCountLabel" class="block mt-1 text-xs font-mono tabular-nums text-teal-800/90 font-medium">
+                Sincronizando acervo...
+              </span>
             </div>
 
-            <div class="inline-flex flex-wrap items-center gap-1 p-1 rounded-xl bg-white border border-slate-200/90 shadow-2xs text-xs font-sans self-start sm:self-auto">
-              <button
-                type="button"
-                data-slide-filter="todas"
-                onclick="window.App.filtrarLaminasHome('todas')"
-                class="home-slide-filter-btn px-3 py-1.5 rounded-lg bg-teal-900 text-white shadow-xs transition-colors text-[11px] font-medium tabular-nums cursor-pointer"
-              >
-                Todas (4)
-              </button>
-              <button
-                type="button"
-                data-slide-filter="osseo"
-                onclick="window.App.filtrarLaminasHome('osseo')"
-                class="home-slide-filter-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-teal-900 hover:bg-slate-50 transition-colors text-[11px] font-medium tabular-nums cursor-pointer"
-              >
-                Tecido Ósseo (3)
-              </button>
-              <button
-                type="button"
-                data-slide-filter="epitelial"
-                onclick="window.App.filtrarLaminasHome('epitelial')"
-                class="home-slide-filter-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-teal-900 hover:bg-slate-50 transition-colors text-[11px] font-medium tabular-nums cursor-pointer"
-              >
-                Tecido Epitelial (1)
-              </button>
+            <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              <div id="homeSlidesFilters" class="hidden inline-flex flex-wrap items-center gap-1 p-1 rounded-xl bg-white border border-slate-200/90 shadow-2xs text-xs font-sans"></div>
+
+              <div id="popularRotationControls" class="hidden items-center gap-0.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs p-1 text-xs font-sans select-none">
+                <button
+                  type="button"
+                  id="popularPrevBtn"
+                  class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer active:scale-95"
+                  aria-label="Lâminas anteriores"
+                  title="Lâminas anteriores"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                  </svg>
+                </button>
+                <span id="popularRotationCounter" class="font-mono tabular-nums text-[11px] font-semibold text-slate-700 px-1.5 whitespace-nowrap">01 / 01</span>
+                <button
+                  type="button"
+                  id="popularNextBtn"
+                  class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer active:scale-95"
+                  aria-label="Próximas lâminas"
+                  title="Próximas lâminas"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
-          <!-- Grid de Pranchas Científicas (Galeria Editorial Assimétrica 12 Colunas) -->
-          <div id="homeSlidesGrid" data-grid-mode="bento" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5 lg:gap-6">
-
-              <!-- Prancha 1: Osso Maduro 40x (Destaque Principal — Col 7) -->
-              <div data-slide-id="cw3XGCgUwN71XdlwkUe5" data-slide-topic="osseo" onclick="window.location.href='microscopio.html?id=cw3XGCgUwN71XdlwkUe5'" class="popular-slide-card bento-primary palas-card-tactile palas-card-interactive group bg-white border border-slate-200/90 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer">
-                <div class="bento-card-inner flex flex-col w-full h-full">
-                  <div class="bento-media relative w-full aspect-[4/3] bg-slate-100 overflow-hidden border-b border-slate-200/70">
-                    <img
-                      src="assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
-                      alt="Osso Maduro 40x"
-                      class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
-                      loading="lazy"
-                    />
-                    <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
-                    <div class="absolute top-2.5 left-2.5">
-                      <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10.5px] font-mono tabular-nums font-semibold px-2.5 py-1 rounded-md shadow-sm">
-                        Desgaste &middot; 40x
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="bento-body-wrap flex-1 flex flex-col justify-between">
-                    <div class="p-4 sm:p-5">
-                      <div class="flex items-center justify-between gap-2 text-[10px] font-mono tracking-[0.06em] tabular-nums mb-1.5">
-                        <span class="uppercase text-teal-700 font-semibold">Tecido Ósseo</span>
-                        <span class="text-slate-400 normal-case">0,16 &micro;m/px</span>
-                      </div>
-                      <h3 class="popular-slide-title font-serif font-bold text-base sm:text-lg lg:text-xl text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1.5">
-                        Osso Maduro 40x
-                      </h3>
-                      <p class="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-sans">
-                        Ósteons, canalículos e linhas cimentantes em objetiva de 40x.
-                      </p>
-                    </div>
-
-                    <div class="px-4 sm:px-5 pb-4 sm:pb-5 mt-auto">
-                      <a
-                        href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5"
-                        class="pt-3 border-t border-slate-100 w-full text-xs font-semibold text-teal-800 group-hover:text-teal-950 transition-colors flex items-center justify-between no-underline"
-                      >
-                        <span>Abrir no microscópio</span>
-                        <span class="text-slate-400 group-hover:text-teal-800 group-hover:translate-x-0.5 transition-all">&rarr;</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Prancha 2: Pele Espessa (Contraste Cromático H&E — Col 5) -->
-              <div data-slide-id="a3oRvXvJpMKAtU2RE85q" data-slide-topic="epitelial" onclick="window.location.href='microscopio.html?id=a3oRvXvJpMKAtU2RE85q'" class="popular-slide-card bento-accent palas-card-tactile palas-card-interactive group bg-white border border-slate-200/90 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer">
-                <div class="bento-card-inner flex flex-col w-full h-full">
-                  <div class="bento-media relative w-full aspect-[4/3] bg-slate-100 overflow-hidden border-b border-slate-200/70">
-                    <img
-                      src="assets/histologia/lamina-real1-preview.jpg"
-                      alt="Pele Espessa"
-                      class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
-                      loading="lazy"
-                    />
-                    <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
-                    <div class="absolute top-2.5 left-2.5">
-                      <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10.5px] font-mono tabular-nums font-semibold px-2.5 py-1 rounded-md shadow-sm">
-                        H&amp;E &middot; 40x
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="bento-body-wrap flex-1 flex flex-col justify-between">
-                    <div class="p-4 sm:p-5">
-                      <div class="flex items-center justify-between gap-2 text-[10px] font-mono tracking-[0.06em] tabular-nums mb-1.5">
-                        <span class="uppercase text-teal-700 font-semibold">Tecido Epitelial</span>
-                        <span class="text-slate-400 normal-case">0,16 &micro;m/px</span>
-                      </div>
-                      <h3 class="popular-slide-title font-serif font-bold text-base sm:text-lg lg:text-xl text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1.5">
-                        Pele Espessa
-                      </h3>
-                      <p class="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-sans">
-                        Epiderme estratificada queratinizada e derme papilar em rotina H&amp;E.
-                      </p>
-                    </div>
-
-                    <div class="px-4 sm:px-5 pb-4 sm:pb-5 mt-auto">
-                      <a
-                        href="microscopio.html?id=a3oRvXvJpMKAtU2RE85q"
-                        class="pt-3 border-t border-slate-100 w-full text-xs font-semibold text-teal-800 group-hover:text-teal-950 transition-colors flex items-center justify-between no-underline"
-                      >
-                        <span>Abrir no microscópio</span>
-                        <span class="text-slate-400 group-hover:text-teal-800 group-hover:translate-x-0.5 transition-all">&rarr;</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Prancha 3: Osso Maduro 10x (Cartão Horizontal — Col 6) -->
-              <div data-slide-id="FFGk5d9kOAct5HIDdjQ7" data-slide-topic="osseo" onclick="window.location.href='microscopio.html?id=FFGk5d9kOAct5HIDdjQ7'" class="popular-slide-card bento-wide palas-card-tactile palas-card-interactive group bg-white border border-slate-200/90 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer">
-                <div class="bento-card-inner flex flex-col w-full h-full">
-                  <div class="bento-media relative w-full aspect-[4/3] bg-slate-100 overflow-hidden border-b border-slate-200/70">
-                    <img
-                      src="assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg"
-                      alt="Osso Maduro 10x"
-                      class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
-                      loading="lazy"
-                    />
-                    <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
-                    <div class="absolute top-2.5 left-2.5">
-                      <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10.5px] font-mono tabular-nums font-semibold px-2.5 py-1 rounded-md shadow-sm">
-                        Desgaste &middot; 10x
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="bento-body-wrap flex-1 flex flex-col justify-between">
-                    <div class="p-4 sm:p-5">
-                      <div class="flex items-center justify-between gap-2 text-[10px] font-mono tracking-[0.06em] tabular-nums mb-1.5">
-                        <span class="uppercase text-teal-700 font-semibold">Tecido Ósseo</span>
-                        <span class="text-slate-400 normal-case">0,63 &micro;m/px</span>
-                      </div>
-                      <h3 class="popular-slide-title font-serif font-bold text-base sm:text-lg text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1.5">
-                        Osso Maduro 10x
-                      </h3>
-                      <p class="text-xs text-slate-600 leading-relaxed font-sans">
-                        Visão panorâmica da arquitetura do tecido ósseo compacto cortical.
-                      </p>
-                    </div>
-
-                    <div class="px-4 sm:px-5 pb-4 sm:pb-5 mt-auto">
-                      <a
-                        href="microscopio.html?id=FFGk5d9kOAct5HIDdjQ7"
-                        class="pt-3 border-t border-slate-100 w-full text-xs font-semibold text-teal-800 group-hover:text-teal-950 transition-colors flex items-center justify-between no-underline"
-                      >
-                        <span>Abrir no microscópio</span>
-                        <span class="text-slate-400 group-hover:text-teal-800 group-hover:translate-x-0.5 transition-all">&rarr;</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Prancha 4: Osso Maduro (Cartão Horizontal — Col 6) -->
-              <div data-slide-id="96ZYqoM2SV8p4fB2QgeM" data-slide-topic="osseo" onclick="window.location.href='microscopio.html?id=96ZYqoM2SV8p4fB2QgeM'" class="popular-slide-card bento-wide palas-card-tactile palas-card-interactive group bg-white border border-slate-200/90 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer">
-                <div class="bento-card-inner flex flex-col w-full h-full">
-                  <div class="bento-media relative w-full aspect-[4/3] bg-slate-100 overflow-hidden border-b border-slate-200/70">
-                    <img
-                      src="assets/histologia/osso_maduro_desgaste_ct-preview.jpg"
-                      alt="Osso Maduro"
-                      class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
-                      loading="lazy"
-                    />
-                    <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
-                    <div class="absolute top-2.5 left-2.5">
-                      <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10.5px] font-mono tabular-nums font-semibold px-2.5 py-1 rounded-md shadow-sm">
-                        Desgaste &middot; 40x
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="bento-body-wrap flex-1 flex flex-col justify-between">
-                    <div class="p-4 sm:p-5">
-                      <div class="flex items-center justify-between gap-2 text-[10px] font-mono tracking-[0.06em] tabular-nums mb-1.5">
-                        <span class="uppercase text-teal-700 font-semibold">Tecido Ósseo</span>
-                        <span class="text-slate-400 normal-case">0,16 &micro;m/px</span>
-                      </div>
-                      <h3 class="popular-slide-title font-serif font-bold text-base sm:text-lg text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1.5">
-                        Osso Maduro
-                      </h3>
-                      <p class="text-xs text-slate-600 leading-relaxed font-sans">
-                        Sistemas de Havers, lacunas osteocitárias e canais de Volkmann.
-                      </p>
-                    </div>
-
-                    <div class="px-4 sm:px-5 pb-4 sm:pb-5 mt-auto">
-                      <a
-                        href="microscopio.html?id=96ZYqoM2SV8p4fB2QgeM"
-                        class="pt-3 border-t border-slate-100 w-full text-xs font-semibold text-teal-800 group-hover:text-teal-950 transition-colors flex items-center justify-between no-underline"
-                      >
-                        <span>Abrir no microscópio</span>
-                        <span class="text-slate-400 group-hover:text-teal-800 group-hover:translate-x-0.5 transition-all">&rarr;</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+          <!-- Grid de Pranchas Ativas (Teto de 4 visíveis + rotação automática via js/home-showcase.js) -->
+          <div id="homeSlidesGrid" data-count="0" class="popular-grid-transition grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5 lg:gap-6">
+            <div class="col-span-full bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-xs font-mono text-slate-400">
+              Carregando lâminas ativas do acervo...
             </div>
+          </div>
 
         </div>
       </section>
-
-      <!-- Sincronização leve do acervo com Firestore + filtro local por tecido -->
-      <script>
-        (function() {
-          window.App = window.App || {};
-          window.App.filtrarLaminasHome = function(filtro) {
-            const target = filtro || 'todas';
-            const grid = document.getElementById('homeSlidesGrid');
-            if (grid) {
-              grid.setAttribute('data-grid-mode', target === 'todas' ? 'bento' : 'filtered');
-            }
-            let visiveis = 0;
-            document.querySelectorAll('#secaoLaminasPopulares .popular-slide-card').forEach(card => {
-              const topico = card.getAttribute('data-slide-topic') || '';
-              const mostrar = target === 'todas' || topico === target;
-              card.classList.toggle('hidden', !mostrar);
-              if (mostrar) visiveis++;
-            });
-
-            document.querySelectorAll('.home-slide-filter-btn').forEach(btn => {
-              const ativo = btn.getAttribute('data-slide-filter') === target;
-              if (ativo) {
-                btn.classList.remove('text-slate-600', 'hover:text-teal-900', 'hover:bg-slate-50');
-                btn.classList.add('bg-teal-900', 'text-white', 'shadow-xs');
-              } else {
-                btn.classList.remove('bg-teal-900', 'text-white', 'shadow-xs');
-                btn.classList.add('text-slate-600', 'hover:text-teal-900', 'hover:bg-slate-50');
-              }
-            });
-
-            const countEl = document.getElementById('homeSlidesCountLabel');
-            if (countEl) {
-              if (target === 'todas') {
-                countEl.textContent = visiveis + ' lâminas no acervo';
-              } else if (target === 'osseo') {
-                countEl.textContent = visiveis + ' lâminas em Tecido Ósseo';
-              } else if (target === 'epitelial') {
-                countEl.textContent = visiveis + (visiveis === 1 ? ' lâmina em Tecido Epitelial' : ' lâminas em Tecido Epitelial');
-              }
-            }
-          };
-
-          let synced = false;
-          function syncPopularCardsFirestore() {
-            if (synced) return;
-            if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) return;
-            synced = true;
-            try {
-              const db = firebase.firestore();
-              db.collection('laminas').where('status', '==', 'ativa').get()
-                .then(snapshot => {
-                  if (!snapshot || snapshot.empty) return;
-                  snapshot.forEach(doc => {
-                    const data = doc.data() || {};
-                    const nome = (data.nome || '').trim();
-                    if (!nome) return;
-                    document.querySelectorAll('[data-slide-id="' + doc.id + '"]').forEach(card => {
-                      const tEl = card.querySelector('.popular-slide-title');
-                      if (tEl) tEl.textContent = nome;
-                      const linkEl = card.querySelector('a');
-                      if (linkEl) linkEl.href = 'microscopio.html?id=' + encodeURIComponent(doc.id);
-                    });
-                  });
-                })
-                .catch(() => {});
-            } catch (e) {}
-          }
-          document.addEventListener('DOMContentLoaded', syncPopularCardsFirestore);
-          window.addEventListener('palas-firebase-ready', syncPopularCardsFirestore, { once: true });
-        })();
-      </script>
 
       <!-- ============================================================
            QUINTA FAIXA: COMO USAR O MICROSCÓPIO (FUNDO BRANCO PURO)
@@ -1757,15 +879,15 @@
 
             <!-- Coluna Esquerda -->
             <div class="lg:col-span-4 flex flex-col items-start text-left">
-              <span class="block font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-700/90 mb-1.5">04 &middot; Modo de Uso</span>
               <h2 class="text-2xl sm:text-3xl font-serif font-extrabold text-slate-950 tracking-[-0.02em]">
                 Como usar o microscópio
               </h2>
               <p class="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
-                Os comandos replicam o uso básico do microscópio óptico. Vale começar na objetiva de 4x para se localizar no corte antes de aproximar.
+                Comandos diretos de microscopia óptica. Comece em 4x para se situar no corte.
               </p>
               <a
                 href="microscopio.html?id=cw3XGCgUwN71XdlwkUe5"
+                data-default-microscope-link
                 class="mt-5 inline-flex items-center gap-2 pl-4 pr-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200/90 hover:border-slate-900 transition-all duration-150 active:scale-[0.98] text-xs font-semibold no-underline shadow-2xs group"
               >
                 <span>Abrir lâmina de teste</span>
@@ -1784,7 +906,7 @@
                   </h3>
                   <div class="sm:w-7/12">
                     <p class="text-sm text-slate-600 leading-relaxed">
-                      Clique e arraste para percorrer todo o corte. Use o scroll do mouse ou o gesto de pinça no celular para aproximar até o detalhe celular.
+                      Arraste para percorrer o corte; use o scroll ou pinça para ampliar.
                     </p>
                     <div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
                       <kbd class="palas-kbd-cap">Arrastar</kbd>
@@ -1802,7 +924,7 @@
                   </h3>
                   <div class="sm:w-7/12">
                     <p class="text-sm text-slate-600 leading-relaxed">
-                      Alterne entre as objetivas disponíveis (4x, 10x e 40x) no painel inferior e ative a régua em micrômetros para medir estruturas diretamente na imagem.
+                      Alterne entre as objetivas no painel inferior e meça estruturas em micrômetros.
                     </p>
                     <div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
                       <kbd class="palas-kbd-cap">4&times;</kbd>
@@ -1820,7 +942,7 @@
                   </h3>
                   <div class="sm:w-7/12">
                     <p class="text-sm text-slate-600 leading-relaxed">
-                      Clique nos termos sublinhados no texto para localizar cada estrutura na lâmina sem perder o ponto de leitura, ou oculte os pinos para treinar.
+                      Clique nos termos do texto para localizar estruturas no corte ou oculte os pinos para treinar.
                     </p>
                     <div class="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[11px] text-slate-500">
                       <span class="inline-flex items-center gap-1"><kbd class="palas-kbd-cap">M</kbd><span>Marcações</span></span>
@@ -1846,12 +968,11 @@
 
           <!-- 1. Texto -->
           <div class="max-w-2xl">
-            <span class="block font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-700/90 mb-1.5">05 &middot; Expediente</span>
             <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-[-0.02em] leading-snug">
               Quem faz o Palas Atlas
             </h2>
             <p class="mt-3 text-sm sm:text-base text-slate-600 leading-relaxed font-sans">
-              O atlas é construído na graduação em Medicina, com orientação docente, fotografando e revisando lâminas reais para que outros estudantes consigam estudar fora do horário de laboratório.
+              Construído na graduação em Medicina com orientação docente para ampliar o estudo prático fora do laboratório.
             </p>
           </div>
 
@@ -1920,13 +1041,9 @@
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
 
             <div class="lg:col-span-4 text-left">
-              <span class="block font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-300/85 mb-1.5">06 &middot; Perguntas Frequentes</span>
               <h2 class="text-2xl sm:text-3xl font-serif font-extrabold text-white tracking-[-0.02em]">
                 Dúvidas frequentes
               </h2>
-              <p class="text-sm sm:text-base text-slate-200 mt-2.5 leading-relaxed">
-                Respostas rápidas sobre o funcionamento do atlas e o uso das imagens nos estudos.
-              </p>
               <div class="mt-5 pt-4 border-t border-white/10 text-xs text-slate-300 space-y-1">
                 <p>Sugestões ou correções?</p>
                 <a href="mailto:contato@palasatlas.com" class="inline-block font-semibold text-teal-300 hover:text-teal-200 no-underline">contato@palasatlas.com</a>
@@ -3039,7 +2156,7 @@
   
   <!-- Módulos JS Locais com Cache Busting -->
   <script type="module" src="js/slide-security.js?v=20261121v5"></script>
-  <script type="module" src="js/main.js?v=20261123v4"></script>
+  <script type="module" src="js/main.js?v=20261123v5"></script>
   <!-- COOKIE CONSENT BANNER (BARRA DISCRETA) -->
   <div id="cookieBanner" class="palas-glass-instrument fixed bottom-3 left-3 right-3 sm:bottom-5 sm:left-auto sm:right-5 sm:translate-x-0 sm:w-auto sm:max-w-md z-[9999] bg-white/95 backdrop-blur-md border border-slate-200/90 px-4 py-3 rounded-xl shadow-[0_12px_32px_rgba(15,23,42,0.12)] flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 text-xs text-slate-600 leading-snug hidden">
     <p class="m-0">Usamos apenas armazenamento local essencial para preferências e anotações de estudo.</p>

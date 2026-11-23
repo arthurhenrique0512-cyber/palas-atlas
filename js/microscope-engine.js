@@ -23,6 +23,11 @@ import {
   escaparHTML
 } from "./sanitizer.js";
 import {
+  derivePreviewImage,
+  isGenericStain,
+  TOPIC_LABELS
+} from "./active-slides-store.js?v=20261123v1";
+import {
   emitirCertidaoOptica,
   calcularCampoDeVisaoUm,
   formatarComprimento,
@@ -68,6 +73,7 @@ let _fullscreenRegistrado   = false;
 let _popstateRegistrado     = false;
 let _pagehideRegistrado     = false;
 let _catalogoLaminasSwitcher = [];
+let _unsubSwitcherLaminas   = null;
 
 // Controle de concorrência e temporizadores do visualizador
 let _loadEpoch              = 0;
@@ -713,8 +719,66 @@ function registrarControleAjudaMicroscopio() {
 }
 
 // ---------------------------------------------------------------------------
-// 2. Carrega a lamina pelo ID (Instantâneo no Acervo Base + Firestore)
+// 2. Carrega a lamina pelo ID (Validando status 'ativa' antes de exibir)
 // ---------------------------------------------------------------------------
+async function isAdminAutenticado() {
+  try {
+    if (typeof firebase === "undefined" || typeof firebase.auth !== "function") return false;
+    const authObj = firebase.auth();
+    if (authObj.currentUser) return true;
+    return await new Promise((resolve) => {
+      let resolved = false;
+      let unsub = null;
+      const timer = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          if (typeof unsub === "function") try { unsub(); } catch (e) {}
+          resolve(Boolean(authObj.currentUser));
+        }
+      }, 800);
+      unsub = authObj.onAuthStateChanged((user) => {
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timer);
+          if (typeof unsub === "function") try { unsub(); } catch (e) {}
+          resolve(Boolean(user));
+        }
+      });
+    });
+  } catch (e) {
+    return false;
+  }
+}
+
+function aplicarOverridesFirestoreNaLamina(target, dados) {
+  if (!target || !dados) return;
+  const textoValido = (v) => typeof v === "string" && v.replace(/<[^>]*>/g, "").trim().length > 0;
+
+  if (textoValido(dados.nome)) target.nome = dados.nome;
+  if (textoValido(dados.coloracao) && !isColoracaoGenerica(dados.coloracao)) {
+    target.coloracao = dados.coloracao;
+  }
+  if (textoValido(dados.disciplina)) target.disciplina = dados.disciplina;
+  if (textoValido(dados.topicoTitulo)) target.topicoTitulo = dados.topicoTitulo;
+  if (textoValido(dados.subtitulo)) target.subtitulo = dados.subtitulo;
+  if (textoValido(dados.descricaoHTML)) target.descricaoHTML = dados.descricaoHTML;
+  else if (textoValido(dados.descricao)) target.descricaoHTML = dados.descricao;
+  if (Array.isArray(dados.pinos) && dados.pinos.length > 0) {
+    target.pinos = dados.pinos;
+  }
+  if (Array.isArray(dados.questoes) && dados.questoes.length > 0) {
+    target.questoes = dados.questoes;
+  }
+  if (dados.maxMagnification) {
+    target.maxMagnification = Number(dados.maxMagnification) || 40;
+  }
+  ["objetivaCaptura", "mpp", "perfilOptico", "metodoCalibracao", "opticsUrl"].forEach((campo) => {
+    if (dados[campo] !== undefined && dados[campo] !== null && dados[campo] !== "") {
+      target[campo] = dados[campo];
+    }
+  });
+}
+
 async function carregarLaminaNoMicroscopio(laminaId) {
   if (!laminaId) {
     exibirErroMicroscopio("Nenhuma lâmina selecionada.");
@@ -724,16 +788,72 @@ async function carregarLaminaNoMicroscopio(laminaId) {
   const myEpoch = ++_loadEpoch;
   const idBuscado = String(laminaId).trim();
 
-  // 1. Se for uma das lâminas base conhecidas do acervo, carrega imediatamente
-  const fallback = fallbackLaminas[idBuscado] || 
-                   fallbackLaminas[idBuscado.toLowerCase()] || 
-                   Object.values(fallbackLaminas).find(l => 
+  // 1. Verifica se corresponde a uma lâmina base conhecida do acervo
+  const fallback = fallbackLaminas[idBuscado] ||
+                   fallbackLaminas[idBuscado.toLowerCase()] ||
+                   Object.values(fallbackLaminas).find(l =>
                      l.id.toLowerCase() === idBuscado.toLowerCase() ||
                      (Array.isArray(l.aliases) && l.aliases.some(a => a.toLowerCase() === idBuscado.toLowerCase()))
                    );
 
   if (fallback) {
-    laminaAtualData = { ...fallback };
+    const primaryId = fallback.firestoreId || fallback.id;
+    let dadosFirestore = null;
+
+    if (typeof db !== "undefined" && db) {
+      try {
+        let docRef = await Promise.race([
+          db.collection("laminas").doc(primaryId).get(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Firestore")), 4000))
+        ]).catch((err) => {
+          console.warn("[Palas Atlas] Falha ao consultar status/dados da lâmina:", primaryId, err);
+          return null;
+        });
+        if (myEpoch !== _loadEpoch) return;
+
+        if ((!docRef || !docRef.exists) && idBuscado && idBuscado !== primaryId) {
+          docRef = await Promise.race([
+            db.collection("laminas").doc(idBuscado).get(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Firestore")), 4000))
+          ]).catch(() => null);
+          if (myEpoch !== _loadEpoch) return;
+        }
+
+        if (docRef && docRef.exists) {
+          dadosFirestore = docRef.data() || {};
+          if (dadosFirestore.status && String(dadosFirestore.status).toLowerCase().trim() !== "ativa") {
+            const isAdmin = await isAdminAutenticado();
+            if (myEpoch !== _loadEpoch) return;
+            if (!isAdmin) {
+              exibirErroMicroscopio("Esta lâmina está inativa e não está disponível no acervo público.");
+              return;
+            }
+          }
+        }
+      } catch (err) {
+        if (myEpoch !== _loadEpoch) return;
+        console.warn("[Palas Atlas] Erro ao verificar status da lâmina:", err);
+      }
+    }
+
+    // Bloqueia mesmo em falha offline caso seja explicitamente a lâmina legada desativada
+    if (!dadosFirestore && primaryId === "96ZYqoM2SV8p4fB2QgeM") {
+      const isAdmin = await isAdminAutenticado();
+      if (myEpoch !== _loadEpoch) return;
+      if (!isAdmin) {
+        exibirErroMicroscopio("Esta lâmina está inativa e não está disponível no acervo público.");
+        return;
+      }
+    }
+
+    if (myEpoch !== _loadEpoch) return;
+
+    const dataFinal = { ...fallback };
+    if (dadosFirestore) {
+      aplicarOverridesFirestoreNaLamina(dataFinal, dadosFirestore);
+    }
+
+    laminaAtualData = dataFinal;
     window.laminaAtualData = laminaAtualData;
     listaPinosAtual = Array.isArray(laminaAtualData.pinos) ? laminaAtualData.pinos : [];
     listaQuestoesAtual = Array.isArray(laminaAtualData.questoes) ? laminaAtualData.questoes : [];
@@ -745,78 +865,6 @@ async function carregarLaminaNoMicroscopio(laminaId) {
     renderizarQuestoesNaSidebar(listaQuestoesAtual);
     atualizarBadgeContadorQuestoes();
     inicializarOpenSeadragon();
-
-    // Sincroniza em background: textos e pinos editados no CMS (Firestore)
-    // têm prioridade sobre os valores padrão do acervo local.
-    if (typeof db !== "undefined" && db) {
-      const primaryId = fallback.firestoreId || fallback.id;
-
-      (async () => {
-        try {
-          let docRef = await db.collection("laminas").doc(primaryId).get().catch((err) => {
-            console.warn("[Palas Atlas] Falha ao sincronizar lâmina do Firestore:", primaryId, err);
-            return null;
-          });
-          if (myEpoch !== _loadEpoch) return;
-          if ((!docRef || !docRef.exists) && idBuscado && idBuscado !== primaryId) {
-            docRef = await db.collection("laminas").doc(idBuscado).get().catch((err) => {
-              console.warn("[Palas Atlas] Falha ao sincronizar lâmina do Firestore:", idBuscado, err);
-              return null;
-            });
-            if (myEpoch !== _loadEpoch) return;
-          }
-          if (!docRef || !docRef.exists) return;
-
-          const dados = docRef.data() || {};
-          const textoValido = (v) => typeof v === "string" && v.replace(/<[^>]*>/g, "").trim().length > 0;
-
-          if (textoValido(dados.nome)) laminaAtualData.nome = dados.nome;
-          if (textoValido(dados.coloracao) && !isColoracaoGenerica(dados.coloracao)) {
-            laminaAtualData.coloracao = dados.coloracao;
-          }
-          if (textoValido(dados.disciplina)) laminaAtualData.disciplina = dados.disciplina;
-          if (textoValido(dados.topicoTitulo)) laminaAtualData.topicoTitulo = dados.topicoTitulo;
-          if (textoValido(dados.subtitulo)) laminaAtualData.subtitulo = dados.subtitulo;
-          if (textoValido(dados.descricaoHTML)) laminaAtualData.descricaoHTML = dados.descricaoHTML;
-          else if (textoValido(dados.descricao)) laminaAtualData.descricaoHTML = dados.descricao;
-          if (Array.isArray(dados.pinos) && dados.pinos.length > 0) {
-            laminaAtualData.pinos = dados.pinos;
-            listaPinosAtual = dados.pinos;
-            atualizarBotaoMarcacoes();
-            if (viewer && viewer.world && viewer.world.getItemCount() > 0) {
-              renderizarTodasMarcacoesNoViewer();
-              if (_pendingUrlPinId) {
-                const alvoPin = _pendingUrlPinId;
-                _pendingUrlPinId = null;
-                focarPinoNoViewer(alvoPin);
-              }
-            }
-          }
-          if (Array.isArray(dados.questoes) && dados.questoes.length > 0) {
-            laminaAtualData.questoes = dados.questoes;
-            listaQuestoesAtual = dados.questoes;
-            renderizarQuestoesNaSidebar(listaQuestoesAtual);
-            atualizarBadgeContadorQuestoes();
-          }
-          if (dados.maxMagnification) {
-            laminaAtualData.maxMagnification = Number(dados.maxMagnification) || 40;
-          }
-          // Metadados ópticos cadastrados no CMS (objetiva, MPP, perfil, método)
-          ["objetivaCaptura", "mpp", "perfilOptico", "metodoCalibracao", "opticsUrl"].forEach((campo) => {
-            if (dados[campo] !== undefined && dados[campo] !== null && dados[campo] !== "") {
-              laminaAtualData[campo] = dados[campo];
-            }
-          });
-          recalcularCertidaoOptica();
-          aplicarLimitesOpticos();
-
-          renderizarMetadadosDaLamina();
-          renderizarDescricaoETextos();
-        } catch (err) {
-          console.warn("[Palas Atlas] Erro geral na sincronização paralela do Firestore:", err);
-        }
-      })();
-    }
     return;
   }
 
@@ -824,7 +872,7 @@ async function carregarLaminaNoMicroscopio(laminaId) {
   if (typeof db !== "undefined" && db) {
     try {
       const fetchPromise = db.collection("laminas").doc(idBuscado).get();
-      const timeoutPromise = new Promise((_, reject) => 
+      const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Timeout Firestore")), 5000)
       );
 
@@ -832,6 +880,14 @@ async function carregarLaminaNoMicroscopio(laminaId) {
       if (myEpoch !== _loadEpoch) return;
       if (docRef && docRef.exists) {
         const dados = docRef.data() || {};
+        if (dados.status && String(dados.status).toLowerCase().trim() !== "ativa") {
+          const isAdmin = await isAdminAutenticado();
+          if (myEpoch !== _loadEpoch) return;
+          if (!isAdmin) {
+            exibirErroMicroscopio("Esta lâmina está inativa e não está disponível no acervo público.");
+            return;
+          }
+        }
         laminaAtualData = { id: docRef.id, ...dados };
         window.laminaAtualData = laminaAtualData;
         let dziCandidate = laminaAtualData.dziUrl || (laminaAtualData.imagemUrl && laminaAtualData.imagemUrl.toLowerCase().endsWith('.dzi') ? laminaAtualData.imagemUrl : '');
@@ -867,10 +923,12 @@ async function carregarLaminaNoMicroscopio(laminaId) {
 
   if (myEpoch !== _loadEpoch) return;
 
-  // 3. Fallback secundário por correspondência parcial de nome/slug
-  const fallbackSecundario = Object.values(fallbackLaminas).find(l => 
-    idBuscado.toLowerCase().includes(l.id.toLowerCase()) || 
-    l.id.toLowerCase().includes(idBuscado.toLowerCase())
+  // 3. Fallback secundário por correspondência parcial de nome/slug (excluindo legada inativa)
+  const fallbackSecundario = Object.values(fallbackLaminas).find(l =>
+    l.firestoreId !== "96ZYqoM2SV8p4fB2QgeM" && (
+      idBuscado.toLowerCase().includes(l.id.toLowerCase()) ||
+      l.id.toLowerCase().includes(idBuscado.toLowerCase())
+    )
   );
   if (fallbackSecundario) {
     laminaAtualData = { ...fallbackSecundario };
@@ -1565,6 +1623,10 @@ function destruirInstanciaViewer() {
 export function destruirMicroscopio() {
   flushRespostasPendentes();
   destruirInstanciaViewer();
+  if (typeof _unsubSwitcherLaminas === "function") {
+    try { _unsubSwitcherLaminas(); } catch (e) {}
+    _unsubSwitcherLaminas = null;
+  }
   if (_stageResizeObserver) {
     try { _stageResizeObserver.disconnect(); } catch (e) {}
     _stageResizeObserver = null;
@@ -3044,6 +3106,15 @@ function exibirErroMicroscopio(msg) {
   }
   const tituloEl = document.getElementById("slideTitle");
   if (tituloEl) tituloEl.textContent = "Lâmina Indisponível";
+  const lNome = document.getElementById("laminarioNome");
+  if (lNome) lNome.textContent = "Lâmina Indisponível";
+  const lNomeMobile = document.getElementById("laminarioNomeMobile");
+  if (lNomeMobile) lNomeMobile.textContent = "Indisponível";
+  const breadcrumb = document.getElementById("viewerBreadcrumb");
+  if (breadcrumb) {
+    breadcrumb.textContent = "Indisponível";
+    breadcrumb.classList.remove("hidden");
+  }
   const descEl = document.getElementById("slideDescriptionContainer");
   if (descEl) descEl.innerHTML = `<p class="text-slate-500 italic text-sm font-sans">Não foi possível recuperar os dados morfológicos desta peça.</p>`;
   listaQuestoesAtual = [];
@@ -3760,47 +3831,37 @@ function registrarAtalhosTecladoMicroscopio() {
   });
 }
 
-const CATALOGO_BASE_SWITCHER = [
-  {
-    id: "cw3XGCgUwN71XdlwkUe5",
-    nome: "Osso Maduro 40x",
+const SWITCHER_METADATA_HINTS = {
+  cw3XGCgUwN71XdlwkUe5: {
     subtitulo: "Ósteons, canalículos e linhas cimentantes",
     topicoTitulo: "Tecido Ósseo Compacto e Esponjoso",
-    meta: "Desgaste • 40x",
+    meta: "Desgaste",
     maxMag: 40,
     previewImage: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg",
     aliases: ["osso_maduro_desgaste_ct_3.0", "osso_3.0", "osso-3.0"]
   },
-  {
-    id: "FFGk5d9kOAct5HIDdjQ7",
-    nome: "Osso Maduro 10x",
+  FFGk5d9kOAct5HIDdjQ7: {
     subtitulo: "Visão panorâmica e topografia cortical",
     topicoTitulo: "Tecido Ósseo Compacto e Esponjoso",
-    meta: "Desgaste • 10x",
+    meta: "Desgaste",
     maxMag: 10,
     previewImage: "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg",
     aliases: ["osso_maduro_desgaste_ct_2.0", "osso_2.0", "osso-2.0"]
   },
-  {
-    id: "96ZYqoM2SV8p4fB2QgeM",
-    nome: "Osso Maduro",
-    subtitulo: "Sistemas de Havers e canalículos",
-    topicoTitulo: "Tecido Ósseo Compacto e Esponjoso",
-    meta: "Desgaste • 40x",
-    maxMag: 40,
-    previewImage: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg",
-    aliases: ["osso_maduro_desgaste_ct", "osso-maduro", "osso_maduro"]
-  },
-  {
-    id: "a3oRvXvJpMKAtU2RE85q",
-    nome: "Pele Espessa",
+  a3oRvXvJpMKAtU2RE85q: {
     subtitulo: "Epiderme queratinizada e Derme papilar",
     topicoTitulo: "Tecido Epitelial de Revestimento e Glandular",
-    meta: "H&E • 40x",
+    meta: "H&E",
     maxMag: 40,
     previewImage: "assets/histologia/lamina-real1-preview.jpg",
     aliases: ["lamina-real1", "lamina-real-1", "pele_espessa", "pele-espessa"]
   }
+};
+
+const ORDEM_SWITCHER_PRIORITARIA = [
+  "cw3XGCgUwN71XdlwkUe5",
+  "FFGk5d9kOAct5HIDdjQ7",
+  "a3oRvXvJpMKAtU2RE85q"
 ];
 
 function resolverIdCanonicoSwitcher(slideId) {
@@ -3810,7 +3871,16 @@ function resolverIdCanonicoSwitcher(slideId) {
     String(item.id).toLowerCase() === alvo ||
     (Array.isArray(item.aliases) && item.aliases.some(a => String(a).toLowerCase() === alvo))
   );
-  return match ? match.id : String(slideId).trim();
+  if (match) return match.id;
+  for (const [hintId, hint] of Object.entries(SWITCHER_METADATA_HINTS)) {
+    if (
+      hintId.toLowerCase() === alvo ||
+      (Array.isArray(hint.aliases) && hint.aliases.some(a => String(a).toLowerCase() === alvo))
+    ) {
+      return hintId;
+    }
+  }
+  return String(slideId).trim();
 }
 
 function formatarBadgeTecnica(rawMeta, maxMag) {
@@ -3828,7 +3898,12 @@ function renderizarListaLaminarioRapido() {
   const activeId = resolverIdCanonicoSwitcher(laminaAtualData?.id || "");
   if (totalEl) {
     const n = _catalogoLaminasSwitcher.length;
-    totalEl.textContent = `${n} ${n === 1 ? "lâmina" : "lâminas"}`;
+    totalEl.textContent = n > 0 ? `${n} ${n === 1 ? "lâmina" : "lâminas"}` : "Acervo";
+  }
+
+  if (_catalogoLaminasSwitcher.length === 0) {
+    listEl.innerHTML = `<div class="p-4 text-center text-xs text-slate-400 font-mono">Carregando lâminas ativas...</div>`;
+    return;
   }
 
   listEl.innerHTML = _catalogoLaminasSwitcher.map((item) => {
@@ -3884,7 +3959,20 @@ function atualizarNavegacaoRodapeSidebar() {
   if (!prevBtn && !nextBtn) return;
 
   const pool = _catalogoLaminasSwitcher;
-  if (!pool || pool.length < 2) return;
+  if (!pool || pool.length < 2) {
+    if (prevName) prevName.textContent = "—";
+    if (nextName) nextName.textContent = "—";
+    [prevBtn, nextBtn].filter(Boolean).forEach((btn) => {
+      btn.disabled = true;
+      btn.classList.add("opacity-45", "pointer-events-none");
+    });
+    return;
+  }
+
+  [prevBtn, nextBtn].filter(Boolean).forEach((btn) => {
+    btn.disabled = false;
+    btn.classList.remove("opacity-45", "pointer-events-none");
+  });
 
   const activeId = resolverIdCanonicoSwitcher(laminaAtualData?.id || "");
   const idx = pool.findIndex(item => item.id === activeId);
@@ -3957,6 +4045,11 @@ function atualizarCertidaoOpticaUI() {
 function renderizarAcervoRelacionado() {
   const grid = document.getElementById("acervoRelacionadoGrid");
   if (!grid) return;
+
+  if (_catalogoLaminasSwitcher.length === 0) {
+    grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl border border-slate-200/80 p-6 text-center text-xs font-mono text-slate-400">Carregando lâminas ativas do acervo...</div>`;
+    return;
+  }
 
   const activeId = resolverIdCanonicoSwitcher(laminaAtualData?.id || "");
   grid.innerHTML = _catalogoLaminasSwitcher.map((item) => {
@@ -4057,14 +4150,11 @@ function renderizarOpcoesSwitcher(selectedId) {
 }
 
 function sincronizarSeletorRapidoLaminas(slideId) {
-  if (!_catalogoLaminasSwitcher.length) {
-    _catalogoLaminasSwitcher = CATALOGO_BASE_SWITCHER.map(item => ({ ...item }));
-  }
   renderizarOpcoesSwitcher(slideId);
 }
 
 function inicializarSeletorRapidoLaminas() {
-  _catalogoLaminasSwitcher = CATALOGO_BASE_SWITCHER.map(item => ({ ...item }));
+  _catalogoLaminasSwitcher = [];
   renderizarOpcoesSwitcher(laminaAtualData?.id || "");
 
   const selects = [
@@ -4084,43 +4174,62 @@ function inicializarSeletorRapidoLaminas() {
     });
   });
 
+  if (typeof _unsubSwitcherLaminas === "function") {
+    try { _unsubSwitcherLaminas(); } catch (e) {}
+    _unsubSwitcherLaminas = null;
+  }
+
   if (typeof db !== "undefined" && db) {
-    db.collection("laminas")
+    _unsubSwitcherLaminas = db.collection("laminas")
       .where("status", "==", "ativa")
-      .get()
-      .then((snapshot) => {
-        if (!snapshot || snapshot.empty) return;
-        const extras = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data() || {};
-          const docIdLower = String(doc.id).toLowerCase();
-          const existe = _catalogoLaminasSwitcher.find(base =>
-            String(base.id).toLowerCase() === docIdLower ||
-            (Array.isArray(base.aliases) && base.aliases.some(a => String(a).toLowerCase() === docIdLower))
-          );
-          if (existe) {
-            if (data.nome && data.nome.trim()) existe.nome = data.nome.trim();
-            if (data.coloracao && !isColoracaoGenerica(data.coloracao)) existe.meta = data.coloracao.trim();
-          } else if (data.nome && data.nome.trim()) {
-            extras.push({
+      .onSnapshot(
+        (snapshot) => {
+          const itensAtivos = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data() || {};
+            if (String(data.status || "").toLowerCase().trim() !== "ativa") return;
+            const nome = String(data.nome || "").trim();
+            if (!nome) return;
+
+            const hint = SWITCHER_METADATA_HINTS[doc.id];
+            const maxMag = Number(data.maxMagnification || data.maxMag || hint?.maxMag) || 40;
+            const rawColor = String(data.coloracao || "").trim();
+            const metaBase = !isGenericStain(rawColor) ? rawColor : (hint?.meta || "Histologia");
+            const topicoSlug = String(data.topico || "").trim().toLowerCase();
+            const topicoTitulo = data.topicoTitulo || hint?.topicoTitulo || TOPIC_LABELS[topicoSlug] || "Histologia";
+
+            itensAtivos.push({
               id: doc.id,
-              nome: data.nome.trim(),
-              subtitulo: data.subtitulo || "Lâmina Histológica Digital",
-              topicoTitulo: data.topicoTitulo || "Histologia",
-              meta: !isColoracaoGenerica(data.coloracao) ? data.coloracao.trim() : `${Number(data.maxMagnification) || 40}x`,
-              maxMag: Number(data.maxMagnification) || 40,
-              previewImage: data.previewImage || data.thumbnailUrl || "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg",
-              aliases: []
+              nome,
+              subtitulo: String(data.subtitulo || hint?.subtitulo || "Lâmina Histológica Digital").trim(),
+              topicoTitulo,
+              meta: metaBase,
+              maxMag,
+              previewImage: derivePreviewImage(doc.id, data),
+              aliases: hint?.aliases || []
             });
+          });
+
+          itensAtivos.sort((a, b) => {
+            const ia = ORDEM_SWITCHER_PRIORITARIA.indexOf(a.id);
+            const ib = ORDEM_SWITCHER_PRIORITARIA.indexOf(b.id);
+            if (ia !== -1 && ib !== -1) return ia - ib;
+            if (ia !== -1) return -1;
+            if (ib !== -1) return 1;
+            return a.nome.localeCompare(b.nome, "pt-BR");
+          });
+
+          _catalogoLaminasSwitcher = itensAtivos;
+          renderizarOpcoesSwitcher(laminaAtualData?.id || "");
+          if (laminaAtualData) {
+            renderizarMetadadosDaLamina();
+            atualizarCertidaoOpticaUI();
           }
-        });
-        if (extras.length > 0) {
-          extras.sort((a, b) => a.nome.localeCompare(b.nome));
-          _catalogoLaminasSwitcher = [..._catalogoLaminasSwitcher, ...extras];
+        },
+        (err) => {
+          console.warn("[SwitchLaminario] Erro ao sincronizar lâminas ativas:", err);
         }
-        renderizarOpcoesSwitcher(laminaAtualData?.id || "");
-      })
-      .catch(() => {});
+      );
   }
 }
 

@@ -23,39 +23,7 @@ export const catalogData = {
         id: "epitelial",
         titulo: "Tecido Epitelial de Revestimento e Glandular",
         resumo: "Caracterizado por células poliédricas fortemente justapostas, assentadas sobre uma lâmina basal, com escassa matriz extracelular e ausência de vascularização direta (nutrido por difusão a partir do conjuntivo adjacente). Exibe polaridade celular definida (domínios apical, lateral e basal) e especializações de membrana (microvilosidades, cílios, desmossomos e junções de oclusão). Divisões principais: epitélios de revestimento (classificados pelo número de camadas e forma celular) e epitélios glandulares (exócrinos, organizados em ductos e porções secretoras acinares ou tubulares; e endócrinos, cordonais ou foliculares, que lançam hormônios na circulação).",
-        laminasEstaticas: [
-          {
-            id: "a3oRvXvJpMKAtU2RE85q",
-            nome: "Pele Espessa",
-            coloracao: "Hematoxilina e Eosina (H&E) • 40x",
-            disciplina: "histologia",
-            topico: "epitelial",
-            maxMagnification: 40,
-            defaultCenter: { x: 0.5, y: 0.70 },
-            dziUrl: "assets/histologia/lamina-real1.dzi",
-            imageUrl: "assets/histologia/lamina-real1.dzi",
-            caminhoImagemBase: "assets/histologia/lamina-real1-preview.jpg",
-            thumbnailUrl: "assets/histologia/lamina-real1-preview.jpg",
-            questoes: [
-              {
-                id: "q-pele-1",
-                numero: 1,
-                titulo: "Estratificação da Epiderme",
-                x: 1631.39,
-                y: 6802.9,
-                enunciado: "Identifique o estrato epidérmico caracterizado por queratinócitos achatados repletos de grânulos basofílicos densos de querato-hialina.",
-                alternativas: [
-                  "Camada Granulosa (grânulos de querato-hialina)",
-                  "Camada Basal (melanócitos)",
-                  "Camada Espinhosa (desmossomos)",
-                  "Derme Papilar (tecido conjuntivo frouxo)"
-                ],
-                alternativaCorreta: 0,
-                explicacao: "A camada granulosa da epiderme da pele espessa exibe queratinócitos com abundantes grânulos basofílicos de querato-hialina, responsáveis pela maturação e síntese da queratina madura."
-              }
-            ]
-          }
-        ]
+        laminasEstaticas: []
       },
       {
         id: "conjuntivo",
@@ -76,47 +44,7 @@ export const catalogData = {
         id: "osseo",
         titulo: "Tecido Ósseo Compacto e Esponjoso",
         resumo: "Tecido conjuntivo rígido e mineralizado, composto por matriz orgânica (predomínio de colágeno tipo I) impregnada por matriz inorgânica (cristais de hidroxiapatita). Suas células incluem osteoblastos (síntese do osteoide), osteócitos (manutenção da matriz em lacunas comunicadas por canalículos) e osteoclastos (células multinucleadas responsáveis pela reabsorção óssea). Apresenta-se como Ósseo Compacto (organizado em Sistemas de Havers ou Ósteons, com lamelas concêntricas ao redor de canais vasculares) e Ósseo Esponjoso (rede tridimensional de trabéculas ósseas que delimitam cavidades preenchidas por medula óssea).",
-        laminasEstaticas: [
-          {
-            id: "cw3XGCgUwN71XdlwkUe5",
-            nome: "Osso Maduro 40x",
-            coloracao: "Desgaste • 40x Mapeamento 6x8 (48 fotos)",
-            disciplina: "histologia",
-            topico: "osseo",
-            maxMagnification: 40,
-            defaultCenter: { x: 0.5, y: 0.5 },
-            dziUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
-            imageUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0.dzi",
-            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg",
-            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct_3.0-preview.jpg"
-          },
-          {
-            id: "FFGk5d9kOAct5HIDdjQ7",
-            nome: "Osso Maduro 10x",
-            coloracao: "Desgaste • 10x Mapeamento 2x5",
-            disciplina: "histologia",
-            topico: "osseo",
-            maxMagnification: 10,
-            defaultCenter: { x: 0.5, y: 0.5 },
-            dziUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
-            imageUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0.dzi",
-            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg",
-            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct_2.0-preview.jpg"
-          },
-          {
-            id: "96ZYqoM2SV8p4fB2QgeM",
-            nome: "Osso Maduro",
-            coloracao: "Desgaste • 40x",
-            disciplina: "histologia",
-            topico: "osseo",
-            maxMagnification: 40,
-            defaultCenter: { x: 0.65, y: 0.525 },
-            dziUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
-            imageUrl: "assets/histologia/osso_maduro_desgaste_ct.dzi",
-            caminhoImagemBase: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg",
-            thumbnailUrl: "assets/histologia/osso_maduro_desgaste_ct-preview.jpg"
-          }
-        ]
+        laminasEstaticas: []
       },
       {
         id: "nervoso",
