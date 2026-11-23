@@ -25,8 +25,8 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/tailwind.min.css?v=20261122v2">
-  <link rel="stylesheet" href="css/styles.css?v=20261122v2">
+  <link rel="stylesheet" href="css/tailwind.min.css?v=20261123v3">
+  <link rel="stylesheet" href="css/styles.css?v=20261123v3">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/usnistgov/OpenSeadragonScalebar/openseadragon-scalebar.js"></script>
@@ -35,9 +35,9 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
   <!-- Web Component da Marca -->
-  <script src="js/brand-logo.js?v=20261122v2"></script>
+  <script src="js/brand-logo.js?v=20261123v3"></script>
 
-  <link rel="stylesheet" href="css/splash.css?v=20261122v2">
+  <link rel="stylesheet" href="css/splash.css?v=20261123v3">
   <style>
     :root {
       --viewer-header-h: 56px;
@@ -362,7 +362,7 @@
        ════════════════════════════════════════════════════════════════════ -->
   <header id="viewerHeader" class="palas-header-glass sticky top-0 shrink-0 w-full bg-white/95 backdrop-blur-md z-50 border-b border-slate-200/85">
     <!-- Filete Superior Institucional (Slate, Teal & Gold) -->
-    <div class="palas-top-rule h-[2px] w-full bg-gradient-to-r from-slate-900 via-[#0369a1] to-slate-900"></div>
+    <div class="palas-top-rule h-[2px] w-full bg-gradient-to-r from-slate-900 via-[#0f766e] to-slate-900"></div>
 
     <div class="max-w-[1640px] mx-auto px-2.5 sm:px-5 lg:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
       <!-- Esquerda: Voltar + Marca + Laminário Visual -->
@@ -396,7 +396,7 @@
             aria-expanded="false"
             aria-controls="popoverLaminarioRapido"
             title="Trocar lâmina rapidamente (Laminário)"
-            class="palas-pill-tactile h-10 px-2.5 pr-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-sky-600/40 flex items-center gap-2.5 text-left transition-all duration-200 cursor-pointer max-w-[260px] lg:max-w-[300px]"
+            class="palas-pill-tactile h-10 px-2.5 pr-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-teal-700/40 flex items-center gap-2.5 text-left transition-all duration-200 cursor-pointer max-w-[260px] lg:max-w-[300px]"
           >
             <img
               id="laminarioThumbAtual"
@@ -658,7 +658,7 @@
               <span class="text-slate-400">&#8599;</span>
             </button>
 
-            <a href="#secaoCertidaoOptica" onclick="window.toggleMobileMoreMenu(false);" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left font-medium text-sky-800 no-underline">
+            <a href="#secaoCertidaoOptica" onclick="window.toggleMobileMoreMenu(false);" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left font-medium text-teal-800 no-underline">
               <span>Ficha técnica e acervo</span>
               <span>&darr;</span>
             </a>
@@ -684,7 +684,7 @@
       </div>
 
       <div class="px-4 py-2.5 border-t border-slate-100 bg-slate-50/75 flex items-center justify-end text-[11px]">
-        <a href="index.html#secaoDisciplinas" class="font-semibold text-sky-700 hover:text-sky-900 no-underline inline-flex items-center gap-1">
+        <a href="index.html#secaoDisciplinas" class="font-semibold text-teal-800 hover:text-teal-950 no-underline inline-flex items-center gap-1">
           <span>Catálogo completo</span>
           <span>&rarr;</span>
         </a>
@@ -699,9 +699,9 @@
     <div class="max-w-[1640px] mx-auto px-3 sm:px-5 lg:px-6 h-10 sm:h-11 flex items-center justify-between gap-3">
       <!-- Desktop/Tablet Breadcrumb -->
       <nav aria-label="Navegação estrutural" class="hidden md:flex items-center gap-2 text-xs font-sans text-slate-500 min-w-0">
-        <a href="index.html" class="hover:text-sky-700 transition-colors no-underline shrink-0">Atlas</a>
+        <a href="index.html" class="hover:text-teal-800 transition-colors no-underline shrink-0">Atlas</a>
         <span class="text-slate-300 select-none">&rsaquo;</span>
-        <a id="viewerBreadcrumbDisc" href="index.html?frente=histologia" class="hover:text-sky-700 transition-colors no-underline shrink-0">Histologia</a>
+        <a id="viewerBreadcrumbDisc" href="index.html?frente=histologia" class="hover:text-teal-800 transition-colors no-underline shrink-0">Histologia</a>
         <span class="text-slate-300 select-none">&rsaquo;</span>
         <span id="viewerBreadcrumbTopic" class="text-slate-500 truncate max-w-[200px] lg:max-w-[280px]">Morfologia</span>
         <span class="text-slate-300 select-none">&rsaquo;</span>
@@ -754,9 +754,9 @@
 
       <!-- Direita Desktop: Atalhos internos da página + Modo Bancada -->
       <div class="hidden md:flex items-center gap-3 shrink-0">
-        <a href="#secaoCertidaoOptica" class="text-[11px] font-medium text-slate-500 hover:text-sky-700 transition-colors no-underline">Ficha técnica</a>
+        <a href="#secaoCertidaoOptica" class="text-[11px] font-medium text-slate-500 hover:text-teal-800 transition-colors no-underline">Ficha técnica</a>
         <span class="text-slate-300 select-none">&bull;</span>
-        <a href="#secaoAcervoRelacionado" class="text-[11px] font-medium text-slate-500 hover:text-sky-700 transition-colors no-underline">Outras lâminas</a>
+        <a href="#secaoAcervoRelacionado" class="text-[11px] font-medium text-slate-500 hover:text-teal-800 transition-colors no-underline">Outras lâminas</a>
         <span class="h-3.5 w-px bg-slate-200"></span>
         <button
           id="btnModoBancada"
@@ -891,7 +891,7 @@
             title="Recolher ou expandir minimapa (N)"
             class="palas-glass-instrument inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-slate-200/85 text-[11px] font-medium text-slate-700 hover:text-slate-950 transition-all cursor-pointer shadow-sm"
           >
-            <svg class="w-3 h-3 text-[#0369a1] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg class="w-3 h-3 text-[#0f766e] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <rect x="3" y="4" width="18" height="16" rx="2"/>
               <rect x="11" y="9" width="7" height="6" rx="1"/>
             </svg>
@@ -907,7 +907,7 @@
           <button
             type="button"
             onclick="window.trocarLente(4, this)"
-            class="lens-btn palas-mono-tech bg-[#0369a1] text-white font-bold shadow-sm shadow-sky-900/20 px-2.5 sm:px-3 py-1.5 lg:py-1 rounded-xl text-xs transition-all active-lens cursor-pointer touch-manipulation min-w-[40px] min-h-[36px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
+            class="lens-btn palas-mono-tech bg-[#0f766e] text-white font-bold shadow-sm shadow-teal-900/20 px-2.5 sm:px-3 py-1.5 lg:py-1 rounded-xl text-xs transition-all active-lens cursor-pointer touch-manipulation min-w-[40px] min-h-[36px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0"
             data-mag="4"
           >4x</button>
           <button
@@ -940,21 +940,21 @@
           <button
             type="button"
             onclick="window.alterarZoom(1.35)"
-            class="palas-mono-tech w-8 h-9 sm:w-9 sm:h-9 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0369a1] hover:bg-slate-100 active:bg-slate-200 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
+            class="palas-mono-tech w-8 h-9 sm:w-9 sm:h-9 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0f766e] hover:bg-slate-100 active:bg-slate-200 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
             title="Aproximar (+)"
             aria-label="Aproximar zoom"
           >+</button>
           <button
             type="button"
             onclick="window.alterarZoom(0.75)"
-            class="palas-mono-tech w-8 h-9 sm:w-9 sm:h-9 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0369a1] hover:bg-slate-100 active:bg-slate-200 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
+            class="palas-mono-tech w-8 h-9 sm:w-9 sm:h-9 lg:w-7 lg:h-7 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0f766e] hover:bg-slate-100 active:bg-slate-200 transition-all text-sm lg:text-xs font-bold cursor-pointer touch-manipulation shrink-0"
             title="Afastar (&minus;)"
             aria-label="Afastar zoom"
           >&minus;</button>
           <button
             type="button"
             onclick="window.osdViewerAction('home')"
-            class="palas-mono-tech min-h-[36px] lg:min-h-0 px-2.5 py-1 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0369a1] hover:bg-slate-100 active:bg-slate-200 transition-all text-xs lg:text-[10.5px] tracking-wider uppercase font-semibold cursor-pointer touch-manipulation shrink-0"
+            class="palas-mono-tech min-h-[36px] lg:min-h-0 px-2.5 py-1 flex items-center justify-center rounded-xl text-slate-700 hover:text-[#0f766e] hover:bg-slate-100 active:bg-slate-200 transition-all text-xs lg:text-[10.5px] tracking-wider uppercase font-semibold cursor-pointer touch-manipulation shrink-0"
             title="Enquadramento geral (R)"
             aria-label="Enquadramento geral 1 para 1"
           >1:1</button>
@@ -962,10 +962,10 @@
           <div class="w-px h-5 lg:h-4 bg-slate-200 shrink-0"></div>
 
           <!-- Display Óptico Contínuo + Largura Real do Campo -->
-          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-sky-50/90 border border-sky-200/80 shrink-0 min-h-[36px] lg:min-h-[28px]" title="Ampliação atual e largura real do campo de visão">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#0284c7] shrink-0"></span>
-            <span class="palas-mono-tech text-[#0369a1] font-bold text-xs" id="zoomIndicatorDisplay">4x</span>
-            <span class="hidden sm:inline text-sky-300 font-normal">&middot;</span>
+          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-teal-50/90 border border-teal-200/80 shrink-0 min-h-[36px] lg:min-h-[28px]" title="Ampliação atual e largura real do campo de visão">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#0f766e] shrink-0"></span>
+            <span class="palas-mono-tech text-[#0f766e] font-bold text-xs" id="zoomIndicatorDisplay">4x</span>
+            <span class="hidden sm:inline text-teal-300 font-normal">&middot;</span>
             <span class="hidden sm:inline palas-mono-tech text-[11px] font-medium text-slate-600" id="fovIndicatorDisplay">—</span>
           </div>
         </div>
@@ -988,12 +988,12 @@
         <div class="w-[88vw] sm:w-[370px] lg:w-[340px] xl:w-[396px] max-w-[396px] h-full flex flex-col">
 
           <!-- Filete Editorial Superior do Painel -->
-          <div class="h-[2px] w-full bg-gradient-to-r from-[#0369a1] via-[#0f766e] to-[#d4af37]/80 shrink-0"></div>
+          <div class="h-[2px] w-full bg-gradient-to-r from-[#0f766e] via-[#0d9488] to-[#d4af37]/80 shrink-0"></div>
 
           <!-- Cabeçalho Editorial da Lâmina -->
           <div class="palas-sidebar-header px-5 sm:px-6 pt-4 sm:pt-5 pb-4 border-b border-slate-200/90 shrink-0 flex items-start justify-between gap-3">
             <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-800 mb-1">
+              <div class="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-800 mb-1">
                 <span id="slideDisciplina">HISTOLOGIA</span>
               </div>
               <h2 id="slideTitle" class="text-lg sm:text-[21px] font-serif font-extrabold text-slate-950 leading-snug tracking-tight">
@@ -1026,7 +1026,7 @@
               id="btnTabDescricao"
               type="button"
               onclick="window.alternarAbaPainel('descricao')"
-              class="tab-btn-ativo relative py-3 text-xs font-semibold tracking-wide transition-colors duration-150 cursor-pointer border-b-2 border-[#0369a1] text-slate-950 touch-manipulation flex items-center justify-center"
+              class="tab-btn-ativo relative py-3 text-xs font-semibold tracking-wide transition-colors duration-150 cursor-pointer border-b-2 border-[#0f766e] text-slate-950 touch-manipulation flex items-center justify-center"
             >
               Descrição
             </button>
@@ -1068,9 +1068,9 @@
                 id="btnLaminaAnterior"
                 type="button"
                 onclick="window.navegarLaminaAdjacente && window.navegarLaminaAdjacente(-1)"
-                class="group px-2.5 py-2 rounded-xl bg-white hover:bg-sky-50/60 border border-slate-200/90 hover:border-sky-300 text-left transition-all cursor-pointer min-w-0 shadow-2xs"
+                class="group px-2.5 py-2 rounded-xl bg-white hover:bg-teal-50/60 border border-slate-200/90 hover:border-teal-300 text-left transition-all cursor-pointer min-w-0 shadow-2xs"
               >
-                <span class="block text-[10px] palas-mono-tech uppercase tracking-wider text-slate-400 group-hover:text-sky-700">&larr; Anterior</span>
+                <span class="block text-[10px] palas-mono-tech uppercase tracking-wider text-slate-400 group-hover:text-teal-800">&larr; Anterior</span>
                 <span id="btnLaminaAnteriorNome" class="block text-xs font-semibold text-slate-800 truncate mt-0.5">—</span>
               </button>
 
@@ -1078,15 +1078,15 @@
                 id="btnLaminaProxima"
                 type="button"
                 onclick="window.navegarLaminaAdjacente && window.navegarLaminaAdjacente(1)"
-                class="group px-2.5 py-2 rounded-xl bg-white hover:bg-sky-50/60 border border-slate-200/90 hover:border-sky-300 text-right transition-all cursor-pointer min-w-0 shadow-2xs"
+                class="group px-2.5 py-2 rounded-xl bg-white hover:bg-teal-50/60 border border-slate-200/90 hover:border-teal-300 text-right transition-all cursor-pointer min-w-0 shadow-2xs"
               >
-                <span class="block text-[10px] palas-mono-tech uppercase tracking-wider text-slate-400 group-hover:text-sky-700">Próxima &rarr;</span>
+                <span class="block text-[10px] palas-mono-tech uppercase tracking-wider text-slate-400 group-hover:text-teal-800">Próxima &rarr;</span>
                 <span id="btnLaminaProximaNome" class="block text-xs font-semibold text-slate-800 truncate mt-0.5">—</span>
               </button>
             </div>
 
             <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1.5 border-t border-slate-200/70">
-              <a href="index.html#secaoDisciplinas" class="hover:text-sky-700 transition-colors no-underline font-medium">Catálogo completo</a>
+              <a href="index.html#secaoDisciplinas" class="hover:text-teal-800 transition-colors no-underline font-medium">Catálogo completo</a>
               <a
                 id="linkReportarErroLamina"
                 href="mailto:contato@palasatlas.com?subject=Correção sugerida no Palas Atlas"
@@ -1152,7 +1152,7 @@
         <div>
           <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-950 tracking-tight">Outras lâminas</h2>
         </div>
-        <a href="index.html#secaoDisciplinas" class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-700 hover:text-sky-900 transition-colors no-underline self-start sm:self-auto">
+        <a href="index.html#secaoDisciplinas" class="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-800 hover:text-teal-950 transition-colors no-underline self-start sm:self-auto">
           <span>Ver catálogo completo</span>
           <span>&rarr;</span>
         </a>
@@ -1165,64 +1165,64 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════════
-       6. RODAPÉ INSTITUCIONAL PALAS ATLAS (Sincronizado com index.html)
+       6. RODAPÉ INSTITUCIONAL UNIFICADO PALAS ATLAS
        ════════════════════════════════════════════════════════════════════ -->
-  <footer id="footer-light" class="palas-band-linen w-full bg-white text-slate-600 border-t border-slate-200/90 mt-auto font-sans">
+  <footer id="footer-light" class="w-full bg-[#172731] text-slate-300 border-t border-white/10 mt-auto font-sans transition-opacity duration-300 relative z-20">
     <div class="max-w-[1640px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
 
         <!-- Coluna 1: Marca -->
         <div class="space-y-3.5">
           <div class="flex items-center gap-2">
-            <span class="text-lg font-bold text-slate-900 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">PALAS</span>
-            <span class="text-lg font-bold text-sky-700 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">ATLAS</span>
+            <span class="text-lg font-bold text-white tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">PALAS</span>
+            <span class="text-lg font-bold text-sky-400 tracking-[0.18em]" style="font-family: 'Cormorant Garamond', Georgia, serif;">ATLAS</span>
           </div>
-          <p class="text-xs leading-relaxed max-w-xs text-slate-500">
-            Integração científica e prática laboratorial para estudantes da área da saúde.
+          <p class="text-xs leading-relaxed max-w-xs text-slate-300">
+            Lâminas reais digitalizadas para o estudo prático ao microscópio.
           </p>
         </div>
 
         <!-- Coluna 2: Disciplinas -->
         <div class="space-y-3">
-          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Disciplinas</h4>
+          <h4 class="text-slate-200 font-semibold tracking-wider text-xs uppercase">Disciplinas</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html?frente=histologia">Histologia</a></li>
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html?frente=patologia">Patologia</a></li>
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html?frente=parasitologia">Parasitologia</a></li>
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html?frente=microbiologia">Microbiologia</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="index.html?frente=histologia">Histologia</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="index.html?frente=patologia">Patologia</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="index.html?frente=parasitologia">Parasitologia</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="index.html?frente=microbiologia">Microbiologia</a></li>
           </ul>
         </div>
 
-        <!-- Coluna 3: Plataforma -->
+        <!-- Coluna 3: Projeto -->
         <div class="space-y-3">
-          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Plataforma</h4>
+          <h4 class="text-slate-200 font-semibold tracking-wider text-xs uppercase">Projeto</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="index.html">Início (Home)</a></li>
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="sobre.html">Sobre o Projeto &amp; Equipe</a></li>
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="admin.html">Painel do Desenvolvedor (CMS)</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="index.html">Início</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="sobre.html">Sobre Nós</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="admin.html">Painel CMS</a></li>
           </ul>
         </div>
 
-        <!-- Coluna 4: Suporte e Legal -->
+        <!-- Coluna 4: Contato & Legal -->
         <div class="space-y-3">
-          <h4 class="text-slate-900 font-semibold tracking-wider text-xs uppercase">Suporte &amp; Legal</h4>
+          <h4 class="text-slate-200 font-semibold tracking-wider text-xs uppercase">Contato &amp; Legal</h4>
           <ul class="space-y-2.5">
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="mailto:contato@palasatlas.com">Reportar Erro</a></li>
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="termos.html">Termos de Uso</a></li>
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="privacidade.html">Privacidade</a></li>
-            <li><a class="hover:text-sky-700 transition-colors text-xs text-slate-500 block no-underline" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="mailto:contato@palasatlas.com">Reportar erro</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="termos.html">Termos de Uso</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="privacidade.html">Privacidade</a></li>
+            <li><a class="hover:text-white transition-colors text-xs text-slate-300 block no-underline" href="mailto:contato@palasatlas.com">contato@palasatlas.com</a></li>
           </ul>
         </div>
 
       </div>
 
-      <div class="mt-10 pt-6 border-t border-slate-200/80 text-center text-xs text-slate-400">
-        &copy; 2026 Palas Atlas &mdash; Todos os direitos reservados. Projeto Acadêmico sem fins lucrativos.
+      <div class="mt-10 pt-6 border-t border-white/10 text-center text-xs text-slate-400">
+        &copy; 2026 Palas Atlas &mdash; Projeto acadêmico sem fins lucrativos.
       </div>
     </div>
   </footer>
 
-  <script type="module" src="js/slide-security.js?v=20261122v2"></script>
-  <script type="module" src="js/microscope-engine.js?v=20261122v2"></script>
+  <script type="module" src="js/slide-security.js?v=20261123v3"></script>
+  <script type="module" src="js/microscope-engine.js?v=20261123v3"></script>
 </body>
 </html>

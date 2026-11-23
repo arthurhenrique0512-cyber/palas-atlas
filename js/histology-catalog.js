@@ -9,7 +9,7 @@
  * Zero Emojis | Zero Truncamento | Clinical Precision UI
  */
 import { db } from "./firebase-config.js";
-import { catalogData } from "./catalog-data.js?v=20261118v3";
+import { catalogData } from "./catalog-data.js?v=20261122v4";
 import { getState, subscribe, setFrenteAtiva } from "./state.js";
 import { escaparHTML } from "./sanitizer.js";
 
@@ -47,7 +47,7 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
         htmlItens += `
           <button
             type="button"
-            onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
+            onclick="window.App.abrirTopico('${topico.id}', 'histologia')"
             class="text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 py-1.5 px-3 block transition-colors w-full text-left leading-snug break-words cursor-pointer border-l-2 border-transparent"
             title="${topico.titulo}">
             ${topico.titulo}
@@ -56,42 +56,41 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
     });
   }
 
-  const navItem = (id, label, dotClass) => {
-    const isAtivo = disciplinaAtual === id;
-    const btnClass = isAtivo
-      ? "bg-teal-50 text-teal-950 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left flex items-center gap-2.5 transition-colors"
-      : "text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50/80 py-1.5 px-3 block transition-colors w-full text-left flex items-center gap-2.5 border-l-2 border-transparent cursor-pointer";
-    return `
-      <button type="button" onclick="window.App.selecionarFrente('${id}')" class="${btnClass}">
+  const navEmBreve = (id, label, dotClass) => `
+    <button
+      type="button"
+      onclick="window.App.selecionarFrente('${id}')"
+      class="text-xs text-slate-500 hover:text-slate-900 hover:bg-slate-50/80 py-1.5 px-3 w-full text-left flex items-center justify-between gap-2 border-l-2 border-transparent transition-colors cursor-pointer">
+      <span class="flex items-center gap-2.5 min-w-0">
         <span class="w-2 h-2 rounded-full ${dotClass} shrink-0"></span>
         <span class="truncate">${label}</span>
-      </button>
-    `;
-  };
-
-  const mapNomenclatura = {
-    histologia: "Tecidos Histológicos",
-    patologia: "Processos Patológicos",
-    parasitologia: "Helmintos e Protozoários",
-    microbiologia: "Bactérias e Fungos"
-  };
-  const tituloTopicos = mapNomenclatura[disciplinaAtual] || "Tópicos";
+      </span>
+      <span class="text-[9px] font-mono uppercase tracking-wider text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">Em breve</span>
+    </button>
+  `;
 
   return `
     <aside class="space-y-6 text-xs font-sans text-slate-600 border-r border-slate-200/80 pr-6 hidden lg:block">
       <div>
         <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-2.5 block">Disciplinas</span>
         <div class="space-y-1">
-          ${navItem('histologia', 'Histologia', 'bg-sky-600')}
-          ${navItem('patologia', 'Patologia', 'bg-rose-600')}
-          ${navItem('parasitologia', 'Parasitologia', 'bg-emerald-600')}
-          ${navItem('microbiologia', 'Microbiologia', 'bg-violet-600')}
+          <button type="button" onclick="window.App.navegarPara('pgHome')" class="text-xs text-slate-600 hover:text-teal-800 hover:bg-slate-50/80 py-1.5 px-3 block transition-colors w-full text-left flex items-center gap-2 border-l-2 border-transparent cursor-pointer">
+            <span>&larr;</span>
+            <span>Voltar ao início</span>
+          </button>
+          <button type="button" onclick="window.App.selecionarFrente('histologia')" class="bg-teal-50 text-teal-950 font-semibold border-l-2 border-teal-700 pl-3 py-1.5 w-full text-left flex items-center gap-2.5 transition-colors cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-teal-600 shrink-0"></span>
+            <span class="truncate">Histologia</span>
+          </button>
+          ${navEmBreve('patologia', 'Patologia', 'bg-rose-600')}
+          ${navEmBreve('parasitologia', 'Parasitologia', 'bg-emerald-600')}
+          ${navEmBreve('microbiologia', 'Microbiologia', 'bg-violet-600')}
         </div>
       </div>
       
       ${htmlItens ? `
       <div>
-        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-2.5 block">${tituloTopicos}</span>
+        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-2.5 block">Tecidos Histológicos</span>
         <div class="space-y-1">
           ${htmlItens}
         </div>
@@ -102,38 +101,10 @@ function gerarIndiceLateral(modulo, topicoAtivoId, exibirSubtopicos = false) {
 }
 
 /**
- * Seletor Horizontal/Compacto de Disciplinas para Mobile e Tablet (lg:hidden)
- * Permite ao usuário alternar com 1 toque entre Histologia, Patologia, Parasitologia e Microbiologia
+ * O site opera com foco exclusivo em Histologia; barra multi-disciplinas desativada.
  */
 function gerarBarraDisciplinasTopo() {
-  const lista = [
-    { id: "histologia", label: "Histologia", dot: "bg-sky-600", activeBorder: "border-slate-900 text-slate-950 bg-slate-100" },
-    { id: "patologia", label: "Patologia", dot: "bg-rose-600", activeBorder: "border-rose-600 text-rose-800 bg-rose-50/70" },
-    { id: "parasitologia", label: "Parasitologia", dot: "bg-emerald-600", activeBorder: "border-emerald-600 text-emerald-800 bg-emerald-50/70" },
-    { id: "microbiologia", label: "Microbiologia", dot: "bg-violet-600", activeBorder: "border-violet-600 text-violet-800 bg-violet-50/70" }
-  ];
-
-  const chipsHtml = lista.map((item) => {
-    const isAtivo = disciplinaAtual === item.id;
-    const classes = isAtivo
-      ? `${item.activeBorder} font-semibold shadow-2xs`
-      : "bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200/90";
-    return `
-      <button
-        type="button"
-        onclick="window.App.selecionarFrente('${item.id}')"
-        class="flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-2 min-h-[42px] sm:min-h-[38px] rounded-lg sm:rounded-none text-xs font-sans transition-all border cursor-pointer whitespace-nowrap ${classes}">
-        <span class="w-2 h-2 rounded-full ${item.dot} shrink-0"></span>
-        <span>${item.label}</span>
-      </button>
-    `;
-  }).join("");
-
-  return `
-    <div class="w-full mb-5 sm:mb-7 grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 select-none">
-      ${chipsHtml}
-    </div>
-  `;
+  return "";
 }
 
 /**
@@ -172,13 +143,9 @@ function gerarBarraTopicosMobile(modulo, topicoAtivoId, disc) {
  * @param {string} disciplina - Identificador da disciplina.
  */
 function renderizarCatalogoHistologia(disciplina) {
-  if (disciplina && catalogData[disciplina]) {
-    disciplinaAtual = disciplina;
-  } else if (typeof getState === "function" && getState() && catalogData[getState().frenteAtiva]) {
-    disciplinaAtual = getState().frenteAtiva;
-  }
+  disciplinaAtual = "histologia";
 
-  const modulo = catalogData[disciplinaAtual] || catalogData.histologia;
+  const modulo = catalogData.histologia;
   const c1 = document.getElementById("histoCatalog");
   const c2 = document.getElementById("histoSubCatalog");
 
@@ -196,20 +163,20 @@ function renderizarCatalogoHistologia(disciplina) {
       htmlRows += `
         <div 
           onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')"
-          class="px-4 sm:px-8 py-4 sm:py-5 hover:bg-sky-50/50 transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 group">
+          class="px-4 sm:px-8 py-4 sm:py-5 hover:bg-teal-50/50 transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 group">
           <div class="flex items-center gap-3 sm:gap-6 min-w-0">
-            <span class="font-mono text-xs sm:text-sm font-bold text-slate-400 group-hover:text-sky-700 transition-colors w-6 shrink-0 select-none">${numFormatado}</span>
-            <span class="h-5 w-px bg-slate-200 group-hover:bg-sky-300 transition-colors shrink-0"></span>
-            <h3 class="font-serif text-sm sm:text-lg text-slate-900 font-bold tracking-[-0.015em] leading-snug group-hover:text-sky-800 transition-colors">${topico.titulo}</h3>
+            <span class="font-mono text-xs sm:text-sm font-bold text-slate-400 group-hover:text-teal-800 transition-colors w-6 shrink-0 select-none">${numFormatado}</span>
+            <span class="h-5 w-px bg-slate-200 group-hover:bg-teal-300 transition-colors shrink-0"></span>
+            <h3 class="font-serif text-sm sm:text-lg text-slate-900 font-bold tracking-[-0.015em] leading-snug group-hover:text-teal-950 transition-colors">${topico.titulo}</h3>
           </div>
-          <span class="w-9 h-9 rounded-none bg-slate-50 border border-slate-200/80 group-hover:border-sky-600 group-hover:bg-sky-600 flex items-center justify-center text-slate-400 group-hover:text-white shrink-0 transition-all group-hover:translate-x-0.5">
+          <span class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200/80 group-hover:border-teal-700 group-hover:bg-teal-700 flex items-center justify-center text-slate-400 group-hover:text-white shrink-0 transition-all group-hover:translate-x-0.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </span>
         </div>
       `;
       
       htmlSubmenu += `
-        <button onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')" class="text-left text-slate-600 hover:text-sky-700 hover:bg-slate-100 text-xs font-medium py-1.5 px-3 rounded-lg transition-colors leading-snug break-words w-full">
+        <button onclick="window.App.abrirTopico('${topico.id}', '${disciplinaAtual}')" class="text-left text-slate-600 hover:text-teal-800 hover:bg-slate-100 text-xs font-medium py-1.5 px-3 rounded-lg transition-colors leading-snug break-words w-full">
           ${topico.titulo}
         </button>
       `;
@@ -245,7 +212,7 @@ function renderizarCatalogoHistologia(disciplina) {
       <!-- CABEÇALHO DA DISCIPLINA -->
       <div class="mb-6 pb-5 border-b border-slate-200/90">
         <nav aria-label="Navegação estrutural" class="flex items-center gap-2 text-xs font-sans text-slate-400 mb-2 flex-wrap">
-          <a href="#" onclick="window.App.navegarPara('pgHome'); return false;" class="text-slate-500 hover:text-sky-700 transition-colors no-underline">Início</a>
+          <a href="#" onclick="window.App.navegarPara('pgHome'); return false;" class="text-slate-500 hover:text-teal-800 transition-colors no-underline">Início</a>
           <span class="text-slate-300 select-none">&rsaquo;</span>
           <span class="text-slate-900 font-semibold pointer-events-none">${modulo.tituloDisciplina}</span>
         </nav>
@@ -258,7 +225,7 @@ function renderizarCatalogoHistologia(disciplina) {
       </div>
 
       <!-- LISTA VERTICAL NUMERADA (ESTILO SUMÁRIO DE LIVRO) -->
-      <div class="palas-console-panel bg-white rounded-none border border-slate-200/90 shadow-[0_12px_36px_-12px_rgba(15,23,42,0.06)] divide-y divide-slate-200/80 overflow-hidden">
+      <div class="palas-console-panel bg-white rounded-2xl border border-slate-200/90 shadow-[0_12px_36px_-12px_rgba(15,23,42,0.06)] divide-y divide-slate-200/80 overflow-hidden">
         ${htmlRows}
       </div>
     </div>
@@ -272,9 +239,9 @@ function renderizarCatalogoHistologia(disciplina) {
  * @param {boolean} skipHistory - Impede o pushState se a chamada vier de um evento popstate.
  */
 export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
-  const disc = disciplina || disciplinaAtual || "histologia";
+  const disc = "histologia";
   disciplinaAtual = disc;
-  const modulo = catalogData[disc] || catalogData.histologia;
+  const modulo = catalogData.histologia;
   const topico = modulo.topicos.find((t) => t.id === idTopico);
   if (!topico) return;
 
@@ -582,9 +549,9 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
     const slideUrl = `microscopio.html?id=${encodeURIComponent(slideIdStr)}`;
 
     return `
-      <div data-open-slide-url="${escaparHTML(slideUrl)}" class="palas-card-tactile palas-card-interactive group bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgb(15,23,42,0.03)] hover:shadow-[0_12px_32px_rgb(13,148,136,0.08)] hover:-translate-y-1 hover:border-teal-700/40 transition-all duration-300 flex flex-col justify-between cursor-pointer">
+      <div data-open-slide-url="${escaparHTML(slideUrl)}" class="palas-card-tactile palas-card-interactive group bg-white border border-slate-200/90 rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer">
         <div>
-          <div class="palas-slide-frame relative w-full aspect-[4/3] bg-slate-100 overflow-hidden">
+          <div class="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden border-b border-slate-200/70">
             <!-- Placeholder exibido quando a imagem falha -->
             <div class="thumb-placeholder absolute inset-0 flex-col items-center justify-center gap-1 hidden bg-slate-100">
               <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -597,43 +564,41 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
               src="${escaparHTML(thumbSrc)}"
               data-fallback="${escaparHTML(thumbSrcFallback)}"
               alt="${escaparHTML(nomeLamina)}"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
               loading="lazy"
               onerror="if(!this.dataset.fbApplied && this.dataset.fallback){this.dataset.fbApplied='1';this.src=this.dataset.fallback;}else{this.style.display='none';var ph=this.parentElement.querySelector('.thumb-placeholder');if(ph){ph.classList.remove('hidden');ph.classList.add('flex');}}"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent pointer-events-none"></div>
+            <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
 
-            <!-- Badge de aumento no canto superior esquerdo -->
-            <div class="absolute top-3 left-3 flex gap-1.5">
-              <span class="bg-black/75 backdrop-blur-sm text-white border border-white/10 text-[10px] font-sans font-semibold px-2.5 py-0.5 rounded-full">
+            <!-- Selo limpo de aumento -->
+            <div class="absolute top-3 left-3">
+              <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10.5px] font-mono font-semibold px-2.5 py-1 rounded-lg shadow-sm">
                 ${escaparHTML(badgeAumento)}
               </span>
-            </div>
-
-            <!-- Rodapé do preview com disciplina e tópico -->
-            <div class="absolute bottom-3 left-3 right-3 text-white">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-teal-300 font-semibold">${escaparHTML(String(disciplinaNome).toUpperCase())} • ${escaparHTML(String(topicoNome).toUpperCase())}</span>
             </div>
           </div>
 
           <!-- Título anatômico em destaque e coloração -->
           <div class="p-4 sm:p-5">
-            <h3 class="font-serif font-bold text-base sm:text-lg text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1">
+            <div class="flex items-center justify-between gap-2 text-[10px] font-mono tracking-wider mb-1.5">
+              <span class="uppercase text-teal-700 font-semibold">${escaparHTML(String(disciplinaNome))} &middot; ${escaparHTML(String(topicoNome))}</span>
+            </div>
+            <h3 class="font-serif font-bold text-base sm:text-lg text-slate-900 group-hover:text-teal-900 transition-colors leading-snug mb-1.5">
               ${escaparHTML(nomeLamina)}
             </h3>
-            <p class="text-xs text-slate-500 leading-relaxed font-sans">
+            <p class="text-xs text-slate-600 leading-relaxed font-sans">
               ${escaparHTML(coloracaoNome)}
             </p>
           </div>
         </div>
 
-        <!-- Botão de acesso direto -->
-        <div class="p-4 pt-0 sm:p-5 sm:pt-0 mt-auto">
+        <!-- Rodapé alinhado ao estilo da Home -->
+        <div class="px-4 sm:px-5 pb-4 sm:pb-5 mt-auto">
           <a
             href="${escaparHTML(slideUrl)}"
-            class="w-full py-2.5 min-h-[44px] lg:min-h-0 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-teal-900 hover:text-white border border-slate-200 rounded-xl transition-all duration-200 inline-flex items-center justify-center gap-2 group/btn no-underline">
-            <span>Examinar Lâmina</span>
-            <span class="text-slate-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-transform">&rarr;</span>
+            class="pt-3 border-t border-slate-100 w-full text-xs font-semibold text-teal-800 group-hover:text-teal-950 transition-colors flex items-center justify-between no-underline">
+            <span>Abrir no microscópio</span>
+            <span class="text-slate-400 group-hover:text-teal-800 group-hover:translate-x-0.5 transition-all">&rarr;</span>
           </a>
         </div>
       </div>
@@ -881,165 +846,79 @@ function voltarNivel(nivelDestino) {
   }
 }
 
+function destacarCardEmBreve(disciplina) {
+  const cardsWrap = document.getElementById('cardsOutrasDisciplinas');
+  if (cardsWrap) {
+    cardsWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    document.getElementById('secaoDisciplinas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  const card = document.querySelector(`[data-disciplina-card="${disciplina}"]`);
+  if (card) {
+    card.classList.add('ring-2', 'ring-teal-700/40', 'shadow-md');
+    setTimeout(() => {
+      card.classList.remove('ring-2', 'ring-teal-700/40', 'shadow-md');
+    }, 1500);
+  }
+}
+
 /**
- * Alterna a exibição do accordion na Home para uma disciplina.
- * Elimina completamente a página intermediária.
+ * Alterna a exibição do accordion de Histologia na Home.
+ * Para Patologia, Parasitologia e Microbiologia (sem tópicos), recolhe Histologia e destaca o card informativo.
  */
 function toggleAccordionDisciplinas(disciplina = 'histologia') {
   const containerHisto = document.getElementById('accordionContainerHistologia');
   const btnTxtHisto = document.getElementById('btnTxtHistologia');
   const arrowIconHisto = document.getElementById('arrowIconHistologia');
 
-  const containerOutras = document.getElementById('accordionContainerOutras');
-  const listaOutras = document.getElementById('listaAccordionOutras');
+  if (['patologia', 'parasitologia', 'microbiologia'].includes(disciplina)) {
+    if (containerHisto) containerHisto.classList.add('hidden');
+    if (btnTxtHisto) btnTxtHisto.textContent = 'Ver módulos';
+    if (arrowIconHisto) arrowIconHisto.classList.remove('rotate-180');
+    destacarCardEmBreve(disciplina);
+    return;
+  }
 
-  if (disciplina === 'histologia') {
-    if (!containerHisto) return;
-    const isHidden = containerHisto.classList.contains('hidden');
-    if (containerOutras) {
-      containerOutras.classList.add('hidden');
-      containerOutras.dataset.disciplinaAtiva = '';
-    }
+  if (!containerHisto) return;
 
-    if (isHidden) {
-      containerHisto.classList.remove('hidden');
-      if (btnTxtHisto) btnTxtHisto.textContent = 'Recolher';
-      if (arrowIconHisto) arrowIconHisto.classList.add('rotate-180');
-      setTimeout(() => {
-        containerHisto.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 60);
-    } else {
-      containerHisto.classList.add('hidden');
-      if (btnTxtHisto) btnTxtHisto.textContent = 'Ver módulos';
-      if (arrowIconHisto) arrowIconHisto.classList.remove('rotate-180');
-    }
+  const isHidden = containerHisto.classList.contains('hidden');
+
+  if (isHidden) {
+    containerHisto.classList.remove('hidden');
+    if (btnTxtHisto) btnTxtHisto.textContent = 'Recolher';
+    if (arrowIconHisto) arrowIconHisto.classList.add('rotate-180');
+    setTimeout(() => {
+      containerHisto.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 60);
   } else {
-    // Patologia, Parasitologia, Microbiologia — renderização dinâmica a partir de catalogData
-    if (!containerOutras) return;
-    if (containerHisto) {
-      containerHisto.classList.add('hidden');
-      if (btnTxtHisto) btnTxtHisto.textContent = 'Ver módulos';
-      if (arrowIconHisto) arrowIconHisto.classList.remove('rotate-180');
-    }
-
-    const estaAbertoMesma = !containerOutras.classList.contains('hidden') && containerOutras.dataset.disciplinaAtiva === disciplina;
-
-    if (estaAbertoMesma) {
-      containerOutras.classList.add('hidden');
-      containerOutras.dataset.disciplinaAtiva = '';
-    } else {
-      containerOutras.dataset.disciplinaAtiva = disciplina;
-      containerOutras.classList.remove('hidden');
-
-      const modulo = catalogData[disciplina];
-      const accentMap = {
-        patologia: {
-          dot: 'bg-rose-600',
-          num: '!text-rose-600',
-          hoverBtn: 'group-hover:!bg-rose-600 group-hover:!border-rose-600 group-hover:!text-white'
-        },
-        parasitologia: {
-          dot: 'bg-emerald-600',
-          num: '!text-emerald-600',
-          hoverBtn: 'group-hover:!bg-emerald-600 group-hover:!border-emerald-600 group-hover:!text-white'
-        },
-        microbiologia: {
-          dot: 'bg-violet-600',
-          num: '!text-violet-600',
-          hoverBtn: 'group-hover:!bg-violet-600 group-hover:!border-violet-600 group-hover:!text-white'
-        }
-      };
-      const cfg = accentMap[disciplina] || {
-        dot: 'bg-sky-600',
-        num: '!text-sky-600',
-        hoverBtn: 'group-hover:!bg-sky-600 group-hover:!border-sky-600 group-hover:!text-white'
-      };
-
-      if (listaOutras && modulo && Array.isArray(modulo.topicos) && modulo.topicos.length > 0) {
-        const headerHtml = `
-          <div class="px-4 sm:px-8 py-4 sm:py-5 bg-slate-50/90 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full ${cfg.dot} shrink-0"></span>
-                <span class="text-xs sm:text-sm font-serif font-bold text-slate-900">${escaparHTML(modulo.tituloDisciplina)}</span>
-                <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">(${modulo.topicos.length} ${modulo.topicos.length === 1 ? 'tópico' : 'tópicos'})</span>
-              </div>
-              <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Selecione um tópico para estudar o resumo morfológico e acessar o acervo.</p>
-            </div>
-            <span class="text-[11px] text-slate-500 font-sans shrink-0">
-              <span class="text-slate-400 font-mono text-[10px] uppercase tracking-wider">Referência:</span> ${escaparHTML(modulo.bibliografia || '')}
-            </span>
-          </div>
-        `;
-
-        const rowsHtml = modulo.topicos.map((topico, idx) => {
-          const num = String(idx + 1).padStart(2, '0');
-          const temLamina = Array.isArray(topico.laminasEstaticas || topico.laminas) && (topico.laminasEstaticas || topico.laminas).length > 0;
-          const badgeResumo = temLamina
-            ? ''
-            : `<span class="hidden sm:inline-flex items-center text-[10px] font-mono bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full shrink-0">Resumo teórico</span>`;
-
-          return `
-            <div data-accordion-topico="${escaparHTML(topico.id)}" data-accordion-disc="${escaparHTML(disciplina)}" class="accordion-item-row px-4 sm:px-8 py-3.5 sm:py-4.5 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 group">
-              <div class="flex items-center gap-3 sm:gap-6 min-w-0">
-                <span class="accordion-num text-xs sm:text-sm select-none ${cfg.num}">${num}</span>
-                <span class="accordion-sep shrink-0"></span>
-                <h3 class="accordion-title font-serif text-sm sm:text-lg font-bold tracking-[-0.015em] leading-snug">${escaparHTML(topico.titulo)}</h3>
-              </div>
-              <div class="flex items-center gap-2.5 shrink-0">
-                ${badgeResumo}
-                <span class="accordion-action-btn rounded-none shadow-2xs shrink-0 ${cfg.hoverBtn}">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                </span>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        listaOutras.innerHTML = headerHtml + rowsHtml;
-
-        if (!listaOutras.__accordionDelegated) {
-          listaOutras.__accordionDelegated = true;
-          listaOutras.addEventListener('click', (ev) => {
-            const row = ev.target.closest('[data-accordion-topico]');
-            if (!row) return;
-            const topicoId = row.getAttribute('data-accordion-topico');
-            const discId = row.getAttribute('data-accordion-disc');
-            if (topicoId && discId) {
-              abrirTopico(topicoId, discId);
-            }
-          });
-        }
-      }
-
-      setTimeout(() => {
-        containerOutras.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 60);
-    }
+    containerHisto.classList.add('hidden');
+    if (btnTxtHisto) btnTxtHisto.textContent = 'Ver módulos';
+    if (arrowIconHisto) arrowIconHisto.classList.remove('rotate-180');
   }
 }
 
 function fecharAccordionOutras() {
-  const containerOutras = document.getElementById('accordionContainerOutras');
-  if (containerOutras) {
-    containerOutras.classList.add('hidden');
-    containerOutras.dataset.disciplinaAtiva = '';
-  }
+  // Mantido como no-op por compatibilidade com chamadas externas legadas.
 }
 
 function abrirAccordionHero(disciplina = 'histologia') {
   const secao = document.getElementById('secaoDisciplinas');
-  if (disciplina === 'histologia') {
-    const containerHisto = document.getElementById('accordionContainerHistologia');
-    const btnTxtHisto = document.getElementById('btnTxtHistologia');
-    const arrowIconHisto = document.getElementById('arrowIconHistologia');
-    if (containerHisto) {
-      containerHisto.classList.remove('hidden');
-      if (btnTxtHisto) btnTxtHisto.textContent = 'Recolher';
-      if (arrowIconHisto) arrowIconHisto.classList.add('rotate-180');
-    }
-  } else {
-    toggleAccordionDisciplinas(disciplina);
+  const containerHisto = document.getElementById('accordionContainerHistologia');
+  const btnTxtHisto = document.getElementById('btnTxtHistologia');
+  const arrowIconHisto = document.getElementById('arrowIconHistologia');
+
+  if (['patologia', 'parasitologia', 'microbiologia'].includes(disciplina)) {
+    if (containerHisto) containerHisto.classList.add('hidden');
+    if (btnTxtHisto) btnTxtHisto.textContent = 'Ver módulos';
+    if (arrowIconHisto) arrowIconHisto.classList.remove('rotate-180');
+    destacarCardEmBreve(disciplina);
+    return;
+  }
+
+  if (containerHisto) {
+    containerHisto.classList.remove('hidden');
+    if (btnTxtHisto) btnTxtHisto.textContent = 'Recolher';
+    if (arrowIconHisto) arrowIconHisto.classList.add('rotate-180');
   }
 
   if (secao) {
@@ -1048,17 +927,20 @@ function abrirAccordionHero(disciplina = 'histologia') {
 }
 
 export function abrirDisciplinaHome(disciplina = 'histologia', skipHistory = false) {
+  const targetDisc = ['histologia', 'patologia', 'parasitologia', 'microbiologia'].includes(disciplina)
+    ? disciplina
+    : 'histologia';
   if (window.App && typeof window.App.goHome === 'function') {
     window.App.goHome(skipHistory);
   }
   setTimeout(() => {
-    abrirAccordionHero(disciplina);
+    abrirAccordionHero(targetDisc);
   }, 100);
 }
 
 export function voltarParaDisciplinaHome(disciplina = 'histologia') {
   encerrarListenersCatalogo();
-  abrirDisciplinaHome(disciplina);
+  abrirDisciplinaHome(disciplina || 'histologia');
 }
 
 // Reativo: se frente mudar no state
@@ -1070,7 +952,7 @@ subscribe((state) => {
       const urlParams = new URLSearchParams(window.location.search);
       const topicoParam = urlParams.get('topico');
       if (topicoParam) {
-        abrirTopico(topicoParam, state.frenteAtiva, true);
+        abrirTopico(topicoParam, 'histologia', true);
       }
     }
   }

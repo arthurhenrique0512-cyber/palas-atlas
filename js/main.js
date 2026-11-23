@@ -8,7 +8,7 @@ import {
   abrirTopico,
   abrirDisciplinaHome,
   encerrarListenersCatalogo
-} from "./histology-catalog.js?v=20261122v2";
+} from "./histology-catalog.js?v=20261123v1";
 
 // Lazy loading sob demanda do dashboard-engine para otimizar o bundle do aluno
 let _dashboardEnginePromise = null;
@@ -94,7 +94,8 @@ function init() {
     frenteParam = "dashboard";
   }
   if (frenteParam && topicoParam) {
-    abrirTopico(topicoParam, frenteParam, true);
+    const discTopico = frenteParam === "histologia" ? "histologia" : "histologia";
+    abrirTopico(topicoParam, discTopico, true);
   } else if (frenteParam && ["histologia", "patologia", "parasitologia", "microbiologia"].includes(frenteParam)) {
     renderView(getState());
     abrirDisciplinaHome(frenteParam, true);
@@ -168,7 +169,7 @@ function renderView(state) {
     // HOME: Barra Superior Arquitetônica com Logo Grande (size="lg") à Esquerda e Glassmorphism
     if (headerMin) {
       headerMin.classList.remove("hidden");
-      headerMin.className = "sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] transition-all duration-300 pointer-events-auto";
+      headerMin.className = "palas-header-glass sticky top-0 z-50 w-full backdrop-blur-md border-b border-slate-200/70 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] transition-all duration-300 pointer-events-auto";
     }
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "true");
@@ -229,7 +230,7 @@ function renderView(state) {
     return;
   }
 
-  // Renderização das disciplinas e módulos ativos
+  // Renderização das frentes ativas na Home
   if (["histologia", "patologia", "parasitologia", "microbiologia"].includes(state.frenteAtiva)) {
     if (elements.pgHistologia) elements.pgHistologia.classList.remove("hidden");
     const subCatalog = document.getElementById("histoSubCatalog");
@@ -257,7 +258,7 @@ function renderView(state) {
 
 /**
  * Aciona o seletor de frentes no store reativo com suporte a History API.
- * Para frentes do ciclo básico, agora expande o accordion diretamente na Home sem página intermediária.
+ * Para Histologia expande os módulos na Home; para as demais destaca o card correspondente.
  * @param {string} frente - Identificador ('histologia', 'patologia', 'parasitologia', 'microbiologia').
  * @param {boolean} skipHistory - Impede o pushState se a chamada vier de um evento popstate.
  */

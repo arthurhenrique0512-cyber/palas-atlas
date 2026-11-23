@@ -70,39 +70,25 @@ body {
   background-size: 180px 180px, 100% 100%;
 }
 
-/* Hero institucional principal (Home) com iluminação de laboratório e retícula óptica */
+/* Hero institucional principal (Home) com iluminação suave limpa */
 .palas-surface-hero {
   background-color: #f3f8f8;
   background-image:
-    var(--palas-grain-light),
-    radial-gradient(ellipse 64% 58% at 14% 12%, rgba(13, 148, 136, 0.075) 0%, transparent 66%),
-    radial-gradient(ellipse 52% 48% at 78% 22%, rgba(3, 105, 161, 0.055) 0%, transparent 68%),
+    radial-gradient(ellipse 64% 58% at 14% 12%, rgba(13, 148, 136, 0.065) 0%, transparent 66%),
+    radial-gradient(ellipse 52% 48% at 78% 22%, rgba(3, 105, 161, 0.045) 0%, transparent 68%),
     radial-gradient(ellipse 75% 65% at 50% 45%, rgba(255, 255, 255, 0.72) 0%, transparent 74%),
     linear-gradient(180deg, #e8f1f0 0%, #f3f8f8 52%, #ffffff 100%);
-  background-size: 180px 180px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.92);
-}
-
-.palas-surface-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image: var(--palas-micro-dots);
-  background-size: 24px 24px;
-  mask-image: radial-gradient(ellipse 88% 78% at 50% 42%, rgba(0, 0, 0, 0.9) 18%, transparent 82%);
-  -webkit-mask-image: radial-gradient(ellipse 88% 78% at 50% 42%, rgba(0, 0, 0, 0.9) 18%, transparent 82%);
 }
 
 /* Hero editorial das páginas internas (Sobre, Privacidade, Termos) */
 .palas-surface-hero-sub {
-  background-color: #fcfdfe;
+  background-color: #f4f9f9;
   background-image:
-    var(--palas-grain-subtle),
-    radial-gradient(ellipse 70% 60% at 18% 0%, rgba(3, 105, 161, 0.045) 0%, transparent 70%),
-    linear-gradient(180deg, #f8fbfc 0%, #ffffff 100%);
-  background-size: 180px 180px, 100% 100%, 100% 100%;
+    radial-gradient(ellipse 68% 58% at 16% 0%, rgba(13, 148, 136, 0.065) 0%, transparent 68%),
+    linear-gradient(180deg, #eaf2f1 0%, #f5f9f9 54%, #ffffff 100%);
+  background-size: 100% 100%, 100% 100%;
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.9);
 }
 
@@ -293,34 +279,40 @@ body {
   background-color: #ffffff;
   background-image: none;
   box-shadow:
-    0 0 0 3px rgba(3, 105, 161, 0.12),
-    0 12px 28px -8px rgba(3, 105, 161, 0.16);
+    0 0 0 3px rgba(15, 118, 110, 0.12),
+    0 12px 28px -8px rgba(15, 118, 110, 0.14);
 }
 
 /* Card monográfico escuro de Histologia (textura acetinada + anéis de platina + filete dourado) */
 .palas-card-monograph-dark {
+  position: relative;
+  overflow: hidden;
   background-color: #0d1f29;
   background-image:
     var(--palas-grain-dark),
     var(--palas-optical-rings),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 45%),
-    linear-gradient(135deg, #0b1623 0%, #0d2b2e 52%, #0f1d2e 100%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0%, transparent 45%),
+    linear-gradient(135deg, #0b1b24 0%, #0e3236 52%, #102432 100%);
   background-size: 180px 180px, 340px 340px, 100% 100%, 100% 100%;
   background-position: 0 0, calc(100% - 20px) center, 0 0, 0 0;
   background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-  border-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    inset 0 1px 0 rgba(212, 175, 55, 0.48),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
-    0 18px 42px -14px rgba(15, 23, 42, 0.28);
+    inset 0 1px 0 rgba(212, 175, 55, 0.56),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 20px 46px -14px rgba(15, 23, 42, 0.34);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.24s ease;
 }
 
 .palas-card-monograph-dark:hover {
-  border-color: rgba(212, 175, 55, 0.28);
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.34);
   box-shadow:
-    inset 0 1px 0 rgba(212, 175, 55, 0.62),
+    inset 0 1px 0 rgba(212, 175, 55, 0.72),
     inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-    0 22px 48px -14px rgba(15, 23, 42, 0.34);
+    0 24px 52px -14px rgba(15, 23, 42, 0.42);
 }
 
 /* Moldura de lamínula de vidro montada para previews de lâminas */
@@ -427,8 +419,8 @@ body {
 
 #viewerStage .navigator .displayregion,
 .openseadragon-navigator .displayregion {
-  border: 2px solid #0369a1 !important;
-  background-color: rgba(3, 105, 161, 0.12) !important;
+  border: 2px solid #0f766e !important;
+  background-color: rgba(15, 118, 110, 0.14) !important;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.85) !important;
 }
 
@@ -457,10 +449,10 @@ body {
 
 /* Refinamento tátil dos botões do revólver de objetivas no microscópio */
 #viewerLensPanel .lens-btn.active-lens {
-  background-image: linear-gradient(180deg, #0374b2 0%, #0369a1 100%);
+  background-image: linear-gradient(180deg, #0f766e 0%, #115e59 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 2px 6px rgba(3, 105, 161, 0.28);
+    0 2px 6px rgba(15, 118, 110, 0.28);
 }
 
 #viewerLensPanel .lens-btn:not(.active-lens):hover {
@@ -470,15 +462,23 @@ body {
 
 /* Estado aberto do FAQ editorial */
 .faq-item.is-open {
-  background-color: #f8fcfc;
+  background-color: #f6fbfa;
+  background-image: linear-gradient(90deg, rgba(15, 118, 110, 0.045) 0%, rgba(255, 255, 255, 0) 45%);
+  box-shadow: inset 3px 0 0 #0f766e;
+}
+
+/* Zona de fechamento escura editorial (Dúvidas + Rodapé como bloco à parte) */
+.palas-closing-dark {
+  background-color: #1e313d;
   background-image:
-    var(--palas-grain-subtle),
-    linear-gradient(180deg, #f8fcfc 0%, #ffffff 100%);
-  border-color: rgba(13, 148, 136, 0.42);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    inset 3px 0 0 #0f766e,
-    0 12px 28px -12px rgba(15, 118, 110, 0.14);
+    radial-gradient(ellipse 65% 55% at 15% 0%, rgba(20, 184, 166, 0.12) 0%, transparent 65%),
+    linear-gradient(180deg, #223744 0%, #1c2e39 100%);
+}
+
+.palas-closing-dark .faq-item.is-open {
+  background-color: rgba(255, 255, 255, 0.085);
+  background-image: linear-gradient(90deg, rgba(94, 234, 212, 0.12) 0%, rgba(255, 255, 255, 0) 48%);
+  box-shadow: inset 3px 0 0 #5eead4;
 }
 
 /* Estilização de Barras de Rolagem (Discreta e Ultrafina - Sóbrio e Clínico) */
@@ -897,12 +897,12 @@ input#global-search-input:-webkit-autofill:active {
 /* Container Principal do Accordion */
 #accordionContainerHistologia,
 #accordionContainerOutras {
-  border: 1px solid rgba(203, 213, 225, 0.85);
-  border-top: 3px solid #0284c7;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  border-top: 3px solid #0f766e;
   background-color: #ffffff;
   background-image:
     var(--palas-grain-subtle),
-    linear-gradient(180deg, #ffffff 0%, #fafcfe 100%);
+    linear-gradient(180deg, #ffffff 0%, #f9fcfb 100%);
   background-size: 180px 180px, 100% 100%;
   box-shadow:
     inset 0 1px 0 rgba(212, 175, 55, 0.35),
@@ -911,7 +911,7 @@ input#global-search-input:-webkit-autofill:active {
 
 /* Linhas / Itens do Accordion */
 .accordion-item-row {
-  border-bottom: 1px solid rgba(241, 245, 249, 1);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.75);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
@@ -919,7 +919,7 @@ input#global-search-input:-webkit-autofill:active {
   border-bottom: none;
 }
 .accordion-item-row:hover {
-  background-color: rgba(240, 249, 255, 0.7);
+  background-color: rgba(240, 253, 250, 0.85);
 }
 
 /* Filete vertical de destaque no hover da linha */
@@ -934,14 +934,14 @@ input#global-search-input:-webkit-autofill:active {
   transition: background 0.2s ease;
 }
 .accordion-item-row:hover::before {
-  background: #0284c7;
+  background: #0f766e;
 }
 
 /* Número do Módulo (01, 02...) */
 .accordion-num {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-weight: 700;
-  color: #0284c7;
+  color: #0f766e;
   transition: color 0.15s ease;
   width: 1.6rem;
   letter-spacing: 0.04em;
@@ -961,7 +961,7 @@ input#global-search-input:-webkit-autofill:active {
   transition: color 0.15s ease, transform 0.15s ease;
 }
 .accordion-item-row:hover .accordion-title {
-  color: #0369a1;
+  color: #0f766e;
   transform: translateX(2px);
 }
 
@@ -983,14 +983,18 @@ input#global-search-input:-webkit-autofill:active {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .accordion-item-row:hover .accordion-action-btn {
-  background-color: #0284c7;
-  background-image: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
-  border-color: #0284c7;
-  color: #ffffff;
+  background-color: #0f766e !important;
+  background-image: linear-gradient(180deg, #0d9488 0%, #0f766e 100%) !important;
+  border-color: #0f766e !important;
+  color: #ffffff !important;
   transform: translateX(2px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 4px 12px -2px rgba(2, 132, 199, 0.35);
+    0 4px 12px -2px rgba(15, 118, 110, 0.35);
+}
+.accordion-item-row:hover .accordion-action-btn svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 /* ==========================================================================

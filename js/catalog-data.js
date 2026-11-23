@@ -141,33 +141,7 @@ export const catalogData = {
     caminhoBase: "/assets/patologia/",
     corDestaque: "border-rose-600 bg-rose-50 text-rose-900",
     corPino: "bg-rose-600",
-    topicos: [
-      {
-        id: "lesao_celular",
-        titulo: "Lesão, Adaptação e Morte Celular (Necroses e Apoptose)",
-        resumo: "Respostas celulares frente a estresses fisiológicos e estímulos nocivos, englobando adaptações reversíveis (hipertrofia, hiperplasia, atrofia e metaplasia) e lesões celulares. A persistência da injúria conduz à morte celular: necrose (processo acidental com perda da integridade de membrana, inflamação local e padrões morfológicos coagulativo, liquefativo, caseoso, gorduroso e fibrinoide) ou apoptose (morte programada mediada por caspases, sem resposta inflamatória adjacente)."
-      },
-      {
-        id: "inflamacao_reparo",
-        titulo: "Inflamação Aguda, Crônica e Reparo Tecidual",
-        resumo: "Resposta vascular e celular protetora dos tecidos conjuntivos frente a infecções e danos teciduais. A inflamação aguda caracteriza-se por alterações no calibre vascular, exsudação plasmática (edema) e influxo predominante de neutrófilos. A inflamação crônica cursa com infiltração mononuclear (macrófagos, linfócitos, plasmócitos), destruição tecidual e tentativas simultâneas de reparo (angiogênese e deposição de colágeno por fibroblastos), podendo culminar em fibrose ou regeneração tecidual."
-      },
-      {
-        id: "disturbios_hemodinamicos",
-        titulo: "Distúrbios Hemodinâmicos (Trombose, Embolia, Infarto e Edema)",
-        resumo: "Alterações no fluxo sanguíneo, hemostasia e equilíbrio hidrostático tecidual. Inclui edema (acúmulo de líquido intersticial por aumento de pressão hidrostática ou queda da pressão oncótica), trombose (formação patológica intravascular de trombos arteriais ou venosos regida pela Tríade de Virchow), embolia (impactação de êmbolos tromboembólicos, gasosos ou gordurosos) e infarto (área de necrose isquêmica por oclusão do suprimento arterial ou venoso)."
-      },
-      {
-        id: "neoplasias",
-        titulo: "Neoplasias Benignas e Malignas (Carcinomas, Sarcomas e Linfomas)",
-        resumo: "Proliferação autônoma e desregulada de células decorrente de alterações genéticas e epigenéticas em proto-oncogenes e genes supressores de tumor. Diferenciação entre neoplasias benignas (bem circunscritas, expansivas e sem capacidade de metástase) e malignas (infiltrativas, com atipia citológica, pleomorfismo, mitoses atípicas e potencial de invasão vascular e disseminação linfática ou hematogênica)."
-      },
-      {
-        id: "patologia_sistemica",
-        titulo: "Patologia Sistêmica (Cardiovascular, Respiratória e Digestiva)",
-        resumo: "Expressão histopatológica de doenças nos principais sistemas orgânicos, abrangendo lesões ateroscleróticas e infarto agudo do miocárdio no sistema cardiovascular; pneumonias bacterianas, enfisema e bronquite crônica no sistema respiratório; e gastrites associadas a Helicobacter pylori, úlceras pépticas e doenças inflamatórias intestinais no trato gastrointestinal."
-      }
-    ]
+    topicos: []
   },
   parasitologia: {
     tituloDisciplina: "Parasitologia",
@@ -175,28 +149,7 @@ export const catalogData = {
     caminhoBase: "/assets/parasitologia/",
     corDestaque: "border-emerald-600 bg-emerald-50 text-emerald-900",
     corPino: "bg-emerald-600",
-    topicos: [
-      {
-        id: "protozoo_enterica",
-        titulo: "Protozoologia Entérica (Entamoeba histolytica, Giardia duodenalis, Cryptosporidium)",
-        resumo: "Protozoários do trato digestivo transmitidos por veiculação fecal-oral através de água e alimentos contaminados com cistos ou oocistos. Estudo morfológico e patogênico de Entamoeba histolytica (trofozoítos com eritrofagocitose e úlceras em botão de camisa), Giardia duodenalis (trofozoítos piriformes com disco suctorial que atapetam a mucosa duodenal) e Cryptosporidium spp. (oocistos esféricos ácido-resistentes em coloração de Ziehl-Neelsen modificado)."
-      },
-      {
-        id: "protozoo_tissular",
-        titulo: "Protozoologia Tissular e Sanguínea (Trypanosoma cruzi, Leishmania spp., Plasmodium spp., Toxoplasma gondii)",
-        resumo: "Agentes causadores de protozooses sistêmicas transmitidas por vetores artrópodes ou ingestão tecidual. Análise morfológica de tripomastigotas e amastigotas de Trypanosoma cruzi (Doença de Chagas); formas amastigotas de Leishmania em macrófagos; anéis jovens, esquizontes e gametócitos de Plasmodium spp. (Malária); e taquizoítos e cistos teciduais com bradizoítos de Toxoplasma gondii."
-      },
-      {
-        id: "nematoideos",
-        titulo: "Helmintologia - Nematódeos (Ascaris, Ancylostoma, Enterobius, Strongyloides)",
-        resumo: "Vermes cilíndricos com tubo digestivo completo e sexos separados. Morfologia de adultos e ovos diagnósticos nos exames parasitológicos de fezes: ovos mamelonados de Ascaris lumbricoides, ovos larvados de Ancylostoma e Necator, ovos assimétricos em formato de 'D' de Enterobius vermicularis (pesquisa em fita adesiva) e larvas rabditoides e filarioides de Strongyloides stercoralis."
-      },
-      {
-        id: "cestodeos_trematodeos",
-        titulo: "Helmintologia - Cestódeos e Trematódeos (Taenia solium/saginata, Schistosoma mansoni)",
-        resumo: "Platelmintos de corpo achatado dorsoventralmente. Cestódeos (tênias): escólex com ventosas e rostro com ganchos (T. solium) ou inerme (T. saginata), proglotes grávidas e ovos com membrana externa radialmente estriada. Trematódeos: Schistosoma mansoni com dimorfismo sexual evidente (macho com canal ginecóforo abrigando a fêmea) e ovos ovalados dotados de espículo lateral conspícuo."
-      }
-    ]
+    topicos: []
   },
   microbiologia: {
     tituloDisciplina: "Microbiologia",
@@ -204,27 +157,6 @@ export const catalogData = {
     caminhoBase: "/assets/microbiologia/",
     corDestaque: "border-amber-600 bg-amber-50 text-amber-900",
     corPino: "bg-amber-600",
-    topicos: [
-      {
-        id: "bacterio_gram_pos",
-        titulo: "Bacteriologia - Cocos e Bastonetes Gram-Positivos (Staphylococcus, Streptococcus, Bacillus)",
-        resumo: "Bactérias com espessa camada de peptideoglicano e ácidos teicoicos que retêm o complexo cristal violeta-iodo na coloração de Gram, exibindo coloração azul-púrpura. Inclui cocos em arranjo de cachos (Staphylococcus spp., avaliados por testes de catalase e coagulase) ou em cadeias (Streptococcus spp., diferenciados pelo padrão de hemólise em ágar-sangue), além de bacilos formadores de esporos como Bacillus e Clostridium."
-      },
-      {
-        id: "bacterio_gram_neg",
-        titulo: "Bacteriologia - Bacilos e Cocos Gram-Negativos (Enterobactérias, Pseudomonas, Neisseria)",
-        resumo: "Microrganismos com fina parede de peptideoglicano e membrana externa rica em lipopolissacarídeo (LPS / endotoxina), descorados pelo álcool-acetona e contracorados em rosa/vermelho pela fucsina ou safranina. Abrange enterobactérias fermentadoras de glicose (Escherichia coli, Klebsiella), bacilos não fermentadores ambientais (Pseudomonas aeruginosa) e diplococos reniformes como Neisseria meningitidis e Neisseria gonorrhoeae."
-      },
-      {
-        id: "bacterio_baar",
-        titulo: "Bacteriologia - Bacilos Álcool-Ácido Resistentes / BAAR (Mycobacterium tuberculosis e M. leprae)",
-        resumo: "Bactérias do gênero Mycobacterium caracterizadas por parede celular rica em ácidos micólicos de alta hidrofobicidade, impermeáveis à coloração de Gram comum. Identificados pela técnica de Ziehl-Neelsen, na qual retêm a fucsina fenicada mesmo após lavagem com álcool-ácido clorídrico, visualizando-se bacilos delgados fúcsia/vermelhos sobre fundo azul de metileno."
-      },
-      {
-        id: "micologia_medica",
-        titulo: "Micologia Médica (Fungos Leveduriformes, Filamentosos e Dimórficos - Candida, Aspergillus, Paracoccidioides)",
-        resumo: "Morfologia microscópica de fungos de importância médica caracterizados por parede celular de quitina e glucanos. Compreende leveduras monocelulares com brotamento e pseudohifas (Candida spp.), bolores filamentosos com hifas hialinas septadas e conídios (Aspergillus spp.) e fungos dimórficos térmicos com clássica morfologia leveduriforme em 'roda de leme' em tecidos aquecidos (Paracoccidioides brasiliensis)."
-      }
-    ]
+    topicos: []
   }
 };

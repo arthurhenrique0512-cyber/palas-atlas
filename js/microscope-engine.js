@@ -1108,7 +1108,7 @@ export function alternarAbaPainel(aba) {
   const abaAlvo = (aba === "questoes") ? "questoes" : "descricao";
   abaAtivaPainel = abaAlvo;
 
-  const estiloAtivo   = "tab-btn-ativo relative py-3 text-xs font-semibold tracking-wide transition-colors duration-150 cursor-pointer border-b-2 border-[#0369a1] text-slate-950 touch-manipulation flex items-center justify-center";
+  const estiloAtivo   = "tab-btn-ativo relative py-3 text-xs font-semibold tracking-wide transition-colors duration-150 cursor-pointer border-b-2 border-[#0f766e] text-slate-950 touch-manipulation flex items-center justify-center";
   const estiloInativo = "tab-btn-inativo relative py-3 text-xs font-medium tracking-wide transition-colors duration-150 cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 touch-manipulation flex items-center justify-center";
 
   if (abaAlvo === "descricao") {
@@ -1134,7 +1134,7 @@ function atualizarBadgeContadorQuestoes() {
   badge.textContent = String(total);
 
   if (total > 0) {
-    badge.className = "palas-mono-tech px-1.5 py-0.5 rounded-full text-[10px] bg-sky-50 text-sky-800 border border-sky-200 font-semibold";
+    badge.className = "palas-mono-tech px-1.5 py-0.5 rounded-full text-[10px] bg-teal-50 text-teal-800 border border-teal-200 font-semibold";
   } else {
     badge.className = "palas-mono-tech px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600 border border-slate-200/80 font-medium";
   }
@@ -1333,17 +1333,17 @@ export function renderizarQuestoesNaSidebar(questoes) {
           title="Focar localização da questão no microscópio"
         >
           <div class="flex items-start gap-2.5 min-w-0">
-            <span class="palas-mono-tech px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-50 text-sky-800 border border-sky-200 shrink-0 mt-0.5">
+            <span class="palas-mono-tech px-2 py-0.5 rounded-md text-[11px] font-bold bg-teal-50 text-teal-800 border border-teal-200 shrink-0 mt-0.5">
               Q${numeroQSafe}
             </span>
             <div class="min-w-0">
-              <h4 class="text-xs font-semibold text-slate-900 tracking-wide font-sans group-hover:text-sky-800 transition-colors leading-snug">
+              <h4 class="text-xs font-semibold text-slate-900 tracking-wide font-sans group-hover:text-teal-800 transition-colors leading-snug">
                 ${escaparHTML(tituloQ)}
               </h4>
             </div>
           </div>
           ${temCoordenadas ? `
-            <div class="flex items-center gap-1 text-[10px] palas-mono-tech uppercase tracking-wider text-slate-500 group-hover:text-sky-700 shrink-0 transition-colors pt-0.5">
+            <div class="flex items-center gap-1 text-[10px] palas-mono-tech uppercase tracking-wider text-slate-500 group-hover:text-teal-800 shrink-0 transition-colors pt-0.5">
               <span>Focar</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -1371,7 +1371,7 @@ export function renderizarQuestoesNaSidebar(questoes) {
             rows="3"
             placeholder="Sua anotação / resposta diagnóstica..."
             style="resize:vertical; min-height:72px;"
-            class="palas-input-recessed w-full bg-white border border-slate-300 focus:border-sky-600 focus:ring-1 focus:ring-sky-600/25 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 font-sans leading-relaxed outline-none transition-all"
+            class="palas-input-recessed w-full bg-white border border-slate-300 focus:border-teal-700 focus:ring-1 focus:ring-teal-700/25 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 font-sans leading-relaxed outline-none transition-all"
           >${escaparHTML(respostaSalva)}</textarea>
         </div>
       </div>
@@ -1445,11 +1445,11 @@ function destacarCardQuestaoNaSidebar(qId) {
     const cardQId = card.getAttribute("data-questao-id");
     const isAtivo = String(cardQId) === idBuscado;
     if (isAtivo) {
-      card.classList.add("border-sky-600", "bg-sky-50/50", "ring-1", "ring-sky-600/25", "shadow-sm");
+      card.classList.add("border-teal-700", "bg-teal-50/50", "ring-1", "ring-teal-700/25", "shadow-sm");
       card.classList.remove("border-slate-200/90", "bg-white");
       card.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
-      card.classList.remove("border-sky-600", "bg-sky-50/50", "ring-1", "ring-sky-600/25", "shadow-sm");
+      card.classList.remove("border-teal-700", "bg-teal-50/50", "ring-1", "ring-teal-700/25", "shadow-sm");
       card.classList.add("border-slate-200/90", "bg-white");
     }
   });
@@ -2202,7 +2202,7 @@ export function formatarMagnificacaoOtica(mag) {
 // ---------------------------------------------------------------------------
 // 6. Atualiza destaque do botão de lente conforme zoom atual
 // ---------------------------------------------------------------------------
-const LENS_BTN_ACTIVE_CLS = "lens-btn palas-mono-tech bg-[#0369a1] text-white font-bold shadow-sm shadow-sky-900/20 px-2.5 sm:px-3 py-1.5 lg:py-1 rounded-xl text-xs transition-all active-lens cursor-pointer touch-manipulation min-w-[40px] min-h-[36px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
+const LENS_BTN_ACTIVE_CLS = "lens-btn palas-mono-tech bg-[#0f766e] text-white font-bold shadow-sm shadow-teal-900/20 px-2.5 sm:px-3 py-1.5 lg:py-1 rounded-xl text-xs transition-all active-lens cursor-pointer touch-manipulation min-w-[40px] min-h-[36px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
 const LENS_BTN_IDLE_CLS   = "lens-btn palas-mono-tech text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 font-medium px-2.5 sm:px-3 py-1.5 lg:py-1 rounded-xl text-xs transition-all duration-200 cursor-pointer touch-manipulation min-w-[40px] min-h-[36px] lg:min-w-0 lg:min-h-0 flex items-center justify-center shrink-0";
 
 function atualizarLenteBotaoAtivo() {
@@ -3845,20 +3845,20 @@ function renderizarListaLaminarioRapido() {
         data-laminario-id="${idSafe}"
         class="w-full flex items-center gap-3 p-2 rounded-xl border text-left transition-all cursor-pointer ${
           isAtiva
-            ? "bg-sky-50/90 border-sky-300 shadow-2xs"
+            ? "bg-teal-50/90 border-teal-300 shadow-2xs"
             : "bg-white hover:bg-slate-50 border-slate-200/80 hover:border-slate-300"
         }"
       >
         <img src="${escaparHTML(thumb)}" alt="${nomeSafe}" class="w-14 h-10 rounded-lg object-cover border border-slate-200 shrink-0 bg-slate-100" />
         <div class="min-w-0 flex-1">
           <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-bold ${isAtiva ? "text-sky-950" : "text-slate-900"} truncate">${nomeSafe}</span>
+            <span class="text-xs font-bold ${isAtiva ? "text-teal-950" : "text-slate-900"} truncate">${nomeSafe}</span>
             <span class="palas-mono-tech text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200/80 shrink-0">${metaSafe}</span>
           </div>
           <p class="text-[11px] text-slate-500 truncate mt-0.5">${subSafe}</p>
         </div>
         ${isAtiva ? `
-          <span class="w-2 h-2 rounded-full bg-[#0369a1] shrink-0" title="Em visualização"></span>
+          <span class="w-2 h-2 rounded-full bg-[#0f766e] shrink-0" title="Em visualização"></span>
         ` : ""}
       </button>
     `;
@@ -3971,20 +3971,20 @@ function renderizarAcervoRelacionado() {
       <button
         type="button"
         data-acervo-slide-id="${idSafe}"
-        class="palas-card-tactile palas-card-interactive group rounded-2xl border overflow-hidden text-left flex flex-col cursor-pointer ${
-          isAtiva ? "border-sky-500 ring-1 ring-sky-500/30" : ""
+        class="palas-card-tactile palas-card-interactive group bg-white rounded-2xl border overflow-hidden text-left flex flex-col cursor-pointer ${
+          isAtiva ? "border-teal-700 ring-1 ring-teal-700/25" : "border-slate-200/90"
         }"
       >
-        <div class="palas-slide-frame relative w-full aspect-[16/10] bg-slate-900 overflow-hidden">
+        <div class="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden border-b border-slate-200/70">
           <img
             src="${escaparHTML(thumb)}"
             alt="${nomeSafe}"
             loading="lazy"
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent"></div>
-          <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-            <span class="palas-mono-tech px-2.5 py-0.5 rounded-full bg-slate-950/70 backdrop-blur-md border border-white/15 text-[10px] font-semibold text-white">
+          <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5"></div>
+          <div class="absolute top-3 left-3 flex items-center gap-1.5">
+            <span class="bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200/90 text-[10px] font-mono font-semibold px-2.5 py-1 rounded-lg shadow-sm">
               ${metaSafe}
             </span>
           </div>
@@ -3992,12 +3992,12 @@ function renderizarAcervoRelacionado() {
 
         <div class="p-4 flex-1 flex flex-col justify-between gap-2 w-full">
           <div>
-            <h3 class="text-sm font-serif font-bold text-slate-900 group-hover:text-sky-800 transition-colors">${nomeSafe}</h3>
-            <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">${subSafe}</p>
+            <h3 class="text-sm sm:text-base font-serif font-bold text-slate-900 group-hover:text-teal-900 transition-colors leading-snug">${nomeSafe}</h3>
+            <p class="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">${subSafe}</p>
           </div>
-          <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold ${isAtiva ? "text-sky-700" : "text-slate-700 group-hover:text-sky-700"}">
-            <span>${isAtiva ? "Lâmina atual" : "Abrir"}</span>
-            <span class="transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
+          <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-teal-800 group-hover:text-teal-950 transition-colors">
+            <span>${isAtiva ? "Lâmina atual" : "Abrir no microscópio"}</span>
+            <span class="text-slate-400 group-hover:text-teal-800 transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
           </div>
         </div>
       </button>
