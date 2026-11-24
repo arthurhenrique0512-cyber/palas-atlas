@@ -7,7 +7,7 @@
  *               Ativa a coreografia de entrada na Home Page.
  *
  *   theme     : 'light-bg' (padrão) | 'pure-white'
- *               light-bg   → slate-900 + azul-petróleo #0369A1 (padrão institucional)
+ *               light-bg   → slate-900 + teal clínico #0F766E (padrão institucional)
  *               pure-white → branco monocromático (sobre fundos escuros)
  *
  *   size      : 'sm' | 'md' (padrão) | 'lg'
@@ -85,7 +85,7 @@ class BrandLogo extends HTMLElement {
       owlWrapper.style.marginRight = isCompact ? '-10px' : '0px';
       owlWrapper.style.filter = isCompact
         ? 'blur(1px)'
-        : 'drop-shadow(0 0 4px rgba(3, 105, 161, 0.22))';
+        : 'drop-shadow(0 0 4px rgba(15, 118, 110, 0.22))';
       owlWrapper.style.pointerEvents = isCompact ? 'none' : 'auto';
     }
 
@@ -150,11 +150,11 @@ class BrandLogo extends HTMLElement {
       subtitleStyle = 'color: #ffffff;';
       imgStyle      = 'filter: brightness(0) invert(1);';
     } else {
-      // TEMA CLARO (Branco Frio & Azul-Petróleo): Slate-900 + Azul-Petróleo (#0369A1)
+      // TEMA CLARO (Branco Frio & Teal Clínico): Slate-900 + Teal Clínico (#0F766E)
       palasStyle    = 'color: #0f172a;';
-      atlasStyle    = 'color: #0369a1;';
+      atlasStyle    = 'color: #0f766e;';
       subtitleStyle = 'color: #64748b;';
-      imgStyle      = 'color: #0369a1;';
+      imgStyle      = 'color: #0f766e;';
     }
 
     // ─── Template ───────────────────────────────────────────────────────────

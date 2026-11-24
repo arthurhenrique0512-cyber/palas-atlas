@@ -706,7 +706,7 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
         </nav>
 
         <!-- TÍTULO DO TÓPICO -->
-        <h1 id="tituloTopicoH1" class="text-2xl lg:text-3xl font-bold text-slate-950 tracking-tight mb-4">
+        <h1 id="tituloTopicoH1" class="text-2xl lg:text-3xl font-serif font-extrabold text-slate-950 tracking-[-0.02em] mb-4">
           ${escaparHTML(topico.titulo)}
         </h1>
 
@@ -717,7 +717,7 @@ export async function abrirTopico(idTopico, disciplina, skipHistory = false) {
 
         <!-- SEÇÃO DE LÂMINAS DE MICROSCOPIA ASSOCIADAS -->
         <div class="mt-8 mb-4">
-          <h2 class="text-xl font-bold text-slate-900 mb-6">
+          <h2 class="text-xl font-serif font-bold text-slate-900 tracking-tight mb-6">
             Lâminas de Microscopia Associadas
           </h2>
           <div id="gridCatalogoLaminas" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">

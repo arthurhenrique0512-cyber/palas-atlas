@@ -9,7 +9,7 @@ import {
   abrirTopico,
   abrirDisciplinaHome,
   encerrarListenersCatalogo
-} from "./histology-catalog.js?v=20261123v5";
+} from "./histology-catalog.js?v=20261123v6";
 
 // Lazy loading sob demanda do dashboard-engine para otimizar o bundle do aluno
 let _dashboardEnginePromise = null;
@@ -83,6 +83,21 @@ function init() {
 
     window.addEventListener("scroll", handleDynamicNavbarScroll, { passive: true });
     handleDynamicNavbarScroll();
+  }
+
+  const desktopNav = document.getElementById("desktopNavLinks");
+  if (desktopNav) {
+    desktopNav.addEventListener("click", (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link) return;
+      if (!getState().frenteAtiva) return; // na Home, comportamento nativo
+      event.preventDefault();
+      const targetId = link.getAttribute("href").slice(1);
+      goHome();
+      setTimeout(() => {
+        document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    });
   }
 
   // Inscreve a função de renderização no gerenciador reativo
@@ -193,7 +208,7 @@ function renderView(state) {
     // SUBPÁGINAS DO ACERVO: Barra Superior com Botão Voltar + Divisor + Logotipo agrupados à esquerda
     if (headerMin) {
       headerMin.classList.remove("hidden");
-      headerMin.className = "fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/90 transition-all duration-300 pointer-events-auto shadow-xs";
+      headerMin.className = "palas-header-glass fixed top-0 left-0 right-0 z-50 w-full border-b border-slate-200/90 transition-all duration-300 pointer-events-auto shadow-xs";
     }
     if (brandLogo) {
       brandLogo.setAttribute("is-home", "false");

@@ -1,7 +1,7 @@
 /* ==========================================================================
    PALAS ATLAS — TELA DE CARREGAMENTO & PRELOADER (DESIGN SYSTEM OFICIAL)
    Fidelidade Tipográfica: Cormorant Garamond + Inter
-   Paleta: Slate-900 (#0F172A) / Azul-Petróleo (#0369A1) — Light Mode Oficial
+   Paleta: Slate-900 (#0F172A) / Teal Clínico (#0F766E) — Light Mode Oficial
    ========================================================================== */
 
 @keyframes splashFadeInScale {
@@ -85,15 +85,15 @@
 }
 
 .splash-owl-anim {
-  color: #0369a1 !important;
+  color: #0f766e !important;
   opacity: 1;
-  filter: drop-shadow(0 0 8px rgba(3, 105, 161, 0.16));
+  filter: drop-shadow(0 0 8px rgba(15, 118, 110, 0.16));
   transition: color 0.3s ease;
 }
 
 .splash-shimmer-atlas {
   font-family: 'Cormorant Garamond', Georgia, serif !important;
-  color: #0369a1 !important;
+  color: #0f766e !important;
   font-weight: 700 !important;
   display: inline-block;
 }
@@ -113,7 +113,7 @@
 }
 
 .splash-progress-bar {
-  background: linear-gradient(90deg, #0d9488, #0369a1, #0d9488) !important;
+  background: linear-gradient(90deg, #0d9488, #0f766e, #0d9488) !important;
   border-radius: 9999px !important;
   animation: splashSweepLine 2.2s ease-in-out infinite;
 }
