@@ -591,6 +591,12 @@ export function initHomeShowcase() {
   // 4. METADADOS E LINKS DINÂMICOS DA HOME (APENAS LÂMINAS ATIVAS)
   // -------------------------------------------------------------------------
   function updateHomeDynamicMeta() {
+    const heroActiveCount = document.getElementById("heroActiveSlidesCount");
+    if (heroActiveCount) {
+      const n = activeSlides.length;
+      heroActiveCount.textContent = `${n} ${n === 1 ? "lâmina digitalizada" : "lâminas digitalizadas"}`;
+    }
+
     const countBadge = document.getElementById("histologiaCountBadge");
     if (countBadge) {
       const n = activeSlides.length;

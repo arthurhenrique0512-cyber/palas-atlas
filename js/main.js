@@ -4,7 +4,7 @@
  */
 import { setFrenteAtiva, subscribe, getState } from "./state.js";
 import { initGlobalSearch } from "./search-engine.js?v=20261123v3";
-import { initHomeShowcase } from "./home-showcase.js?v=20261123v1";
+import { initHomeShowcase } from "./home-showcase.js?v=20261123v2";
 import {
   abrirTopico,
   abrirDisciplinaHome,
